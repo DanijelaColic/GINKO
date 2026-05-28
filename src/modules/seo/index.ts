@@ -1,6 +1,6 @@
-/**
- * SEO module — Phase 1 stub.
- * Guide content, landing pages, and structured-data helpers
- * will be implemented in Phase 2.
- */
-export type { Guide, GuideTranslation, LandingPage, LandingPageTranslation } from './types';
+export type { GuideArticle, GuideListItem, GuideSection, GuideCoverImage } from './guides/guide-types';
+export { GUIDES, GUIDE_HUB_BY_LOCALE } from './guides/guides-content';
+export { getGuides } from './guides/get-guides';
+export { getGuideBySlug } from './guides/get-guide-by-slug';
+export { getSeoNavLinks } from './seo-nav-links';
+export type { SeoNavLink } from './seo-nav-links';

@@ -47,6 +47,30 @@ export type PriceBreakdown = {
   cleaningFee?: number;
 };
 
+// ── Booking public confirmation view ──────────────────────────────
+
+export type BookingConfirmationData = {
+  id: string;
+  reference: string;
+  status: 'pending' | 'confirmed' | 'cancelled';
+  guestName: string;
+  roomName: string;
+  checkIn: string;
+  checkOut: string;
+  nights: number;
+  pricePerNight: number;
+  totalPrice: number;
+  deposit: number;
+  createdAt: string;
+  payment: {
+    recipient: string;
+    iban: string;
+    bic: string;
+    bankName: string;
+    description: string;
+  };
+};
+
 // ── Booking create input ───────────────────────────────────────────
 
 export type BookingCreateInput = {

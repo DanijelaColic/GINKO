@@ -4,25 +4,13 @@
 
 import type { Metadata } from 'next';
 import { getLocale, getTranslations } from 'next-intl/server';
-import { getSiteUrl } from '@/lib/siteUrl';
+import { getValidLocale } from '@/i18n/messages';
+import { getPageMetadata } from '@/i18n/metadata';
 import BookingWidget from '@/components/hotel/BookingWidget';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
-  const t = await getTranslations({ locale, namespace: 'bookingPage' });
-  const BASE_URL = getSiteUrl();
-  const title = t('title');
-  const description = t('description');
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      url: `${BASE_URL}/booking`,
-    },
-    alternates: { canonical: `${BASE_URL}/booking` },
-  };
+  const locale = getValidLocale(await getLocale());
+  return getPageMetadata({ locale, pathname: '/booking', namespace: 'bookingPage' });
 }
 
 type Props = {

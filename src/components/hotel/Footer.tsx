@@ -8,6 +8,12 @@ const NAV_LINKS = [
   { key: 'rooms', href: '/rooms' },
   { key: 'booking', href: '/booking' },
   { key: 'guides', href: '/guides' },
+  { key: 'gallery', href: '/gallery' },
+] as const;
+
+const LEGAL_LINKS = [
+  { key: 'privacy', href: '/privacy' },
+  { key: 'cookies', href: '/cookies' },
 ] as const;
 
 export default async function Footer() {
@@ -52,8 +58,19 @@ export default async function Footer() {
           </div>
         </div>
 
-        <div className="mt-10 border-t border-white/10 pt-6 text-center text-xs text-white/30">
-          &copy; {YEAR} {t('brand')} &mdash; {t('rights')}
+        <div className="mt-10 border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/30">
+          <span>&copy; {YEAR} {t('brand')} &mdash; {t('rights')}</span>
+          <nav aria-label="Legal" className="flex gap-4">
+            {LEGAL_LINKS.map(({ key, href }) => (
+              <Link
+                key={key}
+                href={href}
+                className="hover:text-white/60 transition-colors"
+              >
+                {t(`legal.${key}`)}
+              </Link>
+            ))}
+          </nav>
         </div>
       </div>
     </footer>

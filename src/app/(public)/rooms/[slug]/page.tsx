@@ -9,8 +9,11 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { rooms } from '@/modules/rooms/rooms.config';
 import { getRoom } from '@/modules/rooms/room.repository';
 import { getSiteUrl } from '@/lib/siteUrl';
+import { getValidLocale } from '@/i18n/messages';
+import { getBreadcrumbStructuredData } from '@/i18n/metadata';
 import ImageGallery from '@/components/hotel/ImageGallery';
 import { Link } from '@/i18n/navigation';
+import { InternalLinks } from '@/components/seo/InternalLinks';
 import type { RoomLocale } from '@/modules/rooms/room.types';
 
 type Props = {
@@ -23,9 +26,9 @@ export function generateStaticParams() {
 
 export async function generateMetadata({ params }: Props) {
   const { slug } = await params;
-  const locale = await getLocale();
+  const locale = getValidLocale(await getLocale());
   const t = await getTranslations({ locale, namespace: 'roomDetailPage' });
-  const room = getRoom(slug, locale as RoomLocale);
+  const room = await getRoom(slug, locale as RoomLocale);
   if (!room) return {};
   const prefix = t('metadata.titlePrefix');
   const suffix = t('metadata.descriptionSuffix');
@@ -48,15 +51,25 @@ export async function generateMetadata({ params }: Props) {
 }
 
 export default async function RoomDetailPage({ params }: Props) {
-  const locale = await getLocale();
+  const locale = getValidLocale(await getLocale());
   const t = await getTranslations('roomDetailPage');
   const { slug } = await params;
-  const room = getRoom(slug, locale as RoomLocale);
+  const room = await getRoom(slug, locale as RoomLocale);
 
   if (!room) notFound();
 
+  const breadcrumbJsonLd = getBreadcrumbStructuredData(locale, [
+    { name: 'Ginko Sobe', pathname: '/' },
+    { name: t('breadcrumb.rooms'), pathname: '/rooms' },
+    { name: room.name, pathname: `/rooms/${room.slug}` },
+  ]);
+
   return (
     <div>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
       {/* Gallery — placeholder div if no images */}
       <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
         {room.images.length > 0 ? (
@@ -212,6 +225,10 @@ export default async function RoomDetailPage({ params }: Props) {
             </div>
           </div>
         </div>
+      </div>
+
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+        <InternalLinks currentPath={`/rooms/${slug}`} />
       </div>
     </div>
   );

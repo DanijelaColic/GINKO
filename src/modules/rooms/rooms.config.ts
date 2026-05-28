@@ -21,7 +21,12 @@ export const rooms: Room[] = [
     priceHighSeason: 90,
     fullyBooked: false,
     amenities: ['WiFi', 'Klima', 'TV', 'Hladnjak', 'Kuhalo za vodu', 'Parking'],
-    images: [],
+    images: [
+      'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80',
+      'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80',
+      'https://images.unsplash.com/photo-1568503939619-a31fc1e09428?w=1200&q=80',
+    ],
   },
   {
     slug: 'orah',
@@ -40,7 +45,13 @@ export const rooms: Room[] = [
     priceHighSeason: 130,
     fullyBooked: false,
     amenities: ['WiFi', 'Klima', 'TV', 'Hladnjak', 'Kuhalo za vodu', 'Parking', 'Terasa'],
-    images: [],
+    images: [
+      'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&q=80',
+      'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&q=80',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80',
+      'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=80',
+    ],
   },
   {
     slug: 'bijela',
@@ -59,7 +70,11 @@ export const rooms: Room[] = [
     priceHighSeason: 80,
     fullyBooked: false,
     amenities: ['WiFi', 'Klima', 'TV', 'Kuhalo za vodu', 'Parking'],
-    images: [],
+    images: [
+      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80',
+      'https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=1200&q=80',
+      'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1200&q=80',
+    ],
   },
 ];
 

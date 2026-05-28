@@ -4,14 +4,42 @@
     "description": "Gemütliche Unterkunft inmitten der Natur. Buchen Sie Ihr Zimmer auf ginko-sobe.com.",
     "openGraphAlt": "Ginko Zimmer – Unterkunftsansicht"
   },
+  "metadata": {
+    "layout": {
+      "title": {
+        "default": "Ginko Zimmer",
+        "template": "%s | Ginko Zimmer"
+      },
+      "description": "Privatzimmer in Zadar — ruhige Lage, Direktbuchung ohne Vermittler.",
+      "openGraph": {
+        "title": "Ginko Zimmer – Privatunterkunft in Zadar",
+        "description": "Komfortable Zimmer mit Frühstück in einem ruhigen Teil von Zadar. Direkt buchen.",
+        "imageAlt": "Ginko Zimmer – Unterkunftsansicht"
+      },
+      "twitter": {
+        "title": "Ginko Zimmer – Privatunterkunft in Zadar",
+        "description": "Komfortable Zimmer mit Frühstück in einem ruhigen Teil von Zadar. Direkt buchen."
+      }
+    },
+    "structuredData": {
+      "description": "Ginko Zimmer bietet Privatunterkunft in Zadar mit komfortablen Zimmern und familiärer Atmosphäre.",
+      "amenities": {
+        "wifi": "Kostenloses WLAN",
+        "airConditioning": "Klimaanlage",
+        "parking": "Kostenloser Parkplatz"
+      }
+    }
+  },
   "navbar": {
     "brand": "Ginko Zimmer",
     "localeLabel": "Sprache",
+    "menuLabel": "Navigation",
     "links": {
       "home": "Startseite",
       "rooms": "Zimmer",
       "booking": "Buchen",
-      "guides": "Reiseführer"
+      "guides": "Reiseführer",
+      "gallery": "Galerie"
     },
     "cta": "Jetzt Buchen"
   },
@@ -23,10 +51,15 @@
       "home": "Startseite",
       "rooms": "Zimmer",
       "booking": "Buchen",
-      "guides": "Reiseführer"
+      "guides": "Reiseführer",
+      "gallery": "Galerie"
     },
     "contactTitle": "Kontakt",
-    "rights": "Alle Rechte vorbehalten."
+    "rights": "Alle Rechte vorbehalten.",
+    "legal": {
+      "privacy": "Datenschutzerklärung",
+      "cookies": "Cookies"
+    }
   },
   "homePage": {
     "heroTitle": "Willkommen bei Ginko Zimmer",
@@ -38,6 +71,11 @@
     "eyebrow": "Unterkunft",
     "title": "Unsere Zimmer",
     "description": "Sorgfältig gestaltete Zimmer mit natürlichen Materialien und einladender Atmosphäre.",
+    "openGraph": {
+      "title": "Zimmer – Ginko Zimmer Zadar",
+      "description": "Komfortable Privatzimmer in Zadar mit Direktbuchung ohne Provision.",
+      "imageAlt": "Ginko Zimmer – Zimmer in Zadar"
+    },
     "itemLabel": "Zimmer",
     "badges": {
       "fullyBooked": "Ausgebucht"
@@ -116,6 +154,11 @@
     "eyebrow": "Buchung",
     "title": "Zimmer buchen",
     "description": "Wählen Sie Ihr Zimmer, Datum und senden Sie Ihre Anfrage — ohne Zwischenhändler.",
+    "openGraph": {
+      "title": "Zimmer buchen – Ginko Zimmer Zadar",
+      "description": "Direkte Zimmerbuchung in Zadar ohne Vermittler und ohne Provision.",
+      "imageAlt": "Ginko Zimmer – Buchung"
+    },
     "strip": {
       "checkInLabel": "Check-in",
       "checkInValue": "ab 14:00",

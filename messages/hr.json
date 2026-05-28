@@ -4,14 +4,42 @@
     "description": "Ugodan smještaj u srcu prirode. Rezervirajte svoju sobu na ginko-sobe.com.",
     "openGraphAlt": "Ginko Sobe – pogled na smještaj"
   },
+  "metadata": {
+    "layout": {
+      "title": {
+        "default": "Ginko Sobe",
+        "template": "%s | Ginko Sobe"
+      },
+      "description": "Privatni smještaj u Zadru — sobe s pogledom, mirna lokacija, direktna rezervacija bez posrednika.",
+      "openGraph": {
+        "title": "Ginko Sobe – privatni smještaj u Zadru",
+        "description": "Udobne sobe s doručkom u mirnom dijelu Zadra. Rezervirajte direktno.",
+        "imageAlt": "Ginko Sobe – pogled na smještaj"
+      },
+      "twitter": {
+        "title": "Ginko Sobe – privatni smještaj u Zadru",
+        "description": "Udobne sobe s doručkom u mirnom dijelu Zadra. Rezervirajte direktno."
+      }
+    },
+    "structuredData": {
+      "description": "Ginko Sobe pruža privatni smještaj u Zadru s udobnim sobama i domaćinskim ugođajem.",
+      "amenities": {
+        "wifi": "Besplatni WiFi",
+        "airConditioning": "Klima uređaj",
+        "parking": "Besplatni parking"
+      }
+    }
+  },
   "navbar": {
     "brand": "Ginko Sobe",
     "localeLabel": "Jezik",
+    "menuLabel": "Navigacija",
     "links": {
       "home": "Početna",
       "rooms": "Sobe",
       "booking": "Rezervacija",
-      "guides": "Vodič"
+      "guides": "Vodič",
+      "gallery": "Galerija"
     },
     "cta": "Rezervirajte"
   },
@@ -23,10 +51,15 @@
       "home": "Početna",
       "rooms": "Sobe",
       "booking": "Rezervacija",
-      "guides": "Vodič"
+      "guides": "Vodič",
+      "gallery": "Galerija"
     },
     "contactTitle": "Kontakt",
-    "rights": "Sva prava pridržana."
+    "rights": "Sva prava pridržana.",
+    "legal": {
+      "privacy": "Politika privatnosti",
+      "cookies": "Kolačići"
+    }
   },
   "homePage": {
     "heroTitle": "Dobrodošli u Ginko Sobe",
@@ -38,6 +71,11 @@
     "eyebrow": "Smještaj",
     "title": "Naše sobe",
     "description": "Sobe pažljivo uređene s prirodnim materijalima i ugodnom atmosferom.",
+    "openGraph": {
+      "title": "Sobe – Ginko Sobe Zadar",
+      "description": "Udobne privatne sobe u Zadru s direktnom rezervacijom bez provizija.",
+      "imageAlt": "Ginko Sobe – sobe u Zadru"
+    },
     "itemLabel": "Soba",
     "badges": {
       "fullyBooked": "Zauzeto"
@@ -116,6 +154,11 @@
     "eyebrow": "Rezervacija",
     "title": "Rezervirajte sobu",
     "description": "Odaberite sobu, datume i pošaljite upit — bez posrednika.",
+    "openGraph": {
+      "title": "Rezervirajte sobu – Ginko Sobe Zadar",
+      "description": "Direktna rezervacija sobe u Zadru bez posrednika i bez provizija.",
+      "imageAlt": "Ginko Sobe – rezervacija"
+    },
     "strip": {
       "checkInLabel": "Dolazak",
       "checkInValue": "od 14:00",

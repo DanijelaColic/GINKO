@@ -189,6 +189,15 @@ export default function BookingWidget({
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? t('errors.submitFailed'));
+
+      // Phase 7: redirect to confirmation page if the API returns a confirmation URL.
+      // Falls back to inline success state for backwards-compatibility with mock API.
+      if (data.confirmationUrl) {
+        // eslint-disable-next-line react-hooks/immutability
+        window.location.href = data.confirmationUrl;
+        return;
+      }
+
       setSuccess(true);
       if (priceData && data.bookingId) {
         fetchBarcodes(priceData.deposit, form.name, data.bookingId);

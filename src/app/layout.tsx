@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { Inter, Playfair_Display } from 'next/font/google';
 import { NextIntlClientProvider } from 'next-intl';
-import { getLocale, getMessages, getTranslations } from 'next-intl/server';
-import { getSiteUrl } from '@/lib/siteUrl';
+import { getLocale, getMessages } from 'next-intl/server';
+import { getValidLocale } from '@/i18n/messages';
+import { getRootMetadata, getStructuredData } from '@/i18n/metadata';
+import { CookieBanner } from '@/components/hotel/CookieBanner';
 import './globals.css';
 
 const inter = Inter({
@@ -17,40 +19,9 @@ const playfair = Playfair_Display({
   display: 'swap',
 });
 
-const BASE_URL = getSiteUrl();
-
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
-  const t = await getTranslations({ locale, namespace: 'siteMetadata' });
-
-  return {
-    metadataBase: new URL(BASE_URL),
-    title: {
-      default: t('title'),
-      template: `%s | ${t('title')}`,
-    },
-    description: t('description'),
-    openGraph: {
-      type: 'website',
-      locale:
-        locale === 'en' ? 'en_US' : locale === 'de' ? 'de_DE' : 'hr_HR',
-      url: BASE_URL,
-      siteName: t('title'),
-      title: t('title'),
-      description: t('description'),
-      images: [
-        {
-          url: '/images/og-image.jpg',
-          width: 1200,
-          height: 630,
-          alt: t('openGraphAlt'),
-        },
-      ],
-    },
-    alternates: {
-      canonical: BASE_URL,
-    },
-  };
+  const locale = getValidLocale(await getLocale());
+  return getRootMetadata(locale);
 }
 
 export default async function RootLayout({
@@ -58,8 +29,9 @@ export default async function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const locale = await getLocale();
+  const locale = getValidLocale(await getLocale());
   const messages = await getMessages();
+  const structuredData = await getStructuredData(locale);
 
   return (
     <html
@@ -67,8 +39,13 @@ export default async function RootLayout({
       className={`${inter.variable} ${playfair.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
         <NextIntlClientProvider messages={messages}>
           {children}
+          <CookieBanner />
         </NextIntlClientProvider>
       </body>
     </html>

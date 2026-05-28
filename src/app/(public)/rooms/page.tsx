@@ -4,33 +4,24 @@
 
 import type { Metadata } from 'next';
 import { getLocale, getTranslations } from 'next-intl/server';
+
+// Rooms data is mock-static; revalidate once per hour when real backend is connected.
+export const revalidate = 3600;
 import { getRooms } from '@/modules/rooms/room.repository';
-import { getSiteUrl } from '@/lib/siteUrl';
+import { getValidLocale } from '@/i18n/messages';
+import { getPageMetadata } from '@/i18n/metadata';
 import RoomGrid from '@/components/hotel/RoomGrid';
 import type { RoomLocale } from '@/modules/rooms/room.types';
 
 export async function generateMetadata(): Promise<Metadata> {
-  const locale = await getLocale();
-  const t = await getTranslations({ locale, namespace: 'roomsPage' });
-  const BASE_URL = getSiteUrl();
-  const title = t('title');
-  const description = t('description');
-  return {
-    title,
-    description,
-    openGraph: {
-      title,
-      description,
-      url: `${BASE_URL}/rooms`,
-    },
-    alternates: { canonical: `${BASE_URL}/rooms` },
-  };
+  const locale = getValidLocale(await getLocale());
+  return getPageMetadata({ locale, pathname: '/rooms', namespace: 'roomsPage' });
 }
 
 export default async function RoomsPage() {
-  const locale = await getLocale();
+  const locale = getValidLocale(await getLocale());
   const t = await getTranslations('roomsPage');
-  const rooms = getRooms(locale as RoomLocale);
+  const rooms = await getRooms(locale as RoomLocale);
 
   const cardLabels = {
     itemLabel: t('itemLabel'),

@@ -1,0 +1,81 @@
+// Copied from Villa-Jurina/src/app/api/admin/bookings/[id]/route.ts
+// Adaptations: apartment_slug → room_slug, getRoomBySlug from room.repository,
+//              removed email sending (Phase 9+), kept _resend_email stub
+import { NextRequest, NextResponse } from 'next/server';
+import { createServerSupabaseClient } from '@/lib/supabase';
+import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
+import { getRoomBySlug } from '@/modules/rooms/room.repository';
+import { parseLocalDate, diffDays, calculatePrice } from '@/modules/booking/dates';
+import type { Booking } from '@/modules/booking/booking.types';
+
+type Params = { params: Promise<{ id: string }> };
+
+// PATCH /api/admin/bookings/[id]
+export async function PATCH(request: NextRequest, { params }: Params) {
+  if (!isAdminAuthenticatedFromRequest(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const updates: Partial<Booking> & Record<string, unknown> = await request.json();
+
+  const supabase = createServerSupabaseClient();
+
+  // _resend_email stub — email integration in Phase 9
+  if (updates._resend_email === true) {
+    return NextResponse.json({ success: true, note: 'Email integration pending Phase 9' });
+  }
+
+  // Recalculate price if dates or room change
+  const needsRecalc = updates.check_in || updates.check_out || updates.room_slug;
+
+  let existing: Booking | null = null;
+  if (needsRecalc) {
+    const { data } = await supabase.from('bookings').select('*').eq('id', id).single();
+    existing = data;
+  }
+
+  if (needsRecalc && existing) {
+    const slug = (updates.room_slug as string | undefined) ?? existing.room_slug;
+    const checkIn = parseLocalDate(
+      (updates.check_in as string | undefined) ?? existing.check_in,
+    );
+    const checkOut = parseLocalDate(
+      (updates.check_out as string | undefined) ?? existing.check_out,
+    );
+    const room = getRoomBySlug(slug);
+
+    if (room && checkOut > checkIn) {
+      const nights = diffDays(checkOut, checkIn);
+      const priceData = calculatePrice(checkIn, checkOut, room);
+      updates.nights = nights;
+      updates.total_price = priceData.totalPrice;
+      updates.deposit = priceData.deposit;
+      updates.price_per_night = Math.round(priceData.totalPrice / nights);
+    }
+  }
+
+  const { data, error } = await supabase
+    .from('bookings')
+    .update(updates)
+    .eq('id', id)
+    .select()
+    .single();
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json(data);
+}
+
+// DELETE /api/admin/bookings/[id]
+export async function DELETE(request: NextRequest, { params }: Params) {
+  if (!isAdminAuthenticatedFromRequest(request)) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const supabase = createServerSupabaseClient();
+  const { error } = await supabase.from('bookings').delete().eq('id', id);
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  return NextResponse.json({ success: true });
+}

@@ -1,6 +1,5 @@
-/**
- * Gallery module — Phase 1 stub.
- * Image sourcing (Supabase Storage or static) and lightbox component
- * will be implemented in Phase 2.
- */
-export type { GalleryImage, GalleryCollection } from './types';
+export type { GalleryItem, GalleryMedia, GallerySection } from './gallery.types';
+export { GALLERY_CATEGORIES, DEFAULT_GALLERY_CATEGORY } from './gallery.categories';
+export type { GalleryCategoryKey } from './gallery.categories';
+export { getGalleryItems } from './gallery.repository';
+export { getGallerySections } from './gallery.service';

@@ -1,20 +1,82 @@
-// Mock booking API — Phase 3
-// GET  /api/bookings?room={slug}  → returns [] (no bookings yet)
-// POST /api/bookings              → validates + returns { bookingId }
-// Replace with Supabase-backed implementation in Phase 4
-
+// Adapted from VJ/src/app/api/bookings/route.ts
+// Changes: apartment_slug → room_slug, getApartment → getRoomBySlug (static config),
+//          removed VJ email integration (Phase 8+), added confirmation token response,
+//          added blocked_dates overlap check alongside booking overlap check.
 import { NextRequest, NextResponse } from 'next/server';
-import { getRoom } from '@/modules/rooms/room.repository';
-import { getBookedRanges, createBooking } from '@/modules/booking/booking.repository';
-import { diffDays, parseLocalDate } from '@/modules/booking/dates';
+import { createServerSupabaseClient } from '@/lib/supabase';
+import { getRoomBySlug } from '@/modules/rooms/room.repository';
+import {
+  parseLocalDate,
+  isRangeAvailable,
+  diffDays,
+  calculatePrice,
+} from '@/modules/booking/dates';
 import { MIN_NIGHTS } from '@/modules/booking/booking.config';
+import {
+  createBookingViewToken,
+  getBookingConfirmationUrl,
+} from '@/lib/bookingConfirmation';
+import type { BookedRange } from '@/modules/booking/booking.types';
 
+// GET /api/bookings?room=slug
+// Returns booked date ranges for the calendar component
 export async function GET(request: NextRequest) {
-  const slug = request.nextUrl.searchParams.get('room') ?? '';
-  const ranges = await getBookedRanges(slug);
-  return NextResponse.json(ranges);
+  const { searchParams } = new URL(request.url);
+  const slug = searchParams.get('room');
+
+  if (!slug) {
+    return NextResponse.json({ error: 'Nedostaje parametar room' }, { status: 400 });
+  }
+
+  const room = getRoomBySlug(slug);
+  if (!room) {
+    return NextResponse.json({ error: 'Soba nije pronađena' }, { status: 404 });
+  }
+
+  try {
+    const supabase = createServerSupabaseClient();
+
+    const [bookingsRes, blockedRes, externalRes] = await Promise.all([
+      supabase
+        .from('bookings')
+        .select('check_in, check_out')
+        .eq('room_slug', slug)
+        .neq('status', 'cancelled'),
+      supabase
+        .from('blocked_dates')
+        .select('check_in, check_out')
+        .eq('room_slug', slug),
+      // Phase 9: include external iCal-imported events
+      supabase
+        .from('external_calendar_events')
+        .select('starts_on, ends_on')
+        .eq('room_slug', slug),
+    ]);
+
+    if (bookingsRes.error) throw bookingsRes.error;
+
+    const ranges: BookedRange[] = [
+      ...(bookingsRes.data ?? []),
+      ...(blockedRes.data ?? []),
+      ...(externalRes.data ?? []).map((e) => ({
+        check_in: e.starts_on as string,
+        check_out: e.ends_on as string,
+      })),
+    ];
+
+    return NextResponse.json(ranges);
+  } catch (err) {
+    const detail =
+      err && typeof err === 'object' && 'message' in err
+        ? String((err as { message: unknown }).message)
+        : String(err);
+    console.error('GET /api/bookings:', detail);
+    return NextResponse.json({ error: 'Greška pri dohvatu rezervacija' }, { status: 500 });
+  }
 }
 
+// POST /api/bookings
+// Creates a new booking after server-side validation + overlap check
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
@@ -28,55 +90,124 @@ export async function POST(request: NextRequest) {
       adults,
       children,
       notes,
-      locale,
+      locale: bodyLocale,
     } = body;
 
+    const locale: 'hr' | 'en' | 'de' =
+      bodyLocale === 'en' || bodyLocale === 'de' ? bodyLocale : 'hr';
+
     if (!room_slug || !check_in || !check_out || !guest_name || !guest_email) {
-      return NextResponse.json({ error: 'Missing required fields.' }, { status: 400 });
+      return NextResponse.json({ error: 'Nedostaju obavezna polja' }, { status: 400 });
     }
 
-    const room = getRoom(room_slug, locale ?? 'hr');
+    const room = getRoomBySlug(room_slug);
     if (!room) {
-      return NextResponse.json({ error: 'Room not found.' }, { status: 404 });
-    }
-    if (room.fullyBooked) {
-      return NextResponse.json({ error: 'Room is not available.' }, { status: 409 });
+      return NextResponse.json({ error: 'Soba nije pronađena' }, { status: 404 });
     }
 
-    const ci = parseLocalDate(check_in);
-    const co = parseLocalDate(check_out);
-    const nights = diffDays(co, ci);
+    const checkInDate = parseLocalDate(check_in);
+    const checkOutDate = parseLocalDate(check_out);
+
+    if (checkOutDate <= checkInDate) {
+      return NextResponse.json(
+        { error: 'Datum odjave mora biti nakon datuma dolaska' },
+        { status: 400 },
+      );
+    }
+
+    const nights = diffDays(checkOutDate, checkInDate);
 
     if (nights < MIN_NIGHTS) {
       return NextResponse.json(
-        { error: `Minimum stay is ${MIN_NIGHTS} nights.` },
-        { status: 422 },
+        { error: `Minimalni boravak su ${MIN_NIGHTS} noći` },
+        { status: 400 },
       );
     }
 
     const totalGuests = (adults ?? 1) + (children ?? 0);
     if (totalGuests > room.capacity) {
       return NextResponse.json(
-        { error: `Room ${room.name} accepts maximum ${room.capacity} guests.` },
-        { status: 422 },
+        { error: `Soba ${room.name} prima maksimalno ${room.capacity} osoba.` },
+        { status: 400 },
       );
     }
 
-    const { id } = await createBooking({
-      room_slug,
-      check_in,
-      check_out,
-      guest_name,
-      guest_email,
-      guest_phone,
-      adults: adults ?? 1,
-      children: children ?? 0,
-      notes,
-      locale,
-    });
+    const supabase = createServerSupabaseClient();
 
-    return NextResponse.json({ bookingId: id }, { status: 201 });
-  } catch {
-    return NextResponse.json({ error: 'Server error.' }, { status: 500 });
+    // Overlap check: confirmed/pending bookings + blocked dates + external iCal events
+    const [bookingsRes, blockedRes, externalRes] = await Promise.all([
+      supabase
+        .from('bookings')
+        .select('check_in, check_out')
+        .eq('room_slug', room_slug)
+        .neq('status', 'cancelled'),
+      supabase
+        .from('blocked_dates')
+        .select('check_in, check_out')
+        .eq('room_slug', room_slug),
+      supabase
+        .from('external_calendar_events')
+        .select('starts_on, ends_on')
+        .eq('room_slug', room_slug),
+    ]);
+
+    const existingRanges: BookedRange[] = [
+      ...(bookingsRes.data ?? []),
+      ...(blockedRes.data ?? []),
+      ...(externalRes.data ?? []).map((e) => ({
+        check_in: e.starts_on as string,
+        check_out: e.ends_on as string,
+      })),
+    ];
+
+    if (!isRangeAvailable(checkInDate, checkOutDate, existingRanges)) {
+      return NextResponse.json(
+        { error: 'Odabrani termini su već zauzeti. Molimo odaberite druge datume.' },
+        { status: 409 },
+      );
+    }
+
+    // Server-side pricing (source of truth)
+    const priceData = calculatePrice(checkInDate, checkOutDate, room);
+    const { totalPrice, deposit } = priceData;
+    const avgPricePerNight = Math.round(totalPrice / nights);
+
+    const { data: booking, error: insertError } = await supabase
+      .from('bookings')
+      .insert({
+        room_slug,
+        check_in,
+        check_out,
+        nights,
+        guest_name,
+        guest_email,
+        guest_phone: guest_phone || null,
+        adults: adults ?? 1,
+        children: children ?? 0,
+        price_per_night: avgPricePerNight,
+        total_price: totalPrice,
+        deposit,
+        status: 'pending',
+        locale,
+        notes: notes || null,
+      })
+      .select()
+      .single();
+
+    if (insertError) throw insertError;
+
+    const confirmationToken = createBookingViewToken(booking.id, guest_email);
+    const confirmationUrl = getBookingConfirmationUrl(booking.id, confirmationToken);
+
+    return NextResponse.json(
+      { success: true, bookingId: booking.id, confirmationUrl },
+      { status: 201 },
+    );
+  } catch (err) {
+    console.error('POST /api/bookings:', err);
+    return NextResponse.json(
+      { error: 'Greška pri kreiranju rezervacije. Pokušajte ponovo ili nas kontaktirajte.' },
+      { status: 500 },
+    );
   }
 }
