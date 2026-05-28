@@ -1,0 +1,248 @@
+{
+  "siteMetadata": {
+    "title": "Ginko Rooms",
+    "description": "Comfortable accommodation surrounded by nature. Book your room at ginko-sobe.com.",
+    "openGraphAlt": "Ginko Rooms – accommodation view"
+  },
+  "navbar": {
+    "brand": "Ginko Rooms",
+    "localeLabel": "Language",
+    "links": {
+      "home": "Home",
+      "rooms": "Rooms",
+      "booking": "Book",
+      "guides": "Guides"
+    },
+    "cta": "Book Now"
+  },
+  "footer": {
+    "brand": "Ginko Rooms",
+    "tagline": "Your peace. Your nature.",
+    "navTitle": "Navigation",
+    "links": {
+      "home": "Home",
+      "rooms": "Rooms",
+      "booking": "Book",
+      "guides": "Guides"
+    },
+    "contactTitle": "Contact",
+    "rights": "All rights reserved."
+  },
+  "homePage": {
+    "heroTitle": "Welcome to Ginko Rooms",
+    "heroSubtitle": "Comfortable accommodation surrounded by nature for an unforgettable stay.",
+    "heroCta": "View Rooms",
+    "bookCta": "Book Now"
+  },
+  "roomsPage": {
+    "eyebrow": "Accommodation",
+    "title": "Our Rooms",
+    "description": "Rooms carefully designed with natural materials and a welcoming atmosphere.",
+    "itemLabel": "Room",
+    "badges": {
+      "fullyBooked": "Fully Booked"
+    },
+    "stats": {
+      "duplex": "Duplex",
+      "seaView": "Nature view",
+      "balcony": "Balcony / Terrace"
+    },
+    "price": {
+      "title": "Price per night",
+      "offSeason": "Off-season",
+      "highSeason": "July / August",
+      "unavailable": "This room is currently unavailable for booking."
+    },
+    "actions": {
+      "details": "More details",
+      "book": "Book"
+    },
+    "filters": {
+      "guestsLabel": "Min. guests",
+      "maxPriceLabel": "Max price/night",
+      "any": "Any",
+      "noResults": "No rooms match your filters."
+    }
+  },
+  "roomDetailPage": {
+    "eyebrow": "Room",
+    "breadcrumb": {
+      "home": "Home",
+      "rooms": "Rooms"
+    },
+    "metadata": {
+      "titlePrefix": "Room",
+      "descriptionSuffix": "Ginko Rooms."
+    },
+    "stats": {
+      "duplex": "Duplex",
+      "seaView": "Nature view",
+      "balcony": "Balcony / Terrace"
+    },
+    "beds": {
+      "title": "Beds"
+    },
+    "amenities": {
+      "title": "What's included"
+    },
+    "price": {
+      "title": "Price per night",
+      "offSeason": "Off-season",
+      "highSeason": "July / August"
+    },
+    "rules": {
+      "checkInLabel": "Check-in:",
+      "checkOutLabel": "Check-out:",
+      "petsLabel": "Pets:",
+      "petsValue": "Not allowed",
+      "smokingLabel": "Smoking:",
+      "smokingValue": "Not allowed",
+      "minStayLabel": "Minimum stay:",
+      "minStayValue": "2 nights",
+      "minStay": "Minimum stay: 2 nights",
+      "depositLabel": "Deposit:",
+      "depositValue": "of total amount"
+    },
+    "actions": {
+      "bookThis": "Book this room"
+    },
+    "unavailable": {
+      "title": "Room is currently unavailable.",
+      "description": "Browse other available rooms.",
+      "cta": "Other rooms"
+    }
+  },
+  "bookingPage": {
+    "eyebrow": "Booking",
+    "title": "Book a Room",
+    "description": "Choose your room, dates and send your inquiry — no middlemen.",
+    "strip": {
+      "checkInLabel": "Check-in",
+      "checkInValue": "from 14:00",
+      "checkOutLabel": "Check-out",
+      "checkOutValue": "until 11:00",
+      "minStayLabel": "Min. stay",
+      "minStayValue": "2 nights",
+      "depositLabel": "Deposit",
+      "depositValue": "30% at booking"
+    }
+  },
+  "bookingWidget": {
+    "description": "Ginko Rooms offers comfortable accommodation in a peaceful setting. Direct booking, no platform fees.",
+    "labels": {
+      "night": {
+        "one": "1 night",
+        "other": "{count} nights"
+      }
+    },
+    "steps": {
+      "room": "0. Select room",
+      "dates": "1. Select dates",
+      "summary": "2. Price summary",
+      "details": "3. Your details"
+    },
+    "paymentTerms": {
+      "title": "Payment and cancellation terms",
+      "depositLabel": "Payment ({percent}%)",
+      "depositNote": "paid immediately at booking.",
+      "balanceLabel": "Remaining balance ({percent}%)",
+      "balanceNote": "must be paid no later than {days} days before arrival",
+      "cancellationTitle": "Cancellation"
+    },
+    "summary": {
+      "line": "{nights, plural, one {{nights}× night} other {{nights}× nights}} · {pricePerNight} €",
+      "discount": "Discount for {nights}+ nights ({percent}%)",
+      "cleaningFee": "Cleaning service",
+      "total": "Total"
+    },
+    "form": {
+      "name": "Full name",
+      "namePlaceholder": "Anna Horvat",
+      "email": "Email",
+      "emailPlaceholder": "anna@example.com",
+      "phone": "Phone / WhatsApp",
+      "phonePlaceholder": "+385 91 234 5678",
+      "adults": "Adults",
+      "children": "Children",
+      "maxGuests": "Maximum {capacity} guests in total",
+      "notes": "Notes (optional)",
+      "notesPlaceholder": "Special requests or questions…",
+      "rules": {
+        "checkIn": "Check-in",
+        "checkOut": "Check-out"
+      },
+      "agreeRules": "I agree with the house rules and booking terms.",
+      "submitting": "Sending…",
+      "submit": "Send booking inquiry · {totalPrice} €"
+    },
+    "success": {
+      "title": "Booking inquiry received!",
+      "description": "Thank you, <name></name>! We have sent a confirmation to <email></email>. We will get back to you as soon as possible.",
+      "newBooking": "New booking",
+      "summary": {
+        "accommodation": "Accommodation",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "nights": "Nights",
+        "total": "Total",
+        "deposit": "Payment ({percent}%)",
+        "depositNote": "paid immediately at booking.",
+        "balance": "Remaining balance ({percent}%)",
+        "balanceNote": "must be paid no later than {days} days before arrival",
+        "cancellationTitle": "Cancellation",
+        "bankLabel": "Bank",
+        "internationalPayments": "international payments",
+        "qrTitle": "Quick QR payment",
+        "generatingQr": "Generating QR codes…",
+        "hub3Title": "Croatian banks",
+        "hub3Alt": "HUB3 PDF417 barcode",
+        "hub3Hint": "m-zaba, m-keks, Erste, OTP, PBZ…",
+        "epcTitle": "EU / international",
+        "epcAlt": "EPC SEPA QR code",
+        "epcHint": "Revolut, N26, Wise, SEPA…"
+      }
+    },
+    "errors": {
+      "maxGuests": "{apartmentName}: maximum {capacity} guests.",
+      "submitFailed": "Sending the booking inquiry failed."
+    },
+    "policies": {
+      "cancellation": {
+        "line1": "Free cancellation up to 5 days before planned arrival.",
+        "line2": "If cancelled within 5 days before arrival, the full booking amount is non-refundable.",
+        "line3": "For special cases, contact us directly."
+      }
+    },
+    "calendar": {
+      "loading": "Loading calendar…",
+      "previousMonth": "Previous month",
+      "nextMonth": "Next month",
+      "reset": "Reset selection",
+      "errors": {
+        "loadAvailability": "Error loading availability.",
+        "loadDates": "Error loading available dates."
+      },
+      "legend": {
+        "available": "Available",
+        "booked": "Booked",
+        "selected": "Selected",
+        "pickCheckIn": "Select check-in date",
+        "pickCheckOut": "Select check-out date (min. {minNights} nights)"
+      },
+      "tooltips": {
+        "booked": "Booked",
+        "minStay": "Minimum stay: {minNights} nights"
+      }
+    }
+  },
+  "guidesPage": {
+    "title": "Local Guides",
+    "subtitle": "Discover the beauty and attractions nearby.",
+    "readMore": "Read More"
+  },
+  "notFoundPage": {
+    "title": "Page Not Found",
+    "description": "The requested page does not exist or has been moved.",
+    "cta": "Back to Home"
+  }
+}

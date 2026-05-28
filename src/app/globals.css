@@ -1,0 +1,35 @@
+@import 'tailwindcss';
+
+@theme {
+  /* Ginko brand palette – nature-inspired greens and warm neutrals */
+  --color-primary: #3a6b4a;
+  --color-primary-light: #4e8a60;
+  --color-primary-dark: #2a4f37;
+  --color-accent: #b5825a;
+  --color-accent-light: #c9a07a;
+  --color-stone: #f2ede6;
+  --color-stone-light: #faf8f5;
+  --color-text: #1e2d22;
+  --color-muted: #6b7a6e;
+
+  --font-serif: var(--font-playfair);
+  --font-sans: var(--font-inter);
+}
+
+:root {
+  --background: #fafaf8;
+  --foreground: #1e2d22;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), sans-serif;
+}
+
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-playfair), Georgia, serif;
+}

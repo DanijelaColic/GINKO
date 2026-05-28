@@ -1,0 +1,248 @@
+{
+  "siteMetadata": {
+    "title": "Ginko Zimmer",
+    "description": "Gemütliche Unterkunft inmitten der Natur. Buchen Sie Ihr Zimmer auf ginko-sobe.com.",
+    "openGraphAlt": "Ginko Zimmer – Unterkunftsansicht"
+  },
+  "navbar": {
+    "brand": "Ginko Zimmer",
+    "localeLabel": "Sprache",
+    "links": {
+      "home": "Startseite",
+      "rooms": "Zimmer",
+      "booking": "Buchen",
+      "guides": "Reiseführer"
+    },
+    "cta": "Jetzt Buchen"
+  },
+  "footer": {
+    "brand": "Ginko Zimmer",
+    "tagline": "Ihre Ruhe. Ihre Natur.",
+    "navTitle": "Navigation",
+    "links": {
+      "home": "Startseite",
+      "rooms": "Zimmer",
+      "booking": "Buchen",
+      "guides": "Reiseführer"
+    },
+    "contactTitle": "Kontakt",
+    "rights": "Alle Rechte vorbehalten."
+  },
+  "homePage": {
+    "heroTitle": "Willkommen bei Ginko Zimmer",
+    "heroSubtitle": "Gemütliche Unterkunft inmitten der Natur für einen unvergesslichen Aufenthalt.",
+    "heroCta": "Zimmer ansehen",
+    "bookCta": "Jetzt Buchen"
+  },
+  "roomsPage": {
+    "eyebrow": "Unterkunft",
+    "title": "Unsere Zimmer",
+    "description": "Sorgfältig gestaltete Zimmer mit natürlichen Materialien und einladender Atmosphäre.",
+    "itemLabel": "Zimmer",
+    "badges": {
+      "fullyBooked": "Ausgebucht"
+    },
+    "stats": {
+      "duplex": "Zweistöckig",
+      "seaView": "Naturblick",
+      "balcony": "Balkon / Terrasse"
+    },
+    "price": {
+      "title": "Preis pro Nacht",
+      "offSeason": "Nebensaison",
+      "highSeason": "Juli / August",
+      "unavailable": "Dieses Zimmer ist derzeit nicht buchbar."
+    },
+    "actions": {
+      "details": "Mehr Details",
+      "book": "Buchen"
+    },
+    "filters": {
+      "guestsLabel": "Min. Gäste",
+      "maxPriceLabel": "Max. Preis/Nacht",
+      "any": "Beliebig",
+      "noResults": "Keine Zimmer entsprechen Ihren Filtern."
+    }
+  },
+  "roomDetailPage": {
+    "eyebrow": "Zimmer",
+    "breadcrumb": {
+      "home": "Startseite",
+      "rooms": "Zimmer"
+    },
+    "metadata": {
+      "titlePrefix": "Zimmer",
+      "descriptionSuffix": "Ginko Zimmer."
+    },
+    "stats": {
+      "duplex": "Zweistöckig",
+      "seaView": "Naturblick",
+      "balcony": "Balkon / Terrasse"
+    },
+    "beds": {
+      "title": "Betten"
+    },
+    "amenities": {
+      "title": "Inklusive"
+    },
+    "price": {
+      "title": "Preis pro Nacht",
+      "offSeason": "Nebensaison",
+      "highSeason": "Juli / August"
+    },
+    "rules": {
+      "checkInLabel": "Check-in:",
+      "checkOutLabel": "Check-out:",
+      "petsLabel": "Haustiere:",
+      "petsValue": "Nicht erlaubt",
+      "smokingLabel": "Rauchen:",
+      "smokingValue": "Nicht erlaubt",
+      "minStayLabel": "Mindestaufenthalt:",
+      "minStayValue": "2 Nächte",
+      "minStay": "Mindestaufenthalt: 2 Nächte",
+      "depositLabel": "Anzahlung:",
+      "depositValue": "des Gesamtbetrags"
+    },
+    "actions": {
+      "bookThis": "Dieses Zimmer buchen"
+    },
+    "unavailable": {
+      "title": "Zimmer ist derzeit nicht verfügbar.",
+      "description": "Andere verfügbare Zimmer ansehen.",
+      "cta": "Andere Zimmer"
+    }
+  },
+  "bookingPage": {
+    "eyebrow": "Buchung",
+    "title": "Zimmer buchen",
+    "description": "Wählen Sie Ihr Zimmer, Datum und senden Sie Ihre Anfrage — ohne Zwischenhändler.",
+    "strip": {
+      "checkInLabel": "Check-in",
+      "checkInValue": "ab 14:00",
+      "checkOutLabel": "Check-out",
+      "checkOutValue": "bis 11:00",
+      "minStayLabel": "Mindestaufenthalt",
+      "minStayValue": "2 Nächte",
+      "depositLabel": "Anzahlung",
+      "depositValue": "30% bei Buchung"
+    }
+  },
+  "bookingWidget": {
+    "description": "Ginko Zimmer bietet gemütliche Unterkunft in ruhiger Umgebung. Direkte Buchung ohne Plattformgebühren.",
+    "labels": {
+      "night": {
+        "one": "1 Nacht",
+        "other": "{count} Nächte"
+      }
+    },
+    "steps": {
+      "room": "0. Zimmer wählen",
+      "dates": "1. Daten wählen",
+      "summary": "2. Preisübersicht",
+      "details": "3. Ihre Angaben"
+    },
+    "paymentTerms": {
+      "title": "Zahlungs- und Stornobedingungen",
+      "depositLabel": "Zahlung ({percent}%)",
+      "depositNote": "wird sofort bei der Reservierung bezahlt.",
+      "balanceLabel": "Restbetrag ({percent}%)",
+      "balanceNote": "spätestens {days} Tage vor Anreise zu bezahlen",
+      "cancellationTitle": "Stornierung"
+    },
+    "summary": {
+      "line": "{nights, plural, one {{nights}× Nacht} other {{nights}× Nächte}} · {pricePerNight} €",
+      "discount": "Rabatt für {nights}+ Nächte ({percent}%)",
+      "cleaningFee": "Reinigungsservice",
+      "total": "Gesamt"
+    },
+    "form": {
+      "name": "Vor- und Nachname",
+      "namePlaceholder": "Anna Horvat",
+      "email": "E-Mail",
+      "emailPlaceholder": "anna@beispiel.de",
+      "phone": "Telefon / WhatsApp",
+      "phonePlaceholder": "+49 ...",
+      "adults": "Erwachsene",
+      "children": "Kinder",
+      "maxGuests": "Maximal {capacity} Gäste insgesamt",
+      "notes": "Notiz (optional)",
+      "notesPlaceholder": "Besondere Wünsche oder Fragen…",
+      "rules": {
+        "checkIn": "Check-in",
+        "checkOut": "Check-out"
+      },
+      "agreeRules": "Ich stimme den Hausregeln und Buchungsbedingungen zu.",
+      "submitting": "Wird gesendet…",
+      "submit": "Buchungsanfrage senden · {totalPrice} €"
+    },
+    "success": {
+      "title": "Buchungsanfrage erhalten!",
+      "description": "Vielen Dank, <name></name>! Wir haben eine Bestätigung an <email></email> gesendet und melden uns so bald wie möglich.",
+      "newBooking": "Neue Reservierung",
+      "summary": {
+        "accommodation": "Unterkunft",
+        "checkIn": "Check-in",
+        "checkOut": "Check-out",
+        "nights": "Nächte",
+        "total": "Gesamt",
+        "deposit": "Zahlung ({percent}%)",
+        "depositNote": "wird sofort bei der Reservierung bezahlt.",
+        "balance": "Restbetrag ({percent}%)",
+        "balanceNote": "spätestens {days} Tage vor Anreise zu bezahlen",
+        "cancellationTitle": "Stornierung",
+        "bankLabel": "Bank",
+        "internationalPayments": "Auslandszahlungen",
+        "qrTitle": "Schnelle QR-Zahlung",
+        "generatingQr": "QR-Codes werden erzeugt…",
+        "hub3Title": "Kroatische Banken",
+        "hub3Alt": "HUB3 PDF417-Barcode",
+        "hub3Hint": "m-zaba, m-keks, Erste, OTP, PBZ…",
+        "epcTitle": "EU / Ausland",
+        "epcAlt": "EPC SEPA QR-Code",
+        "epcHint": "Revolut, N26, Wise, SEPA…"
+      }
+    },
+    "errors": {
+      "maxGuests": "{apartmentName}: maximal {capacity} Gäste.",
+      "submitFailed": "Die Buchungsanfrage konnte nicht gesendet werden."
+    },
+    "policies": {
+      "cancellation": {
+        "line1": "Kostenlose Stornierung bis 5 Tage vor geplanter Anreise.",
+        "line2": "Bei Stornierung innerhalb von 5 Tagen vor Anreise ist der volle Buchungsbetrag nicht erstattbar.",
+        "line3": "Für Sonderfälle kontaktieren Sie uns bitte direkt."
+      }
+    },
+    "calendar": {
+      "loading": "Kalender wird geladen…",
+      "previousMonth": "Vorheriger Monat",
+      "nextMonth": "Nächster Monat",
+      "reset": "Auswahl zurücksetzen",
+      "errors": {
+        "loadAvailability": "Fehler beim Laden der Verfügbarkeit.",
+        "loadDates": "Fehler beim Laden freier Daten."
+      },
+      "legend": {
+        "available": "Frei",
+        "booked": "Belegt",
+        "selected": "Ausgewählt",
+        "pickCheckIn": "Check-in-Datum wählen",
+        "pickCheckOut": "Check-out-Datum wählen (mind. {minNights} Nächte)"
+      },
+      "tooltips": {
+        "booked": "Belegt",
+        "minStay": "Mindestaufenthalt: {minNights} Nächte"
+      }
+    }
+  },
+  "guidesPage": {
+    "title": "Reiseführer",
+    "subtitle": "Entdecken Sie die Schönheiten und Sehenswürdigkeiten in der Nähe.",
+    "readMore": "Mehr lesen"
+  },
+  "notFoundPage": {
+    "title": "Seite nicht gefunden",
+    "description": "Die angeforderte Seite existiert nicht oder wurde verschoben.",
+    "cta": "Zurück zur Startseite"
+  }
+}

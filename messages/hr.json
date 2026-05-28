@@ -1,0 +1,248 @@
+{
+  "siteMetadata": {
+    "title": "Ginko Sobe",
+    "description": "Ugodan smještaj u srcu prirode. Rezervirajte svoju sobu na ginko-sobe.com.",
+    "openGraphAlt": "Ginko Sobe – pogled na smještaj"
+  },
+  "navbar": {
+    "brand": "Ginko Sobe",
+    "localeLabel": "Jezik",
+    "links": {
+      "home": "Početna",
+      "rooms": "Sobe",
+      "booking": "Rezervacija",
+      "guides": "Vodič"
+    },
+    "cta": "Rezervirajte"
+  },
+  "footer": {
+    "brand": "Ginko Sobe",
+    "tagline": "Vaš mir. Vaša priroda.",
+    "navTitle": "Navigacija",
+    "links": {
+      "home": "Početna",
+      "rooms": "Sobe",
+      "booking": "Rezervacija",
+      "guides": "Vodič"
+    },
+    "contactTitle": "Kontakt",
+    "rights": "Sva prava pridržana."
+  },
+  "homePage": {
+    "heroTitle": "Dobrodošli u Ginko Sobe",
+    "heroSubtitle": "Ugodan smještaj okružen prirodom za nezaboravan odmor.",
+    "heroCta": "Pogledajte sobe",
+    "bookCta": "Rezervirajte sada"
+  },
+  "roomsPage": {
+    "eyebrow": "Smještaj",
+    "title": "Naše sobe",
+    "description": "Sobe pažljivo uređene s prirodnim materijalima i ugodnom atmosferom.",
+    "itemLabel": "Soba",
+    "badges": {
+      "fullyBooked": "Zauzeto"
+    },
+    "stats": {
+      "duplex": "Dvoetažno",
+      "seaView": "Pogled na prirodu",
+      "balcony": "Balkon / Terasa"
+    },
+    "price": {
+      "title": "Cijena po noći",
+      "offSeason": "Izvan sezone",
+      "highSeason": "Srpanj / Kolovoz",
+      "unavailable": "Soba trenutno nije dostupna za rezervaciju."
+    },
+    "actions": {
+      "details": "Više detalja",
+      "book": "Rezerviraj"
+    },
+    "filters": {
+      "guestsLabel": "Min. gostiju",
+      "maxPriceLabel": "Maks. cijena/noć",
+      "any": "Bilo koji",
+      "noResults": "Nema soba koje odgovaraju filteru."
+    }
+  },
+  "roomDetailPage": {
+    "eyebrow": "Soba",
+    "breadcrumb": {
+      "home": "Početna",
+      "rooms": "Sobe"
+    },
+    "metadata": {
+      "titlePrefix": "Soba",
+      "descriptionSuffix": "Ginko Sobe."
+    },
+    "stats": {
+      "duplex": "Dvoetažno",
+      "seaView": "Pogled na prirodu",
+      "balcony": "Balkon / Terasa"
+    },
+    "beds": {
+      "title": "Kreveti"
+    },
+    "amenities": {
+      "title": "Što je uključeno"
+    },
+    "price": {
+      "title": "Cijena po noći",
+      "offSeason": "Izvan sezone",
+      "highSeason": "Srpanj / Kolovoz"
+    },
+    "rules": {
+      "checkInLabel": "Check-in:",
+      "checkOutLabel": "Check-out:",
+      "petsLabel": "Kućni ljubimci:",
+      "petsValue": "Nisu dozvoljeni",
+      "smokingLabel": "Pušenje:",
+      "smokingValue": "Nije dozvoljeno",
+      "minStayLabel": "Minimalni boravak:",
+      "minStayValue": "2 noći",
+      "minStay": "Minimalni boravak: 2 noći",
+      "depositLabel": "Depozit:",
+      "depositValue": "od ukupnog iznosa"
+    },
+    "actions": {
+      "bookThis": "Rezerviraj ovu sobu"
+    },
+    "unavailable": {
+      "title": "Soba trenutno nije dostupna.",
+      "description": "Pogledajte ostale dostupne sobe.",
+      "cta": "Ostale sobe"
+    }
+  },
+  "bookingPage": {
+    "eyebrow": "Rezervacija",
+    "title": "Rezervirajte sobu",
+    "description": "Odaberite sobu, datume i pošaljite upit — bez posrednika.",
+    "strip": {
+      "checkInLabel": "Dolazak",
+      "checkInValue": "od 14:00",
+      "checkOutLabel": "Odlazak",
+      "checkOutValue": "do 11:00",
+      "minStayLabel": "Min. boravak",
+      "minStayValue": "2 noći",
+      "depositLabel": "Depozit",
+      "depositValue": "30% pri rezervaciji"
+    }
+  },
+  "bookingWidget": {
+    "description": "Ginko Sobe nudi ugodan smještaj u mirnom okruženju. Direktna rezervacija bez provizija.",
+    "labels": {
+      "night": {
+        "one": "1 noć",
+        "other": "{count} noći"
+      }
+    },
+    "steps": {
+      "room": "0. Odabir sobe",
+      "dates": "1. Odabir datuma",
+      "summary": "2. Sažetak cijene",
+      "details": "3. Vaši podaci"
+    },
+    "paymentTerms": {
+      "title": "Uvjeti plaćanja i otkazivanja",
+      "depositLabel": "Uplata ({percent}%)",
+      "depositNote": "plaća se odmah pri rezervaciji.",
+      "balanceLabel": "Ostatak ({percent}%)",
+      "balanceNote": "plaća se najkasnije {days} dana prije dolaska",
+      "cancellationTitle": "Otkazivanje"
+    },
+    "summary": {
+      "line": "{nights, plural, one {{nights}× noć} few {{nights}× noći} other {{nights}× noći}} · {pricePerNight} €",
+      "discount": "Popust {nights}+ noći ({percent}%)",
+      "cleaningFee": "Usluga čišćenja",
+      "total": "Ukupno"
+    },
+    "form": {
+      "name": "Ime i prezime",
+      "namePlaceholder": "Ana Horvat",
+      "email": "E-pošta",
+      "emailPlaceholder": "ana@primjer.hr",
+      "phone": "Mobitel / WhatsApp",
+      "phonePlaceholder": "+385 91 234 5678",
+      "adults": "Odrasli",
+      "children": "Djeca",
+      "maxGuests": "Najviše {capacity} gostiju ukupno",
+      "notes": "Napomena (nije obavezno)",
+      "notesPlaceholder": "Posebne želje ili pitanja…",
+      "rules": {
+        "checkIn": "Dolazak (check-in)",
+        "checkOut": "Odlazak (check-out)"
+      },
+      "agreeRules": "Slažem se s pravilima i uvjetima rezervacije.",
+      "submitting": "Šaljem…",
+      "submit": "Pošalji upit za rezervaciju · {totalPrice} €"
+    },
+    "success": {
+      "title": "Upit za rezervaciju zaprimljen!",
+      "description": "Hvala vam, <name></name>! Poslali smo potvrdu na <email></email>. Javit ćemo vam se u najkraćem roku.",
+      "newBooking": "Nova rezervacija",
+      "summary": {
+        "accommodation": "Smještaj",
+        "checkIn": "Dolazak",
+        "checkOut": "Odlazak",
+        "nights": "Noćenja",
+        "total": "Ukupno",
+        "deposit": "Uplata ({percent}%)",
+        "depositNote": "plaća se odmah pri rezervaciji.",
+        "balance": "Ostatak ({percent}%)",
+        "balanceNote": "plaća se najkasnije {days} dana prije dolaska",
+        "cancellationTitle": "Otkazivanje",
+        "bankLabel": "Banka",
+        "internationalPayments": "uplate iz inozemstva",
+        "qrTitle": "Brzo plaćanje QR kodom",
+        "generatingQr": "Generiram QR kodove…",
+        "hub3Title": "Hrvatske banke",
+        "hub3Alt": "HUB3 PDF417 barkod",
+        "hub3Hint": "m-zaba, m-keks, Erste, OTP, PBZ…",
+        "epcTitle": "EU / inozemstvo",
+        "epcAlt": "EPC SEPA QR kod",
+        "epcHint": "Revolut, N26, Wise, SEPA…"
+      }
+    },
+    "errors": {
+      "maxGuests": "{apartmentName}: maksimalno {capacity} gostiju.",
+      "submitFailed": "Slanje upita za rezervaciju nije uspjelo."
+    },
+    "policies": {
+      "cancellation": {
+        "line1": "Besplatno otkazivanje do 5 dana prije planiranog dolaska.",
+        "line2": "U slučaju otkazivanja unutar 5 dana prije dolaska, zadržava se puni iznos rezervacije.",
+        "line3": "Za detalje i posebne slučajeve javite nam se direktno."
+      }
+    },
+    "calendar": {
+      "loading": "Učitavam kalendar…",
+      "previousMonth": "Prethodni mjesec",
+      "nextMonth": "Sljedeći mjesec",
+      "reset": "Poništi odabir",
+      "errors": {
+        "loadAvailability": "Greška pri učitavanju dostupnosti.",
+        "loadDates": "Greška pri učitavanju slobodnih datuma."
+      },
+      "legend": {
+        "available": "Slobodno",
+        "booked": "Zauzeto",
+        "selected": "Odabrano",
+        "pickCheckIn": "Odaberite datum dolaska",
+        "pickCheckOut": "Odaberite datum odlaska (min. {minNights} noći)"
+      },
+      "tooltips": {
+        "booked": "Zauzeto",
+        "minStay": "Minimalni boravak: {minNights} noći"
+      }
+    }
+  },
+  "guidesPage": {
+    "title": "Vodič po okolici",
+    "subtitle": "Otkrijte ljepote i atrakcije u blizini.",
+    "readMore": "Pročitajte više"
+  },
+  "notFoundPage": {
+    "title": "Stranica nije pronađena",
+    "description": "Tražena stranica ne postoji ili je premještena.",
+    "cta": "Povratak na početnu"
+  }
+}
