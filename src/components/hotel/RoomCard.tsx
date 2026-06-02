@@ -17,6 +17,7 @@ type Props = {
     priceTitle: string;
     offSeason: string;
     highSeason: string;
+    perNight: string;
     unavailable: string;
     details: string;
     book: string;
@@ -57,7 +58,7 @@ export default function RoomCard({ room, labels }: Props) {
           {labels.itemLabel}
         </p>
         <h2 className="font-serif text-xl font-semibold text-text mb-1">{room.name}</h2>
-        <p className="text-muted text-sm leading-relaxed mb-4 line-clamp-3">{room.description}</p>
+        <p className="text-muted text-sm leading-relaxed mb-4">{room.tagline}</p>
 
         {/* Stats */}
         <div className="flex flex-wrap gap-2 mb-4">
@@ -92,17 +93,26 @@ export default function RoomCard({ room, labels }: Props) {
             <p className="text-xs text-muted uppercase tracking-widest font-medium mb-1.5">
               {labels.priceTitle}
             </p>
-            <div className="flex gap-5">
-              <div>
-                <p className="text-xs text-muted mb-0.5">{labels.offSeason}</p>
-                <p className="text-primary font-semibold">{room.priceOffSeason}€</p>
+            {room.priceOffSeason === room.priceHighSeason ? (
+              // Flat pricing — same all year
+              <div className="flex items-baseline gap-1.5">
+                <p className="text-primary font-semibold text-lg">{room.priceOffSeason}€</p>
+                <p className="text-xs text-muted">{labels.perNight}</p>
               </div>
-              <div className="w-px bg-stone" />
-              <div>
-                <p className="text-xs text-muted mb-0.5">{labels.highSeason}</p>
-                <p className="text-primary font-semibold">{room.priceHighSeason}€</p>
+            ) : (
+              // Seasonal pricing
+              <div className="flex gap-5">
+                <div>
+                  <p className="text-xs text-muted mb-0.5">{labels.offSeason}</p>
+                  <p className="text-primary font-semibold">{room.priceOffSeason}€</p>
+                </div>
+                <div className="w-px bg-stone" />
+                <div>
+                  <p className="text-xs text-muted mb-0.5">{labels.highSeason}</p>
+                  <p className="text-primary font-semibold">{room.priceHighSeason}€</p>
+                </div>
               </div>
-            </div>
+            )}
           </div>
         ) : (
           <div className="mb-4 p-3 bg-stone-light rounded-xl text-muted text-sm">

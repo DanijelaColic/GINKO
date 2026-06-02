@@ -1,164 +1,332 @@
-// Adapted from Villa-Jurina/src/lib/apartments.ts → renamed fields, Ginko domain
-// Mock data — replace with real room data before launch
+// Real room data — Ginko Sobe, Trg Presvetog Trojstva 3, 43500 Daruvar
+// Images: Unsplash placeholders — replace with real photos before launch
+// EN/DE translations mirror HR until proper translation is done (marked TODO)
 
 import type { Room, RoomLocale } from './room.types';
 
 export const rooms: Room[] = [
   {
-    slug: 'zelena',
-    name: 'Zelena',
-    tagline: 'Tišina, zelenilo i jutarnji mir.',
+    slug: 'ginko-1',
+    name: 'Ginko 1',
+    tagline: 'Šarmantna i intimna soba u srcu Daruvara.',
     description:
-      'ZELENA je prostrana i svjetla soba okružena prirodom. Dizajnirana za dvoje koji traže odmor daleko od vreve — s pogledom na vrt, prirodnim materijalima i tihim jutarnjim buđenjem uz ptičji pjev.',
+      'Dobrodošli u Ginko 1, šarmantnu i intimnu sobu skrivenu u prekrasnom gradu Daruvaru. Smještena na Trgu Presvetog Trojstva 3, ova soba je savršeno dizajnirana za osobu koja traži mir i udobnost — ali udobno smješta i dvoje. Prostrana spavaća soba s bračnim krevetom, moderna kupaonica i topla atmosfera osiguravaju sve što vam treba za opuštajući boravak. Kućni ljubimci su dobrodošli na upit.',
     capacity: 2,
     capacityNote: '2 osobe',
-    size: 22,
-    beds: '1 bračni krevet',
-    view: true,
-    balcony: false,
-    floors: 1,
-    priceOffSeason: 70,
-    priceHighSeason: 90,
-    fullyBooked: false,
-    amenities: ['WiFi', 'Klima', 'TV', 'Hladnjak', 'Kuhalo za vodu', 'Parking'],
-    images: [
-      'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80',
-      'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80',
-      'https://images.unsplash.com/photo-1568503939619-a31fc1e09428?w=1200&q=80',
-    ],
-  },
-  {
-    slug: 'orah',
-    name: 'Orah',
-    tagline: 'Prostranstvo i toplina za cijelu obitelj.',
-    description:
-      'ORAH je obiteljska soba s karakterom. Dva kreveta, prostrana kupaoonica i terasa s pogledom na okolno zelenilo. Savršena za parove s djetetom ili manje obitelji koje žele udoban i miran smještaj.',
-    capacity: 4,
-    capacityNote: '4 osobe (2+2)',
-    size: 35,
-    beds: '1 bračni krevet + 2 pomoćna ležaja',
-    view: true,
-    balcony: true,
-    floors: 1,
-    priceOffSeason: 100,
-    priceHighSeason: 130,
-    fullyBooked: false,
-    amenities: ['WiFi', 'Klima', 'TV', 'Hladnjak', 'Kuhalo za vodu', 'Parking', 'Terasa'],
-    images: [
-      'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&q=80',
-      'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&q=80',
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
-      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80',
-      'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=80',
-    ],
-  },
-  {
-    slug: 'bijela',
-    name: 'Bijela',
-    tagline: 'Minimalizam i elegancija za savršen bijeg.',
-    description:
-      'BIJELA je minimalistički uređena soba u bijelom — čista linija, puno prirodnog svjetla i savršen mir. Idealna za samce ili parove koji cijene jednostavnost i eleganciju iznad svega.',
-    capacity: 2,
-    capacityNote: '2 osobe',
-    size: 18,
+    size: 15,
     beds: '1 bračni krevet',
     view: false,
     balcony: false,
     floors: 1,
     priceOffSeason: 60,
-    priceHighSeason: 80,
+    priceHighSeason: 60,
     fullyBooked: false,
-    amenities: ['WiFi', 'Klima', 'TV', 'Kuhalo za vodu', 'Parking'],
+    amenities: ['WiFi', 'LCD TV', 'Klima', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
+    images: [
+      'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80',
+      'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
+      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80',
+    ],
+  },
+  {
+    slug: 'ginko-2',
+    name: 'Ginko 2',
+    tagline: 'Prostrana soba s terasom za ugodne večeri.',
+    description:
+      'Otkrijte očaravajući boravak u Ginko 2, šarmantnoj sobi smještenoj u srcu slikovitog Daruvara. Smještena na Trgu Presvetog Trojstva 3, nećete biti daleko od bogate povijesti i ljepote ovog grada. Soba udobno prima do dvoje gostiju, a po potrebi može ugostiti i treću osobu. Terasa, satelitski TV i pristup sauni čine ovu sobu jednim od omiljenih izbora naših gostiju. Kućni ljubimci su dobrodošli na upit.',
+    capacity: 3,
+    capacityNote: 'do 3 osobe',
+    size: 20,
+    beds: '1 bračni krevet',
+    view: false,
+    balcony: true,
+    floors: 1,
+    priceOffSeason: 60,
+    priceHighSeason: 60,
+    fullyBooked: false,
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
+    images: [
+      'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&q=80',
+      'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&q=80',
+      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80',
+    ],
+  },
+  {
+    slug: 'ginko-3',
+    name: 'Ginko 3',
+    tagline: 'Privatno utočište s modernim sadržajima i terasom.',
+    description:
+      'Dobrodošli u Ginko 3, vaše privatno utočište smješteno u srcu Daruvara. Naš šarmantni apartman nalazi se na Trgu Presvetog Trojstva 3, nudeći vam autentično hrvatsko iskustvo u samom srcu vivopisne kulture i bogate povijesti. Soba je potpuno opremljena modernim sadržajima i udobno prima 2 gosta, a po potrebi i do 3. Terasa, sauna i potpuna privatnost čine ovaj boravak posebnim. Kućni ljubimci su dobrodošli na upit.',
+    capacity: 3,
+    capacityNote: 'do 3 osobe',
+    size: 18,
+    beds: '1 bračni krevet',
+    view: false,
+    balcony: true,
+    floors: 1,
+    priceOffSeason: 60,
+    priceHighSeason: 60,
+    fullyBooked: false,
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
       'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80',
       'https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=1200&q=80',
       'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1200&q=80',
     ],
   },
+  {
+    slug: 'ginko-4',
+    name: 'Ginko 4',
+    tagline: 'Moderna soba s terasom i luksuznim sadržajima.',
+    description:
+      'Dobrodošli u Ginko 4 — udobnu sobu s pažljivo odabranim sadržajima za savršen odmor. Smještena u srcu Daruvara na Trgu Presvetog Trojstva 3, ova soba nudi vrhunsku lokaciju u blizini gradskih atrakcija. Naše ljubazno osoblje posvećeno je tome da vaš boravak bude nezaboravan. Terasa, sauna i privatno parkiranje dostupni su svim gostima. Kućni ljubimci su dobrodošli na upit.',
+    capacity: 2,
+    capacityNote: '2 osobe',
+    size: 20,
+    beds: '1 bračni krevet',
+    view: false,
+    balcony: true,
+    floors: 1,
+    priceOffSeason: 60,
+    priceHighSeason: 60,
+    fullyBooked: false,
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
+    images: [
+      'https://images.unsplash.com/photo-1568503939619-a31fc1e09428?w=1200&q=80',
+      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
+      'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=80',
+    ],
+  },
+  {
+    slug: 'ginko-5',
+    name: 'Ginko 5',
+    tagline: 'Elegantna soba za savršen odmor u centru grada.',
+    description:
+      'Dobrodošli u Ginko 5, vaš savršeni boravak u kulturnom srcu Hrvatske. Smještena na Trgu Presvetog Trojstva 3 u Daruvaru, ova elegantna soba nudi ugodan i autentičan okus hrvatskog načina života. Privatni, potpuno namješteni prostor pažljivo je dizajniran za smještaj do dvoje gostiju, no prostrani raspored s lakoćom prima i treću osobu. Terasa, sauna i potpuna privatnost dostupni su svim gostima. Kućni ljubimci su dobrodošli na upit.',
+    capacity: 3,
+    capacityNote: 'do 3 osobe',
+    size: 20,
+    beds: '1 bračni krevet',
+    view: false,
+    balcony: true,
+    floors: 1,
+    priceOffSeason: 60,
+    priceHighSeason: 60,
+    fullyBooked: false,
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
+    images: [
+      'https://images.unsplash.com/photo-1567225557594-88d73398014a?w=1200&q=80',
+      'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=1200&q=80',
+      'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&q=80',
+    ],
+  },
+  {
+    slug: 'ginko-6',
+    name: 'Ginko 6',
+    tagline: 'Idealna za solo putnike — miran i intiman boravak.',
+    description:
+      'Dobrodošli u Ginko 6, ugodnu i privlačnu sobu smještenu u srcu Daruvara na Trgu Presvetog Trojstva 3. Ova soba je posebno osmišljena za solo putnike ili poslovne goste koji traže miran odmor. Udobna spavaća soba s jednokrevetnim krevetom, moderna kupaonica i terasa osiguravaju sve što vam treba za mirno i opuštajuće noćenje. Sauna je dostupna svim gostima. Kućni ljubimci su dobrodošli na upit.',
+    capacity: 1,
+    capacityNote: '1 osoba',
+    size: 14,
+    beds: '1 jednokrevetni krevet',
+    view: false,
+    balcony: true,
+    floors: 1,
+    priceOffSeason: 42,
+    priceHighSeason: 42,
+    fullyBooked: false,
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
+    images: [
+      'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&q=80',
+      'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&q=80',
+      'https://images.unsplash.com/photo-1505692433770-36f19f51681d?w=1200&q=80',
+    ],
+  },
+  {
+    slug: 'ginko-spa-2',
+    name: 'Ginko SPA 2',
+    tagline: 'Wellness suita s privatnom saunom i odvojenom kuhinjom.',
+    description:
+      'Dobrodošli u Ginko SPA 2 — vašu oazu luksuza i wellness iskustva u Daruvaru. Prostrana suita od 50 m² smještena na drugom katu nudi potpuno drugačije iskustvo od standardnih soba: privatna sauna, terasa s pogledom, odvojena kuhinja i besprijekoran dizajn čine ovu suitu idealnom za parove ili manje grupe koje žele nešto više. Svaki detalj pažljivo je dizajniran za miran, opuštajući i nezaboravan odmor. Kućni ljubimci nisu dozvoljeni.',
+    capacity: 3,
+    capacityNote: 'do 3 osobe',
+    size: 50,
+    beds: '1 bračni krevet',
+    view: true,
+    balcony: true,
+    floors: 1,
+    priceOffSeason: 234,
+    priceHighSeason: 234,
+    fullyBooked: false,
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
+    images: [
+      'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80',
+      'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=1200&q=80',
+      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&q=80',
+      'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=1200&q=80',
+    ],
+  },
 ];
 
-// Localized overlays — same pattern as Villa-Jurina apartmentTranslations
+// TODO: Translate EN and DE when content is finalised
 export const roomTranslations: Record<
   RoomLocale,
   Record<string, Pick<Room, 'tagline' | 'description' | 'capacityNote' | 'beds' | 'amenities'>>
 > = {
   hr: {
-    zelena: {
-      tagline: 'Tišina, zelenilo i jutarnji mir.',
-      description:
-        'ZELENA je prostrana i svjetla soba okružena prirodom. Dizajnirana za dvoje koji traže odmor daleko od vreve — s pogledom na vrt, prirodnim materijalima i tihim jutarnjim buđenjem.',
+    'ginko-1': {
+      tagline: 'Šarmantna i intimna soba u srcu Daruvara.',
+      description: rooms[0].description,
       capacityNote: '2 osobe',
       beds: '1 bračni krevet',
-      amenities: ['WiFi', 'Klima', 'TV', 'Hladnjak', 'Kuhalo za vodu', 'Parking'],
+      amenities: rooms[0].amenities,
     },
-    orah: {
-      tagline: 'Prostranstvo i toplina za cijelu obitelj.',
-      description:
-        'ORAH je obiteljska soba s karakterom. Dva kreveta, prostrana kupaoonica i terasa s pogledom na okolno zelenilo. Savršena za obitelji koje žele udoban i miran smještaj.',
-      capacityNote: '4 osobe (2+2)',
-      beds: '1 bračni krevet + 2 pomoćna ležaja',
-      amenities: ['WiFi', 'Klima', 'TV', 'Hladnjak', 'Kuhalo za vodu', 'Parking', 'Terasa'],
+    'ginko-2': {
+      tagline: 'Prostrana soba s terasom za ugodne večeri.',
+      description: rooms[1].description,
+      capacityNote: 'do 3 osobe',
+      beds: '1 bračni krevet',
+      amenities: rooms[1].amenities,
     },
-    bijela: {
-      tagline: 'Minimalizam i elegancija za savršen bijeg.',
-      description:
-        'BIJELA je minimalistički uređena soba u bijelom — čista linija, puno prirodnog svjetla i savršen mir.',
+    'ginko-3': {
+      tagline: 'Privatno utočište s modernim sadržajima i terasom.',
+      description: rooms[2].description,
+      capacityNote: 'do 3 osobe',
+      beds: '1 bračni krevet',
+      amenities: rooms[2].amenities,
+    },
+    'ginko-4': {
+      tagline: 'Moderna soba s terasom i luksuznim sadržajima.',
+      description: rooms[3].description,
       capacityNote: '2 osobe',
       beds: '1 bračni krevet',
-      amenities: ['WiFi', 'Klima', 'TV', 'Kuhalo za vodu', 'Parking'],
+      amenities: rooms[3].amenities,
+    },
+    'ginko-5': {
+      tagline: 'Elegantna soba za savršen odmor u centru grada.',
+      description: rooms[4].description,
+      capacityNote: 'do 3 osobe',
+      beds: '1 bračni krevet',
+      amenities: rooms[4].amenities,
+    },
+    'ginko-6': {
+      tagline: 'Idealna za solo putnike — miran i intiman boravak.',
+      description: rooms[5].description,
+      capacityNote: '1 osoba',
+      beds: '1 jednokrevetni krevet',
+      amenities: rooms[5].amenities,
+    },
+    'ginko-spa-2': {
+      tagline: 'Wellness suita s privatnom saunom i odvojenom kuhinjom.',
+      description: rooms[6].description,
+      capacityNote: 'do 3 osobe',
+      beds: '1 bračni krevet',
+      amenities: rooms[6].amenities,
     },
   },
+  // TODO: Replace with proper EN translations
   en: {
-    zelena: {
-      tagline: 'Quiet, green, and a peaceful morning.',
-      description:
-        'ZELENA is a spacious, bright room surrounded by nature. Designed for two who seek rest far from the hustle — with a garden view, natural materials, and a calm morning wake-up.',
+    'ginko-1': {
+      tagline: 'Charming and intimate room in the heart of Daruvar.',
+      description: rooms[0].description,
       capacityNote: '2 guests',
       beds: '1 double bed',
-      amenities: ['WiFi', 'Air conditioning', 'TV', 'Fridge', 'Kettle', 'Parking'],
+      amenities: ['WiFi', 'LCD TV', 'Air conditioning', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
     },
-    orah: {
-      tagline: 'Space and warmth for the whole family.',
-      description:
-        'ORAH is a family room with character. Two beds, a spacious bathroom and a terrace overlooking the surrounding greenery. Perfect for families wanting comfortable, peaceful accommodation.',
-      capacityNote: '4 guests (2+2)',
-      beds: '1 double bed + 2 sofa beds',
-      amenities: ['WiFi', 'Air conditioning', 'TV', 'Fridge', 'Kettle', 'Parking', 'Terrace'],
+    'ginko-2': {
+      tagline: 'Spacious room with terrace for pleasant evenings.',
+      description: rooms[1].description,
+      capacityNote: 'up to 3 guests',
+      beds: '1 double bed',
+      amenities: ['WiFi', 'LCD TV', 'SAT TV', 'Air conditioning', 'Sauna', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
     },
-    bijela: {
-      tagline: 'Minimalism and elegance for a perfect escape.',
-      description:
-        'BIJELA is a minimalist room in white — clean lines, plenty of natural light and perfect calm. Ideal for solo guests or couples who value simplicity above all.',
+    'ginko-3': {
+      tagline: 'Private retreat with modern amenities and terrace.',
+      description: rooms[2].description,
+      capacityNote: 'up to 3 guests',
+      beds: '1 double bed',
+      amenities: ['WiFi', 'LCD TV', 'SAT TV', 'Air conditioning', 'Sauna', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
+    },
+    'ginko-4': {
+      tagline: 'Modern room with terrace and luxury amenities.',
+      description: rooms[3].description,
       capacityNote: '2 guests',
       beds: '1 double bed',
-      amenities: ['WiFi', 'Air conditioning', 'TV', 'Kettle', 'Parking'],
+      amenities: ['WiFi', 'LCD TV', 'SAT TV', 'Air conditioning', 'Sauna', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
+    },
+    'ginko-5': {
+      tagline: 'Elegant room for a perfect city-centre stay.',
+      description: rooms[4].description,
+      capacityNote: 'up to 3 guests',
+      beds: '1 double bed',
+      amenities: ['WiFi', 'LCD TV', 'SAT TV', 'Air conditioning', 'Sauna', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen'],
+    },
+    'ginko-6': {
+      tagline: 'Perfect for solo travellers — quiet and intimate.',
+      description: rooms[5].description,
+      capacityNote: '1 guest',
+      beds: '1 single bed',
+      amenities: ['WiFi', 'LCD TV', 'SAT TV', 'Air conditioning', 'Sauna', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
+    },
+    'ginko-spa-2': {
+      tagline: 'Wellness suite with private sauna and separate kitchen.',
+      description: rooms[6].description,
+      capacityNote: 'up to 3 guests',
+      beds: '1 double bed',
+      amenities: ['WiFi', 'LCD TV', 'SAT TV', 'Air conditioning', 'Sauna', 'Terrace', 'Separate kitchen', 'Parking', 'Heating', 'Towels', 'Linen'],
     },
   },
+  // TODO: Replace with proper DE translations
   de: {
-    zelena: {
-      tagline: 'Stille, Grün und ruhige Morgen.',
-      description:
-        'ZELENA ist ein geräumiges, helles Zimmer umgeben von Natur. Für zwei konzipiert, die Erholung abseits des Trubels suchen — mit Gartenblick, natürlichen Materialien und ruhigem Morgenerwachen.',
+    'ginko-1': {
+      tagline: 'Charmantes und intimes Zimmer im Herzen von Daruvar.',
+      description: rooms[0].description,
       capacityNote: '2 Gäste',
       beds: '1 Doppelbett',
-      amenities: ['WLAN', 'Klimaanlage', 'TV', 'Kühlschrank', 'Wasserkocher', 'Parkplatz'],
+      amenities: ['WLAN', 'LCD TV', 'Klimaanlage', 'Parkplatz', 'Heizung', 'Handtücher', 'Bettwäsche', 'Haustiere auf Anfrage'],
     },
-    orah: {
-      tagline: 'Großzügigkeit und Wärme für die ganze Familie.',
-      description:
-        'ORAH ist ein Familienzimmer mit Charakter. Zwei Betten, ein geräumiges Bad und eine Terrasse mit Blick ins Grüne. Ideal für Familien mit komfortablem und ruhigem Aufenthalt.',
-      capacityNote: '4 Gäste (2+2)',
-      beds: '1 Doppelbett + 2 Schlafsofa',
-      amenities: ['WLAN', 'Klimaanlage', 'TV', 'Kühlschrank', 'Wasserkocher', 'Parkplatz', 'Terrasse'],
+    'ginko-2': {
+      tagline: 'Geräumiges Zimmer mit Terrasse für angenehme Abende.',
+      description: rooms[1].description,
+      capacityNote: 'bis 3 Gäste',
+      beds: '1 Doppelbett',
+      amenities: ['WLAN', 'LCD TV', 'SAT TV', 'Klimaanlage', 'Sauna', 'Terrasse', 'Parkplatz', 'Heizung', 'Handtücher', 'Bettwäsche', 'Haustiere auf Anfrage'],
     },
-    bijela: {
-      tagline: 'Minimalismus und Eleganz für eine perfekte Auszeit.',
-      description:
-        'BIJELA ist ein minimalistisch eingerichtetes weißes Zimmer — klare Linien, viel natürliches Licht und perfekte Ruhe. Ideal für Alleinreisende oder Paare, die Einfachheit schätzen.',
+    'ginko-3': {
+      tagline: 'Privates Rückzugsort mit moderner Ausstattung und Terrasse.',
+      description: rooms[2].description,
+      capacityNote: 'bis 3 Gäste',
+      beds: '1 Doppelbett',
+      amenities: ['WLAN', 'LCD TV', 'SAT TV', 'Klimaanlage', 'Sauna', 'Terrasse', 'Parkplatz', 'Heizung', 'Handtücher', 'Bettwäsche', 'Haustiere auf Anfrage'],
+    },
+    'ginko-4': {
+      tagline: 'Modernes Zimmer mit Terrasse und Luxusausstattung.',
+      description: rooms[3].description,
       capacityNote: '2 Gäste',
       beds: '1 Doppelbett',
-      amenities: ['WLAN', 'Klimaanlage', 'TV', 'Wasserkocher', 'Parkplatz'],
+      amenities: ['WLAN', 'LCD TV', 'SAT TV', 'Klimaanlage', 'Sauna', 'Terrasse', 'Parkplatz', 'Heizung', 'Handtücher', 'Bettwäsche', 'Haustiere auf Anfrage'],
+    },
+    'ginko-5': {
+      tagline: 'Elegantes Zimmer für einen perfekten Stadtaufenthalt.',
+      description: rooms[4].description,
+      capacityNote: 'bis 3 Gäste',
+      beds: '1 Doppelbett',
+      amenities: ['WLAN', 'LCD TV', 'SAT TV', 'Klimaanlage', 'Sauna', 'Terrasse', 'Parkplatz', 'Heizung', 'Handtücher', 'Bettwäsche'],
+    },
+    'ginko-6': {
+      tagline: 'Ideal für Alleinreisende — ruhig und intim.',
+      description: rooms[5].description,
+      capacityNote: '1 Gast',
+      beds: '1 Einzelbett',
+      amenities: ['WLAN', 'LCD TV', 'SAT TV', 'Klimaanlage', 'Sauna', 'Terrasse', 'Parkplatz', 'Heizung', 'Handtücher', 'Bettwäsche', 'Haustiere auf Anfrage'],
+    },
+    'ginko-spa-2': {
+      tagline: 'Wellness-Suite mit privater Sauna und separater Küche.',
+      description: rooms[6].description,
+      capacityNote: 'bis 3 Gäste',
+      beds: '1 Doppelbett',
+      amenities: ['WLAN', 'LCD TV', 'SAT TV', 'Klimaanlage', 'Sauna', 'Terrasse', 'Separate Küche', 'Parkplatz', 'Heizung', 'Handtücher', 'Bettwäsche'],
     },
   },
 };
