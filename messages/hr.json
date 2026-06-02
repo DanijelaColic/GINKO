@@ -7,22 +7,22 @@
   "metadata": {
     "layout": {
       "title": {
-        "default": "Ginko Sobe",
-        "template": "%s | Ginko Sobe"
+        "default": "Ginko Boutique Rooms & Wellness Daruvar",
+        "template": "%s | Ginko Sobe Daruvar"
       },
-      "description": "Privatni smještaj u Zadru — sobe s pogledom, mirna lokacija, direktna rezervacija bez posrednika.",
+      "description": "Udobne boutique sobe u srcu Daruvara — WiFi, klima, sauna i besplatan parking. Rezervirajte direktno bez posrednika.",
       "openGraph": {
-        "title": "Ginko Sobe – privatni smještaj u Zadru",
-        "description": "Udobne sobe s doručkom u mirnom dijelu Zadra. Rezervirajte direktno.",
-        "imageAlt": "Ginko Sobe – pogled na smještaj"
+        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
+        "description": "Udobne boutique sobe u srcu Daruvara. Sauna, terasa, besplatan parking. Rezervirajte direktno.",
+        "imageAlt": "Ginko Boutique Rooms & Wellness – Daruvar"
       },
       "twitter": {
-        "title": "Ginko Sobe – privatni smještaj u Zadru",
-        "description": "Udobne sobe s doručkom u mirnom dijelu Zadra. Rezervirajte direktno."
+        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
+        "description": "Udobne boutique sobe u srcu Daruvara. Rezervirajte direktno."
       }
     },
     "structuredData": {
-      "description": "Ginko Sobe pruža privatni smještaj u Zadru s udobnim sobama i domaćinskim ugođajem.",
+      "description": "Ginko Boutique Rooms & Wellness nudi udobne sobe u srcu Daruvara s WiFi-jem, klimom, saunom i besplatnim parkingom.",
       "amenities": {
         "wifi": "Besplatni WiFi",
         "airConditioning": "Klima uređaj",
@@ -44,8 +44,8 @@
     "cta": "Rezervirajte"
   },
   "footer": {
-    "brand": "Ginko Sobe",
-    "tagline": "Vaš mir. Vaša priroda.",
+    "brand": "Ginko Boutique Rooms & Wellness",
+    "tagline": "Trg Presvetog Trojstva 3, 43500 Daruvar",
     "navTitle": "Navigacija",
     "links": {
       "home": "Početna",
@@ -59,7 +59,9 @@
     "legal": {
       "privacy": "Politika privatnosti",
       "cookies": "Kolačići"
-    }
+    },
+    "checkIn": "Check-in od 14:00",
+    "checkOut": "Check-out do 10:00"
   },
   "homePage": {
     "heroTitle": "Dobrodošli u Ginko Sobe",

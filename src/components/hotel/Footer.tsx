@@ -1,5 +1,6 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
+import { Phone, Mail, Clock } from 'lucide-react';
 
 const YEAR = new Date().getFullYear();
 
@@ -25,7 +26,7 @@ export default async function Footer() {
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
           {/* Brand column */}
           <div>
-            <p className="font-serif text-lg font-semibold">{t('brand')}</p>
+            <p className="font-serif text-lg font-semibold leading-tight">{t('brand')}</p>
             <p className="mt-2 text-sm text-white/60">{t('tagline')}</p>
           </div>
 
@@ -48,13 +49,38 @@ export default async function Footer() {
             </ul>
           </div>
 
-          {/* Contact placeholder */}
+          {/* Contact */}
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
               {t('contactTitle')}
             </p>
-            {/* Contact details will be added in a later phase */}
-            <p className="text-sm text-white/40 italic">— coming soon —</p>
+            <address className="not-italic space-y-2.5">
+              <p className="text-sm text-white/70 leading-snug">
+                Trg Presvetog Trojstva 3<br />
+                43500 Daruvar, Hrvatska
+              </p>
+              <a
+                href="tel:+385959000799"
+                className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
+              >
+                <Phone size={14} className="shrink-0 text-white/40" />
+                095 9000 799
+              </a>
+              <a
+                href="mailto:ginko.sobe@gmail.com"
+                className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
+              >
+                <Mail size={14} className="shrink-0 text-white/40" />
+                ginko.sobe@gmail.com
+              </a>
+              <p className="flex items-start gap-2 text-sm text-white/60">
+                <Clock size={14} className="shrink-0 mt-0.5 text-white/40" />
+                <span>
+                  {t('checkIn')}<br />
+                  {t('checkOut')}
+                </span>
+              </p>
+            </address>
           </div>
         </div>
 

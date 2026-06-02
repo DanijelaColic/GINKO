@@ -4,7 +4,7 @@ import { getTranslations } from 'next-intl/server';
 import { routing } from './routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ginko-sobe.com';
-const SITE_NAME = 'Ginko Sobe';
+const SITE_NAME = 'Ginko Boutique Rooms & Wellness';
 const HERO_OG_IMAGE_PATH = '/images/hero/exterior-01.jpg';
 
 const OPEN_GRAPH_LOCALES: Record<string, string> = {
@@ -15,31 +15,31 @@ const OPEN_GRAPH_LOCALES: Record<string, string> = {
 
 const KEYWORDS_BY_LOCALE: Record<string, string[]> = {
   hr: [
-    'sobe Zadar',
-    'privatni smještaj Dalmacija',
+    'sobe Daruvar',
+    'boutique sobe Daruvar',
     'ginko sobe',
-    'odmor Zadar',
-    'jeftini smještaj Zadar',
-    'sobe blizu plaže',
-    'Hrvatska smještaj',
+    'smještaj Daruvar',
+    'wellness Daruvar',
+    'sobe Slavonija',
+    'privatni smještaj Daruvar',
   ],
   en: [
-    'rooms Zadar',
-    'private accommodation Dalmatia',
+    'rooms Daruvar',
+    'boutique rooms Daruvar Croatia',
     'ginko rooms',
-    'holiday Zadar',
-    'budget accommodation Zadar',
-    'rooms near beach Croatia',
-    'Croatia accommodation',
+    'accommodation Daruvar',
+    'wellness Daruvar',
+    'hotel Daruvar',
+    'Croatia boutique accommodation',
   ],
   de: [
-    'Zimmer Zadar',
-    'Privatunterkunft Dalmatien',
+    'Zimmer Daruvar',
+    'Boutique-Zimmer Daruvar Kroatien',
     'Ginko Zimmer',
-    'Urlaub Zadar',
-    'günstige Unterkunft Zadar',
-    'Zimmer nahe Strand Kroatien',
-    'Kroatien Unterkunft',
+    'Unterkunft Daruvar',
+    'Wellness Daruvar',
+    'Hotel Daruvar',
+    'Kroatien Boutique-Unterkunft',
   ],
 };
 
@@ -189,17 +189,17 @@ export async function getStructuredData(locale: Locale) {
     name: SITE_NAME,
     description: t('description'),
     url: SITE_URL,
-    telephone: process.env.CONTACT_PHONE ?? '+385000000000',
-    email: process.env.CONTACT_EMAIL ?? 'info@ginko-sobe.com',
+    telephone: '+385959000799',
+    email: 'ginko.sobe@gmail.com',
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'TODO: fill in street address',
-      addressLocality: 'Zadar',
-      postalCode: '23000',
+      streetAddress: 'Trg Presvetog Trojstva 3',
+      addressLocality: 'Daruvar',
+      postalCode: '43500',
       addressCountry: 'HR',
     },
     image: `${SITE_URL}${HERO_OG_IMAGE_PATH}`,
-    priceRange: 'EUR',
+    priceRange: '€€',
     currenciesAccepted: 'EUR',
     amenityFeature: [
       { '@type': 'LocationFeatureSpecification', name: t('amenities.wifi'), value: true },

@@ -7,22 +7,22 @@
   "metadata": {
     "layout": {
       "title": {
-        "default": "Ginko Rooms",
-        "template": "%s | Ginko Rooms"
+        "default": "Ginko Boutique Rooms & Wellness Daruvar",
+        "template": "%s | Ginko Rooms Daruvar"
       },
-      "description": "Private rooms in Zadar — peaceful location, direct booking with no intermediaries.",
+      "description": "Boutique rooms in the heart of Daruvar, Croatia — WiFi, AC, sauna and free parking. Book directly, no middleman.",
       "openGraph": {
-        "title": "Ginko Rooms – private accommodation in Zadar",
-        "description": "Comfortable rooms with breakfast in a quiet part of Zadar. Book directly.",
-        "imageAlt": "Ginko Rooms – accommodation view"
+        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
+        "description": "Boutique rooms in the heart of Daruvar. Sauna, terrace, free parking. Book directly.",
+        "imageAlt": "Ginko Boutique Rooms & Wellness – Daruvar, Croatia"
       },
       "twitter": {
-        "title": "Ginko Rooms – private accommodation in Zadar",
-        "description": "Comfortable rooms with breakfast in a quiet part of Zadar. Book directly."
+        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
+        "description": "Boutique rooms in the heart of Daruvar, Croatia. Book directly."
       }
     },
     "structuredData": {
-      "description": "Ginko Rooms offers private accommodation in Zadar with comfortable rooms and a homely atmosphere.",
+      "description": "Ginko Boutique Rooms & Wellness offers comfortable boutique rooms in the heart of Daruvar with WiFi, AC, sauna and free parking.",
       "amenities": {
         "wifi": "Free WiFi",
         "airConditioning": "Air Conditioning",
@@ -44,8 +44,8 @@
     "cta": "Book Now"
   },
   "footer": {
-    "brand": "Ginko Rooms",
-    "tagline": "Your peace. Your nature.",
+    "brand": "Ginko Boutique Rooms & Wellness",
+    "tagline": "Trg Presvetog Trojstva 3, 43500 Daruvar",
     "navTitle": "Navigation",
     "links": {
       "home": "Home",
@@ -59,7 +59,9 @@
     "legal": {
       "privacy": "Privacy Policy",
       "cookies": "Cookies"
-    }
+    },
+    "checkIn": "Check-in from 14:00",
+    "checkOut": "Check-out until 10:00"
   },
   "homePage": {
     "heroTitle": "Welcome to Ginko Rooms",

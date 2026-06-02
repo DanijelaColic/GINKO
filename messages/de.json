@@ -7,22 +7,22 @@
   "metadata": {
     "layout": {
       "title": {
-        "default": "Ginko Zimmer",
-        "template": "%s | Ginko Zimmer"
+        "default": "Ginko Boutique Rooms & Wellness Daruvar",
+        "template": "%s | Ginko Zimmer Daruvar"
       },
-      "description": "Privatzimmer in Zadar — ruhige Lage, Direktbuchung ohne Vermittler.",
+      "description": "Boutique-Zimmer im Herzen von Daruvar, Kroatien — WLAN, Klimaanlage, Sauna und kostenloser Parkplatz. Direkt buchen ohne Vermittler.",
       "openGraph": {
-        "title": "Ginko Zimmer – Privatunterkunft in Zadar",
-        "description": "Komfortable Zimmer mit Frühstück in einem ruhigen Teil von Zadar. Direkt buchen.",
-        "imageAlt": "Ginko Zimmer – Unterkunftsansicht"
+        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
+        "description": "Boutique-Zimmer im Herzen von Daruvar. Sauna, Terrasse, kostenloser Parkplatz. Direkt buchen.",
+        "imageAlt": "Ginko Boutique Rooms & Wellness – Daruvar, Kroatien"
       },
       "twitter": {
-        "title": "Ginko Zimmer – Privatunterkunft in Zadar",
-        "description": "Komfortable Zimmer mit Frühstück in einem ruhigen Teil von Zadar. Direkt buchen."
+        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
+        "description": "Boutique-Zimmer im Herzen von Daruvar, Kroatien. Direkt buchen."
       }
     },
     "structuredData": {
-      "description": "Ginko Zimmer bietet Privatunterkunft in Zadar mit komfortablen Zimmern und familiärer Atmosphäre.",
+      "description": "Ginko Boutique Rooms & Wellness bietet gemütliche Boutique-Zimmer im Herzen von Daruvar mit WLAN, Klimaanlage, Sauna und kostenlosem Parkplatz.",
       "amenities": {
         "wifi": "Kostenloses WLAN",
         "airConditioning": "Klimaanlage",
@@ -44,8 +44,8 @@
     "cta": "Jetzt Buchen"
   },
   "footer": {
-    "brand": "Ginko Zimmer",
-    "tagline": "Ihre Ruhe. Ihre Natur.",
+    "brand": "Ginko Boutique Rooms & Wellness",
+    "tagline": "Trg Presvetog Trojstva 3, 43500 Daruvar",
     "navTitle": "Navigation",
     "links": {
       "home": "Startseite",
@@ -59,7 +59,9 @@
     "legal": {
       "privacy": "Datenschutzerklärung",
       "cookies": "Cookies"
-    }
+    },
+    "checkIn": "Check-in ab 14:00",
+    "checkOut": "Check-out bis 10:00"
   },
   "homePage": {
     "heroTitle": "Willkommen bei Ginko Zimmer",
