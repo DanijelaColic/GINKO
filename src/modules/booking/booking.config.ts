@@ -9,7 +9,7 @@ export const SITE_NAME = process.env.NEXT_PUBLIC_SITE_NAME ?? 'Ginko Sobe';
 export const SITE_LOCATION = process.env.NEXT_PUBLIC_SITE_LOCATION ?? 'Hrvatska';
 
 // ── Kontakt ───────────────────────────────────────────────────────
-export const OWNER_EMAIL = process.env.OWNER_EMAIL ?? '';
+export const OWNER_EMAIL = process.env.OWNER_EMAIL ?? 'ginkosobe3@gmail.com';
 export const OWNER_PHONE = process.env.OWNER_PHONE ?? '';
 export const OWNER_WHATSAPP = process.env.OWNER_WHATSAPP_URL ?? '';
 

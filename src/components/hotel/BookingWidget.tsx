@@ -12,6 +12,7 @@
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
+import { useRouter } from '@/i18n/navigation';
 import { Check, AlertCircle, Loader2 } from 'lucide-react';
 import BookingCalendar from './BookingCalendar';
 import { formatDisplayDate, formatShortDate, formatDate, calculatePrice } from '@/modules/booking/dates';
@@ -48,6 +49,7 @@ export default function BookingWidget({
   rulesText,
 }: Props) {
   const locale = useLocale();
+  const router = useRouter();
   const t = useTranslations('bookingWidget');
   const getNightsLabel = useCallback(
     (n: number) => {
@@ -190,11 +192,18 @@ export default function BookingWidget({
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? t('errors.submitFailed'));
 
-      // Phase 7: redirect to confirmation page if the API returns a confirmation URL.
-      // Falls back to inline success state for backwards-compatibility with mock API.
+      // Stay on current host (localhost in dev) — API may return production URL from env.
+      if (data.confirmationPath) {
+        router.push(data.confirmationPath);
+        return;
+      }
       if (data.confirmationUrl) {
-        // eslint-disable-next-line react-hooks/immutability
-        window.location.href = data.confirmationUrl;
+        try {
+          const url = new URL(data.confirmationUrl, window.location.origin);
+          router.push(`${url.pathname}${url.search}`);
+        } catch {
+          router.push(data.confirmationUrl);
+        }
         return;
       }
 

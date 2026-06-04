@@ -1,7 +1,7 @@
 // Adapted 1:1 from VJ/src/lib/bookingConfirmation.ts
 // Changes: getBookingConfirmationPath updated to use Ginko's /booking/confirmation route.
 import { createHmac, timingSafeEqual } from 'crypto';
-import { getSiteUrl } from './siteUrl';
+import { getSiteUrl, getSiteUrlFromRequest } from './siteUrl';
 
 function getBookingViewSecret(): string {
   const secret = process.env.BOOKING_VIEW_SECRET?.trim();
@@ -33,6 +33,24 @@ export function getBookingConfirmationPath(bookingId: string, token: string): st
   return `/booking/confirmation/${bookingId}?${params.toString()}`;
 }
 
-export function getBookingConfirmationUrl(bookingId: string, token: string): string {
-  return `${getSiteUrl()}${getBookingConfirmationPath(bookingId, token)}`;
+export function getBookingConfirmationUrl(
+  bookingId: string,
+  token: string,
+  baseUrl?: string,
+): string {
+  const site = baseUrl ?? getSiteUrl();
+  return `${site}${getBookingConfirmationPath(bookingId, token)}`;
+}
+
+/** Build absolute confirmation URL using the incoming request origin when available. */
+export function getBookingConfirmationUrlFromRequest(
+  bookingId: string,
+  token: string,
+  originOrReferer?: string | null,
+): string {
+  return getBookingConfirmationUrl(
+    bookingId,
+    token,
+    getSiteUrlFromRequest(originOrReferer),
+  );
 }

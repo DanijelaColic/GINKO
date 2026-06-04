@@ -70,7 +70,7 @@ async function fetchRoomsFromDb(locale: RoomLocale): Promise<Room[] | null> {
       .eq('active', true)
       .order('sort_order', { ascending: true });
 
-    if (error || !data) return null;
+    if (error || !data || data.length === 0) return null;
     return (data as DbRoom[]).map((r) => mapDbRoom(r, locale));
   } catch {
     return null;
@@ -108,9 +108,9 @@ export async function getRoom(slug: string, locale: RoomLocale = 'hr'): Promise<
 
 export async function getRooms(locale: RoomLocale = 'hr'): Promise<Room[]> {
   const dbRooms = await fetchRoomsFromDb(locale);
-  if (dbRooms) return dbRooms;
+  if (dbRooms && dbRooms.length > 0) return dbRooms;
 
-  // Fallback to static config
+  // Fallback to static config when DB is empty or unavailable
   return staticRooms.map((room) => getLocalizedRoom(room, locale));
 }
 

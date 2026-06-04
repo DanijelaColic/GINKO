@@ -4,7 +4,7 @@ import { getTranslations, getLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Car, Wifi, Wind, TreePine, Heart, Clock, Star, MapPin, ChevronRight } from 'lucide-react';
 import { getValidLocale } from '@/i18n/messages';
-import { getPageMetadata } from '@/i18n/metadata';
+import { getRootMetadata } from '@/i18n/metadata';
 import { getRooms } from '@/modules/rooms/room.repository';
 import type { RoomLocale } from '@/modules/rooms/room.types';
 import RoomCard from '@/components/hotel/RoomCard';
@@ -12,7 +12,8 @@ import HeroSearchBar from '@/components/hotel/HeroSearchBar';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
-  return getPageMetadata({ locale, pathname: '/', namespace: 'siteMetadata' });
+  // Root metadata is already localized and includes OpenGraph/Twitter fields.
+  return getRootMetadata(locale);
 }
 
 // --------------------------------------------------------------------------

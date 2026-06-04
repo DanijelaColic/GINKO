@@ -14,8 +14,10 @@ import {
 import { MIN_NIGHTS } from '@/modules/booking/booking.config';
 import {
   createBookingViewToken,
-  getBookingConfirmationUrl,
+  getBookingConfirmationPath,
+  getBookingConfirmationUrlFromRequest,
 } from '@/lib/bookingConfirmation';
+import { sendNewBookingEmails } from '@/lib/email';
 import type { BookedRange } from '@/modules/booking/booking.types';
 
 // GET /api/bookings?room=slug
@@ -197,10 +199,32 @@ export async function POST(request: NextRequest) {
     if (insertError) throw insertError;
 
     const confirmationToken = createBookingViewToken(booking.id, guest_email);
-    const confirmationUrl = getBookingConfirmationUrl(booking.id, confirmationToken);
+    const origin = request.headers.get('origin') ?? request.headers.get('referer');
+    const confirmationPath = getBookingConfirmationPath(booking.id, confirmationToken);
+    const confirmationUrl = getBookingConfirmationUrlFromRequest(
+      booking.id,
+      confirmationToken,
+      origin,
+    );
+
+    // Email: gost + obavijest vlasniku (ginkosobe3@gmail.com) — ne blokira odgovor
+    void sendNewBookingEmails({
+      guestName: guest_name,
+      guestEmail: guest_email,
+      guestPhone: guest_phone,
+      roomName: room.name,
+      checkIn: checkInDate,
+      checkOut: checkOutDate,
+      nights,
+      totalPrice,
+      deposit,
+      bookingId: booking.id,
+      confirmationUrl,
+      locale,
+    }).catch((err) => console.error('[email] sendNewBookingEmails:', err));
 
     return NextResponse.json(
-      { success: true, bookingId: booking.id, confirmationUrl },
+      { success: true, bookingId: booking.id, confirmationPath, confirmationUrl },
       { status: 201 },
     );
   } catch (err) {

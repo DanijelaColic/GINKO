@@ -3,28 +3,14 @@
 // Stripe 2: added PayDepositButton + payment=success|cancelled state banner.
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getSiteUrl } from '@/lib/siteUrl';
+import { getBookingConfirmationData } from '@/modules/booking/booking.confirmation';
 import { getPaymentStatus } from '@/modules/payments/payment.service';
 import PayDepositButton from '@/components/hotel/PayDepositButton';
-import type { BookingConfirmationData } from '@/modules/booking/booking.types';
 
 type Props = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{ token?: string; payment?: string; session_id?: string }>;
 };
-
-async function fetchConfirmation(id: string, token: string): Promise<BookingConfirmationData | null> {
-  try {
-    const res = await fetch(
-      `${getSiteUrl()}/api/bookings/${id}/public?token=${encodeURIComponent(token)}`,
-      { cache: 'no-store' },
-    );
-    if (!res.ok) return null;
-    return res.json() as Promise<BookingConfirmationData>;
-  } catch {
-    return null;
-  }
-}
 
 export default async function BookingConfirmationPage({ params, searchParams }: Props) {
   const { id } = await params;
@@ -33,7 +19,7 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
   if (!id || !token) notFound();
 
   const [data, paymentStatus] = await Promise.all([
-    fetchConfirmation(id, token),
+    getBookingConfirmationData(id, token),
     getPaymentStatus(id).catch(() => null),
   ]);
 

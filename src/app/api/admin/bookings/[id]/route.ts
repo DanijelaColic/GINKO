@@ -1,11 +1,12 @@
 // Copied from Villa-Jurina/src/app/api/admin/bookings/[id]/route.ts
-// Adaptations: apartment_slug → room_slug, getRoomBySlug from room.repository,
-//              removed email sending (Phase 9+), kept _resend_email stub
+// Adaptations: apartment_slug → room_slug, email via @/lib/email
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
 import { getRoomBySlug } from '@/modules/rooms/room.repository';
 import { parseLocalDate, diffDays, calculatePrice } from '@/modules/booking/dates';
+import { sendConfirmationEmail } from '@/lib/email';
+import { createBookingViewToken, getBookingConfirmationUrl } from '@/lib/bookingConfirmation';
 import type { Booking } from '@/modules/booking/booking.types';
 
 type Params = { params: Promise<{ id: string }> };
@@ -21,12 +22,35 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
   const supabase = createServerSupabaseClient();
 
-  // _resend_email stub — email integration in Phase 9
   if (updates._resend_email === true) {
-    return NextResponse.json({ success: true, note: 'Email integration pending Phase 9' });
+    const { data: booking } = await supabase.from('bookings').select('*').eq('id', id).single();
+    if (!booking) return NextResponse.json({ error: 'Nije pronađeno' }, { status: 404 });
+
+    const room = getRoomBySlug(booking.room_slug);
+    if (booking.guest_email) {
+      const token = createBookingViewToken(booking.id, booking.guest_email);
+      const confirmationUrl = getBookingConfirmationUrl(booking.id, token);
+      const locale =
+        booking.locale === 'en' || booking.locale === 'de' ? booking.locale : 'hr';
+
+      await sendConfirmationEmail({
+        guestName: booking.guest_name,
+        guestEmail: booking.guest_email,
+        guestPhone: booking.guest_phone,
+        roomName: room?.name ?? booking.room_slug,
+        checkIn: parseLocalDate(booking.check_in),
+        checkOut: parseLocalDate(booking.check_out),
+        nights: booking.nights,
+        totalPrice: booking.total_price,
+        deposit: booking.deposit,
+        bookingId: booking.id,
+        confirmationUrl,
+        locale,
+      }).catch((err) => console.error('[email] resend failed:', err));
+    }
+    return NextResponse.json({ success: true });
   }
 
-  // Recalculate price if dates or room change
   const needsRecalc = updates.check_in || updates.check_out || updates.room_slug;
 
   let existing: Booking | null = null;
