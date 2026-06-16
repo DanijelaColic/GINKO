@@ -2,68 +2,48 @@ import type { Metadata } from 'next';
 import Image from 'next/image';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { Car, Wifi, Wind, TreePine, Heart, Clock, Star, MapPin, ChevronRight } from 'lucide-react';
+import { Car, Wifi, Wind, TreePine, Star, MapPin, ChevronRight, Waves, Phone, Mail } from 'lucide-react';
+import ShareButton from '@/components/hotel/ShareButton';
 import { getValidLocale } from '@/i18n/messages';
 import { getRootMetadata } from '@/i18n/metadata';
 import { getRooms } from '@/modules/rooms/room.repository';
 import type { RoomLocale } from '@/modules/rooms/room.types';
-import RoomCard from '@/components/hotel/RoomCard';
 import HeroSearchBar from '@/components/hotel/HeroSearchBar';
+import PropertyGallery from '@/components/hotel/PropertyGallery';
+import type { GalleryImage } from '@/components/hotel/PropertyGallery';
+import AvailabilitySection from '@/components/hotel/AvailabilitySection';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
-  // Root metadata is already localized and includes OpenGraph/Twitter fields.
   return getRootMetadata(locale);
 }
 
-// --------------------------------------------------------------------------
-// Gallery images — Unsplash; replace with real photos before launch
-// --------------------------------------------------------------------------
-const GALLERY_IMAGES = [
-  {
-    src: 'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=800&q=80',
-    alt: 'Udobna soba',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=800&q=80',
-    alt: 'Bazen i vrt',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=800&q=80',
-    alt: 'Vanjski prostor',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1549294413-26f195200c16?w=800&q=80',
-    alt: 'Istra — priroda',
-  },
-  {
-    src: 'https://images.unsplash.com/photo-1602002418153-a3fd02b1a1d7?w=800&q=80',
-    alt: 'Doručak u prirodi',
-  },
+// Sve property fotografije — pojavljuju se u kolažu i lightboxu
+const PROPERTY_IMAGES: GalleryImage[] = [
+  { src: '/images/property/20240504_154454.jpg', alt: 'Ginko Sobe — objekt, Daruvar' },
+  { src: '/images/property/20240906_085556.jpg', alt: 'Ginko Sobe — pogled na objekt' },
+  { src: '/images/property/20240906_091154.jpg', alt: 'Ginko Sobe — zajednički prostori' },
+  { src: '/images/property/20240906_091257.jpg', alt: 'Ginko Sobe — terasa' },
+  { src: '/images/property/20240906_091321.jpg', alt: 'Ginko Sobe — detalji' },
+  { src: '/images/property/20240906_091344.jpg', alt: 'Ginko Sobe — prostori' },
+  { src: '/images/property/20240929_072608.jpg', alt: 'Ginko Sobe — okolica Daruvara' },
+  { src: '/images/property/20241101_080530.jpg', alt: 'Ginko Sobe — doručak' },
+  { src: '/images/property/20241101_080707.jpg', alt: 'Ginko Sobe — jutarnji obrok' },
+  { src: '/images/property/20250405_085232.jpg', alt: 'Ginko Sobe — proljeće' },
+  { src: '/images/property/20250420_083046.jpg', alt: 'Ginko Sobe — travanj' },
+  { src: '/images/property/20250501_174531.jpg', alt: 'Ginko Sobe — veljača' },
+  { src: '/images/property/20251202_144635.jpg', alt: 'Ginko Sobe — eksterijer' },
+  { src: '/images/property/20251202_144813.jpg', alt: 'Ginko Sobe — fasada' },
+  { src: '/images/property/20251202_150520.jpg', alt: 'Ginko Sobe — objekt zimi' },
+  { src: '/images/property/20251228_151836.jpg', alt: 'Ginko Sobe — Daruvar' },
 ];
 
-const FEATURE_ICONS = [Car, Wifi, Wind, TreePine, Heart, Clock];
+const FEATURE_ICONS = [Car, Wifi, Wind, Waves, TreePine, Star];
 
 export default async function HomePage() {
   const locale = getValidLocale(await getLocale());
   const t = await getTranslations('homePage');
-  const tRooms = await getTranslations('roomsPage');
   const rooms = await getRooms(locale as RoomLocale);
-
-  const cardLabels = {
-    itemLabel: tRooms('itemLabel'),
-    fullyBooked: tRooms('badges.fullyBooked'),
-    duplex: tRooms('stats.duplex'),
-    seaView: tRooms('stats.seaView'),
-    balcony: tRooms('stats.balcony'),
-    priceTitle: tRooms('price.title'),
-    offSeason: tRooms('price.offSeason'),
-    highSeason: tRooms('price.highSeason'),
-    perNight: tRooms('price.perNight'),
-    unavailable: tRooms('price.unavailable'),
-    details: tRooms('actions.details'),
-    book: tRooms('actions.book'),
-  };
 
   const features = [1, 2, 3, 4, 5, 6].map((n) => ({
     title: t(`feature${n}Title` as Parameters<typeof t>[0]),
@@ -83,19 +63,16 @@ export default async function HomePage() {
       {/* HERO                                                                */}
       {/* ------------------------------------------------------------------ */}
       <section className="relative min-h-[88vh] flex flex-col items-center justify-center px-4 py-24 overflow-hidden">
-        {/* Background image */}
         <Image
-          src="https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1920&q=80"
-          alt="Ginko Sobe — Istra"
+          src="/images/hero/exterior-01.webp"
+          alt="Ginko Sobe — Daruvar"
           fill
           priority
           className="object-cover object-center"
           sizes="100vw"
         />
-        {/* Gradient overlay — bottom-heavy for search bar readability */}
         <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/65" />
 
-        {/* Content */}
         <div className="relative z-10 flex flex-col items-center text-center max-w-4xl">
           <span className="text-white/80 text-xs font-semibold uppercase tracking-[0.2em] mb-4">
             Daruvar, Hrvatska
@@ -106,81 +83,108 @@ export default async function HomePage() {
           <p className="text-white/85 text-lg sm:text-xl max-w-xl leading-relaxed mb-10 drop-shadow">
             {t('heroSubtitle')}
           </p>
-
-          {/* Search bar */}
           <HeroSearchBar />
-
-          {/* Quick scroll hint */}
           <div className="mt-12 flex items-center gap-2 text-white/60 text-sm">
-            <Link
-              href="/rooms"
+            <a
+              href="#raspolozivost"
               className="hover:text-white transition-colors flex items-center gap-1"
             >
               {t('heroCta')}
               <ChevronRight size={15} />
-            </Link>
+            </a>
           </div>
         </div>
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* ROOMS                                                               */}
+      {/* PROPERTY HEADER                                                     */}
       {/* ------------------------------------------------------------------ */}
-      <section className="py-24 px-4 bg-stone-light">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-accent font-semibold tracking-widest text-xs uppercase mb-3">
-              {t('roomsEyebrow')}
-            </p>
-            <h2 className="font-serif text-4xl sm:text-5xl font-semibold text-text mb-4">
-              {t('roomsTitle')}
+      <section className="bg-white border-b border-stone px-4 py-5">
+        <div className="max-w-6xl mx-auto flex items-start justify-between gap-4">
+          {/* Lijevo: zvjezdice, naziv, adresa, kontakt */}
+          <div>
+            {/* Tri zvjezdice */}
+            <div className="flex gap-0.5 mb-2">
+              {[...Array(3)].map((_, i) => (
+                <Star key={i} size={14} className="fill-accent text-accent" />
+              ))}
+            </div>
+
+            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-text mb-2 leading-tight">
+              Ginko Boutique Rooms &amp; Wellness Daruvar
             </h2>
-            <p className="text-muted text-base max-w-xl mx-auto leading-relaxed">
-              {t('roomsSubtitle')}
-            </p>
+
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
+              <a
+                href="https://maps.google.com/?q=Tomaša+Garika+Masaryka+1,+43500+Daruvar,+Hrvatska"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1.5 hover:text-primary transition-colors"
+              >
+                <MapPin size={13} className="text-primary shrink-0" />
+                Tomaša Garika Masaryka 1, 43500 Daruvar, Hrvatska
+              </a>
+
+              <a
+                href="tel:+385959000799"
+                className="flex items-center gap-1.5 hover:text-primary transition-colors"
+              >
+                <Phone size={13} className="text-primary shrink-0" />
+                095 9000 799
+              </a>
+
+              <a
+                href="mailto:info@ginko-sobe.com"
+                className="flex items-center gap-1.5 hover:text-primary transition-colors"
+              >
+                <Mail size={13} className="text-primary shrink-0" />
+                info@ginko-sobe.com
+              </a>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mb-10">
-            {rooms.map((room) => (
-              <RoomCard key={room.slug} room={room} labels={cardLabels} />
-            ))}
-          </div>
-
-          <div className="text-center">
-            <Link
-              href="/rooms"
-              className="inline-flex items-center gap-2 border border-primary text-primary hover:bg-primary hover:text-white font-medium px-7 py-3 rounded-full transition-colors text-sm"
-            >
-              {t('roomsViewAll')}
-              <ChevronRight size={16} />
-            </Link>
-          </div>
+          {/* Desno: share gumb */}
+          <ShareButton />
         </div>
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* FEATURES                                                            */}
+      {/* PROPERTY GALERIJA — full width                                      */}
       {/* ------------------------------------------------------------------ */}
-      <section className="py-24 px-4 bg-white">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-14">
+      <PropertyGallery images={PROPERTY_IMAGES} />
+
+      {/* ------------------------------------------------------------------ */}
+      {/* OPIS OBJEKTA + KLJUČNI SADRŽAJI                                     */}
+      {/* ------------------------------------------------------------------ */}
+      <section className="py-14 px-4 bg-white">
+        <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+          {/* Lijevo: naslov + opis */}
+          <div>
             <p className="text-accent font-semibold tracking-widest text-xs uppercase mb-3">
               {t('featuresEyebrow')}
             </p>
-            <h2 className="font-serif text-4xl sm:text-5xl font-semibold text-text">
+            <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text mb-4 leading-tight">
               {t('featuresTitle')}
             </h2>
+            <p className="text-muted text-base leading-relaxed mb-6">
+              {t('heroSubtitle')}
+            </p>
+            <div className="flex items-center gap-2 text-sm text-muted">
+              <MapPin size={15} className="text-primary shrink-0" />
+              <span>Trg Presvetog Trojstva 3, 43500 Daruvar</span>
+            </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          {/* Desno: 6 ključnih sadržaja */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5">
             {features.map(({ title, desc, Icon }) => (
-              <div key={title} className="flex gap-4">
-                <div className="shrink-0 w-11 h-11 rounded-xl bg-primary/10 flex items-center justify-center">
-                  <Icon size={20} className="text-primary" />
+              <div key={title} className="flex gap-3">
+                <div className="shrink-0 w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                  <Icon size={18} className="text-primary" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-text text-base mb-1">{title}</h3>
-                  <p className="text-muted text-sm leading-relaxed">{desc}</p>
+                  <h3 className="font-semibold text-text text-sm mb-0.5">{title}</h3>
+                  <p className="text-muted text-xs leading-relaxed">{desc}</p>
                 </div>
               </div>
             ))}
@@ -189,55 +193,15 @@ export default async function HomePage() {
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* GALLERY STRIP                                                       */}
+      {/* RASPOLOŽIVOST                                                        */}
       {/* ------------------------------------------------------------------ */}
-      <section className="py-24 px-4 bg-stone-light overflow-hidden">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-10">
-            <p className="text-accent font-semibold tracking-widest text-xs uppercase mb-3">
-              {t('galleryEyebrow')}
-            </p>
-            <h2 className="font-serif text-4xl sm:text-5xl font-semibold text-text mb-3">
-              {t('galleryTitle')}
-            </h2>
-            <p className="text-muted text-base">{t('gallerySubtitle')}</p>
-          </div>
-
-          {/* Scrollable row */}
-          <div className="flex gap-4 overflow-x-auto pb-4 -mx-4 px-4 snap-x snap-mandatory scrollbar-hide">
-            {GALLERY_IMAGES.map((img, i) => (
-              <div
-                key={i}
-                className="relative shrink-0 w-72 sm:w-80 h-52 sm:h-60 rounded-2xl overflow-hidden snap-start"
-              >
-                <Image
-                  src={img.src}
-                  alt={img.alt}
-                  fill
-                  className="object-cover hover:scale-105 transition-transform duration-500"
-                  sizes="320px"
-                />
-              </div>
-            ))}
-            {/* View gallery CTA tile */}
-            <Link
-              href="/gallery"
-              className="shrink-0 w-52 h-52 sm:h-60 rounded-2xl bg-primary flex flex-col items-center justify-center gap-2 text-white snap-start hover:bg-primary-dark transition-colors"
-            >
-              <span className="font-serif text-xl font-semibold text-center leading-tight px-4">
-                Sva fotografija →
-              </span>
-            </Link>
-          </div>
-        </div>
-      </section>
+      <AvailabilitySection rooms={rooms} />
 
       {/* ------------------------------------------------------------------ */}
-      {/* LOCATION                                                            */}
+      {/* LOKACIJA                                                            */}
       {/* ------------------------------------------------------------------ */}
       <section className="py-24 px-4 bg-white">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          {/* Text */}
           <div>
             <p className="text-accent font-semibold tracking-widest text-xs uppercase mb-4">
               {t('locationEyebrow')}
@@ -256,11 +220,9 @@ export default async function HomePage() {
               {t('locationCta')}
             </a>
           </div>
-
-          {/* Map placeholder — replace with embedded Google Map */}
           <div className="relative h-72 lg:h-80 rounded-2xl overflow-hidden bg-stone">
             <Image
-              src="https://images.unsplash.com/photo-1549144511-f099e773c147?w=800&q=80"
+              src="/images/property/20251228_151836.jpg"
               alt="Daruvar — lokacija"
               fill
               className="object-cover"
@@ -278,7 +240,7 @@ export default async function HomePage() {
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* REVIEWS                                                             */}
+      {/* RECENZIJE                                                           */}
       {/* ------------------------------------------------------------------ */}
       <section className="py-24 px-4 bg-stone-light">
         <div className="max-w-5xl mx-auto">
@@ -290,11 +252,9 @@ export default async function HomePage() {
               {t('reviewsTitle')}
             </h2>
           </div>
-
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {reviews.map(({ text, author, origin }) => (
               <div key={author} className="bg-white rounded-2xl p-7 shadow-sm flex flex-col gap-4">
-                {/* Stars */}
                 <div className="flex gap-0.5">
                   {[...Array(5)].map((_, i) => (
                     <Star key={i} size={15} className="fill-accent text-accent" />
@@ -312,12 +272,12 @@ export default async function HomePage() {
       </section>
 
       {/* ------------------------------------------------------------------ */}
-      {/* BOTTOM CTA BANNER                                                   */}
+      {/* CTA BANNER                                                          */}
       {/* ------------------------------------------------------------------ */}
       <section className="relative py-24 px-4 overflow-hidden">
         <Image
-          src="https://images.unsplash.com/photo-1566073771259-6a8506099945?w=1920&q=80"
-          alt="Rezerviraj odmor"
+          src="/images/hero/hero-01.webp"
+          alt="Rezerviraj odmor u Ginko Sobe"
           fill
           className="object-cover object-center"
           sizes="100vw"

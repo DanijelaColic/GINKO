@@ -23,9 +23,7 @@ export const rooms: Room[] = [
     fullyBooked: false,
     amenities: ['WiFi', 'LCD TV', 'Klima', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      'https://images.unsplash.com/photo-1631049307264-da0ec9d70304?w=1200&q=80',
-      'https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=1200&q=80',
-      'https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=1200&q=80',
+      '/images/rooms/ginko-1/01-cover.jpg',
     ],
   },
   {
@@ -46,9 +44,7 @@ export const rooms: Room[] = [
     fullyBooked: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      'https://images.unsplash.com/photo-1566665797739-1674de7a421a?w=1200&q=80',
-      'https://images.unsplash.com/photo-1598928506311-c55ded91a20c?w=1200&q=80',
-      'https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=1200&q=80',
+      '/images/rooms/ginko-2/01-cover.jpg',
     ],
   },
   {
@@ -69,9 +65,7 @@ export const rooms: Room[] = [
     fullyBooked: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      'https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?w=1200&q=80',
-      'https://images.unsplash.com/photo-1615874959474-d609969a20ed?w=1200&q=80',
-      'https://images.unsplash.com/photo-1540518614846-7eded433c457?w=1200&q=80',
+      '/images/rooms/ginko-3/01-cover.jpg',
     ],
   },
   {
@@ -92,9 +86,7 @@ export const rooms: Room[] = [
     fullyBooked: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      'https://images.unsplash.com/photo-1568503939619-a31fc1e09428?w=1200&q=80',
-      'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80',
-      'https://images.unsplash.com/photo-1583608205776-bfd35f0d9f83?w=1200&q=80',
+      '/images/rooms/ginko-4/01-cover.jpg',
     ],
   },
   {
@@ -115,9 +107,7 @@ export const rooms: Room[] = [
     fullyBooked: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
     images: [
-      'https://images.unsplash.com/photo-1567225557594-88d73398014a?w=1200&q=80',
-      'https://images.unsplash.com/photo-1554995207-c18c203602cb?w=1200&q=80',
-      'https://images.unsplash.com/photo-1571896349842-33c89424de2d?w=1200&q=80',
+      '/images/rooms/ginko-5/01-cover.jpg',
     ],
   },
   {
@@ -138,9 +128,7 @@ export const rooms: Room[] = [
     fullyBooked: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      'https://images.unsplash.com/photo-1611892440504-42a792e24d32?w=1200&q=80',
-      'https://images.unsplash.com/photo-1618773928121-c32242e63f39?w=1200&q=80',
-      'https://images.unsplash.com/photo-1505692433770-36f19f51681d?w=1200&q=80',
+      '/images/rooms/ginko-6/01-cover.jpg',
     ],
   },
   {
@@ -161,10 +149,7 @@ export const rooms: Room[] = [
     fullyBooked: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
     images: [
-      'https://images.unsplash.com/photo-1540555700478-4be289fbecef?w=1200&q=80',
-      'https://images.unsplash.com/photo-1507652313519-d4e9174996dd?w=1200&q=80',
-      'https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?w=1200&q=80',
-      'https://images.unsplash.com/photo-1584132967334-10e028bd69f7?w=1200&q=80',
+      '/images/rooms/ginko-spa-2/01-cover.png',
     ],
   },
 ];

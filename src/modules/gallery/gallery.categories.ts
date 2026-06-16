@@ -3,7 +3,7 @@ export const GALLERY_CATEGORIES = [
   { key: 'rooms', label: 'Sobe' },
   { key: 'common-areas', label: 'Zajednički prostori' },
   { key: 'breakfast', label: 'Doručak' },
-  { key: 'surroundings', label: 'Okolica Zadra' },
+  { key: 'surroundings', label: 'Okolica Daruvara' },
 ] as const;
 
 export type GalleryCategoryKey = (typeof GALLERY_CATEGORIES)[number]['key'];

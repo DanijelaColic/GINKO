@@ -4,12 +4,13 @@ import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
 import { X, ChevronLeft, ChevronRight, Images } from 'lucide-react';
 
+export type GalleryImage = { src: string; alt: string };
+
 type Props = {
-  images: string[];
-  alt: string;
+  images: GalleryImage[];
 };
 
-export default function ImageGallery({ images, alt }: Props) {
+export default function PropertyGallery({ images }: Props) {
   const [lightbox, setLightbox] = useState<number | null>(null);
 
   const prev = useCallback(() => {
@@ -31,107 +32,83 @@ export default function ImageGallery({ images, alt }: Props) {
     return () => window.removeEventListener('keydown', onKey);
   }, [lightbox, prev, next]);
 
+  useEffect(() => {
+    document.body.style.overflow = lightbox !== null ? 'hidden' : '';
+    return () => { document.body.style.overflow = ''; };
+  }, [lightbox]);
+
   if (!images.length) return null;
 
-  const [first, second, third] = images;
-  const showGrid = images.length > 1;
+  const [img1, img2, img3, img4, img5] = images;
 
   return (
     <>
-      {/* ── Collage ─────────────────────────────────────────────── */}
+      {/* ── Booking kolaž: 1 velika + 2x2 desno ─────────────────── */}
       <div className="relative">
-        {showGrid ? (
+        <div
+          className="grid gap-0.5 h-[260px] sm:h-[380px] lg:h-[480px]"
+          style={{ gridTemplateColumns: '2fr 1fr' }}
+        >
+          {/* Glavna slika */}
           <div
-            className="grid gap-0.5 h-[260px] sm:h-[380px] lg:h-[460px]"
-            style={{ gridTemplateColumns: '2fr 1fr' }}
-          >
-            {/* Glavna slika — lijevo */}
-            <div
-              className="relative cursor-pointer overflow-hidden"
-              onClick={() => setLightbox(0)}
-            >
-              <Image
-                src={first}
-                alt={`${alt} 1`}
-                fill
-                priority
-                className="object-cover hover:scale-105 transition-transform duration-500"
-                sizes="(max-width: 768px) 66vw, 66vw"
-              />
-            </div>
-
-            {/* Desna kolona — 2 thumbnails */}
-            <div className="flex flex-col gap-0.5">
-              {second && (
-                <div
-                  className="relative flex-1 cursor-pointer overflow-hidden"
-                  onClick={() => setLightbox(1)}
-                >
-                  <Image
-                    src={second}
-                    alt={`${alt} 2`}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-500"
-                    sizes="34vw"
-                  />
-                </div>
-              )}
-              {third && (
-                <div
-                  className="relative flex-1 cursor-pointer overflow-hidden"
-                  onClick={() => setLightbox(2)}
-                >
-                  <Image
-                    src={third}
-                    alt={`${alt} 3`}
-                    fill
-                    className="object-cover hover:scale-105 transition-transform duration-500"
-                    sizes="34vw"
-                  />
-                  {images.length > 3 && (
-                    <div className="absolute inset-0 bg-black/45 flex items-center justify-center pointer-events-none">
-                      <span className="text-white font-semibold text-base">
-                        +{images.length - 3}
-                      </span>
-                    </div>
-                  )}
-                </div>
-              )}
-            </div>
-          </div>
-        ) : (
-          /* Jedna slika — full width */
-          <div
-            className="relative h-[260px] sm:h-[380px] lg:h-[460px] cursor-pointer overflow-hidden"
+            className="relative cursor-pointer overflow-hidden"
             onClick={() => setLightbox(0)}
           >
             <Image
-              src={first}
-              alt={`${alt} 1`}
+              src={img1.src}
+              alt={img1.alt}
               fill
               priority
               className="object-cover hover:scale-105 transition-transform duration-500"
-              sizes="100vw"
+              sizes="(max-width: 768px) 66vw, 66vw"
             />
           </div>
-        )}
 
-        {/* Gumb "Prikaži sve fotografije" — dolje desno */}
+          {/* Desno: 2×2 grid */}
+          {(img2 || img3 || img4 || img5) && (
+            <div className="grid grid-cols-2 grid-rows-2 gap-0.5">
+              {[img2, img3, img4, img5].map((img, idx) =>
+                img ? (
+                  <div
+                    key={idx}
+                    className="relative cursor-pointer overflow-hidden"
+                    onClick={() => setLightbox(idx + 1)}
+                  >
+                    <Image
+                      src={img.src}
+                      alt={img.alt}
+                      fill
+                      className="object-cover hover:scale-105 transition-transform duration-500"
+                      sizes="25vw"
+                    />
+                    {idx === 3 && images.length > 5 && (
+                      <div className="absolute inset-0 bg-black/50 flex items-center justify-center pointer-events-none">
+                        <span className="text-white font-bold text-lg">+{images.length - 5}</span>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div key={idx} className="bg-stone" />
+                ),
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* Gumb "Prikaži sve fotografije" */}
         <button
           onClick={() => setLightbox(0)}
           className="absolute bottom-3 right-3 flex items-center gap-1.5 bg-white/95 hover:bg-white text-text text-xs font-semibold px-3 py-2 rounded shadow-md transition-colors"
         >
           <Images size={14} className="shrink-0" />
-          {images.length > 1
-            ? `Prikaži sve fotografije (${images.length})`
-            : 'Prikaži fotografiju'}
+          Prikaži sve fotografije ({images.length})
         </button>
       </div>
 
       {/* ── Lightbox ─────────────────────────────────────────────── */}
       {lightbox !== null && (
         <div
-          className="fixed inset-0 z-50 bg-black/92 flex items-center justify-center"
+          className="fixed inset-0 z-50 bg-black/93 flex items-center justify-center"
           onClick={() => setLightbox(null)}
         >
           {/* Zatvori */}
@@ -156,8 +133,8 @@ export default function ImageGallery({ images, alt }: Props) {
             onClick={(e) => e.stopPropagation()}
           >
             <Image
-              src={images[lightbox]}
-              alt={`${alt} ${lightbox + 1}`}
+              src={images[lightbox].src}
+              alt={images[lightbox].alt}
               fill
               className="object-contain"
               sizes="100vw"
@@ -172,7 +149,7 @@ export default function ImageGallery({ images, alt }: Props) {
             <ChevronRight size={26} />
           </button>
 
-          {/* Brojač */}
+          {/* Brojač + alt tekst */}
           <p className="absolute bottom-4 left-1/2 -translate-x-1/2 text-white/50 text-sm tabular-nums">
             {lightbox + 1} / {images.length}
           </p>

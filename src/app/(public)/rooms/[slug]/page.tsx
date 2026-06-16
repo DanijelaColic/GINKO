@@ -70,71 +70,77 @@ export default async function RoomDetailPage({ params }: Props) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
       />
-      {/* Gallery — placeholder div if no images */}
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
-        {room.images.length > 0 ? (
-          <ImageGallery images={room.images} alt={`${t('eyebrow')} ${room.name}`} />
-        ) : (
-          <div className="aspect-[16/6] bg-stone rounded-2xl flex items-center justify-center text-muted italic text-sm">
-            — fotografije dolaze uskoro —
-          </div>
-        )}
-        {room.fullyBooked && (
-          <div className="mt-3 inline-block bg-text/80 text-white text-sm font-medium px-4 py-1.5 rounded-full">
-            {t('unavailable.title')}
-          </div>
-        )}
-      </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        {/* Breadcrumb — copied from Jurina [slug]/page.tsx */}
-        <nav className="text-xs text-muted mb-6 flex items-center gap-2">
-          <Link href="/rooms" className="hover:text-primary transition-colors">
-            {t('breadcrumb.rooms')}
-          </Link>
-          <span>/</span>
-          <span className="text-text">{room.name}</span>
-        </nav>
+      {/* Galerija — full width, bez paddinga */}
+      {room.images.length > 0 ? (
+        <ImageGallery images={room.images} alt={`${t('eyebrow')} ${room.name}`} />
+      ) : (
+        <div className="h-[260px] sm:h-[380px] lg:h-[460px] bg-stone flex items-center justify-center text-muted italic text-sm">
+          — fotografije dolaze uskoro —
+        </div>
+      )}
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-          {/* Left: details */}
+      {/* Sadržaj — ispod galerije */}
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+
+        {/* Breadcrumb + naslov — ispod galerije */}
+        <div className="pt-6 pb-4 border-b border-stone mb-8">
+          <nav className="text-xs text-muted mb-3 flex items-center gap-2">
+            <Link href="/rooms" className="hover:text-primary transition-colors">
+              {t('breadcrumb.rooms')}
+            </Link>
+            <span>/</span>
+            <span className="text-text">{room.name}</span>
+          </nav>
+          <div className="flex flex-wrap items-start justify-between gap-4">
+            <div>
+              <p className="text-accent font-medium tracking-widest text-xs uppercase mb-1">
+                {t('eyebrow')}
+              </p>
+              <h1 className="font-serif text-3xl sm:text-4xl font-semibold text-text leading-tight">
+                {room.name}
+              </h1>
+              <p className="text-muted text-base mt-1">{room.tagline}</p>
+            </div>
+            {room.fullyBooked && (
+              <span className="bg-text/80 text-white text-xs font-medium px-3 py-1.5 rounded-full self-start mt-1">
+                {t('unavailable.title')}
+              </span>
+            )}
+          </div>
+          {/* Quick stats odmah ispod naslova */}
+          <div className="flex flex-wrap gap-3 mt-4">
+            <div className="flex items-center gap-1.5 text-sm text-muted">
+              <Users size={14} className="text-accent" />
+              {room.capacityNote}
+            </div>
+            <div className="flex items-center gap-1.5 text-sm text-muted">
+              <Maximize2 size={14} className="text-accent" />
+              {room.size} m²
+            </div>
+            {room.floors > 1 && (
+              <span className="text-xs bg-stone text-text px-3 py-1 rounded-full">
+                {t('stats.duplex')}
+              </span>
+            )}
+            {room.view && (
+              <span className="text-xs bg-stone text-text px-3 py-1 rounded-full">
+                {t('stats.seaView')}
+              </span>
+            )}
+            {room.balcony && (
+              <span className="text-xs bg-stone text-text px-3 py-1 rounded-full">
+                {t('stats.balcony')}
+              </span>
+            )}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-10 pb-12">
+          {/* Lijevo: opis, kreveti, sadržaji, pravila */}
           <div className="lg:col-span-2">
-            <p className="text-accent font-medium tracking-widest text-xs uppercase mb-2">
-              {t('eyebrow')}
-            </p>
-            <h1 className="font-serif text-4xl font-semibold text-text mb-2">{room.name}</h1>
-            <p className="text-muted text-base mb-8">{room.tagline}</p>
-
             <p className="text-text leading-relaxed mb-8">{room.description}</p>
 
-            {/* Stats — copied from Jurina */}
-            <div className="flex flex-wrap gap-4 mb-8">
-              <div className="flex items-center gap-2 text-sm text-muted bg-stone px-4 py-2 rounded-full">
-                <Users size={15} className="text-accent" />
-                <span>{room.capacityNote}</span>
-              </div>
-              <div className="flex items-center gap-2 text-sm text-muted bg-stone px-4 py-2 rounded-full">
-                <Maximize2 size={15} className="text-accent" />
-                <span>{room.size} m²</span>
-              </div>
-              {room.floors > 1 && (
-                <span className="text-sm bg-stone text-text px-4 py-2 rounded-full">
-                  {t('stats.duplex')}
-                </span>
-              )}
-              {room.view && (
-                <span className="text-sm bg-stone text-text px-4 py-2 rounded-full">
-                  {t('stats.seaView')}
-                </span>
-              )}
-              {room.balcony && (
-                <span className="text-sm bg-stone text-text px-4 py-2 rounded-full">
-                  {t('stats.balcony')}
-                </span>
-              )}
-            </div>
-
-            {/* Beds — copied from Jurina */}
             <div className="mb-8">
               <h3 className="font-serif text-lg font-semibold text-text mb-3">
                 {t('beds.title')}
@@ -142,7 +148,6 @@ export default async function RoomDetailPage({ params }: Props) {
               <p className="text-muted text-sm">{room.beds}</p>
             </div>
 
-            {/* Amenities — copied from Jurina */}
             <div>
               <h3 className="font-serif text-lg font-semibold text-text mb-4">
                 {t('amenities.title')}
@@ -157,7 +162,6 @@ export default async function RoomDetailPage({ params }: Props) {
               </ul>
             </div>
 
-            {/* Rules — copied from Jurina */}
             <div className="mt-8 p-4 bg-stone-light rounded-xl text-sm text-muted space-y-1">
               <p>
                 <strong className="text-text">{t('rules.checkInLabel')}</strong> 14:00 – 23:00
@@ -184,9 +188,9 @@ export default async function RoomDetailPage({ params }: Props) {
             </div>
           </div>
 
-          {/* Right: sticky price + CTA — copied from Jurina */}
+          {/* Desno: sticky cijena + CTA */}
           <div className="lg:col-span-1">
-            <div className="sticky top-24 bg-white rounded-2xl border border-stone shadow-sm p-6">
+            <div className="sticky top-24 bg-white rounded-xl border border-stone shadow-sm p-6">
               {!room.fullyBooked ? (
                 <>
                   <p className="text-xs text-muted uppercase tracking-widest font-medium mb-4">
@@ -204,7 +208,7 @@ export default async function RoomDetailPage({ params }: Props) {
                   </div>
                   <Link
                     href={`/booking?room=${room.slug}`}
-                    className="block w-full text-center bg-accent hover:bg-accent-light text-white font-medium px-6 py-3 rounded-full transition-colors text-sm"
+                    className="block w-full text-center bg-primary hover:bg-primary-dark text-white font-medium px-6 py-3 rounded-lg transition-colors text-sm"
                   >
                     {t('actions.bookThis')}
                   </Link>
@@ -216,7 +220,7 @@ export default async function RoomDetailPage({ params }: Props) {
                   <p className="text-sm text-muted mb-6">{t('unavailable.description')}</p>
                   <Link
                     href="/rooms"
-                    className="block w-full text-center border border-primary text-primary hover:bg-primary hover:text-white font-medium px-6 py-3 rounded-full transition-colors text-sm"
+                    className="block w-full text-center border border-primary text-primary hover:bg-primary hover:text-white font-medium px-6 py-3 rounded-lg transition-colors text-sm"
                   >
                     {t('unavailable.cta')}
                   </Link>
@@ -227,7 +231,7 @@ export default async function RoomDetailPage({ params }: Props) {
         </div>
       </div>
 
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pb-12">
         <InternalLinks currentPath={`/rooms/${slug}`} />
       </div>
     </div>

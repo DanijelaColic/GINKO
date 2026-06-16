@@ -5,7 +5,7 @@ import { routing } from './routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ginko-sobe.com';
 const SITE_NAME = 'Ginko Boutique Rooms & Wellness';
-const HERO_OG_IMAGE_PATH = '/images/hero/exterior-01.jpg';
+const HERO_OG_IMAGE_PATH = '/images/hero/exterior-01.webp';
 
 const OPEN_GRAPH_LOCALES: Record<string, string> = {
   hr: 'hr_HR',
