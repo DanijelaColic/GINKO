@@ -3,10 +3,31 @@
 import { useState, useCallback } from 'react';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
-import { CalendarDays, Users, Check } from 'lucide-react';
+import {
+  CalendarDays, Users,
+  Wifi, Wind, Car, Waves, Tv, Sun, Flame,
+  PawPrint, UtensilsCrossed, Maximize2,
+} from 'lucide-react';
+import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import { calculatePrice, isRangeAvailable, parseLocalDate } from '@/modules/booking/dates';
 import type { Room } from '@/modules/rooms/room.types';
 import type { BookedRange } from '@/modules/booking/booking.types';
+
+type AmenityIconEntry = { icon: React.ElementType; label: string };
+
+const AMENITY_ICONS: Record<string, AmenityIconEntry> = {
+  'WiFi':                   { icon: Wifi,            label: 'Besplatni Wi-Fi' },
+  'LCD TV':                 { icon: Tv,              label: 'LCD TV' },
+  'Satelitski TV':          { icon: Tv,              label: 'SAT TV' },
+  'Klima':                  { icon: Wind,            label: 'Klima-uređaj' },
+  'Sauna':                  { icon: Waves,           label: 'Sauna' },
+  'Jacuzzi':                { icon: Waves,           label: 'Jacuzzi' },
+  'Terasa':                 { icon: Sun,             label: 'Terasa' },
+  'Parking':                { icon: Car,             label: 'Besplatno parkiralište' },
+  'Grijanje':               { icon: Flame,           label: 'Grijanje' },
+  'Posebna kuhinja':        { icon: UtensilsCrossed, label: 'Kuhinja' },
+  'Kućni ljubimci na upit': { icon: PawPrint,        label: 'Kućni ljubimci na upit' },
+};
 
 type Props = {
   rooms: Room[];
@@ -186,42 +207,46 @@ export default function AvailabilitySection({ rooms }: Props) {
 
                 {/* Detalji */}
                 <div className="flex-1 p-5 flex flex-col sm:flex-row gap-4">
-                  {/* Lijevo: naziv, opis, bedgeovi, sadržaji */}
+                  {/* Lijevo: Booking-stil detalji */}
                   <div className="flex-1 min-w-0">
+                    {/* Naziv — primary link kao na Bookingu */}
                     <Link href={`/rooms/${room.slug}`}>
-                      <h3 className="font-serif text-xl font-semibold text-text mb-1 hover:text-primary transition-colors">
+                      <h3 className="text-base font-semibold text-primary hover:underline mb-1 leading-tight">
                         {room.name}
                       </h3>
                     </Link>
-                    <p className="text-muted text-sm mb-3 leading-relaxed">{room.tagline}</p>
 
-                    <div className="flex flex-wrap gap-1.5 mb-3">
-                      <span className="text-xs bg-stone text-muted px-2.5 py-1 rounded-full">
-                        {room.capacityNote}
-                      </span>
-                      <span className="text-xs bg-stone text-muted px-2.5 py-1 rounded-full">
+                    {/* Dostupnost */}
+                    <p className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 mb-3">
+                      <span className="w-2 h-2 bg-emerald-500 rounded-full shrink-0" />
+                      1 soba dostupna
+                    </p>
+
+                    {/* Kreveti s ikonama + veličina */}
+                    <div className="mb-3 space-y-2">
+                      <BedTypeIcons beds={room.beds} iconSize={22} />
+                      <span className="flex items-center gap-1 text-xs text-muted">
+                        <Maximize2 size={12} className="text-text shrink-0" />
                         {room.size} m²
                       </span>
-                      {room.balcony && (
-                        <span className="text-xs bg-stone text-muted px-2.5 py-1 rounded-full">
-                          Terasa
-                        </span>
-                      )}
-                      {room.floors > 1 && (
-                        <span className="text-xs bg-stone text-muted px-2.5 py-1 rounded-full">
-                          Duplex
-                        </span>
-                      )}
                     </div>
 
-                    <ul className="flex flex-wrap gap-x-4 gap-y-1">
-                      {room.amenities.slice(0, 6).map((item) => (
-                        <li key={item} className="flex items-center gap-1 text-xs text-muted">
-                          <Check size={11} className="text-primary shrink-0" />
-                          {item}
-                        </li>
-                      ))}
-                    </ul>
+                    {/* Amenity badgeovi */}
+                    <div className="flex flex-wrap gap-1.5">
+                      {room.amenities.map((item) => {
+                        const entry = AMENITY_ICONS[item];
+                        const Icon = entry?.icon;
+                        return (
+                          <span
+                            key={item}
+                            className="inline-flex items-center gap-1 text-[11px] text-muted bg-stone/70 border border-stone px-2 py-0.5 rounded"
+                          >
+                            {Icon && <Icon size={11} className="shrink-0 text-primary" />}
+                            {entry?.label ?? item}
+                          </span>
+                        );
+                      })}
+                    </div>
                   </div>
 
                   {/* Desno: cijena + CTA */}

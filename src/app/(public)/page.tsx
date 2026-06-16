@@ -158,21 +158,20 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       <section className="py-14 px-4 bg-white">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Lijevo: naslov + opis */}
+          {/* Lijevo: opis objekta */}
           <div>
-            <p className="text-accent font-semibold tracking-widest text-xs uppercase mb-3">
-              {t('featuresEyebrow')}
+            <p className="text-text text-base leading-relaxed mb-6">
+              Ginko Boutique Rooms &amp; Wellness Daruvar smješten je u samom srcu Daruvara, uz park dvorca Janković i u neposrednoj blizini Daruvarskih toplica. Moderne i elegantno uređene sobe nude besplatan Wi-Fi, privatno parkiralište i vrhunsku udobnost, dok wellness zona sa saunom i jacuzzijem pruža savršeno mjesto za opuštanje nakon dana provedenog u istraživanju grada. Idealno za parove, poslovne goste i sve koji traže miran odmor u kontinentalnoj Hrvatskoj.
             </p>
-            <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text mb-4 leading-tight">
-              {t('featuresTitle')}
-            </h2>
-            <p className="text-muted text-base leading-relaxed mb-6">
-              {t('heroSubtitle')}
-            </p>
-            <div className="flex items-center gap-2 text-sm text-muted">
+            <a
+              href="https://maps.google.com/?q=Tomaša+Garika+Masaryka+1,+43500+Daruvar,+Hrvatska"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-muted hover:text-primary transition-colors"
+            >
               <MapPin size={15} className="text-primary shrink-0" />
-              <span>Trg Presvetog Trojstva 3, 43500 Daruvar</span>
-            </div>
+              Tomaša Garika Masaryka 1, 43500 Daruvar, Hrvatska
+            </a>
           </div>
 
           {/* Desno: 6 ključnih sadržaja */}

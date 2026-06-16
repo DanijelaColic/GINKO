@@ -5,6 +5,7 @@
 
 import { notFound } from 'next/navigation';
 import { Users, Maximize2, Check } from 'lucide-react';
+import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { rooms } from '@/modules/rooms/rooms.config';
 import { getRoom } from '@/modules/rooms/room.repository';
@@ -145,7 +146,7 @@ export default async function RoomDetailPage({ params }: Props) {
               <h3 className="font-serif text-lg font-semibold text-text mb-3">
                 {t('beds.title')}
               </h3>
-              <p className="text-muted text-sm">{room.beds}</p>
+              <BedTypeIcons beds={room.beds} iconSize={28} />
             </div>
 
             <div>

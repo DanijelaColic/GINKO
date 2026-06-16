@@ -8,7 +8,7 @@ import { createServerSupabaseClient } from '@/lib/supabase';
 
 // ── Static helpers (used as fallback + for server-side validation in API) ──
 
-function getLocalizedRoom(room: Room, locale: RoomLocale): Room {
+function applyLocaleOverlay(room: Room, locale: RoomLocale): Room {
   const localeMap = roomTranslations[locale] ?? roomTranslations.hr;
   const translated = localeMap[room.slug];
   if (!translated) return room;
@@ -98,20 +98,22 @@ async function fetchRoomFromDb(slug: string, locale: RoomLocale): Promise<Room |
 
 export async function getRoom(slug: string, locale: RoomLocale = 'hr'): Promise<Room | undefined> {
   const dbRoom = await fetchRoomFromDb(slug, locale);
-  if (dbRoom) return dbRoom;
+  if (dbRoom) return applyLocaleOverlay(dbRoom, locale);
 
   // Fallback to static config
   const room = staticRooms.find((r) => r.slug === slug);
   if (!room) return undefined;
-  return getLocalizedRoom(room, locale);
+  return applyLocaleOverlay(room, locale);
 }
 
 export async function getRooms(locale: RoomLocale = 'hr'): Promise<Room[]> {
   const dbRooms = await fetchRoomsFromDb(locale);
-  if (dbRooms && dbRooms.length > 0) return dbRooms;
+  if (dbRooms && dbRooms.length > 0) {
+    return dbRooms.map((room) => applyLocaleOverlay(room, locale));
+  }
 
   // Fallback to static config when DB is empty or unavailable
-  return staticRooms.map((room) => getLocalizedRoom(room, locale));
+  return staticRooms.map((room) => applyLocaleOverlay(room, locale));
 }
 
 export async function getAvailableRooms(locale: RoomLocale = 'hr'): Promise<Room[]> {
