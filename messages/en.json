@@ -97,17 +97,6 @@
     "locationTitle": "Find Us in Daruvar",
     "locationDesc": "Located at Trg Presvetog Trojstva 3 in the heart of Daruvar — steps away from city attractions, thermal baths and restaurants. Free parking for all guests.",
     "locationCta": "Open in Google Maps",
-    "reviewsEyebrow": "Reviews",
-    "reviewsTitle": "What Our Guests Say",
-    "review1Text": "Beautiful accommodation, peaceful location and wonderful hosts. We will definitely return!",
-    "review1Author": "Ana M.",
-    "review1Origin": "Zagreb",
-    "review2Text": "The rooms are spotlessly clean and comfortable. Nature at your fingertips.",
-    "review2Author": "Marko K.",
-    "review2Origin": "Ljubljana",
-    "review3Text": "Perfect escape from the city. Ginko is a true hidden gem of Istria.",
-    "review3Author": "Thomas B.",
-    "review3Origin": "Munich",
     "ctaTitle": "Ready for your getaway?",
     "ctaSubtitle": "Book your room today and secure your spot in our peaceful corner of Istria.",
     "ctaButton": "Book Now"
@@ -118,8 +107,8 @@
     "stillLooking": "Still looking?",
     "askQuestion": "Ask a question",
     "answerHint": "We can answer most questions right away",
-    "qualityTitle": "Quality rating",
-    "qualityDesc": "Ginko Boutique Rooms is rated 3 stars based on amenities, location, size and available services.",
+    "qualityTitle": "What guests value most",
+    "qualityDesc": "Based on guest reviews, visitors especially highlight the clean and tidy accommodation, the quiet location in central Daruvar, and the hosts' hospitality. Below are answers to the most common questions.",
     "faq": {
       "parking": {
         "q": "Does the property offer free parking?",

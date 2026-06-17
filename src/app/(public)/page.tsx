@@ -12,6 +12,7 @@ import HeroSearchBar from '@/components/hotel/HeroSearchBar';
 import PropertyGallery from '@/components/hotel/PropertyGallery';
 import type { GalleryImage } from '@/components/hotel/PropertyGallery';
 import AvailabilitySection from '@/components/hotel/AvailabilitySection';
+import PropertyReviewsSection from '@/components/hotel/PropertyReviewsSection';
 import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSection';
 import PropertySurroundingsSection from '@/components/hotel/PropertySurroundingsSection';
 import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
@@ -52,12 +53,6 @@ export default async function HomePage() {
     title: t(`feature${n}Title` as Parameters<typeof t>[0]),
     desc: t(`feature${n}Desc` as Parameters<typeof t>[0]),
     Icon: FEATURE_ICONS[n - 1],
-  }));
-
-  const reviews = [1, 2, 3].map((n) => ({
-    text: t(`review${n}Text` as Parameters<typeof t>[0]),
-    author: t(`review${n}Author` as Parameters<typeof t>[0]),
-    origin: t(`review${n}Origin` as Parameters<typeof t>[0]),
   }));
 
   return (
@@ -200,6 +195,11 @@ export default async function HomePage() {
       <AvailabilitySection rooms={rooms} />
 
       {/* ------------------------------------------------------------------ */}
+      {/* RECENZIJE GOSTIJU                                                    */}
+      {/* ------------------------------------------------------------------ */}
+      <PropertyReviewsSection />
+
+      {/* ------------------------------------------------------------------ */}
       {/* PITANJA PUTNIKA                                                      */}
       {/* ------------------------------------------------------------------ */}
       <TravelerQuestionsSection />
@@ -252,38 +252,6 @@ export default async function HomePage() {
                 <span className="font-semibold text-text text-sm">Ginko Sobe · Daruvar</span>
               </div>
             </div>
-          </div>
-        </div>
-      </section>
-
-      {/* ------------------------------------------------------------------ */}
-      {/* RECENZIJE                                                           */}
-      {/* ------------------------------------------------------------------ */}
-      <section className="py-24 px-4 bg-stone-light">
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-accent font-semibold tracking-widest text-xs uppercase mb-3">
-              {t('reviewsEyebrow')}
-            </p>
-            <h2 className="font-serif text-4xl sm:text-5xl font-semibold text-text">
-              {t('reviewsTitle')}
-            </h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {reviews.map(({ text, author, origin }) => (
-              <div key={author} className="bg-white rounded-2xl p-7 shadow-sm flex flex-col gap-4">
-                <div className="flex gap-0.5">
-                  {[...Array(5)].map((_, i) => (
-                    <Star key={i} size={15} className="fill-accent text-accent" />
-                  ))}
-                </div>
-                <p className="text-text text-sm leading-relaxed flex-1 italic">&ldquo;{text}&rdquo;</p>
-                <div className="border-t border-stone pt-4">
-                  <p className="font-semibold text-text text-sm">{author}</p>
-                  <p className="text-muted text-xs">{origin}</p>
-                </div>
-              </div>
-            ))}
           </div>
         </div>
       </section>

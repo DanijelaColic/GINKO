@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
-import { MessageCircle, ChevronRight, Star } from 'lucide-react';
+import { MessageCircle, ChevronRight } from 'lucide-react';
 
 const FAQ_COL_1 = ['parking', 'breakfast', 'wifi', 'therms', 'attractions'] as const;
 const FAQ_COL_2 = ['pets', 'checkin', 'wellness', 'families', 'booking'] as const;
@@ -68,16 +68,9 @@ export default function TravelerQuestionsSection() {
   return (
     <section className="py-14 px-4 bg-white border-t border-stone">
       <div className="max-w-6xl mx-auto">
-        {/* Ocjena kvalitete */}
+        {/* Most prema FAQ-u */}
         <div className="border border-stone rounded-xl p-5 mb-8">
-          <div className="flex items-center gap-2 mb-2">
-            <span className="font-semibold text-sm text-text">{t('qualityTitle')}</span>
-            <div className="flex gap-0.5">
-              {[...Array(3)].map((_, i) => (
-                <Star key={i} size={14} className="fill-accent text-accent" />
-              ))}
-            </div>
-          </div>
+          <h3 className="font-semibold text-sm text-text mb-2">{t('qualityTitle')}</h3>
           <p className="text-sm text-muted leading-relaxed">{t('qualityDesc')}</p>
         </div>
 

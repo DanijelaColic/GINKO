@@ -21,6 +21,7 @@ import {
   POPULAR_FACILITIES,
   type FacilityGroup,
 } from '@/modules/property/property-details.config';
+import PropertyHouseRulesSection from '@/components/hotel/PropertyHouseRulesSection';
 
 const POPULAR_ICONS: Record<(typeof POPULAR_FACILITIES)[number]['id'], ElementType> = {
   parking: Car,
@@ -112,6 +113,11 @@ export default function PropertyFacilitiesSection() {
               ))}
             </div>
           ))}
+        </div>
+
+        {/* Kućni red — ispod sadržaja objekta */}
+        <div className="mt-14">
+          <PropertyHouseRulesSection embedded />
         </div>
       </div>
     </section>

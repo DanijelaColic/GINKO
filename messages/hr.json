@@ -97,17 +97,6 @@
     "locationTitle": "Pronađite nas u Daruvaru",
     "locationDesc": "Smješteni na Trgu Presvetog Trojstva 3 u srcu Daruvara — tik uz gradske atrakcije, terme i restorane. Parking je besplatan za sve goste.",
     "locationCta": "Otvori na Google Kartama",
-    "reviewsEyebrow": "Recenzije",
-    "reviewsTitle": "Što kažu naši gosti",
-    "review1Text": "Prekrasan smještaj, mirna lokacija i divni domaćini. Definitivno se vraćamo!",
-    "review1Author": "Ana M.",
-    "review1Origin": "Zagreb",
-    "review2Text": "Sobe su besprijekorno čiste i udobne. Priroda na dohvat ruke.",
-    "review2Author": "Marko K.",
-    "review2Origin": "Ljubljana",
-    "review3Text": "Idealno za bijeg od gradske vreve. Ginko je pravi skriveni biser Istre.",
-    "review3Author": "Thomas B.",
-    "review3Origin": "München",
     "ctaTitle": "Spremi se za odmor?",
     "ctaSubtitle": "Rezerviraj svoju sobu danas i osiguraj mjesto u našem mirnom kutku Istre.",
     "ctaButton": "Rezerviraj sada"
@@ -118,8 +107,8 @@
     "stillLooking": "Još uvijek tražite?",
     "askQuestion": "Postavite pitanje",
     "answerHint": "Na većinu pitanja možemo odgovoriti odmah",
-    "qualityTitle": "Ocjena kvalitete",
-    "qualityDesc": "Ginko Boutique Rooms ocijenjen je s 3 zvjezdice na temelju sadržaja, lokacije, veličine i dostupnih usluga.",
+    "qualityTitle": "Što gosti najviše cijene",
+    "qualityDesc": "Na temelju recenzija gosti posebno ističu čist i uredan smještaj, mirnu lokaciju u centru Daruvara te ljubaznost domaćina. Ispod su odgovori na najčešća pitanja.",
     "faq": {
       "parking": {
         "q": "Nudi li objekt besplatno parkiralište?",
