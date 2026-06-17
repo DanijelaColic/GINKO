@@ -112,6 +112,57 @@
     "ctaSubtitle": "Rezerviraj svoju sobu danas i osiguraj mjesto u našem mirnom kutku Istre.",
     "ctaButton": "Rezerviraj sada"
   },
+  "travelerQuestions": {
+    "title": "Pitanja putnika",
+    "showAvailability": "Prikaži raspoloživost",
+    "stillLooking": "Još uvijek tražite?",
+    "askQuestion": "Postavite pitanje",
+    "answerHint": "Na većinu pitanja možemo odgovoriti odmah",
+    "qualityTitle": "Ocjena kvalitete",
+    "qualityDesc": "Ginko Boutique Rooms ocijenjen je s 3 zvjezdice na temelju sadržaja, lokacije, veličine i dostupnih usluga.",
+    "faq": {
+      "parking": {
+        "q": "Nudi li objekt besplatno parkiralište?",
+        "a": "Da, svi gosti imaju besplatan pristup privatnom parkiralištu uz objekt."
+      },
+      "breakfast": {
+        "q": "Poslužuje li se u objektu doručak?",
+        "a": "Doručak nije uključen u cijenu smještaja. U blizini se nalaze kafići i restorani s jutarnjom ponudom."
+      },
+      "wifi": {
+        "q": "Je li Wi-Fi besplatan?",
+        "a": "Da, besplatan Wi-Fi dostupan je u svim sobama i zajedničkim prostorima."
+      },
+      "therms": {
+        "q": "Koliko je daleko do Daruvarskih toplica?",
+        "a": "Daruvarske toplice nalaze se na pješačkoj udaljenosti od nekoliko minuta od objekta."
+      },
+      "attractions": {
+        "q": "Koje su atrakcije u blizini?",
+        "a": "U neposrednoj blizini su park dvorca Janković, Daruvarske toplice, crkva Sv. Tri kralja i centar grada."
+      },
+      "pets": {
+        "q": "Mogu li doći s kućnim ljubimcima?",
+        "a": "Kućni ljubimci nisu dozvoljeni u objektu."
+      },
+      "checkin": {
+        "q": "Koje su radno vrijeme check-in i check-out?",
+        "a": "Check-in je od 14:00 do 23:00, a check-out od 09:00 do 11:00. Po dogovoru možemo prilagoditi vrijeme dolaska."
+      },
+      "wellness": {
+        "q": "Ima li objekt wellness (sauna, jacuzzi)?",
+        "a": "Da, gosti mogu koristiti wellness zonu sa saunom i jacuzzijem."
+      },
+      "families": {
+        "q": "Nudite li sobe za obitelji?",
+        "a": "Da, neke sobe primaju do 4 gosta i pogodne su za obiteljski boravak."
+      },
+      "booking": {
+        "q": "Kako mogu rezervirati sobu?",
+        "a": "Rezervaciju možete poslati putem obrasca na stranici Rezervacija ili nas kontaktirati e-poštom i telefonom."
+      }
+    }
+  },
   "roomsPage": {
     "eyebrow": "Smještaj",
     "title": "Naše sobe",

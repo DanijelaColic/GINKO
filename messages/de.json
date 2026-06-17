@@ -112,6 +112,57 @@
     "ctaSubtitle": "Buchen Sie noch heute Ihr Zimmer und sichern Sie sich Ihren Platz in unserem ruhigen Winkel Istriens.",
     "ctaButton": "Jetzt Buchen"
   },
+  "travelerQuestions": {
+    "title": "Fragen von Reisenden",
+    "showAvailability": "Verfügbarkeit anzeigen",
+    "stillLooking": "Noch auf der Suche?",
+    "askQuestion": "Frage stellen",
+    "answerHint": "Auf die meisten Fragen können wir sofort antworten",
+    "qualityTitle": "Qualitätsbewertung",
+    "qualityDesc": "Ginko Boutique Rooms ist mit 3 Sternen bewertet — basierend auf Ausstattung, Lage, Größe und verfügbaren Leistungen.",
+    "faq": {
+      "parking": {
+        "q": "Bietet die Unterkunft kostenlose Parkplätze?",
+        "a": "Ja, alle Gäste haben kostenlosen Zugang zum privaten Parkplatz neben dem Haus."
+      },
+      "breakfast": {
+        "q": "Wird Frühstück angeboten?",
+        "a": "Frühstück ist im Zimmerpreis nicht enthalten. Cafés und Restaurants mit Morgenangebot sind in der Nähe."
+      },
+      "wifi": {
+        "q": "Ist WLAN kostenlos?",
+        "a": "Ja, kostenloses WLAN ist in allen Zimmern und Gemeinschaftsbereichen verfügbar."
+      },
+      "therms": {
+        "q": "Wie weit sind die Daruvarer Thermen entfernt?",
+        "a": "Die Daruvarer Thermen sind nur wenige Gehminuten von der Unterkunft entfernt."
+      },
+      "attractions": {
+        "q": "Welche Sehenswürdigkeiten sind in der Nähe?",
+        "a": "In unmittelbarer Nähe befinden sich der Janković-Park, die Daruvarer Thermen, die Kirche der Heiligen Drei Könige und das Stadtzentrum."
+      },
+      "pets": {
+        "q": "Sind Haustiere erlaubt?",
+        "a": "Haustiere sind in der Unterkunft nicht gestattet."
+      },
+      "checkin": {
+        "q": "Wann sind Check-in und Check-out?",
+        "a": "Check-in ist von 14:00 bis 23:00 Uhr, Check-out von 09:00 bis 11:00 Uhr. Ankunftszeiten können nach Absprache angepasst werden."
+      },
+      "wellness": {
+        "q": "Gibt es Wellness (Sauna, Jacuzzi)?",
+        "a": "Ja, Gäste können den Wellnessbereich mit Sauna und Jacuzzi nutzen."
+      },
+      "families": {
+        "q": "Gibt es Familienzimmer?",
+        "a": "Ja, einige Zimmer bieten Platz für bis zu 4 Gäste und eignen sich für Familien."
+      },
+      "booking": {
+        "q": "Wie kann ich ein Zimmer buchen?",
+        "a": "Sie können eine Anfrage über das Buchungsformular senden oder uns per E-Mail und Telefon kontaktieren."
+      }
+    }
+  },
   "roomsPage": {
     "eyebrow": "Unterkunft",
     "title": "Unsere Zimmer",

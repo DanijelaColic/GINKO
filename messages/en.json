@@ -112,6 +112,57 @@
     "ctaSubtitle": "Book your room today and secure your spot in our peaceful corner of Istria.",
     "ctaButton": "Book Now"
   },
+  "travelerQuestions": {
+    "title": "Traveler questions",
+    "showAvailability": "Show availability",
+    "stillLooking": "Still looking?",
+    "askQuestion": "Ask a question",
+    "answerHint": "We can answer most questions right away",
+    "qualityTitle": "Quality rating",
+    "qualityDesc": "Ginko Boutique Rooms is rated 3 stars based on amenities, location, size and available services.",
+    "faq": {
+      "parking": {
+        "q": "Does the property offer free parking?",
+        "a": "Yes, all guests have free access to private parking next to the property."
+      },
+      "breakfast": {
+        "q": "Is breakfast served at the property?",
+        "a": "Breakfast is not included in the room rate. Cafés and restaurants with morning menus are nearby."
+      },
+      "wifi": {
+        "q": "Is Wi-Fi free?",
+        "a": "Yes, free Wi-Fi is available in all rooms and common areas."
+      },
+      "therms": {
+        "q": "How far are the Daruvar thermal baths?",
+        "a": "The Daruvar thermal baths are within a few minutes' walk of the property."
+      },
+      "attractions": {
+        "q": "What attractions are nearby?",
+        "a": "Nearby you'll find Janković Castle park, Daruvar thermal baths, the Church of the Holy Three Kings and the city centre."
+      },
+      "pets": {
+        "q": "Can I bring pets?",
+        "a": "Pets are not allowed at the property."
+      },
+      "checkin": {
+        "q": "What are the check-in and check-out times?",
+        "a": "Check-in is from 14:00 to 23:00, and check-out from 09:00 to 11:00. Arrival times can be arranged by agreement."
+      },
+      "wellness": {
+        "q": "Does the property have wellness (sauna, jacuzzi)?",
+        "a": "Yes, guests can use the wellness area with sauna and jacuzzi."
+      },
+      "families": {
+        "q": "Do you offer family rooms?",
+        "a": "Yes, some rooms accommodate up to 4 guests and are suitable for families."
+      },
+      "booking": {
+        "q": "How can I book a room?",
+        "a": "You can submit a booking request via the Booking page form or contact us by email and phone."
+      }
+    }
+  },
   "roomsPage": {
     "eyebrow": "Accommodation",
     "title": "Our Rooms",

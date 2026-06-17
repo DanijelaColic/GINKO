@@ -12,6 +12,7 @@ import HeroSearchBar from '@/components/hotel/HeroSearchBar';
 import PropertyGallery from '@/components/hotel/PropertyGallery';
 import type { GalleryImage } from '@/components/hotel/PropertyGallery';
 import AvailabilitySection from '@/components/hotel/AvailabilitySection';
+import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSection';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -195,6 +196,11 @@ export default async function HomePage() {
       {/* RASPOLOŽIVOST                                                        */}
       {/* ------------------------------------------------------------------ */}
       <AvailabilitySection rooms={rooms} />
+
+      {/* ------------------------------------------------------------------ */}
+      {/* PITANJA PUTNIKA                                                      */}
+      {/* ------------------------------------------------------------------ */}
+      <TravelerQuestionsSection />
 
       {/* ------------------------------------------------------------------ */}
       {/* LOKACIJA                                                            */}
