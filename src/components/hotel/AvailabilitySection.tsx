@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import { calculatePrice, isRangeAvailable, parseLocalDate } from '@/modules/booking/dates';
+import type { BookedRange } from '@/modules/booking/booking.types';
 import type { Room } from '@/modules/rooms/room.types';
 import { CONTACT_EMAIL } from '@/modules/booking/booking.config';
 
