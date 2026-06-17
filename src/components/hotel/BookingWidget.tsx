@@ -18,6 +18,7 @@ import {
   formatShortDate,
   formatDate,
   calculatePrice,
+  parseLocalDate,
 } from '@/modules/booking/dates';
 import {
   RECIPIENT_IBAN,
@@ -45,6 +46,8 @@ const ARRIVAL_TIME_OPTIONS = [
 
 type Props = {
   initialSlug?: string;
+  initialCheckIn?: string;
+  initialCheckOut?: string;
   bookingsApiPath?: string;
   barcodeApiPath?: string;
   rulesText?: React.ReactNode;
@@ -52,6 +55,8 @@ type Props = {
 
 export default function BookingWidget({
   initialSlug,
+  initialCheckIn,
+  initialCheckOut,
   bookingsApiPath = '/api/bookings',
   barcodeApiPath = '/api/generate-barcode',
   rulesText,
@@ -80,8 +85,6 @@ export default function BookingWidget({
   const availableRooms = useMemo(() => rooms.filter((r) => !r.fullyBooked), []);
 
   // ── State ──────────────────────────────────────────────────────────
-  const [step, setStep] = useState<1 | 2>(1);
-
   const [selectedSlug, setSelectedSlug] = useState<string>(() => {
     if (initialSlug && rooms.find((r) => r.slug === initialSlug && !r.fullyBooked)) {
       return initialSlug;
@@ -92,8 +95,17 @@ export default function BookingWidget({
   const successRef = useRef<HTMLDivElement>(null);
   const step2Ref = useRef<HTMLDivElement>(null);
 
-  const [checkIn, setCheckIn] = useState<Date | null>(null);
-  const [checkOut, setCheckOut] = useState<Date | null>(null);
+  const [checkIn, setCheckIn] = useState<Date | null>(() =>
+    initialCheckIn ? parseLocalDate(initialCheckIn) : null,
+  );
+  const [checkOut, setCheckOut] = useState<Date | null>(() =>
+    initialCheckOut ? parseLocalDate(initialCheckOut) : null,
+  );
+
+  // Ako su datumi već poznati (proslijeđeni iz URL-a), preskoči na korak 2
+  const [step, setStep] = useState<1 | 2>(() =>
+    initialCheckIn && initialCheckOut ? 2 : 1,
+  );
   const [form, setForm] = useState<BookingFormData>(BOOKING_FORM_DEFAULTS);
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);

@@ -14,12 +14,12 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 type Props = {
-  searchParams: Promise<{ room?: string }>;
+  searchParams: Promise<{ room?: string; checkIn?: string; checkOut?: string }>;
 };
 
 export default async function BookingPage({ searchParams }: Props) {
   const t = await getTranslations('bookingPage');
-  const { room } = await searchParams;
+  const { room, checkIn, checkOut } = await searchParams;
 
   return (
     <div>
@@ -39,7 +39,7 @@ export default async function BookingPage({ searchParams }: Props) {
       {/* BookingWidget — max-w je interno po koraku (3xl na k.1, 5xl na k.2) */}
       <section className="py-12 lg:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <BookingWidget initialSlug={room} />
+          <BookingWidget initialSlug={room} initialCheckIn={checkIn} initialCheckOut={checkOut} />
         </div>
       </section>
 
