@@ -12,6 +12,7 @@ import { getRoom } from '@/modules/rooms/room.repository';
 import { getSiteUrl } from '@/lib/siteUrl';
 import { getValidLocale } from '@/i18n/messages';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
+import { SITE_NAME } from '@/modules/booking/booking.config';
 import ImageGallery from '@/components/hotel/ImageGallery';
 import { Link } from '@/i18n/navigation';
 import { InternalLinks } from '@/components/seo/InternalLinks';
@@ -60,7 +61,7 @@ export default async function RoomDetailPage({ params }: Props) {
   if (!room) notFound();
 
   const breadcrumbJsonLd = getBreadcrumbStructuredData(locale, [
-    { name: 'Ginko Sobe', pathname: '/' },
+    { name: SITE_NAME, pathname: '/' },
     { name: t('breadcrumb.rooms'), pathname: '/rooms' },
     { name: room.name, pathname: `/rooms/${room.slug}` },
   ]);

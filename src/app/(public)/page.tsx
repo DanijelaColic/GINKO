@@ -17,6 +17,7 @@ import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSectio
 import PropertySurroundingsSection from '@/components/hotel/PropertySurroundingsSection';
 import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
 import { PROPERTY_ADDRESS, PROPERTY_MAP_URL } from '@/modules/property/property-details.config';
+import { CONTACT_EMAIL } from '@/modules/booking/booking.config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -25,22 +26,22 @@ export async function generateMetadata(): Promise<Metadata> {
 
 // Sve property fotografije — pojavljuju se u kolažu i lightboxu
 const PROPERTY_IMAGES: GalleryImage[] = [
-  { src: '/images/property/20240504_154454.jpg', alt: 'Ginko Sobe — objekt, Daruvar' },
-  { src: '/images/property/20240906_085556.jpg', alt: 'Ginko Sobe — pogled na objekt' },
-  { src: '/images/property/20240906_091154.jpg', alt: 'Ginko Sobe — zajednički prostori' },
-  { src: '/images/property/20240906_091257.jpg', alt: 'Ginko Sobe — terasa' },
-  { src: '/images/property/20240906_091321.jpg', alt: 'Ginko Sobe — detalji' },
-  { src: '/images/property/20240906_091344.jpg', alt: 'Ginko Sobe — prostori' },
-  { src: '/images/property/20240929_072608.jpg', alt: 'Ginko Sobe — okolica Daruvara' },
-  { src: '/images/property/20241101_080530.jpg', alt: 'Ginko Sobe — doručak' },
-  { src: '/images/property/20241101_080707.jpg', alt: 'Ginko Sobe — jutarnji obrok' },
-  { src: '/images/property/20250405_085232.jpg', alt: 'Ginko Sobe — proljeće' },
-  { src: '/images/property/20250420_083046.jpg', alt: 'Ginko Sobe — travanj' },
-  { src: '/images/property/20250501_174531.jpg', alt: 'Ginko Sobe — veljača' },
-  { src: '/images/property/20251202_144635.jpg', alt: 'Ginko Sobe — eksterijer' },
-  { src: '/images/property/20251202_144813.jpg', alt: 'Ginko Sobe — fasada' },
-  { src: '/images/property/20251202_150520.jpg', alt: 'Ginko Sobe — objekt zimi' },
-  { src: '/images/property/20251228_151836.jpg', alt: 'Ginko Sobe — Daruvar' },
+  { src: '/images/property/20240504_154454.jpg', alt: 'Ginko Boutique Rooms & Wellness — objekt, Daruvar' },
+  { src: '/images/property/20240906_085556.jpg', alt: 'Ginko Boutique Rooms & Wellness — pogled na objekt' },
+  { src: '/images/property/20240906_091154.jpg', alt: 'Ginko Boutique Rooms & Wellness — zajednički prostori' },
+  { src: '/images/property/20240906_091257.jpg', alt: 'Ginko Boutique Rooms & Wellness — terasa' },
+  { src: '/images/property/20240906_091321.jpg', alt: 'Ginko Boutique Rooms & Wellness — detalji' },
+  { src: '/images/property/20240906_091344.jpg', alt: 'Ginko Boutique Rooms & Wellness — prostori' },
+  { src: '/images/property/20240929_072608.jpg', alt: 'Ginko Boutique Rooms & Wellness — okolica Daruvara' },
+  { src: '/images/property/20241101_080530.jpg', alt: 'Ginko Boutique Rooms & Wellness — doručak' },
+  { src: '/images/property/20241101_080707.jpg', alt: 'Ginko Boutique Rooms & Wellness — jutarnji obrok' },
+  { src: '/images/property/20250405_085232.jpg', alt: 'Ginko Boutique Rooms & Wellness — proljeće' },
+  { src: '/images/property/20250420_083046.jpg', alt: 'Ginko Boutique Rooms & Wellness — travanj' },
+  { src: '/images/property/20250501_174531.jpg', alt: 'Ginko Boutique Rooms & Wellness — veljača' },
+  { src: '/images/property/20251202_144635.jpg', alt: 'Ginko Boutique Rooms & Wellness — eksterijer' },
+  { src: '/images/property/20251202_144813.jpg', alt: 'Ginko Boutique Rooms & Wellness — fasada' },
+  { src: '/images/property/20251202_150520.jpg', alt: 'Ginko Boutique Rooms & Wellness — objekt zimi' },
+  { src: '/images/property/20251228_151836.jpg', alt: 'Ginko Boutique Rooms & Wellness — Daruvar' },
 ];
 
 const FEATURE_ICONS = [Car, Wifi, Wind, Waves, TreePine, Star];
@@ -64,7 +65,7 @@ export default async function HomePage() {
       <section className="relative min-h-[88vh] flex flex-col items-center justify-center px-4 py-24 overflow-hidden">
         <Image
           src="/images/hero/exterior-01.webp"
-          alt="Ginko Sobe — Daruvar"
+          alt="Ginko Boutique Rooms & Wellness — Daruvar"
           fill
           priority
           className="object-cover object-center"
@@ -133,11 +134,11 @@ export default async function HomePage() {
               </a>
 
               <a
-                href="mailto:info@ginko-sobe.com"
+                href={`mailto:${CONTACT_EMAIL}`}
                 className="flex items-center gap-1.5 hover:text-primary transition-colors"
               >
                 <Mail size={13} className="text-primary shrink-0" />
-                info@ginko-sobe.com
+                {CONTACT_EMAIL}
               </a>
             </div>
           </div>
@@ -221,7 +222,7 @@ export default async function HomePage() {
       <section className="relative py-24 px-4 overflow-hidden">
         <Image
           src="/images/hero/hero-01.webp"
-          alt="Rezerviraj odmor u Ginko Sobe"
+          alt="Rezerviraj odmor u Ginko Boutique Rooms & Wellness"
           fill
           className="object-cover object-center"
           sizes="100vw"

@@ -7,6 +7,7 @@ export type BookingFormData = {
   phone: string;
   adults: string;
   children: string;
+  arrivalTime: string;
   notes: string;
   agreeRules: boolean;
 };
@@ -17,6 +18,7 @@ export const BOOKING_FORM_DEFAULTS: BookingFormData = {
   phone: '',
   adults: '2',
   children: '0',
+  arrivalTime: '',
   notes: '',
   agreeRules: false,
 };

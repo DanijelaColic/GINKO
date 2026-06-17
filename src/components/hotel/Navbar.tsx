@@ -48,7 +48,10 @@ export default function Navbar() {
     >
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         {/* Brand */}
-        <Link href="/" className="font-serif text-xl font-semibold text-[--color-primary]">
+        <Link
+          href="/"
+          className="font-serif text-sm sm:text-base lg:text-lg font-semibold text-primary leading-snug max-w-[52%] sm:max-w-xs md:max-w-none shrink-0"
+        >
           {t('brand')}
         </Link>
 

@@ -1,4 +1,4 @@
-// Real room data — Ginko Sobe, Trg Presvetog Trojstva 3, 43500 Daruvar
+// Real room data — Ginko Sobe, Ulica Tomaša Garika Masaryka 1, 43500 Daruvar
 // Images: Unsplash placeholders — replace with real photos before launch
 // EN/DE translations mirror HR until proper translation is done (marked TODO)
 
@@ -10,7 +10,7 @@ export const rooms: Room[] = [
     name: 'Ginko 1',
     tagline: 'Šarmantna i intimna soba u srcu Daruvara.',
     description:
-      'Dobrodošli u Ginko 1, šarmantnu i intimnu sobu skrivenu u prekrasnom gradu Daruvaru. Smještena na Trgu Presvetog Trojstva 3, ova soba je savršeno dizajnirana za osobu koja traži mir i udobnost — ali udobno smješta i dvoje. Prostrana spavaća soba s bračnim krevetom, moderna kupaonica i topla atmosfera osiguravaju sve što vam treba za opuštajući boravak. Kućni ljubimci su dobrodošli na upit.',
+      'Dobrodošli u Ginko 1, šarmantnu i intimnu sobu skrivenu u prekrasnom gradu Daruvaru. Smještena na Ulici Tomaša Garika Masaryka 1, ova soba je savršeno dizajnirana za osobu koja traži mir i udobnost — ali udobno smješta i dvoje. Prostrana spavaća soba s bračnim krevetom, moderna kupaonica i topla atmosfera osiguravaju sve što vam treba za opuštajući boravak. Kućni ljubimci su dobrodošli na upit.',
     capacity: 2,
     capacityNote: '2 osobe',
     size: 15,
@@ -31,7 +31,7 @@ export const rooms: Room[] = [
     name: 'Ginko 2',
     tagline: 'Prostrana soba s terasom za ugodne večeri.',
     description:
-      'Otkrijte očaravajući boravak u Ginko 2, šarmantnoj sobi smještenoj u srcu slikovitog Daruvara. Smještena na Trgu Presvetog Trojstva 3, nećete biti daleko od bogate povijesti i ljepote ovog grada. Soba udobno prima do dvoje gostiju, a po potrebi može ugostiti i treću osobu. Terasa, satelitski TV i pristup sauni čine ovu sobu jednim od omiljenih izbora naših gostiju. Kućni ljubimci su dobrodošli na upit.',
+      'Otkrijte očaravajući boravak u Ginko 2, šarmantnoj sobi smještenoj u srcu slikovitog Daruvara. Smještena na Ulici Tomaša Garika Masaryka 1, nećete biti daleko od bogate povijesti i ljepote ovog grada. Soba udobno prima do dvoje gostiju, a po potrebi može ugostiti i treću osobu. Terasa, satelitski TV i pristup sauni čine ovu sobu jednim od omiljenih izbora naših gostiju. Kućni ljubimci su dobrodošli na upit.',
     capacity: 3,
     capacityNote: 'do 3 osobe',
     size: 20,
@@ -52,7 +52,7 @@ export const rooms: Room[] = [
     name: 'Ginko 3',
     tagline: 'Privatno utočište s modernim sadržajima i terasom.',
     description:
-      'Dobrodošli u Ginko 3, vaše privatno utočište smješteno u srcu Daruvara. Naš šarmantni apartman nalazi se na Trgu Presvetog Trojstva 3, nudeći vam autentično hrvatsko iskustvo u samom srcu vivopisne kulture i bogate povijesti. Soba je potpuno opremljena modernim sadržajima i udobno prima 2 gosta, a po potrebi i do 3. Terasa, sauna i potpuna privatnost čine ovaj boravak posebnim. Kućni ljubimci su dobrodošli na upit.',
+      'Dobrodošli u Ginko 3, vaše privatno utočište smješteno u srcu Daruvara. Naš šarmantni apartman nalazi se na Ulici Tomaša Garika Masaryka 1, nudeći vam autentično hrvatsko iskustvo u samom srcu vivopisne kulture i bogate povijesti. Soba je potpuno opremljena modernim sadržajima i udobno prima 2 gosta, a po potrebi i do 3. Terasa, sauna i potpuna privatnost čine ovaj boravak posebnim. Kućni ljubimci su dobrodošli na upit.',
     capacity: 3,
     capacityNote: 'do 3 osobe',
     size: 18,
@@ -73,7 +73,7 @@ export const rooms: Room[] = [
     name: 'Ginko 4',
     tagline: 'Moderna soba s terasom i luksuznim sadržajima.',
     description:
-      'Dobrodošli u Ginko 4 — udobnu sobu s pažljivo odabranim sadržajima za savršen odmor. Smještena u srcu Daruvara na Trgu Presvetog Trojstva 3, ova soba nudi vrhunsku lokaciju u blizini gradskih atrakcija. Naše ljubazno osoblje posvećeno je tome da vaš boravak bude nezaboravan. Terasa, sauna i privatno parkiranje dostupni su svim gostima. Kućni ljubimci su dobrodošli na upit.',
+      'Dobrodošli u Ginko 4 — udobnu sobu s pažljivo odabranim sadržajima za savršen odmor. Smještena u srcu Daruvara na Ulici Tomaša Garika Masaryka 1, ova soba nudi vrhunsku lokaciju u blizini gradskih atrakcija. Naše ljubazno osoblje posvećeno je tome da vaš boravak bude nezaboravan. Terasa, sauna i privatno parkiranje dostupni su svim gostima. Kućni ljubimci su dobrodošli na upit.',
     capacity: 2,
     capacityNote: '2 osobe',
     size: 20,
@@ -94,7 +94,7 @@ export const rooms: Room[] = [
     name: 'Ginko 5',
     tagline: 'Elegantna soba za savršen odmor u centru grada.',
     description:
-      'Dobrodošli u Ginko 5, vaš savršeni boravak u kulturnom srcu Hrvatske. Smještena na Trgu Presvetog Trojstva 3 u Daruvaru, ova elegantna soba nudi ugodan i autentičan okus hrvatskog načina života. Privatni, potpuno namješteni prostor pažljivo je dizajniran za smještaj do dvoje gostiju, no prostrani raspored s lakoćom prima i treću osobu. Terasa, sauna i potpuna privatnost dostupni su svim gostima. Kućni ljubimci su dobrodošli na upit.',
+      'Dobrodošli u Ginko 5, vaš savršeni boravak u kulturnom srcu Hrvatske. Smještena na Ulici Tomaša Garika Masaryka 1 u Daruvaru, ova elegantna soba nudi ugodan i autentičan okus hrvatskog načina života. Privatni, potpuno namješteni prostor pažljivo je dizajniran za smještaj do dvoje gostiju, no prostrani raspored s lakoćom prima i treću osobu. Terasa, sauna i potpuna privatnost dostupni su svim gostima. Kućni ljubimci su dobrodošli na upit.',
     capacity: 3,
     capacityNote: 'do 3 osobe',
     size: 20,
@@ -115,7 +115,7 @@ export const rooms: Room[] = [
     name: 'Ginko 6',
     tagline: 'Idealna za solo putnike — miran i intiman boravak.',
     description:
-      'Dobrodošli u Ginko 6, ugodnu i privlačnu sobu smještenu u srcu Daruvara na Trgu Presvetog Trojstva 3. Ova soba je posebno osmišljena za solo putnike ili poslovne goste koji traže miran odmor. Udobna spavaća soba s jednokrevetnim krevetom, moderna kupaonica i terasa osiguravaju sve što vam treba za mirno i opuštajuće noćenje. Sauna je dostupna svim gostima. Kućni ljubimci su dobrodošli na upit.',
+      'Dobrodošli u Ginko 6, ugodnu i privlačnu sobu smještenu u srcu Daruvara na Ulici Tomaša Garika Masaryka 1. Ova soba je posebno osmišljena za solo putnike ili poslovne goste koji traže miran odmor. Udobna spavaća soba s jednokrevetnim krevetom, moderna kupaonica i terasa osiguravaju sve što vam treba za mirno i opuštajuće noćenje. Sauna je dostupna svim gostima. Kućni ljubimci su dobrodošli na upit.',
     capacity: 1,
     capacityNote: '1 osoba',
     size: 14,

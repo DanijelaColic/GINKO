@@ -4,6 +4,7 @@ import { Resend } from 'resend';
 import { formatDisplayDate } from '@/modules/booking/dates';
 import {
   OWNER_EMAIL,
+  CONTACT_EMAIL,
   OWNER_PHONE,
   RECIPIENT_IBAN,
   RECIPIENT_NAME,
@@ -173,7 +174,7 @@ function guestReceivedHtml(d: FullData, depositPct: number, locale: 'hr' | 'en' 
           ? `<p style="font-size:14px;color:#6b7a6e;margin:16px 0 0;">Detalji i uplata: <a href="${d.confirmationUrl}" style="color:#3a6b4a;">${d.confirmationUrl}</a></p>`
           : ''
       }
-      <p style="font-size:13px;color:#6b7a6e;margin:24px 0 0;">Kontakt: ${OWNER_PHONE || ''} · ${OWNER_INBOX()}</p>
+      <p style="font-size:13px;color:#6b7a6e;margin:24px 0 0;">Kontakt: ${OWNER_PHONE || ''} · ${CONTACT_EMAIL}</p>
     </div>
   `);
 }

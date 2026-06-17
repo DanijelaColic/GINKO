@@ -1,7 +1,8 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Phone, Mail, Clock, MapPin } from 'lucide-react';
-import { PROPERTY_MAP_URL } from '@/modules/property/property-details.config';
+import { PROPERTY_MAP_URL, PROPERTY_STREET, PROPERTY_CITY } from '@/modules/property/property-details.config';
+import { CONTACT_EMAIL } from '@/modules/booking/booking.config';
 
 const YEAR = new Date().getFullYear();
 
@@ -64,8 +65,8 @@ export default async function Footer() {
               >
                 <MapPin size={14} className="shrink-0 mt-0.5 text-white/40" />
                 <span>
-                  Trg Presvetog Trojstva 3<br />
-                  43500 Daruvar, Hrvatska
+                  {PROPERTY_STREET}<br />
+                  {PROPERTY_CITY}
                 </span>
               </a>
               <a
@@ -76,11 +77,11 @@ export default async function Footer() {
                 095 9000 799
               </a>
               <a
-                href="mailto:ginko.sobe@gmail.com"
+                href={`mailto:${CONTACT_EMAIL}`}
                 className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
               >
                 <Mail size={14} className="shrink-0 text-white/40" />
-                ginko.sobe@gmail.com
+                {CONTACT_EMAIL}
               </a>
               <p className="flex items-start gap-2 text-sm text-white/60">
                 <Clock size={14} className="shrink-0 mt-0.5 text-white/40" />
@@ -107,6 +108,18 @@ export default async function Footer() {
             ))}
           </nav>
         </div>
+
+        <p className="mt-4 text-center text-xs text-white/25">
+          {t('credit')}{' '}
+          <a
+            href="https://enkr.hr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/40 hover:text-white/70 transition-colors"
+          >
+            enkr.hr
+          </a>
+        </p>
       </div>
     </footer>
   );

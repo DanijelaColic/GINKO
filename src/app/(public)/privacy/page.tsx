@@ -7,15 +7,15 @@ import { getLocale } from 'next-intl/server';
 import { getValidLocale } from '@/i18n/messages';
 import { Link } from '@/i18n/navigation';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
+import { CONTACT_EMAIL, SITE_NAME } from '@/modules/booking/booking.config';
 
 const LAST_UPDATED = '28. svibnja 2026.';
-const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? 'info@ginko-sobe.com';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Politika privatnosti',
     description:
-      'Politika privatnosti Ginko Sobe — kako prikupljamo, koristimo i štitimo vaše osobne podatke sukladno GDPR-u.',
+      `Politika privatnosti ${SITE_NAME} — kako prikupljamo, koristimo i štitimo vaše osobne podatke sukladno GDPR-u.`,
     robots: { index: true },
     alternates: { canonical: '/privacy' },
   };
@@ -25,7 +25,7 @@ export default async function PrivacyPage() {
   const locale = getValidLocale(await getLocale());
 
   const breadcrumbJsonLd = getBreadcrumbStructuredData(locale, [
-    { name: 'Ginko Sobe', pathname: '/' },
+    { name: SITE_NAME, pathname: '/' },
     { name: 'Politika privatnosti', pathname: '/privacy' },
   ]);
 
@@ -48,7 +48,7 @@ export default async function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold text-text mb-3">1. Voditelj obrade</h2>
           <p>
-            Voditelj obrade osobnih podataka je vlasnik smještajnog objekta Ginko Sobe. Za
+            Voditelj obrade osobnih podataka je vlasnik smještajnog objekta {SITE_NAME}. Za
             pitanja vezana uz privatnost možete nas kontaktirati putem e-pošte:{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">
               {CONTACT_EMAIL}

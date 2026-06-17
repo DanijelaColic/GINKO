@@ -1,14 +1,14 @@
 {
   "siteMetadata": {
-    "title": "Ginko Zimmer",
-    "description": "Gemütliche Unterkunft inmitten der Natur. Buchen Sie Ihr Zimmer auf ginko-sobe.com.",
-    "openGraphAlt": "Ginko Zimmer – Unterkunftsansicht"
+    "title": "Ginko Boutique Rooms & Wellness",
+    "description": "Gemütliche Unterkunft im Herzen von Daruvar. Buchen Sie Ihr Zimmer auf ginko-sobe.com.",
+    "openGraphAlt": "Ginko Boutique Rooms & Wellness – Unterkunftsansicht"
   },
   "metadata": {
     "layout": {
       "title": {
         "default": "Ginko Boutique Rooms & Wellness Daruvar",
-        "template": "%s | Ginko Zimmer Daruvar"
+        "template": "%s | Ginko Boutique Rooms & Wellness Daruvar"
       },
       "description": "Boutique-Zimmer im Herzen von Daruvar, Kroatien — WLAN, Klimaanlage, Sauna und kostenloser Parkplatz. Direkt buchen ohne Vermittler.",
       "openGraph": {
@@ -31,7 +31,7 @@
     }
   },
   "navbar": {
-    "brand": "Ginko Zimmer",
+    "brand": "Ginko Boutique Rooms & Wellness",
     "localeLabel": "Sprache",
     "menuLabel": "Navigation",
     "links": {
@@ -45,7 +45,7 @@
   },
   "footer": {
     "brand": "Ginko Boutique Rooms & Wellness",
-    "tagline": "Trg Presvetog Trojstva 3, 43500 Daruvar",
+    "tagline": "Ulica Tomaša Garika Masaryka 1, 43500 Daruvar",
     "navTitle": "Navigation",
     "links": {
       "home": "Startseite",
@@ -61,7 +61,8 @@
       "cookies": "Cookies"
     },
     "checkIn": "Check-in ab 14:00",
-    "checkOut": "Check-out bis 10:00"
+    "checkOut": "Check-out bis 10:00",
+    "credit": "Erstellt von:"
   },
   "homePage": {
     "heroTitle": "Ginko Boutique Rooms & Wellness Daruvar",
@@ -153,9 +154,9 @@
     "title": "Unsere Zimmer",
     "description": "Sorgfältig gestaltete Zimmer mit natürlichen Materialien und einladender Atmosphäre.",
     "openGraph": {
-      "title": "Zimmer – Ginko Zimmer Zadar",
-      "description": "Komfortable Privatzimmer in Zadar mit Direktbuchung ohne Provision.",
-      "imageAlt": "Ginko Zimmer – Zimmer in Zadar"
+      "title": "Zimmer – Ginko Boutique Rooms & Wellness Daruvar",
+      "description": "Komfortable Boutique-Zimmer in Daruvar mit Direktbuchung ohne Provision.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – Zimmer in Daruvar"
     },
     "itemLabel": "Zimmer",
     "badges": {
@@ -192,7 +193,7 @@
     },
     "metadata": {
       "titlePrefix": "Zimmer",
-      "descriptionSuffix": "Ginko Zimmer."
+      "descriptionSuffix": "Ginko Boutique Rooms & Wellness."
     },
     "stats": {
       "duplex": "Zweistöckig",
@@ -237,9 +238,9 @@
     "title": "Zimmer buchen",
     "description": "Wählen Sie Ihr Zimmer, Datum und senden Sie Ihre Anfrage — ohne Zwischenhändler.",
     "openGraph": {
-      "title": "Zimmer buchen – Ginko Zimmer Zadar",
-      "description": "Direkte Zimmerbuchung in Zadar ohne Vermittler und ohne Provision.",
-      "imageAlt": "Ginko Zimmer – Buchung"
+      "title": "Zimmer buchen – Ginko Boutique Rooms & Wellness Daruvar",
+      "description": "Direkte Zimmerbuchung in Daruvar ohne Vermittler und ohne Provision.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – Buchung"
     },
     "strip": {
       "checkInLabel": "Check-in",
@@ -253,12 +254,33 @@
     }
   },
   "bookingWidget": {
-    "description": "Ginko Zimmer bietet gemütliche Unterkunft in ruhiger Umgebung. Direkte Buchung ohne Plattformgebühren.",
+    "description": "Ginko Boutique Rooms & Wellness bietet gemütliche Unterkunft im Herzen von Daruvar. Direkte Buchung ohne Plattformgebühren.",
     "labels": {
       "night": {
         "one": "1 Nacht",
         "other": "{count} Nächte"
       }
+    },
+    "stepper": {
+      "step1": "Datum wählen",
+      "step2": "Ihre Angaben",
+      "step3": "Bestätigung"
+    },
+    "nav": {
+      "continue": "Weiter",
+      "back": "Zurück"
+    },
+    "sidebar": {
+      "title": "Ihre Buchung",
+      "checkIn": "Anreise",
+      "checkOut": "Abreise",
+      "guests": "Gäste",
+      "priceBreakdown": "Preisübersicht",
+      "deposit": "Anzahlung ({percent}%)",
+      "depositNote": "bei Buchung",
+      "balance": "Restbetrag ({percent}%)",
+      "balanceNote": "{days} Tage vor Anreise",
+      "directBooking": "Direktbuchung • Ohne Provision"
     },
     "steps": {
       "room": "0. Zimmer wählen",
@@ -290,6 +312,8 @@
       "adults": "Erwachsene",
       "children": "Kinder",
       "maxGuests": "Maximal {capacity} Gäste insgesamt",
+      "arrivalTime": "Voraussichtliche Ankunftszeit",
+      "arrivalTimeHint": "Check-in von 14:00 – 23:00 Uhr",
       "notes": "Notiz (optional)",
       "notesPlaceholder": "Besondere Wünsche oder Fragen…",
       "rules": {

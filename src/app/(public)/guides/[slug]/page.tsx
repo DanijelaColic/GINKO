@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { getValidLocale } from '@/i18n/messages';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
+import { SITE_NAME } from '@/modules/booking/booking.config';
 import { getGuideBySlug } from '@/modules/seo/guides/get-guide-by-slug';
 import { getGuides } from '@/modules/seo/guides/get-guides';
 import { GUIDE_HUB_BY_LOCALE } from '@/modules/seo/guides/guides-content';
@@ -61,7 +62,7 @@ export default async function GuideArticlePage({ params }: Props) {
     .slice(0, 4);
 
   const breadcrumbJsonLd = getBreadcrumbStructuredData(locale, [
-    { name: 'Ginko Sobe', pathname: '/' },
+    { name: SITE_NAME, pathname: '/' },
     { name: hub.title, pathname: '/guides' },
     { name: guide.title, pathname: `/guides/${guide.slug}` },
   ]);
@@ -76,8 +77,8 @@ export default async function GuideArticlePage({ params }: Props) {
     datePublished: guide.publishedAt,
     dateModified: guide.updatedAt ?? guide.publishedAt,
     inLanguage: locale,
-    author: { '@type': 'Organization', name: 'Ginko Sobe' },
-    publisher: { '@type': 'Organization', name: 'Ginko Sobe' },
+    author: { '@type': 'Organization', name: SITE_NAME },
+    publisher: { '@type': 'Organization', name: SITE_NAME },
     mainEntityOfPage: `${siteUrl}${basePath}/guides/${guide.slug}`,
     image: guide.coverImage.src,
   };
@@ -133,9 +134,9 @@ export default async function GuideArticlePage({ params }: Props) {
       </div>
 
       <div className="mt-12 rounded-xl border border-accent/25 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-text mb-3">Rezervirajte smještaj u Zadru</h2>
+        <h2 className="text-xl font-semibold text-text mb-3">Rezervirajte smještaj u Daruvaru</h2>
         <p className="text-text/70 leading-relaxed mb-5">
-          Ginko Sobe nudi udoban privatni smještaj blizu centra Zadra.
+          {SITE_NAME} nudi udoban boutique smještaj u srcu Daruvara.
         </p>
         <Link
           href="/booking"

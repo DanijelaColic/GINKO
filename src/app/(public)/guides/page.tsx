@@ -4,6 +4,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { getValidLocale } from '@/i18n/messages';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
+import { SITE_NAME } from '@/modules/booking/booking.config';
 import { GUIDE_HUB_BY_LOCALE } from '@/modules/seo/guides/guides-content';
 import { getGuides } from '@/modules/seo/guides/get-guides';
 import { InternalLinks } from '@/components/seo/InternalLinks';
@@ -14,13 +15,13 @@ export async function generateMetadata(): Promise<Metadata> {
   const localizedPath = locale === 'hr' ? '/guides' : `/${locale}/guides`;
 
   return {
-    title: `${content.title} | Ginko Sobe`,
+    title: `${content.title} | ${SITE_NAME}`,
     description: content.description,
     alternates: {
       canonical: localizedPath,
     },
     openGraph: {
-      title: `${content.title} | Ginko Sobe`,
+      title: `${content.title} | ${SITE_NAME}`,
       description: content.description,
       url: localizedPath,
     },
@@ -33,7 +34,7 @@ export default async function GuidesPage() {
   const guides = getGuides(locale);
 
   const breadcrumbJsonLd = getBreadcrumbStructuredData(locale, [
-    { name: 'Ginko Sobe', pathname: '/' },
+    { name: SITE_NAME, pathname: '/' },
     { name: content.title, pathname: '/guides' },
   ]);
 

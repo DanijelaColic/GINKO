@@ -1,21 +1,24 @@
 'use client';
 
-// Copied from VV/src/modules/booking-admin/components/BookingWidget.tsx
-// Adaptations:
-//   - apartments (from booking.config) → rooms (from @/modules/rooms)
-//   - apartment_slug → room_slug in API POST body
-//   - selectedApartment → selectedRoom
-//   - room selector added (Ginko has multiple rooms, VV is single-unit)
-//   - prop apartmentSlug → roomSlug in BookingCalendar
-//   - color: sand→stone, sand-light→stone-light, secondary→accent
-//   - barcode section retained (optional — gracefully fails if API absent)
+// Refactored to multi-step layout (Booking.com style):
+//   Step 1: Room selector + calendar + payment terms
+//   Step 2: Two-column — BookingSummaryCard (sticky) + guest details form
+//   Step 3: Redirect to /booking/confirmation/[id] (or inline success fallback)
+// All API/pricing/submit logic is unchanged.
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
-import { Check, AlertCircle, Loader2 } from 'lucide-react';
+import { Check, AlertCircle, Loader2, ChevronLeft } from 'lucide-react';
 import BookingCalendar from './BookingCalendar';
-import { formatDisplayDate, formatShortDate, formatDate, calculatePrice } from '@/modules/booking/dates';
+import BookingStepsBar from './BookingStepsBar';
+import BookingSummaryCard from './BookingSummaryCard';
+import {
+  formatDisplayDate,
+  formatShortDate,
+  formatDate,
+  calculatePrice,
+} from '@/modules/booking/dates';
 import {
   RECIPIENT_IBAN,
   RECIPIENT_NAME,
@@ -35,6 +38,11 @@ const DEPOSIT_PCT_DISPLAY = Math.round(DEPOSIT_PERCENT * 100);
 const BALANCE_PCT_DISPLAY = 100 - DEPOSIT_PCT_DISPLAY;
 const HAS_BALANCE_PAYMENT = BALANCE_PCT_DISPLAY > 0;
 
+const ARRIVAL_TIME_OPTIONS = [
+  '14:00', '15:00', '16:00', '17:00', '18:00',
+  '19:00', '20:00', '21:00', '22:00', '23:00',
+];
+
 type Props = {
   initialSlug?: string;
   bookingsApiPath?: string;
@@ -51,6 +59,7 @@ export default function BookingWidget({
   const locale = useLocale();
   const router = useRouter();
   const t = useTranslations('bookingWidget');
+
   const getNightsLabel = useCallback(
     (n: number) => {
       if (n === 1) return t('labels.night.one');
@@ -58,6 +67,7 @@ export default function BookingWidget({
     },
     [t],
   );
+
   const cancellationPolicyLines = useMemo(
     () => [
       t('policies.cancellation.line1'),
@@ -69,7 +79,9 @@ export default function BookingWidget({
 
   const availableRooms = useMemo(() => rooms.filter((r) => !r.fullyBooked), []);
 
-  // Room selector state — initialized from query param or first available
+  // ── State ──────────────────────────────────────────────────────────
+  const [step, setStep] = useState<1 | 2>(1);
+
   const [selectedSlug, setSelectedSlug] = useState<string>(() => {
     if (initialSlug && rooms.find((r) => r.slug === initialSlug && !r.fullyBooked)) {
       return initialSlug;
@@ -78,6 +90,8 @@ export default function BookingWidget({
   });
 
   const successRef = useRef<HTMLDivElement>(null);
+  const step2Ref = useRef<HTMLDivElement>(null);
+
   const [checkIn, setCheckIn] = useState<Date | null>(null);
   const [checkOut, setCheckOut] = useState<Date | null>(null);
   const [form, setForm] = useState<BookingFormData>(BOOKING_FORM_DEFAULTS);
@@ -94,12 +108,20 @@ export default function BookingWidget({
     }
   }, [success]);
 
+  // Scroll na vrh koraka 2 pri prolasku
+  useEffect(() => {
+    if (step === 2 && step2Ref.current) {
+      step2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [step]);
+
   const selectedRoom = rooms.find((r) => r.slug === selectedSlug);
   const priceData =
     checkIn && checkOut && selectedRoom
       ? calculatePrice(checkIn, checkOut, selectedRoom)
       : null;
 
+  // ── Barcode fetch (opcionalno — gracefully fails) ──────────────────
   const fetchBarcodes = useCallback(
     async (amount: number, guestName: string, bookingId: string) => {
       setBarcodeLoading(true);
@@ -116,7 +138,7 @@ export default function BookingWidget({
           setEpcQR(data.epc ?? null);
         }
       } catch {
-        // Barcodes are optional — payment without QR is still possible
+        // Barcodes su opcionalani — plaćanje bez QR-a i dalje radi
       } finally {
         setBarcodeLoading(false);
       }
@@ -171,6 +193,14 @@ export default function BookingWidget({
     setSubmitting(true);
     setSubmitError(null);
 
+    // Spoji arrival_time u notes
+    const combinedNotes = [
+      form.arrivalTime ? `Procijenjeno vrijeme dolaska: ${form.arrivalTime}` : '',
+      form.notes,
+    ]
+      .filter(Boolean)
+      .join('\n');
+
     try {
       const res = await fetch(bookingsApiPath, {
         method: 'POST',
@@ -185,14 +215,13 @@ export default function BookingWidget({
           guest_phone: form.phone,
           adults: parseInt(form.adults),
           children: parseInt(form.children),
-          notes: form.notes,
+          notes: combinedNotes || null,
         }),
       });
 
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? t('errors.submitFailed'));
 
-      // Stay on current host (localhost in dev) — API may return production URL from env.
       if (data.confirmationPath) {
         router.push(data.confirmationPath);
         return;
@@ -218,10 +247,13 @@ export default function BookingWidget({
     }
   };
 
-  // ── Success state ───────────────────────────────────────────────
+  // ── Success state (fallback kada nema confirmationPath) ────────────
   if (success) {
     return (
-      <div ref={successRef} className="max-w-lg mx-auto text-center py-8 sm:py-12 px-4 scroll-mt-24">
+      <div
+        ref={successRef}
+        className="max-w-lg mx-auto text-center py-8 sm:py-12 px-4 scroll-mt-24"
+      >
         <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-6">
           <Check size={32} className="text-green-600" />
         </div>
@@ -273,13 +305,16 @@ export default function BookingWidget({
                   {priceData.totalPrice - priceData.deposit} €
                 </span>
                 <span className="text-muted">
-                  {' '}— {t('success.summary.balanceNote', { days: BALANCE_DAYS_BEFORE_CHECK_IN })}
+                  {' '}
+                  — {t('success.summary.balanceNote', { days: BALANCE_DAYS_BEFORE_CHECK_IN })}
                 </span>
               </p>
             )}
             <div className="border-t border-stone pt-3 space-y-2 text-muted text-xs leading-relaxed">
               <p>
-                <strong className="text-text">{t('success.summary.cancellationTitle')}:</strong>
+                <strong className="text-text">
+                  {t('success.summary.cancellationTitle')}:
+                </strong>
               </p>
               <ul className="list-disc pl-4 space-y-1">
                 {cancellationPolicyLines.map((line) => (
@@ -319,8 +354,14 @@ export default function BookingWidget({
                           🇭🇷 {t('success.summary.hub3Title')}
                         </p>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={hub3Barcode} alt={t('success.summary.hub3Alt')} className="max-w-full h-auto mx-auto" />
-                        <p className="text-[10px] text-muted mt-2">{t('success.summary.hub3Hint')}</p>
+                        <img
+                          src={hub3Barcode}
+                          alt={t('success.summary.hub3Alt')}
+                          className="max-w-full h-auto mx-auto"
+                        />
+                        <p className="text-[10px] text-muted mt-2">
+                          {t('success.summary.hub3Hint')}
+                        </p>
                       </div>
                     )}
                     {epcQR && (
@@ -329,8 +370,14 @@ export default function BookingWidget({
                           🌍 {t('success.summary.epcTitle')}
                         </p>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={epcQR} alt={t('success.summary.epcAlt')} className="max-w-full h-auto mx-auto" />
-                        <p className="text-[10px] text-muted mt-2">{t('success.summary.epcHint')}</p>
+                        <img
+                          src={epcQR}
+                          alt={t('success.summary.epcAlt')}
+                          className="max-w-full h-auto mx-auto"
+                        />
+                        <p className="text-[10px] text-muted mt-2">
+                          {t('success.summary.epcHint')}
+                        </p>
                       </div>
                     )}
                   </div>
@@ -344,6 +391,7 @@ export default function BookingWidget({
           type="button"
           onClick={() => {
             setSuccess(false);
+            setStep(1);
             setHub3Barcode(null);
             setEpcQR(null);
             handleReset();
@@ -357,9 +405,10 @@ export default function BookingWidget({
     );
   }
 
-  return (
-    <div>
-      {/* ── 0. Room selector (Ginko-specific: multiple rooms) ─────── */}
+  // ── Korak 1: Odabir sobe i datuma ─────────────────────────────────
+  const step1 = (
+    <div className="max-w-3xl mx-auto">
+      {/* 0. Odabir sobe */}
       {availableRooms.length > 1 && (
         <section className="mb-8">
           <h2 className="font-serif text-xl font-semibold text-text mb-3">
@@ -379,14 +428,14 @@ export default function BookingWidget({
         </section>
       )}
 
-      {/* ── 1. Calendar ──────────────────────────────────────────── */}
+      {/* 1. Kalendar */}
       <section className="mb-8">
         <div className="flex items-center justify-between mb-4 gap-2 flex-wrap">
           <h2 className="font-serif text-xl font-semibold text-text">{t('steps.dates')}</h2>
           {checkIn && checkOut && priceData && (
             <span className="text-sm text-accent font-medium">
-              {formatShortDate(checkIn, locale)} → {formatShortDate(checkOut, locale)}
-              {' '}· {getNightsLabel(priceData.nights)}
+              {formatShortDate(checkIn, locale)} → {formatShortDate(checkOut, locale)} ·{' '}
+              {getNightsLabel(priceData.nights)}
             </span>
           )}
         </div>
@@ -404,6 +453,7 @@ export default function BookingWidget({
           />
         </div>
 
+        {/* Uvjeti plaćanja — prikazuju se tek nakon odabira datuma */}
         {priceData && (
           <div className="mt-6 bg-stone-light border border-stone rounded-xl p-5 text-sm text-muted space-y-3">
             <h3 className="font-serif text-base font-semibold text-text">
@@ -425,13 +475,16 @@ export default function BookingWidget({
                   {priceData.totalPrice - priceData.deposit} €
                 </span>
                 <span className="text-muted">
-                  {' '}— {t('paymentTerms.balanceNote', { days: BALANCE_DAYS_BEFORE_CHECK_IN })}
+                  {' '}
+                  — {t('paymentTerms.balanceNote', { days: BALANCE_DAYS_BEFORE_CHECK_IN })}
                 </span>
               </p>
             )}
             <div className="pt-1 text-xs leading-relaxed space-y-2">
               <p>
-                <strong className="text-text">{t('paymentTerms.cancellationTitle')}:</strong>
+                <strong className="text-text">
+                  {t('paymentTerms.cancellationTitle')}:
+                </strong>
               </p>
               <ul className="list-disc pl-4 space-y-1">
                 {cancellationPolicyLines.map((line) => (
@@ -443,206 +496,241 @@ export default function BookingWidget({
         )}
       </section>
 
-      {/* ── 2. Price summary + form ───────────────────────────────── */}
-      {checkIn && checkOut && priceData && selectedRoom && (
-        <>
-          <section className="mb-8">
-            <h2 className="font-serif text-xl font-semibold text-text mb-4">
-              {t('steps.summary')}
-            </h2>
-            <div className="bg-stone-light rounded-xl p-5">
-              <div className="flex justify-between items-center mb-3 gap-2 flex-wrap">
-                <span className="text-sm text-muted">
-                  {formatDisplayDate(checkIn, locale)} → {formatDisplayDate(checkOut, locale)}
-                </span>
-                <span className="text-sm text-muted">{getNightsLabel(priceData.nights)}</span>
-              </div>
-              {priceData.lines.map((line) => (
-                <div key={line.label} className="flex justify-between text-sm mb-1 gap-2">
-                  <span className="text-muted">
-                    {t('summary.line', {
-                      nights: line.nights,
-                      label: line.label,
-                      pricePerNight: line.pricePerNight,
-                    })}
-                  </span>
-                  <span className="text-text font-medium shrink-0">{line.subtotal} €</span>
-                </div>
-              ))}
-              {priceData.discountAmount ? (
-                <div className="flex justify-between text-sm mb-1 gap-2">
-                  <span className="text-muted">
-                    {t('summary.discount', {
-                      nights: LONG_STAY_DISCOUNT_NIGHTS,
-                      percent: Math.round(LONG_STAY_DISCOUNT_RATE * 100),
-                    })}
-                  </span>
-                  <span className="text-primary font-medium shrink-0">
-                    - {priceData.discountAmount} €
-                  </span>
-                </div>
-              ) : null}
-              {!!priceData.cleaningFee && (
-                <div className="flex justify-between text-sm mb-1 gap-2">
-                  <span className="text-muted">{t('summary.cleaningFee')}</span>
-                  <span className="text-text font-medium shrink-0">+ {priceData.cleaningFee} €</span>
-                </div>
-              )}
-              <div className="border-t border-stone mt-3 pt-3 flex justify-between items-center">
-                <span className="font-semibold text-text">{t('summary.total')}</span>
-                <span className="font-semibold text-primary text-xl">{priceData.totalPrice} €</span>
-              </div>
-            </div>
-          </section>
+      {/* Nastavi gumb */}
+      <button
+        type="button"
+        disabled={!checkIn || !checkOut || !priceData}
+        onClick={() => setStep(2)}
+        className="w-full bg-accent hover:bg-accent-light disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium py-4 rounded-full transition-colors text-sm"
+      >
+        {t('nav.continue')} →
+      </button>
+    </div>
+  );
 
-          <section>
-            <h2 className="font-serif text-xl font-semibold text-text mb-4">
-              {t('steps.details')}
-            </h2>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-text mb-1.5">
-                    {t('form.name')} <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    name="name"
-                    value={form.name}
-                    onChange={handleFormChange}
-                    required
-                    className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
-                    placeholder={t('form.namePlaceholder')}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-text mb-1.5">
-                    {t('form.email')} <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    name="email"
-                    type="email"
-                    value={form.email}
-                    onChange={handleFormChange}
-                    required
-                    className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
-                    placeholder={t('form.emailPlaceholder')}
-                  />
-                </div>
-              </div>
+  // ── Korak 2: Vaši podaci (2-stupčani layout) ──────────────────────
+  const step2 = checkIn && checkOut && priceData && selectedRoom ? (
+    <div ref={step2Ref} className="scroll-mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 items-start">
 
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-text mb-1.5">
-                    {t('form.phone')} <span className="text-red-400">*</span>
-                  </label>
-                  <input
-                    name="phone"
-                    type="tel"
-                    value={form.phone}
-                    onChange={handleFormChange}
-                    required
-                    className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
-                    placeholder={t('form.phonePlaceholder')}
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-text mb-1.5">
-                    {t('form.adults')}
-                  </label>
-                  <select
-                    name="adults"
-                    value={form.adults}
-                    onChange={handleFormChange}
-                    className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
-                  >
-                    {Array.from({ length: selectedRoom.capacity }, (_, i) => i + 1).map((n) => (
-                      <option key={n} value={n}>{n}</option>
-                    ))}
-                  </select>
-                </div>
-                <div>
-                  <label className="block text-sm font-medium text-text mb-1.5">
-                    {t('form.children')}
-                  </label>
-                  <select
-                    name="children"
-                    value={form.children}
-                    onChange={handleFormChange}
-                    className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
-                  >
-                    {Array.from(
-                      { length: Math.max(0, selectedRoom.capacity - parseInt(form.adults || '1')) + 1 },
-                      (_, i) => i,
-                    ).map((n) => (
-                      <option key={n} value={n}>{n}</option>
-                    ))}
-                  </select>
-                  <p className="text-xs text-muted mt-1">
-                    {t('form.maxGuests', { capacity: selectedRoom.capacity })}
-                  </p>
-                </div>
-              </div>
+        {/* Lijevo: sažetak rezervacije (sticky na desktopima) */}
+        <div className="lg:sticky lg:top-24">
+          <BookingSummaryCard
+            room={selectedRoom}
+            checkIn={checkIn}
+            checkOut={checkOut}
+            priceData={priceData}
+            adults={form.adults}
+            children={form.children}
+            locale={locale}
+          />
+        </div>
 
+        {/* Desno: forma s podacima gosta */}
+        <div>
+          <h2 className="font-serif text-2xl font-semibold text-text mb-6">
+            {t('steps.details')}
+          </h2>
+
+          <form onSubmit={handleSubmit} className="space-y-5">
+            {/* Ime i e-pošta */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-sm font-medium text-text mb-1.5">
-                  {t('form.notes')}
+                  {t('form.name')} <span className="text-red-400">*</span>
                 </label>
-                <textarea
-                  name="notes"
-                  value={form.notes}
-                  onChange={handleFormChange}
-                  rows={3}
-                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors resize-none"
-                  placeholder={t('form.notesPlaceholder')}
-                />
-              </div>
-
-              {rulesText ?? (
-                <div className="bg-stone-light rounded-xl p-4 text-xs text-muted space-y-1">
-                  <p>
-                    <strong className="text-text">{t('form.rules.checkIn')}:</strong> 14:00 – 23:00
-                    &nbsp;|&nbsp;
-                    <strong className="text-text">{t('form.rules.checkOut')}:</strong> 09:00 – 11:00
-                  </p>
-                </div>
-              )}
-
-              <label className="flex items-start gap-3 cursor-pointer">
                 <input
-                  name="agreeRules"
-                  type="checkbox"
-                  checked={form.agreeRules}
+                  name="name"
+                  value={form.name}
                   onChange={handleFormChange}
                   required
-                  className="mt-0.5 accent-primary"
+                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                  placeholder={t('form.namePlaceholder')}
                 />
-                <span className="text-sm text-muted">
-                  {t('form.agreeRules')}
-                  <span className="text-red-400"> *</span>
-                </span>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text mb-1.5">
+                  {t('form.email')} <span className="text-red-400">*</span>
+                </label>
+                <input
+                  name="email"
+                  type="email"
+                  value={form.email}
+                  onChange={handleFormChange}
+                  required
+                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                  placeholder={t('form.emailPlaceholder')}
+                />
+              </div>
+            </div>
+
+            {/* Telefon */}
+            <div>
+              <label className="block text-sm font-medium text-text mb-1.5">
+                {t('form.phone')} <span className="text-red-400">*</span>
               </label>
+              <input
+                name="phone"
+                type="tel"
+                value={form.phone}
+                onChange={handleFormChange}
+                required
+                className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                placeholder={t('form.phonePlaceholder')}
+              />
+            </div>
 
-              {submitError && (
-                <div className="flex items-start gap-2 text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm">
-                  <AlertCircle size={16} className="shrink-0 mt-0.5" />
-                  <span>{submitError}</span>
-                </div>
-              )}
+            {/* Broj gostiju */}
+            <div className="grid grid-cols-2 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-text mb-1.5">
+                  {t('form.adults')}
+                </label>
+                <select
+                  name="adults"
+                  value={form.adults}
+                  onChange={handleFormChange}
+                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
+                >
+                  {Array.from({ length: selectedRoom.capacity }, (_, i) => i + 1).map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-sm font-medium text-text mb-1.5">
+                  {t('form.children')}
+                </label>
+                <select
+                  name="children"
+                  value={form.children}
+                  onChange={handleFormChange}
+                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
+                >
+                  {Array.from(
+                    {
+                      length:
+                        Math.max(0, selectedRoom.capacity - parseInt(form.adults || '1')) + 1,
+                    },
+                    (_, i) => i,
+                  ).map((n) => (
+                    <option key={n} value={n}>
+                      {n}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted mt-1">
+                  {t('form.maxGuests', { capacity: selectedRoom.capacity })}
+                </p>
+              </div>
+            </div>
 
+            {/* Procijenjeno vrijeme dolaska */}
+            <div>
+              <label className="block text-sm font-medium text-text mb-1.5">
+                {t('form.arrivalTime')}
+              </label>
+              <select
+                name="arrivalTime"
+                value={form.arrivalTime}
+                onChange={handleFormChange}
+                className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
+              >
+                <option value="">— Odaberite —</option>
+                {ARRIVAL_TIME_OPTIONS.map((time) => (
+                  <option key={time} value={time}>
+                    {time}
+                  </option>
+                ))}
+              </select>
+              <p className="text-xs text-muted mt-1">{t('form.arrivalTimeHint')}</p>
+            </div>
+
+            {/* Posebni zahtjevi / napomene */}
+            <div>
+              <label className="block text-sm font-medium text-text mb-1.5">
+                {t('form.notes')}
+              </label>
+              <textarea
+                name="notes"
+                value={form.notes}
+                onChange={handleFormChange}
+                rows={3}
+                className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors resize-none"
+                placeholder={t('form.notesPlaceholder')}
+              />
+            </div>
+
+            {/* Kućni red */}
+            {rulesText ?? (
+              <div className="bg-stone-light rounded-xl p-4 text-xs text-muted space-y-1">
+                <p>
+                  <strong className="text-text">{t('form.rules.checkIn')}:</strong> 14:00 – 23:00
+                  &nbsp;|&nbsp;
+                  <strong className="text-text">{t('form.rules.checkOut')}:</strong> 09:00 – 11:00
+                </p>
+              </div>
+            )}
+
+            {/* Suglasnost s pravilima */}
+            <label className="flex items-start gap-3 cursor-pointer">
+              <input
+                name="agreeRules"
+                type="checkbox"
+                checked={form.agreeRules}
+                onChange={handleFormChange}
+                required
+                className="mt-0.5 accent-primary"
+              />
+              <span className="text-sm text-muted">
+                {t('form.agreeRules')}
+                <span className="text-red-400"> *</span>
+              </span>
+            </label>
+
+            {/* Greška pri slanju */}
+            {submitError && (
+              <div className="flex items-start gap-2 text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm">
+                <AlertCircle size={16} className="shrink-0 mt-0.5" />
+                <span>{submitError}</span>
+              </div>
+            )}
+
+            {/* Navigacija: natrag + pošalji */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                type="button"
+                onClick={() => setStep(1)}
+                className="flex items-center justify-center gap-2 px-6 py-3.5 rounded-full border border-stone text-sm font-medium text-text hover:bg-stone-light transition-colors sm:w-auto"
+              >
+                <ChevronLeft size={16} />
+                {t('nav.back')}
+              </button>
               <button
                 type="submit"
                 disabled={submitting || !form.agreeRules}
-                className="w-full bg-accent hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-4 rounded-full transition-colors text-sm flex items-center justify-center gap-2"
+                className="flex-1 bg-accent hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-full transition-colors text-sm flex items-center justify-center gap-2"
               >
                 {submitting && <Loader2 size={16} className="animate-spin" />}
                 {submitting
                   ? t('form.submitting')
                   : t('form.submit', { totalPrice: priceData.totalPrice })}
               </button>
-            </form>
-          </section>
-        </>
-      )}
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  // ── Render ────────────────────────────────────────────────────────
+  return (
+    <div>
+      <BookingStepsBar currentStep={step} />
+      {step === 1 && step1}
+      {step === 2 && step2}
     </div>
   );
 }

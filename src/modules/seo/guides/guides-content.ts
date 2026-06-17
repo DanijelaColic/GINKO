@@ -104,7 +104,7 @@ export const GUIDES: GuideArticle[] = [
         heading: 'Smještaj: sobe vs. apartman',
         paragraphs: [
           'Za kraće boravke do 3-4 noći, privatne sobe s doručkom pružaju lagodnost bez brige oko opremljene kuhinje i domaćinstva.',
-          'Ginko Sobe smještene su blizu centra, a domaćin može savjetovati o skrivenim lokalnim mjestima i izletima koji nisu u turistički vodiču.',
+          'Ginko Boutique Rooms & Wellness smješten je u srcu Daruvara, a domaćin može savjetovati o skrivenim lokalnim mjestima i izletima koji nisu u turističkom vodiču.',
         ],
       },
     ],

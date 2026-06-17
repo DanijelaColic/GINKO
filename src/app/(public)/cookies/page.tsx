@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Link } from '@/i18n/navigation';
+import { SITE_NAME } from '@/modules/booking/booking.config';
 
 const LAST_UPDATED = '28. svibnja 2026.';
 
@@ -7,7 +8,7 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: 'Politika kolačića',
     description:
-      'Politika kolačića Ginko Sobe — koje kolačiće koristimo i kako upravljati vašim postavkama.',
+      `Politika kolačića ${SITE_NAME} — koje kolačiće koristimo i kako upravljati vašim postavkama.`,
     robots: { index: true },
     alternates: { canonical: '/cookies' },
   };

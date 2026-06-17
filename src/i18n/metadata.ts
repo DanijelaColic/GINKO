@@ -1,10 +1,11 @@
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
+import { CONTACT_EMAIL, SITE_NAME } from '@/modules/booking/booking.config';
+import { PROPERTY_STREET } from '@/modules/property/property-details.config';
 import { routing } from './routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ginko-sobe.com';
-const SITE_NAME = 'Ginko Boutique Rooms & Wellness';
 const HERO_OG_IMAGE_PATH = '/images/hero/exterior-01.webp';
 
 const OPEN_GRAPH_LOCALES: Record<string, string> = {
@@ -190,10 +191,10 @@ export async function getStructuredData(locale: Locale) {
     description: t('description'),
     url: SITE_URL,
     telephone: '+385959000799',
-    email: 'ginko.sobe@gmail.com',
+    email: CONTACT_EMAIL,
     address: {
       '@type': 'PostalAddress',
-      streetAddress: 'Trg Presvetog Trojstva 3',
+      streetAddress: PROPERTY_STREET,
       addressLocality: 'Daruvar',
       postalCode: '43500',
       addressCountry: 'HR',

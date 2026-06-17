@@ -11,7 +11,7 @@ import {
 import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import { calculatePrice, isRangeAvailable, parseLocalDate } from '@/modules/booking/dates';
 import type { Room } from '@/modules/rooms/room.types';
-import type { BookedRange } from '@/modules/booking/booking.types';
+import { CONTACT_EMAIL } from '@/modules/booking/booking.config';
 
 type AmenityIconEntry = { icon: React.ElementType; label: string };
 
@@ -297,7 +297,7 @@ export default function AvailabilitySection({ rooms }: Props) {
                 Pokušajte s drugim datumima ili nas kontaktirajte direktno.
               </p>
               <a
-                href="mailto:ginkosobe3@gmail.com"
+                href={`mailto:${CONTACT_EMAIL}`}
                 className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-medium px-6 py-3 rounded-lg transition-colors text-sm"
               >
                 Kontaktirajte nas

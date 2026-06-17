@@ -5,6 +5,7 @@ import { getLocale } from 'next-intl/server';
 export const revalidate = 3600;
 import { getValidLocale } from '@/i18n/messages';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
+import { SITE_NAME } from '@/modules/booking/booking.config';
 import { getGallerySections } from '@/modules/gallery/gallery.service';
 import { GalleryGrid } from '@/components/hotel/GalleryGrid';
 import { InternalLinks } from '@/components/seo/InternalLinks';
@@ -15,9 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
 
   const titles = { hr: 'Galerija', en: 'Gallery', de: 'Galerie' };
   const descs = {
-    hr: 'Fotografije soba, zajedničkih prostora i okolice Zadra.',
-    en: 'Photos of rooms, common areas and the surroundings of Zadar.',
-    de: 'Fotos der Zimmer, Gemeinschaftsbereiche und der Umgebung von Zadar.',
+    hr: 'Fotografije soba, zajedničkih prostora i okolice Daruvara.',
+    en: 'Photos of rooms, common areas and the surroundings of Daruvar.',
+    de: 'Fotos der Zimmer, Gemeinschaftsbereiche und der Umgebung von Daruvar.',
   };
 
   return {
@@ -41,13 +42,13 @@ export default async function GalleryPage() {
 
   const headings = { hr: 'Galerija', en: 'Gallery', de: 'Galerie' };
   const subtitles = {
-    hr: 'Fotografije smještaja i okolice Zadra.',
+    hr: 'Fotografije smještaja i okolice Daruvara.',
     en: 'Photos of our accommodation and surroundings.',
     de: 'Fotos unserer Unterkunft und Umgebung.',
   };
 
   const breadcrumbJsonLd = getBreadcrumbStructuredData(locale, [
-    { name: 'Ginko Sobe', pathname: '/' },
+    { name: SITE_NAME, pathname: '/' },
     { name: headings[locale], pathname: '/gallery' },
   ]);
 

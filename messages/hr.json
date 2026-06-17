@@ -1,14 +1,14 @@
 {
   "siteMetadata": {
-    "title": "Ginko Sobe",
-    "description": "Ugodan smještaj u srcu prirode. Rezervirajte svoju sobu na ginko-sobe.com.",
-    "openGraphAlt": "Ginko Sobe – pogled na smještaj"
+    "title": "Ginko Boutique Rooms & Wellness",
+    "description": "Ugodan smještaj u srcu Daruvara. Rezervirajte svoju sobu na ginko-sobe.com.",
+    "openGraphAlt": "Ginko Boutique Rooms & Wellness – pogled na smještaj"
   },
   "metadata": {
     "layout": {
       "title": {
         "default": "Ginko Boutique Rooms & Wellness Daruvar",
-        "template": "%s | Ginko Sobe Daruvar"
+        "template": "%s | Ginko Boutique Rooms & Wellness Daruvar"
       },
       "description": "Udobne boutique sobe u srcu Daruvara — WiFi, klima, sauna i besplatan parking. Rezervirajte direktno bez posrednika.",
       "openGraph": {
@@ -31,7 +31,7 @@
     }
   },
   "navbar": {
-    "brand": "Ginko Sobe",
+    "brand": "Ginko Boutique Rooms & Wellness",
     "localeLabel": "Jezik",
     "menuLabel": "Navigacija",
     "links": {
@@ -45,7 +45,7 @@
   },
   "footer": {
     "brand": "Ginko Boutique Rooms & Wellness",
-    "tagline": "Trg Presvetog Trojstva 3, 43500 Daruvar",
+    "tagline": "Ulica Tomaša Garika Masaryka 1, 43500 Daruvar",
     "navTitle": "Navigacija",
     "links": {
       "home": "Početna",
@@ -61,7 +61,8 @@
       "cookies": "Kolačići"
     },
     "checkIn": "Check-in od 14:00",
-    "checkOut": "Check-out do 10:00"
+    "checkOut": "Check-out do 10:00",
+    "credit": "Izradio:"
   },
   "homePage": {
     "heroTitle": "Ginko Boutique Rooms & Wellness Daruvar",
@@ -153,9 +154,9 @@
     "title": "Naše sobe",
     "description": "Sobe pažljivo uređene s prirodnim materijalima i ugodnom atmosferom.",
     "openGraph": {
-      "title": "Sobe – Ginko Sobe Zadar",
-      "description": "Udobne privatne sobe u Zadru s direktnom rezervacijom bez provizija.",
-      "imageAlt": "Ginko Sobe – sobe u Zadru"
+      "title": "Sobe – Ginko Boutique Rooms & Wellness Daruvar",
+      "description": "Udobne boutique sobe u Daruvaru s direktnom rezervacijom bez provizija.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – sobe u Daruvaru"
     },
     "itemLabel": "Soba",
     "badges": {
@@ -192,7 +193,7 @@
     },
     "metadata": {
       "titlePrefix": "Soba",
-      "descriptionSuffix": "Ginko Sobe."
+      "descriptionSuffix": "Ginko Boutique Rooms & Wellness."
     },
     "stats": {
       "duplex": "Dvoetažno",
@@ -237,9 +238,9 @@
     "title": "Rezervirajte sobu",
     "description": "Odaberite sobu, datume i pošaljite upit — bez posrednika.",
     "openGraph": {
-      "title": "Rezervirajte sobu – Ginko Sobe Zadar",
-      "description": "Direktna rezervacija sobe u Zadru bez posrednika i bez provizija.",
-      "imageAlt": "Ginko Sobe – rezervacija"
+      "title": "Rezervirajte sobu – Ginko Boutique Rooms & Wellness Daruvar",
+      "description": "Direktna rezervacija sobe u Daruvaru bez posrednika i bez provizija.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – rezervacija"
     },
     "strip": {
       "checkInLabel": "Dolazak",
@@ -253,12 +254,33 @@
     }
   },
   "bookingWidget": {
-    "description": "Ginko Sobe nudi ugodan smještaj u mirnom okruženju. Direktna rezervacija bez provizija.",
+    "description": "Ginko Boutique Rooms & Wellness nudi ugodan smještaj u srcu Daruvara. Direktna rezervacija bez provizija.",
     "labels": {
       "night": {
         "one": "1 noć",
         "other": "{count} noći"
       }
+    },
+    "stepper": {
+      "step1": "Odabir datuma",
+      "step2": "Vaši podaci",
+      "step3": "Potvrda"
+    },
+    "nav": {
+      "continue": "Nastavi",
+      "back": "Natrag"
+    },
+    "sidebar": {
+      "title": "Vaša rezervacija",
+      "checkIn": "Dolazak",
+      "checkOut": "Odlazak",
+      "guests": "Gosti",
+      "priceBreakdown": "Sažetak cijene",
+      "deposit": "Depozit ({percent}%)",
+      "depositNote": "pri rezervaciji",
+      "balance": "Ostatak ({percent}%)",
+      "balanceNote": "do {days} dana prije dolaska",
+      "directBooking": "Direktna rezervacija • Bez provizija"
     },
     "steps": {
       "room": "0. Odabir sobe",
@@ -290,6 +312,8 @@
       "adults": "Odrasli",
       "children": "Djeca",
       "maxGuests": "Najviše {capacity} gostiju ukupno",
+      "arrivalTime": "Procijenjeno vrijeme dolaska",
+      "arrivalTimeHint": "Dolazak između 14:00 – 23:00",
       "notes": "Napomena (nije obavezno)",
       "notesPlaceholder": "Posebne želje ili pitanja…",
       "rules": {

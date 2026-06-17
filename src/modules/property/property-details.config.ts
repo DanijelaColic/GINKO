@@ -1,7 +1,8 @@
-export const PROPERTY_ADDRESS = 'Trg Presvetog Trojstva 3, 43500 Daruvar, Hrvatska';
+export const PROPERTY_STREET = 'Ulica Tomaša Garika Masaryka 1';
+export const PROPERTY_CITY = '43500 Daruvar, Hrvatska';
+export const PROPERTY_ADDRESS = `${PROPERTY_STREET}, ${PROPERTY_CITY}`;
 
-export const PROPERTY_MAP_URL =
-  'https://maps.google.com/?q=Trg+Presvetog+Trojstva+3,+43500+Daruvar,+Hrvatska';
+export const PROPERTY_MAP_URL = `https://maps.google.com/?q=${encodeURIComponent(PROPERTY_ADDRESS)}`;
 
 export type SurroundingItem = {
   label: string;
@@ -180,7 +181,7 @@ export const SURROUNDINGS_COPY = {
 } as const;
 
 export const FACILITIES_COPY = {
-  title: 'Sadržaji u smještajnom objektu Ginko Rooms',
+  title: 'Sadržaji u smještajnom objektu Ginko Boutique Rooms & Wellness',
   popularTitle: 'Najpopularniji sadržaji',
   showAvailability: 'Prikaži raspoloživost',
 } as const;
@@ -208,7 +209,7 @@ export type HouseRuleItem = {
 export const HOUSE_RULES_COPY = {
   title: 'Kućni red',
   subtitle:
-    'Objekt Ginko Rooms prima posebne zahtjeve — dodajte zahtjev u sljedećem koraku!',
+    'Objekt Ginko Boutique Rooms & Wellness prima posebne zahtjeve — dodajte zahtjev u sljedećem koraku!',
   showAvailability: 'Prikaži raspoloživost',
 } as const;
 

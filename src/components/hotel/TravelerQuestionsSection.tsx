@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MessageCircle, ChevronRight } from 'lucide-react';
+import { CONTACT_EMAIL } from '@/modules/booking/booking.config';
 
 const FAQ_COL_1 = ['parking', 'breakfast', 'wifi', 'therms', 'attractions'] as const;
 const FAQ_COL_2 = ['pets', 'checkin', 'wellness', 'families', 'booking'] as const;
@@ -96,7 +97,7 @@ export default function TravelerQuestionsSection() {
           <div className="bg-white border border-stone rounded-xl p-8 flex flex-col items-center justify-center text-center min-h-[200px]">
             <h3 className="font-semibold text-text text-base mb-4">{t('stillLooking')}</h3>
             <a
-              href="mailto:info@ginko-sobe.com"
+              href={`mailto:${CONTACT_EMAIL}`}
               className="inline-flex items-center justify-center border border-primary text-primary hover:bg-primary/5 font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm"
             >
               {t('askQuestion')}
