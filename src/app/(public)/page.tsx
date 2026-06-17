@@ -13,6 +13,8 @@ import PropertyGallery from '@/components/hotel/PropertyGallery';
 import type { GalleryImage } from '@/components/hotel/PropertyGallery';
 import AvailabilitySection from '@/components/hotel/AvailabilitySection';
 import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSection';
+import PropertySurroundingsSection from '@/components/hotel/PropertySurroundingsSection';
+import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -203,9 +205,19 @@ export default async function HomePage() {
       <TravelerQuestionsSection />
 
       {/* ------------------------------------------------------------------ */}
+      {/* OKOLICA OBJEKTA                                                     */}
+      {/* ------------------------------------------------------------------ */}
+      <PropertySurroundingsSection />
+
+      {/* ------------------------------------------------------------------ */}
+      {/* SADRŽAJI OBJEKTA                                                    */}
+      {/* ------------------------------------------------------------------ */}
+      <PropertyFacilitiesSection />
+
+      {/* ------------------------------------------------------------------ */}
       {/* LOKACIJA                                                            */}
       {/* ------------------------------------------------------------------ */}
-      <section className="py-24 px-4 bg-white">
+      <section id="lokacija" className="py-24 px-4 bg-white">
         <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
           <div>
             <p className="text-accent font-semibold tracking-widest text-xs uppercase mb-4">
