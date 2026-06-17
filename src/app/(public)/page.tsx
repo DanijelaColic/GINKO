@@ -16,6 +16,7 @@ import PropertyReviewsSection from '@/components/hotel/PropertyReviewsSection';
 import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSection';
 import PropertySurroundingsSection from '@/components/hotel/PropertySurroundingsSection';
 import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
+import { PROPERTY_ADDRESS, PROPERTY_MAP_URL } from '@/modules/property/property-details.config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -114,13 +115,13 @@ export default async function HomePage() {
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
               <a
-                href="https://maps.google.com/?q=Tomaša+Garika+Masaryka+1,+43500+Daruvar,+Hrvatska"
+                href={PROPERTY_MAP_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1.5 hover:text-primary transition-colors"
               >
                 <MapPin size={13} className="text-primary shrink-0" />
-                Tomaša Garika Masaryka 1, 43500 Daruvar, Hrvatska
+                {PROPERTY_ADDRESS}
               </a>
 
               <a
@@ -162,13 +163,13 @@ export default async function HomePage() {
               Ginko Boutique Rooms &amp; Wellness Daruvar smješten je u samom srcu Daruvara, uz park dvorca Janković i u neposrednoj blizini Daruvarskih toplica. Moderne i elegantno uređene sobe nude besplatan Wi-Fi, privatno parkiralište i vrhunsku udobnost, dok wellness zona sa saunom i jacuzzijem pruža savršeno mjesto za opuštanje nakon dana provedenog u istraživanju grada. Idealno za parove, poslovne goste i sve koji traže miran odmor u kontinentalnoj Hrvatskoj.
             </p>
             <a
-              href="https://maps.google.com/?q=Tomaša+Garika+Masaryka+1,+43500+Daruvar,+Hrvatska"
+              href={PROPERTY_MAP_URL}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2 text-sm text-muted hover:text-primary transition-colors"
             >
               <MapPin size={15} className="text-primary shrink-0" />
-              Tomaša Garika Masaryka 1, 43500 Daruvar, Hrvatska
+              {PROPERTY_ADDRESS}
             </a>
           </div>
 
@@ -213,48 +214,6 @@ export default async function HomePage() {
       {/* SADRŽAJI OBJEKTA                                                    */}
       {/* ------------------------------------------------------------------ */}
       <PropertyFacilitiesSection />
-
-      {/* ------------------------------------------------------------------ */}
-      {/* LOKACIJA                                                            */}
-      {/* ------------------------------------------------------------------ */}
-      <section id="lokacija" className="py-24 px-4 bg-white">
-        <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <p className="text-accent font-semibold tracking-widest text-xs uppercase mb-4">
-              {t('locationEyebrow')}
-            </p>
-            <h2 className="font-serif text-4xl sm:text-5xl font-semibold text-text mb-6 leading-tight">
-              {t('locationTitle')}
-            </h2>
-            <p className="text-muted text-base leading-relaxed mb-8">{t('locationDesc')}</p>
-            <a
-              href="https://maps.google.com/?q=Trg+Presvetog+Trojstva+3,+43500+Daruvar,+Hrvatska"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-medium px-7 py-3 rounded-full transition-colors text-sm"
-            >
-              <MapPin size={16} />
-              {t('locationCta')}
-            </a>
-          </div>
-          <div className="relative h-72 lg:h-80 rounded-2xl overflow-hidden bg-stone">
-            <Image
-              src="/images/property/20251228_151836.jpg"
-              alt="Daruvar — lokacija"
-              fill
-              className="object-cover"
-              sizes="(max-width: 1024px) 100vw, 50vw"
-            />
-            <div className="absolute inset-0 bg-primary/10" />
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-white rounded-2xl shadow-lg px-5 py-3 flex items-center gap-2">
-                <MapPin size={18} className="text-primary" />
-                <span className="font-semibold text-text text-sm">Ginko Sobe · Daruvar</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ------------------------------------------------------------------ */}
       {/* CTA BANNER                                                          */}

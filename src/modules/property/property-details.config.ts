@@ -1,5 +1,7 @@
+export const PROPERTY_ADDRESS = 'Trg Presvetog Trojstva 3, 43500 Daruvar, Hrvatska';
+
 export const PROPERTY_MAP_URL =
-  'https://maps.google.com/?q=Tomaša+Garika+Masaryka+1,+43500+Daruvar,+Hrvatska';
+  'https://maps.google.com/?q=Trg+Presvetog+Trojstva+3,+43500+Daruvar,+Hrvatska';
 
 export type SurroundingItem = {
   label: string;

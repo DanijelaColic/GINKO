@@ -1,6 +1,7 @@
 import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { Phone, Mail, Clock } from 'lucide-react';
+import { Phone, Mail, Clock, MapPin } from 'lucide-react';
+import { PROPERTY_MAP_URL } from '@/modules/property/property-details.config';
 
 const YEAR = new Date().getFullYear();
 
@@ -21,7 +22,7 @@ export default async function Footer() {
   const t = await getTranslations('footer');
 
   return (
-    <footer className="bg-[--color-text] text-white">
+    <footer className="relative z-10 bg-text text-white shrink-0">
       <div className="mx-auto max-w-6xl px-4 py-12">
         <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
           {/* Brand column */}
@@ -55,10 +56,18 @@ export default async function Footer() {
               {t('contactTitle')}
             </p>
             <address className="not-italic space-y-2.5">
-              <p className="text-sm text-white/70 leading-snug">
-                Trg Presvetog Trojstva 3<br />
-                43500 Daruvar, Hrvatska
-              </p>
+              <a
+                href={PROPERTY_MAP_URL}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-start gap-2 text-sm text-white/70 hover:text-white transition-colors leading-snug"
+              >
+                <MapPin size={14} className="shrink-0 mt-0.5 text-white/40" />
+                <span>
+                  Trg Presvetog Trojstva 3<br />
+                  43500 Daruvar, Hrvatska
+                </span>
+              </a>
               <a
                 href="tel:+385959000799"
                 className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
