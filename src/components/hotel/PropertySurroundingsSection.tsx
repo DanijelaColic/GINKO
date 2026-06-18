@@ -5,6 +5,7 @@ import {
   SURROUNDINGS_COPY,
   type SurroundingItem,
 } from '@/modules/property/property-details.config';
+import { SURROUNDINGS_SECTION_ID } from '@/modules/booking/booking.config';
 
 const CATEGORIES = [
   { key: 'restaurants' as const, icon: UtensilsCrossed },
@@ -27,7 +28,7 @@ function SurroundingList({ items }: { items: readonly SurroundingItem[] }) {
 
 export default function PropertySurroundingsSection() {
   return (
-    <section className="py-14 px-4 bg-white border-t border-stone">
+    <section id={SURROUNDINGS_SECTION_ID} className="py-14 px-4 bg-white border-t border-stone scroll-mt-28">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-2">
           <div>

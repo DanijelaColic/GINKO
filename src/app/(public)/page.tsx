@@ -17,7 +17,7 @@ import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSectio
 import PropertySurroundingsSection from '@/components/hotel/PropertySurroundingsSection';
 import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
 import { PROPERTY_ADDRESS, PROPERTY_MAP_URL } from '@/modules/property/property-details.config';
-import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF } from '@/modules/booking/booking.config';
+import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF, OVERVIEW_SECTION_ID } from '@/modules/booking/booking.config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -151,7 +151,8 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       {/* PROPERTY GALERIJA — full width                                      */}
       {/* ------------------------------------------------------------------ */}
-      <PropertyGallery images={PROPERTY_IMAGES} />
+      <div id={OVERVIEW_SECTION_ID} className="scroll-mt-28">
+        <PropertyGallery images={PROPERTY_IMAGES} />
 
       {/* ------------------------------------------------------------------ */}
       {/* OPIS OBJEKTA + KLJUČNI SADRŽAJI                                     */}
@@ -190,6 +191,7 @@ export default async function HomePage() {
           </div>
         </div>
       </section>
+      </div>
 
       {/* ------------------------------------------------------------------ */}
       {/* RASPOLOŽIVOST                                                        */}

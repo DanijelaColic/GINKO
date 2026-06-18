@@ -145,7 +145,7 @@ export default function AvailabilitySection({ rooms }: Props) {
   });
 
   return (
-    <section className="py-14 px-4 bg-stone-light" id={AVAILABILITY_SECTION_ID}>
+    <section className="py-14 px-4 bg-stone-light scroll-mt-28" id={AVAILABILITY_SECTION_ID}>
       <div className="max-w-6xl mx-auto">
         <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text mb-2">
           Raspoloživost

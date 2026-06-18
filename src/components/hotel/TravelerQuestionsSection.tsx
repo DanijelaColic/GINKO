@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MessageCircle, ChevronRight } from 'lucide-react';
-import { CONTACT_EMAIL } from '@/modules/booking/booking.config';
+import { CONTACT_EMAIL, QUESTIONS_SECTION_ID } from '@/modules/booking/booking.config';
 
 const FAQ_COL_1 = ['parking', 'breakfast', 'wifi', 'therms', 'attractions'] as const;
 const FAQ_COL_2 = ['pets', 'checkin', 'wellness', 'families', 'booking'] as const;
@@ -67,7 +67,7 @@ export default function TravelerQuestionsSection() {
   };
 
   return (
-    <section className="py-14 px-4 bg-white border-t border-stone">
+    <section id={QUESTIONS_SECTION_ID} className="py-14 px-4 bg-white border-t border-stone scroll-mt-28">
       <div className="max-w-6xl mx-auto">
         {/* Most prema FAQ-u */}
         <div className="border border-stone rounded-xl p-5 mb-8">

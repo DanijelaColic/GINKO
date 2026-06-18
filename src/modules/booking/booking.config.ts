@@ -45,7 +45,35 @@ export const HIGH_SEASON_LABEL = 'Visoka sezona';
 export const OFF_SEASON_LABEL = 'Van sezone';
 
 // ── Navigacija (raspoloživost → rezervacija) ─────────────────────
+export const OVERVIEW_SECTION_ID = 'pregled';
 export const AVAILABILITY_SECTION_ID = 'raspolozivost';
+export const REVIEWS_SECTION_ID = 'recenzije';
+export const QUESTIONS_SECTION_ID = 'pitanja';
+export const SURROUNDINGS_SECTION_ID = 'okolica';
+export const FACILITIES_SECTION_ID = 'sadrzaji';
+
+export const PROPERTY_SUBNAV_SECTION_IDS = [
+  OVERVIEW_SECTION_ID,
+  AVAILABILITY_SECTION_ID,
+  REVIEWS_SECTION_ID,
+  QUESTIONS_SECTION_ID,
+  SURROUNDINGS_SECTION_ID,
+  FACILITIES_SECTION_ID,
+] as const;
+
+export const PROPERTY_NAV_ITEMS = [
+  { key: 'overview', id: OVERVIEW_SECTION_ID },
+  { key: 'availability', id: AVAILABILITY_SECTION_ID },
+  { key: 'reviews', id: REVIEWS_SECTION_ID },
+  { key: 'questions', id: QUESTIONS_SECTION_ID },
+  { key: 'surroundings', id: SURROUNDINGS_SECTION_ID },
+  { key: 'facilities', id: FACILITIES_SECTION_ID },
+] as const;
+
+export function propertySectionHref(id: string) {
+  return `/#${id}`;
+}
+
 export const AVAILABILITY_SECTION_HREF = `/#${AVAILABILITY_SECTION_ID}` as const;
 
 export function buildAvailabilityHref(params?: {

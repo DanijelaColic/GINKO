@@ -2,17 +2,18 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Phone, Mail, Clock, MapPin } from 'lucide-react';
 import { PROPERTY_MAP_URL, PROPERTY_STREET, PROPERTY_CITY } from '@/modules/property/property-details.config';
-import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF } from '@/modules/booking/booking.config';
+import {
+  CONTACT_EMAIL,
+  PROPERTY_NAV_ITEMS,
+  propertySectionHref,
+} from '@/modules/booking/booking.config';
 
 const YEAR = new Date().getFullYear();
 
-const NAV_LINKS = [
-  { key: 'home', href: '/' },
-  { key: 'rooms', href: '/rooms' },
-  { key: 'booking', href: AVAILABILITY_SECTION_HREF },
-  { key: 'guides', href: '/guides' },
-  { key: 'gallery', href: '/gallery' },
-] as const;
+const NAV_LINKS = PROPERTY_NAV_ITEMS.map(({ key, id }) => ({
+  key,
+  href: propertySectionHref(id),
+}));
 
 const LEGAL_LINKS = [
   { key: 'privacy', href: '/privacy' },
@@ -21,6 +22,7 @@ const LEGAL_LINKS = [
 
 export default async function Footer() {
   const t = await getTranslations('footer');
+  const tSections = await getTranslations('homePage.subnav');
 
   return (
     <footer className="relative z-10 bg-text text-white shrink-0">
@@ -44,7 +46,7 @@ export default async function Footer() {
                     href={href}
                     className="text-sm text-white/70 hover:text-white transition-colors"
                   >
-                    {t(`links.${key}`)}
+                    {tSections(key)}
                   </Link>
                 </li>
               ))}

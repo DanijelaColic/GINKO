@@ -21,6 +21,7 @@ import {
   POPULAR_FACILITIES,
   type FacilityGroup,
 } from '@/modules/property/property-details.config';
+import { FACILITIES_SECTION_ID } from '@/modules/booking/booking.config';
 import PropertyHouseRulesSection from '@/components/hotel/PropertyHouseRulesSection';
 
 const POPULAR_ICONS: Record<(typeof POPULAR_FACILITIES)[number]['id'], ElementType> = {
@@ -76,7 +77,7 @@ export default function PropertyFacilitiesSection() {
   }
 
   return (
-    <section className="py-14 px-4 bg-white border-t border-stone">
+    <section id={FACILITIES_SECTION_ID} className="py-14 px-4 bg-white border-t border-stone scroll-mt-28">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text">

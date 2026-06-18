@@ -10,6 +10,7 @@ import {
   type GuestReview,
   type ReviewTopicId,
 } from '@/modules/property/property-details.config';
+import { REVIEWS_SECTION_ID } from '@/modules/booking/booking.config';
 
 const TEXT_PREVIEW_LENGTH = 180;
 const PREVIEW_COUNT = 3;
@@ -182,8 +183,8 @@ export default function PropertyReviewsSection() {
   return (
     <section
       ref={sectionRef}
-      className="py-14 px-4 bg-white border-t border-stone"
-      id="recenzije"
+      className="py-14 px-4 bg-white border-t border-stone scroll-mt-28"
+      id={REVIEWS_SECTION_ID}
     >
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">

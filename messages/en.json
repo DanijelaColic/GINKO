@@ -46,14 +46,7 @@
   "footer": {
     "brand": "Ginko Boutique Rooms & Wellness",
     "tagline": "Ulica Tomaša Garika Masaryka 1, 43500 Daruvar",
-    "navTitle": "Navigation",
-    "links": {
-      "home": "Home",
-      "rooms": "Rooms",
-      "booking": "Book",
-      "guides": "Guides",
-      "gallery": "Gallery"
-    },
+    "navTitle": "Sections",
     "contactTitle": "Contact",
     "rights": "All rights reserved.",
     "legal": {
@@ -99,7 +92,17 @@
     "ctaTitle": "Ready for your getaway?",
     "ctaSubtitle": "Book your room today and secure your spot in our peaceful corner of Slavonia.",
     "ctaButton": "Book Now",
-    "availabilitySelectDates": "Please select check-in and check-out dates before continuing."
+    "availabilitySelectDates": "Please select check-in and check-out dates before continuing.",
+    "subnav": {
+      "ariaLabel": "Property section navigation",
+      "overview": "Overview",
+      "availability": "Availability",
+      "reviews": "Reviews",
+      "questions": "Questions",
+      "surroundings": "Area",
+      "facilities": "Facilities",
+      "bookCta": "Book now"
+    }
   },
   "travelerQuestions": {
     "title": "Traveler questions",
