@@ -103,6 +103,56 @@ export async function createCheckoutSession(
   };
 }
 
+// ── Create Payment Intent for Stripe Elements (inline form) ──────
+
+/**
+ * Create a Stripe PaymentIntent and return its client_secret for use
+ * with Stripe Elements on the confirmation page (no redirect needed).
+ * Persists a payment_intents row — webhooks handle confirmation.
+ */
+export async function createPaymentIntentForElements(
+  input: CreatePaymentIntentInput,
+): Promise<{ clientSecret: string } & PaymentIntentResult> {
+  const stripe = getStripeClient();
+
+  const pi = await stripe.paymentIntents.create({
+    amount: input.amount_cents,
+    currency: (input.currency ?? 'eur').toLowerCase(),
+    automatic_payment_methods: { enabled: true },
+    metadata: {
+      booking_id: input.booking_id,
+      payment_type: input.metadata?.payment_type ?? 'deposit',
+      ...(input.metadata ?? {}),
+    },
+  });
+
+  if (!pi.client_secret) {
+    throw new Error('Stripe nije vratio client_secret za PaymentIntent');
+  }
+
+  const record = await createPaymentIntentRecord({
+    booking_id: input.booking_id,
+    stripe_payment_intent_id: pi.id,
+    amount: input.amount_cents,
+    currency: (input.currency ?? 'eur').toLowerCase(),
+    status: 'requires_payment_method',
+    client_secret: pi.client_secret,
+    metadata: {
+      payment_type: input.metadata?.payment_type ?? 'deposit',
+    },
+  });
+
+  return {
+    clientSecret: pi.client_secret,
+    id: record.id,
+    stripe_payment_intent_id: pi.id,
+    client_secret: pi.client_secret,
+    amount: record.amount,
+    currency: record.currency,
+    status: record.status,
+  };
+}
+
 // ── Get Payment Status ────────────────────────────────────────────
 
 export async function getPaymentStatus(bookingId: string): Promise<PaymentStatus | null> {

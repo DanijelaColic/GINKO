@@ -3,7 +3,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { verifyBookingViewToken } from '@/lib/bookingConfirmation';
 import { getRoomBySlug } from '@/modules/rooms/room.repository';
-import { formatDisplayDate, parseLocalDate } from '@/modules/booking/dates';
+import { formatDisplayDate, parseLocalDate, calculatePrice } from '@/modules/booking/dates';
 import {
   RECIPIENT_IBAN,
   RECIPIENT_NAME,
@@ -25,7 +25,7 @@ export async function getBookingConfirmationData(
     const { data: booking, error } = await supabase
       .from('bookings')
       .select(
-        'id, room_slug, check_in, check_out, nights, guest_name, guest_email, total_price, deposit, status, created_at',
+        'id, room_slug, check_in, check_out, nights, guest_name, guest_email, total_price, deposit, status, created_at, adults, children',
       )
       .eq('id', bookingId)
       .single();
@@ -37,6 +37,8 @@ export async function getBookingConfirmationData(
     }
 
     const room = getRoomBySlug(booking.room_slug);
+    if (!room) return null;
+
     const checkInDate = parseLocalDate(booking.check_in);
     const checkOutDate = parseLocalDate(booking.check_out);
     const pricePerNight =
@@ -44,18 +46,27 @@ export async function getBookingConfirmationData(
         ? Math.round(booking.total_price / booking.nights)
         : booking.total_price;
 
+    const priceBreakdown = calculatePrice(checkInDate, checkOutDate, room);
+
     return {
       id: booking.id,
       reference: `REZ-${booking.id.substring(0, 8).toUpperCase()}`,
       status: booking.status as BookingConfirmationData['status'],
       guestName: booking.guest_name,
-      roomName: room?.name ?? booking.room_slug,
+      guestEmail: booking.guest_email,
+      roomName: room.name,
+      room,
       checkIn: formatDisplayDate(checkInDate),
       checkOut: formatDisplayDate(checkOutDate),
+      checkInIso: booking.check_in,
+      checkOutIso: booking.check_out,
       nights: booking.nights,
+      adults: booking.adults ?? 1,
+      children: booking.children ?? 0,
       pricePerNight,
       totalPrice: booking.total_price,
       deposit: booking.deposit,
+      priceBreakdown,
       createdAt: booking.created_at,
       payment: {
         recipient: RECIPIENT_NAME,

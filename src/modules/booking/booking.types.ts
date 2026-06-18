@@ -58,18 +58,27 @@ export type PriceBreakdown = {
 
 // ── Booking public confirmation view ──────────────────────────────
 
+import type { Room } from '@/modules/rooms/room.types';
+
 export type BookingConfirmationData = {
   id: string;
   reference: string;
   status: 'pending' | 'confirmed' | 'cancelled';
   guestName: string;
+  guestEmail: string;
   roomName: string;
+  room: Room;
   checkIn: string;
   checkOut: string;
+  checkInIso: string;
+  checkOutIso: string;
   nights: number;
+  adults: number;
+  children: number;
   pricePerNight: number;
   totalPrice: number;
   deposit: number;
+  priceBreakdown: PriceBreakdown;
   createdAt: string;
   payment: {
     recipient: string;

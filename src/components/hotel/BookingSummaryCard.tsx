@@ -30,6 +30,7 @@ type Props = {
   adults: string;
   children: string;
   locale: string;
+  readOnly?: boolean;
 };
 
 const DEPOSIT_PCT = Math.round(DEPOSIT_PERCENT * 100);
@@ -50,6 +51,7 @@ export default function BookingSummaryCard({
   adults,
   children,
   locale,
+  readOnly = false,
 }: Props) {
   const t = useTranslations('bookingWidget');
 
@@ -185,19 +187,21 @@ export default function BookingSummaryCard({
             <p className="text-[11px] text-muted">{room.capacityNote}</p>
           </div>
 
-          {/* Promijeni datume / goste */}
-          <Link
-            href={buildAvailabilityHref({
-              room: room.slug,
-              checkIn: formatDate(checkIn),
-              checkOut: formatDate(checkOut),
-              adults,
-              children,
-            })}
-            className="text-[11px] text-primary hover:underline underline-offset-2 inline-block"
-          >
-            {t('sidebar.changeDates')}
-          </Link>
+          {/* Promijeni datume / goste — skriveno kad je rezervacija već kreirana */}
+          {!readOnly && (
+            <Link
+              href={buildAvailabilityHref({
+                room: room.slug,
+                checkIn: formatDate(checkIn),
+                checkOut: formatDate(checkOut),
+                adults,
+                children,
+              })}
+              className="text-[11px] text-primary hover:underline underline-offset-2 inline-block"
+            >
+              {t('sidebar.changeDates')}
+            </Link>
+          )}
         </div>
 
         {/* ── 4. Pregled cijene ──────────────────────────────────────── */}
