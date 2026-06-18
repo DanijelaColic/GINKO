@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { getValidLocale } from '@/i18n/messages';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
-import { SITE_NAME } from '@/modules/booking/booking.config';
+import { SITE_NAME, AVAILABILITY_SECTION_HREF } from '@/modules/booking/booking.config';
 import { getGuideBySlug } from '@/modules/seo/guides/get-guide-by-slug';
 import { getGuides } from '@/modules/seo/guides/get-guides';
 import { GUIDE_HUB_BY_LOCALE } from '@/modules/seo/guides/guides-content';
@@ -139,7 +139,7 @@ export default async function GuideArticlePage({ params }: Props) {
           {SITE_NAME} nudi udoban boutique smještaj u srcu Daruvara.
         </p>
         <Link
-          href="/booking"
+          href={AVAILABILITY_SECTION_HREF}
           className="inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
         >
           Provjeri dostupnost

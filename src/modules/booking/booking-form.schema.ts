@@ -2,24 +2,40 @@
 // No zod in this phase — keep it minimal
 
 export type BookingFormData = {
-  name: string;
+  firstName: string;
+  lastName: string;
   email: string;
+  country: string;
   phone: string;
+  bookingFor: 'self' | 'other';
+  guestStayingName: string;
   adults: string;
   children: string;
+  needsCrib: boolean;
   arrivalTime: string;
   notes: string;
+  isBusiness: boolean;
+  companyName: string;
+  vatId: string;
   agreeRules: boolean;
 };
 
 export const BOOKING_FORM_DEFAULTS: BookingFormData = {
-  name: '',
+  firstName: '',
+  lastName: '',
   email: '',
+  country: 'Hrvatska',
   phone: '',
+  bookingFor: 'self',
+  guestStayingName: '',
   adults: '2',
   children: '0',
+  needsCrib: false,
   arrivalTime: '',
   notes: '',
+  isBusiness: false,
+  companyName: '',
+  vatId: '',
   agreeRules: false,
 };
 
@@ -28,9 +44,14 @@ export type BookingFormErrors = Partial<Record<keyof BookingFormData, string>>;
 export function validateBookingForm(data: BookingFormData): BookingFormErrors {
   const errors: BookingFormErrors = {};
 
-  if (!data.name.trim()) errors.name = 'Required';
+  if (!data.firstName.trim()) errors.firstName = 'Required';
+  if (!data.lastName.trim()) errors.lastName = 'Required';
   if (!data.email.trim() || !data.email.includes('@')) errors.email = 'Required';
+  if (!data.country.trim()) errors.country = 'Required';
   if (!data.phone.trim()) errors.phone = 'Required';
+  if (data.bookingFor === 'other' && !data.guestStayingName.trim()) {
+    errors.guestStayingName = 'Required';
+  }
   if (!data.agreeRules) errors.agreeRules = 'Required';
 
   return errors;

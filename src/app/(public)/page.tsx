@@ -17,7 +17,7 @@ import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSectio
 import PropertySurroundingsSection from '@/components/hotel/PropertySurroundingsSection';
 import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
 import { PROPERTY_ADDRESS, PROPERTY_MAP_URL } from '@/modules/property/property-details.config';
-import { CONTACT_EMAIL } from '@/modules/booking/booking.config';
+import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF } from '@/modules/booking/booking.config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -234,7 +234,7 @@ export default async function HomePage() {
           </h2>
           <p className="text-white/80 text-base leading-relaxed mb-8">{t('ctaSubtitle')}</p>
           <Link
-            href="/booking"
+            href={AVAILABILITY_SECTION_HREF}
             className="inline-flex items-center gap-2 bg-white text-primary hover:bg-stone-light font-semibold px-9 py-4 rounded-full transition-colors text-base shadow-lg"
           >
             {t('ctaButton')}

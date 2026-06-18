@@ -6,7 +6,9 @@ import type { Metadata } from 'next';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getValidLocale } from '@/i18n/messages';
 import { getPageMetadata } from '@/i18n/metadata';
+import { buildAvailabilityHref } from '@/modules/booking/booking.config';
 import BookingWidget from '@/components/hotel/BookingWidget';
+import { redirect } from '@/i18n/navigation';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -14,32 +16,30 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 type Props = {
-  searchParams: Promise<{ room?: string; checkIn?: string; checkOut?: string }>;
+  searchParams: Promise<{ room?: string; checkIn?: string; checkOut?: string; adults?: string; children?: string }>;
 };
 
 export default async function BookingPage({ searchParams }: Props) {
+  const locale = getValidLocale(await getLocale());
   const t = await getTranslations('bookingPage');
-  const { room, checkIn, checkOut } = await searchParams;
+  const { room, checkIn, checkOut, adults, children } = await searchParams;
+
+  if (!checkIn || !checkOut) {
+    redirect({ href: buildAvailabilityHref(room ? { room } : undefined), locale });
+  }
 
   return (
     <div>
-      {/* Header — copied from VJ rezervacija/page.tsx */}
-      <section className="py-14 lg:py-18 bg-stone-light text-center">
-        <div className="max-w-2xl mx-auto px-4">
-          <p className="text-accent font-medium tracking-widest text-xs uppercase mb-3">
-            {t('eyebrow')}
-          </p>
-          <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-text mb-4">
-            {t('title')}
-          </h1>
-          <p className="text-muted text-base leading-relaxed">{t('description')}</p>
-        </div>
-      </section>
-
-      {/* BookingWidget — max-w je interno po koraku (3xl na k.1, 5xl na k.2) */}
+      {/* BookingWidget — header se prikazuje samo na koraku 1 (unutar widgeta) */}
       <section className="py-12 lg:py-16">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-          <BookingWidget initialSlug={room} initialCheckIn={checkIn} initialCheckOut={checkOut} />
+          <BookingWidget
+            initialSlug={room}
+            initialCheckIn={checkIn}
+            initialCheckOut={checkOut}
+            initialAdults={adults}
+            initialChildren={children}
+          />
         </div>
       </section>
 

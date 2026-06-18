@@ -19,6 +19,13 @@ export type BookingEmailData = {
   guestName: string;
   guestEmail: string;
   guestPhone?: string | null;
+  guestCountry?: string | null;
+  needsCrib?: boolean;
+  isBusiness?: boolean;
+  companyName?: string | null;
+  vatId?: string | null;
+  bookingFor?: 'self' | 'other';
+  guestStayingName?: string | null;
   roomName: string;
   checkIn: Date;
   checkOut: Date;
@@ -205,6 +212,23 @@ function guestConfirmedHtml(d: FullData, locale: 'hr' | 'en' | 'de'): string {
 }
 
 function ownerNewBookingHtml(d: FullData): string {
+  const extraRows = [
+    d.guestCountry
+      ? `<tr><td style="padding:8px 0;color:#6b7a6e;width:120px;">Zemlja</td><td>${d.guestCountry}</td></tr>`
+      : '',
+    d.bookingFor === 'other' && d.guestStayingName
+      ? `<tr><td style="padding:8px 0;color:#6b7a6e;">Boravi gost</td><td style="font-weight:600;">${d.guestStayingName}</td></tr>`
+      : '',
+    d.needsCrib
+      ? `<tr><td style="padding:8px 0;color:#6b7a6e;">Dječji krevetić</td><td style="color:#c26c0a;font-weight:600;">Da ⚠️</td></tr>`
+      : '',
+    d.isBusiness
+      ? `<tr><td style="padding:8px 0;color:#6b7a6e;">Poslovno</td><td>Da${d.companyName ? ` — ${d.companyName}` : ''}${d.vatId ? ` | PDV: ${d.vatId}` : ''}</td></tr>`
+      : '',
+  ]
+    .filter(Boolean)
+    .join('');
+
   return emailShell(`
     <div style="background:#3a6b4a;padding:20px 24px;">
       <h1 style="color:#fff;font-size:18px;margin:0;">Nova rezervacija</h1>
@@ -215,6 +239,7 @@ function ownerNewBookingHtml(d: FullData): string {
         <tr><td style="padding:8px 0;color:#6b7a6e;">Gost</td><td style="font-weight:600;">${d.guestName}</td></tr>
         <tr><td style="padding:8px 0;color:#6b7a6e;">Email</td><td><a href="mailto:${d.guestEmail}">${d.guestEmail}</a></td></tr>
         <tr><td style="padding:8px 0;color:#6b7a6e;">Telefon</td><td>${d.guestPhone ?? '—'}</td></tr>
+        ${extraRows}
         <tr><td style="padding:8px 0;color:#6b7a6e;">Check-in</td><td>${d.checkInStr}</td></tr>
         <tr><td style="padding:8px 0;color:#6b7a6e;">Check-out</td><td>${d.checkOutStr}</td></tr>
         <tr><td style="padding:8px 0;color:#6b7a6e;">Noći</td><td>${d.nights}</td></tr>

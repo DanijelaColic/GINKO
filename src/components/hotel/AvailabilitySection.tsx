@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import Image from 'next/image';
-import { Link } from '@/i18n/navigation';
+import { useTranslations } from 'next-intl';
+import { Link, useRouter } from '@/i18n/navigation';
 import {
-  CalendarDays, Users,
+  CalendarDays, Users, AlertCircle,
   Wifi, Wind, Car, Waves, Tv, Sun, Flame,
   PawPrint, UtensilsCrossed, Maximize2,
 } from 'lucide-react';
@@ -12,7 +13,11 @@ import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import { calculatePrice, isRangeAvailable, parseLocalDate } from '@/modules/booking/dates';
 import type { BookedRange } from '@/modules/booking/booking.types';
 import type { Room } from '@/modules/rooms/room.types';
-import { CONTACT_EMAIL } from '@/modules/booking/booking.config';
+import {
+  CONTACT_EMAIL,
+  AVAILABILITY_SECTION_ID,
+  buildBookingHref,
+} from '@/modules/booking/booking.config';
 
 type AmenityIconEntry = { icon: React.ElementType; label: string };
 
@@ -41,21 +46,53 @@ type RoomStatus = {
 };
 
 export default function AvailabilitySection({ rooms }: Props) {
+  const t = useTranslations('homePage');
+  const router = useRouter();
+
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [guests, setGuests] = useState(2);
+  const [adults, setAdults] = useState(2);
+  const [children, setChildren] = useState(0);
+  const [highlightedRoom, setHighlightedRoom] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<Record<string, RoomStatus | null>>({});
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  const [dateError, setDateError] = useState<string | null>(null);
 
   const today = new Date().toISOString().split('T')[0];
   const hasDates = !!(checkIn && checkOut && checkIn < checkOut);
 
+  // Prefill datuma/sobe/gostiju iz URL query parametara (npr. s hero search bara ili stranice sobe)
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const ci = params.get('checkIn');
+    const co = params.get('checkOut');
+    const room = params.get('room');
+    const a = parseInt(params.get('adults') ?? '');
+    const ch = parseInt(params.get('children') ?? '');
+    if (ci) setCheckIn(ci);
+    if (co) setCheckOut(co);
+    if (room) setHighlightedRoom(room);
+    if (!isNaN(a) && a >= 1) setAdults(a);
+    if (!isNaN(ch) && ch >= 0) setChildren(ch);
+    if (window.location.hash === `#${AVAILABILITY_SECTION_ID}`) {
+      document.getElementById(AVAILABILITY_SECTION_ID)?.scrollIntoView({ behavior: 'smooth' });
+    }
+  }, []);
+
+  useEffect(() => {
+    if (hasDates) setDateError(null);
+  }, [hasDates]);
+
   const handleSearch = useCallback(
     async (e: React.FormEvent) => {
       e.preventDefault();
-      if (!hasDates) return;
+      if (!hasDates) {
+        setDateError(t('availabilitySelectDates'));
+        return;
+      }
 
+      setDateError(null);
       setLoading(true);
       setSearched(true);
 
@@ -86,18 +123,29 @@ export default function AvailabilitySection({ rooms }: Props) {
       setStatuses(map);
       setLoading(false);
     },
-    [hasDates, checkIn, checkOut, rooms],
+    [hasDates, checkIn, checkOut, rooms, t],
   );
+
+  const handleReserve = (roomSlug: string) => {
+    if (!hasDates) {
+      setDateError(t('availabilitySelectDates'));
+      return;
+    }
+    setDateError(null);
+    router.push(buildBookingHref({ room: roomSlug, checkIn, checkOut, adults, children }));
+  };
+
+  const totalGuests = adults + children;
 
   const availableRooms = rooms.filter((r) => {
     if (r.fullyBooked) return false;
-    if (r.capacity < guests) return false;
+    if (r.capacity < totalGuests) return false;
     if (searched && statuses[r.slug]?.available === false) return false;
     return true;
   });
 
   return (
-    <section className="py-14 px-4 bg-stone-light" id="raspolozivost">
+    <section className="py-14 px-4 bg-stone-light" id={AVAILABILITY_SECTION_ID}>
       <div className="max-w-6xl mx-auto">
         <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text mb-2">
           Raspoloživost
@@ -147,21 +195,44 @@ export default function AvailabilitySection({ rooms }: Props) {
             </div>
           </label>
 
+          {/* Odrasli */}
           <label className="flex items-center gap-3 px-4 py-3 border-b sm:border-b-0 sm:border-r border-stone hover:bg-stone-light/60 cursor-pointer">
             <Users size={16} className="text-primary shrink-0" />
             <div className="flex flex-col">
               <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                Gosti
+                Odrasli
               </span>
               <select
-                value={guests}
-                onChange={(e) => { setGuests(Number(e.target.value)); setSearched(false); }}
+                value={adults}
+                onChange={(e) => {
+                  const a = Number(e.target.value);
+                  setAdults(a);
+                  if (children > 3 - a) setChildren(Math.max(0, 3 - a));
+                  setSearched(false);
+                }}
                 className="text-text text-sm font-medium bg-transparent outline-none cursor-pointer pr-2"
               >
-                {[1, 2, 3, 4, 5, 6].map((n) => (
-                  <option key={n} value={n}>
-                    {n} {n === 1 ? 'gost' : 'gosta'}
-                  </option>
+                {[1, 2, 3].map((n) => (
+                  <option key={n} value={n}>{n}</option>
+                ))}
+              </select>
+            </div>
+          </label>
+
+          {/* Djeca */}
+          <label className="flex items-center gap-3 px-4 py-3 border-b sm:border-b-0 sm:border-r border-stone hover:bg-stone-light/60 cursor-pointer">
+            <Users size={16} className="text-primary shrink-0" />
+            <div className="flex flex-col">
+              <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
+                Djeca
+              </span>
+              <select
+                value={children}
+                onChange={(e) => { setChildren(Number(e.target.value)); setSearched(false); }}
+                className="text-text text-sm font-medium bg-transparent outline-none cursor-pointer pr-2"
+              >
+                {Array.from({ length: Math.max(1, 3 - adults + 1) }, (_, i) => i).map((n) => (
+                  <option key={n} value={n}>{n}</option>
                 ))}
               </select>
             </div>
@@ -169,22 +240,32 @@ export default function AvailabilitySection({ rooms }: Props) {
 
           <button
             type="submit"
-            disabled={!hasDates || loading}
+            disabled={loading}
             className="bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-8 py-3 transition-colors text-sm whitespace-nowrap"
           >
             {loading ? 'Provjera…' : 'Provjeri dostupnost'}
           </button>
         </form>
 
+        {dateError && (
+          <div className="flex items-start gap-2 text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm mb-4">
+            <AlertCircle size={16} className="shrink-0 mt-0.5" />
+            <span>{dateError}</span>
+          </div>
+        )}
+
         {/* Kartice soba */}
         <div className="flex flex-col gap-4">
           {availableRooms.map((room) => {
             const status = statuses[room.slug];
+            const isHighlighted = highlightedRoom === room.slug;
 
             return (
               <div
                 key={room.slug}
-                className="bg-white border border-stone rounded-xl overflow-hidden flex flex-col sm:flex-row"
+                className={`bg-white border rounded-xl overflow-hidden flex flex-col sm:flex-row ${
+                  isHighlighted ? 'border-primary ring-2 ring-primary/20' : 'border-stone'
+                }`}
               >
                 {/* Slika */}
                 <Link
@@ -210,20 +291,17 @@ export default function AvailabilitySection({ rooms }: Props) {
                 <div className="flex-1 p-5 flex flex-col sm:flex-row gap-4">
                   {/* Lijevo: Booking-stil detalji */}
                   <div className="flex-1 min-w-0">
-                    {/* Naziv — primary link kao na Bookingu */}
                     <Link href={`/rooms/${room.slug}`}>
                       <h3 className="text-base font-semibold text-primary hover:underline mb-1 leading-tight">
                         {room.name}
                       </h3>
                     </Link>
 
-                    {/* Dostupnost */}
                     <p className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 mb-3">
                       <span className="w-2 h-2 bg-emerald-500 rounded-full shrink-0" />
                       1 soba dostupna
                     </p>
 
-                    {/* Kreveti s ikonama + veličina */}
                     <div className="mb-3 space-y-2">
                       <BedTypeIcons beds={room.beds} iconSize={22} />
                       <span className="flex items-center gap-1 text-xs text-muted">
@@ -232,7 +310,6 @@ export default function AvailabilitySection({ rooms }: Props) {
                       </span>
                     </div>
 
-                    {/* Amenity badgeovi */}
                     <div className="flex flex-wrap gap-1.5">
                       {room.amenities.map((item) => {
                         const entry = AMENITY_ICONS[item];
@@ -272,23 +349,19 @@ export default function AvailabilitySection({ rooms }: Props) {
                       )}
                     </div>
 
-                    <Link
-                      href={
-                        hasDates
-                          ? `/booking?room=${room.slug}&checkIn=${checkIn}&checkOut=${checkOut}`
-                          : `/booking?room=${room.slug}`
-                      }
+                    <button
+                      type="button"
+                      onClick={() => handleReserve(room.slug)}
                       className="bg-primary hover:bg-primary-dark text-white font-medium px-5 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap"
                     >
                       Rezerviraj
-                    </Link>
+                    </button>
                   </div>
                 </div>
               </div>
             );
           })}
 
-          {/* Nema dostupnih soba */}
           {searched && !loading && availableRooms.length === 0 && (
             <div className="text-center py-14 text-muted">
               <p className="font-serif text-xl font-semibold text-text mb-2">

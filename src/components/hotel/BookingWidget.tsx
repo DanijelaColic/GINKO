@@ -48,6 +48,8 @@ type Props = {
   initialSlug?: string;
   initialCheckIn?: string;
   initialCheckOut?: string;
+  initialAdults?: string;
+  initialChildren?: string;
   bookingsApiPath?: string;
   barcodeApiPath?: string;
   rulesText?: React.ReactNode;
@@ -57,6 +59,8 @@ export default function BookingWidget({
   initialSlug,
   initialCheckIn,
   initialCheckOut,
+  initialAdults,
+  initialChildren,
   bookingsApiPath = '/api/bookings',
   barcodeApiPath = '/api/generate-barcode',
   rulesText,
@@ -64,6 +68,7 @@ export default function BookingWidget({
   const locale = useLocale();
   const router = useRouter();
   const t = useTranslations('bookingWidget');
+  const tPage = useTranslations('bookingPage');
 
   const getNightsLabel = useCallback(
     (n: number) => {
@@ -106,7 +111,15 @@ export default function BookingWidget({
   const [step, setStep] = useState<1 | 2>(() =>
     initialCheckIn && initialCheckOut ? 2 : 1,
   );
-  const [form, setForm] = useState<BookingFormData>(BOOKING_FORM_DEFAULTS);
+  const [form, setForm] = useState<BookingFormData>(() => {
+    const a = initialAdults ? parseInt(initialAdults) : null;
+    const ch = initialChildren ? parseInt(initialChildren) : null;
+    return {
+      ...BOOKING_FORM_DEFAULTS,
+      adults: a && a >= 1 ? String(a) : BOOKING_FORM_DEFAULTS.adults,
+      children: ch && ch >= 0 ? String(ch) : BOOKING_FORM_DEFAULTS.children,
+    };
+  });
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
@@ -205,10 +218,19 @@ export default function BookingWidget({
     setSubmitting(true);
     setSubmitError(null);
 
-    // Spoji arrival_time u notes
-    const combinedNotes = [
+    // Spoji sve opcionalne podatke u notes (strukturirano)
+    const guestName = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
+    const notesLines = [
+      form.country ? `Zemlja: ${form.country}` : '',
+      form.bookingFor === 'other' && form.guestStayingName
+        ? `Rezervacija za drugog gosta: ${form.guestStayingName}`
+        : '',
+      form.needsCrib ? 'Dječji krevetić: da' : '',
       form.arrivalTime ? `Procijenjeno vrijeme dolaska: ${form.arrivalTime}` : '',
-      form.notes,
+      form.isBusiness ? 'Poslovno putovanje: da' : '',
+      form.isBusiness && form.companyName ? `Tvrtka: ${form.companyName}` : '',
+      form.isBusiness && form.vatId ? `PDV broj: ${form.vatId}` : '',
+      form.notes.trim() ? `Posebni zahtjevi:\n${form.notes.trim()}` : '',
     ]
       .filter(Boolean)
       .join('\n');
@@ -222,12 +244,22 @@ export default function BookingWidget({
           check_in: formatDate(checkIn),
           check_out: formatDate(checkOut),
           locale,
-          guest_name: form.name,
+          guest_name: guestName,
+          guest_first_name: form.firstName.trim(),
+          guest_last_name: form.lastName.trim(),
+          guest_country: form.country,
           guest_email: form.email,
           guest_phone: form.phone,
           adults: parseInt(form.adults),
           children: parseInt(form.children),
-          notes: combinedNotes || null,
+          booking_for: form.bookingFor,
+          guest_staying_name:
+            form.bookingFor === 'other' ? form.guestStayingName.trim() || null : null,
+          needs_crib: form.needsCrib,
+          is_business: form.isBusiness,
+          company_name: form.isBusiness ? form.companyName.trim() || null : null,
+          vat_id: form.isBusiness ? form.vatId.trim() || null : null,
+          notes: notesLines || null,
         }),
       });
 
@@ -250,7 +282,7 @@ export default function BookingWidget({
 
       setSuccess(true);
       if (priceData && data.bookingId) {
-        fetchBarcodes(priceData.deposit, form.name, data.bookingId);
+        fetchBarcodes(priceData.deposit, guestName, data.bookingId);
       }
     } catch (err) {
       setSubmitError(err instanceof Error ? err.message : t('errors.submitFailed'));
@@ -274,7 +306,7 @@ export default function BookingWidget({
         </h2>
         <p className="text-muted leading-relaxed mb-6">
           {t.rich('success.description', {
-            name: () => <strong className="text-text">{form.name}</strong>,
+            name: () => <strong className="text-text">{form.firstName} {form.lastName}</strong>,
             email: () => <strong className="text-text">{form.email}</strong>,
           })}
         </p>
@@ -420,6 +452,17 @@ export default function BookingWidget({
   // ── Korak 1: Odabir sobe i datuma ─────────────────────────────────
   const step1 = (
     <div className="max-w-3xl mx-auto">
+      {/* Naslov stranice — samo korak 1 */}
+      <div className="text-center mb-10">
+        <p className="text-accent font-medium tracking-widest text-xs uppercase mb-3">
+          {tPage('eyebrow')}
+        </p>
+        <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-text mb-4">
+          {tPage('title')}
+        </h1>
+        <p className="text-muted text-base leading-relaxed">{tPage('description')}</p>
+      </div>
+
       {/* 0. Odabir sobe */}
       {availableRooms.length > 1 && (
         <section className="mb-8">
@@ -544,22 +587,41 @@ export default function BookingWidget({
             {t('steps.details')}
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-5">
-            {/* Ime i e-pošta */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-text mb-1.5">
-                  {t('form.name')} <span className="text-red-400">*</span>
-                </label>
-                <input
-                  name="name"
-                  value={form.name}
-                  onChange={handleFormChange}
-                  required
-                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
-                  placeholder={t('form.namePlaceholder')}
-                />
+          <form onSubmit={handleSubmit} className="space-y-6">
+
+            {/* ── 1. Kontakt podaci ─────────────────────────────────── */}
+            <div className="space-y-4">
+              {/* Ime + Prezime */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1.5">
+                    {t('form.firstName')} <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    name="firstName"
+                    value={form.firstName}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                    placeholder={t('form.firstNamePlaceholder')}
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-text mb-1.5">
+                    {t('form.lastName')} <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    name="lastName"
+                    value={form.lastName}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                    placeholder={t('form.lastNamePlaceholder')}
+                  />
+                </div>
               </div>
+
+              {/* E-pošta */}
               <div>
                 <label className="block text-sm font-medium text-text mb-1.5">
                   {t('form.email')} <span className="text-red-400">*</span>
@@ -574,105 +636,222 @@ export default function BookingWidget({
                   placeholder={t('form.emailPlaceholder')}
                 />
               </div>
-            </div>
 
-            {/* Telefon */}
-            <div>
-              <label className="block text-sm font-medium text-text mb-1.5">
-                {t('form.phone')} <span className="text-red-400">*</span>
-              </label>
-              <input
-                name="phone"
-                type="tel"
-                value={form.phone}
-                onChange={handleFormChange}
-                required
-                className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
-                placeholder={t('form.phonePlaceholder')}
-              />
-            </div>
-
-            {/* Broj gostiju */}
-            <div className="grid grid-cols-2 gap-4">
+              {/* Zemlja */}
               <div>
                 <label className="block text-sm font-medium text-text mb-1.5">
-                  {t('form.adults')}
+                  {t('form.country')} <span className="text-red-400">*</span>
                 </label>
                 <select
-                  name="adults"
-                  value={form.adults}
+                  name="country"
+                  value={form.country}
                   onChange={handleFormChange}
+                  required
                   className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
                 >
-                  {Array.from({ length: selectedRoom.capacity }, (_, i) => i + 1).map((n) => (
-                    <option key={n} value={n}>
-                      {n}
-                    </option>
-                  ))}
+                  <option value="Hrvatska">Hrvatska</option>
+                  <option value="Bosna i Hercegovina">Bosna i Hercegovina</option>
+                  <option value="Srbija">Srbija</option>
+                  <option value="Slovenija">Slovenija</option>
+                  <option value="Austrija">Austrija</option>
+                  <option value="Mađarska">Mađarska</option>
+                  <option value="Njemačka">Njemačka</option>
+                  <option value="Italija">Italija</option>
+                  <option value="Češka">Češka</option>
+                  <option value="Slovačka">Slovačka</option>
+                  <option value="Poljska">Poljska</option>
+                  <option value="Nizozemska">Nizozemska</option>
+                  <option value="Belgija">Belgija</option>
+                  <option value="Francuska">Francuska</option>
+                  <option value="Švicarska">Švicarska</option>
+                  <option value="Velika Britanija">Velika Britanija</option>
+                  <option value="SAD">SAD</option>
+                  <option value="Ostalo">Ostalo</option>
                 </select>
               </div>
+
+              {/* Telefon */}
               <div>
                 <label className="block text-sm font-medium text-text mb-1.5">
-                  {t('form.children')}
+                  {t('form.phone')} <span className="text-red-400">*</span>
                 </label>
-                <select
-                  name="children"
-                  value={form.children}
+                <input
+                  name="phone"
+                  type="tel"
+                  value={form.phone}
                   onChange={handleFormChange}
-                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
-                >
-                  {Array.from(
-                    {
-                      length:
-                        Math.max(0, selectedRoom.capacity - parseInt(form.adults || '1')) + 1,
-                    },
-                    (_, i) => i,
-                  ).map((n) => (
-                    <option key={n} value={n}>
-                      {n}
-                    </option>
-                  ))}
-                </select>
-                <p className="text-xs text-muted mt-1">
-                  {t('form.maxGuests', { capacity: selectedRoom.capacity })}
-                </p>
+                  required
+                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                  placeholder={t('form.phonePlaceholder')}
+                />
               </div>
             </div>
 
-            {/* Procijenjeno vrijeme dolaska */}
+            {/* ── 2. Za koga je rezervacija? ──────────────────────── */}
             <div>
-              <label className="block text-sm font-medium text-text mb-1.5">
-                {t('form.arrivalTime')}
-              </label>
-              <select
-                name="arrivalTime"
-                value={form.arrivalTime}
-                onChange={handleFormChange}
-                className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
-              >
-                <option value="">— Odaberite —</option>
-                {ARRIVAL_TIME_OPTIONS.map((time) => (
-                  <option key={time} value={time}>
-                    {time}
-                  </option>
-                ))}
-              </select>
-              <p className="text-xs text-muted mt-1">{t('form.arrivalTimeHint')}</p>
+              <p className="text-sm font-medium text-text mb-2">
+                {t('form.bookingForTitle')}{' '}
+                <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
+              </p>
+              <div className="space-y-2">
+                <label className="flex items-center gap-3 cursor-pointer text-sm text-text">
+                  <input
+                    type="radio"
+                    name="bookingFor"
+                    value="self"
+                    checked={form.bookingFor === 'self'}
+                    onChange={handleFormChange}
+                    className="accent-primary"
+                  />
+                  {t('form.bookingForSelf')}
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer text-sm text-text">
+                  <input
+                    type="radio"
+                    name="bookingFor"
+                    value="other"
+                    checked={form.bookingFor === 'other'}
+                    onChange={handleFormChange}
+                    className="accent-primary"
+                  />
+                  {t('form.bookingForOther')}
+                </label>
+              </div>
+              {form.bookingFor === 'other' && (
+                <div className="mt-3">
+                  <label className="block text-sm font-medium text-text mb-1.5">
+                    {t('form.guestStayingName')} <span className="text-red-400">*</span>
+                  </label>
+                  <input
+                    name="guestStayingName"
+                    value={form.guestStayingName}
+                    onChange={handleFormChange}
+                    required
+                    className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                    placeholder={t('form.guestStayingNamePlaceholder')}
+                  />
+                </div>
+              )}
             </div>
 
-            {/* Posebni zahtjevi / napomene */}
-            <div>
-              <label className="block text-sm font-medium text-text mb-1.5">
-                {t('form.notes')}
+            {/* ── 3. Krevetić (samo kad ima djece) ────────────────── */}
+            {parseInt(form.children) > 0 && (
+              <label className="flex items-start gap-3 cursor-pointer">
+                <input
+                  name="needsCrib"
+                  type="checkbox"
+                  checked={form.needsCrib}
+                  onChange={handleFormChange}
+                  className="mt-0.5 accent-primary"
+                />
+                <span className="text-sm text-text">
+                  {t('form.needsCrib')}{' '}
+                  <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
+                  <br />
+                  <span className="text-xs text-muted">{t('form.needsCribHint')}</span>
+                </span>
               </label>
-              <textarea
-                name="notes"
-                value={form.notes}
-                onChange={handleFormChange}
-                rows={3}
-                className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors resize-none"
-                placeholder={t('form.notesPlaceholder')}
-              />
+            )}
+
+            {/* ── 4. Dolazak i posebni zahtjevi ───────────────────── */}
+            <div className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-text mb-1.5">
+                  {t('form.arrivalTime')}{' '}
+                  <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
+                </label>
+                <select
+                  name="arrivalTime"
+                  value={form.arrivalTime}
+                  onChange={handleFormChange}
+                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
+                >
+                  <option value="">— Odaberite —</option>
+                  {ARRIVAL_TIME_OPTIONS.map((time) => (
+                    <option key={time} value={time}>
+                      {time}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-xs text-muted mt-1">{t('form.arrivalTimeHint')}</p>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-text mb-1.5">
+                  {t('form.notes')}{' '}
+                  <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
+                </label>
+                <textarea
+                  name="notes"
+                  value={form.notes}
+                  onChange={handleFormChange}
+                  rows={3}
+                  className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors resize-none"
+                  placeholder=""
+                />
+              </div>
+            </div>
+
+            {/* ── 5. Poslovno putovanje ────────────────────────────── */}
+            <div>
+              <p className="text-sm font-medium text-text mb-2">
+                {t('form.businessTitle')}{' '}
+                <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
+              </p>
+              <div className="flex gap-5">
+                <label className="flex items-center gap-2 cursor-pointer text-sm text-text">
+                  <input
+                    type="radio"
+                    name="isBusiness"
+                    value="false"
+                    checked={!form.isBusiness}
+                    onChange={() => setForm((prev) => ({ ...prev, isBusiness: false }))}
+                    className="accent-primary"
+                  />
+                  {t('form.businessNo')}
+                </label>
+                <label className="flex items-center gap-2 cursor-pointer text-sm text-text">
+                  <input
+                    type="radio"
+                    name="isBusiness"
+                    value="true"
+                    checked={form.isBusiness}
+                    onChange={() => setForm((prev) => ({ ...prev, isBusiness: true }))}
+                    className="accent-primary"
+                  />
+                  {t('form.businessYes')}
+                </label>
+              </div>
+              {form.isBusiness && (
+                <div className="mt-3 space-y-3">
+                  <div>
+                    <label className="block text-sm font-medium text-text mb-1.5">
+                      {t('form.companyName')}{' '}
+                      <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
+                    </label>
+                    <input
+                      name="companyName"
+                      value={form.companyName}
+                      onChange={handleFormChange}
+                      className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                      placeholder={t('form.companyNamePlaceholder')}
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-text mb-1.5">
+                      {t('form.vatId')}{' '}
+                      <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
+                    </label>
+                    <input
+                      name="vatId"
+                      value={form.vatId}
+                      onChange={handleFormChange}
+                      className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors"
+                      placeholder={t('form.vatIdPlaceholder')}
+                    />
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Kućni red */}

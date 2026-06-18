@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { Users, Maximize2 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import type { Room } from '@/modules/rooms/room.types';
+import { buildAvailabilityHref } from '@/modules/booking/booking.config';
 
 type Props = {
   room: Room;
@@ -130,7 +131,7 @@ export default function RoomCard({ room, labels }: Props) {
           </Link>
           {!room.fullyBooked && (
             <Link
-              href={`/booking?room=${room.slug}`}
+              href={buildAvailabilityHref({ room: room.slug })}
               className="bg-accent hover:bg-accent-light text-white font-medium px-4 py-2 rounded-full transition-colors text-sm"
             >
               {labels.book}

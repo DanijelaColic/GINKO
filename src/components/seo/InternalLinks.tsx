@@ -2,6 +2,7 @@ import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { getValidLocale } from '@/i18n/messages';
 import { getSeoNavLinks } from '@/modules/seo/seo-nav-links';
+import { AVAILABILITY_SECTION_HREF } from '@/modules/booking/booking.config';
 
 type InternalLinksProps = {
   currentPath: string;
@@ -9,7 +10,7 @@ type InternalLinksProps = {
 
 const CORE_LINKS = [
   { href: '/rooms', labelKey: 'rooms' },
-  { href: '/booking', labelKey: 'booking' },
+  { href: AVAILABILITY_SECTION_HREF, labelKey: 'booking' },
   { href: '/guides', labelKey: 'guides' },
   { href: '/gallery', labelKey: 'gallery' },
 ] as const;

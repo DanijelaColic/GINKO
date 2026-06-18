@@ -12,7 +12,7 @@ import { getRoom } from '@/modules/rooms/room.repository';
 import { getSiteUrl } from '@/lib/siteUrl';
 import { getValidLocale } from '@/i18n/messages';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
-import { SITE_NAME } from '@/modules/booking/booking.config';
+import { SITE_NAME, buildAvailabilityHref } from '@/modules/booking/booking.config';
 import ImageGallery from '@/components/hotel/ImageGallery';
 import { Link } from '@/i18n/navigation';
 import { InternalLinks } from '@/components/seo/InternalLinks';
@@ -209,7 +209,7 @@ export default async function RoomDetailPage({ params }: Props) {
                     </div>
                   </div>
                   <Link
-                    href={`/booking?room=${room.slug}`}
+                    href={buildAvailabilityHref({ room: room.slug })}
                     className="block w-full text-center bg-primary hover:bg-primary-dark text-white font-medium px-6 py-3 rounded-lg transition-colors text-sm"
                   >
                     {t('actions.bookThis')}

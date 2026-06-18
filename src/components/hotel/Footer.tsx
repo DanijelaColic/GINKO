@@ -2,14 +2,14 @@ import { getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Phone, Mail, Clock, MapPin } from 'lucide-react';
 import { PROPERTY_MAP_URL, PROPERTY_STREET, PROPERTY_CITY } from '@/modules/property/property-details.config';
-import { CONTACT_EMAIL } from '@/modules/booking/booking.config';
+import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF } from '@/modules/booking/booking.config';
 
 const YEAR = new Date().getFullYear();
 
 const NAV_LINKS = [
   { key: 'home', href: '/' },
   { key: 'rooms', href: '/rooms' },
-  { key: 'booking', href: '/booking' },
+  { key: 'booking', href: AVAILABILITY_SECTION_HREF },
   { key: 'guides', href: '/guides' },
   { key: 'gallery', href: '/gallery' },
 ] as const;

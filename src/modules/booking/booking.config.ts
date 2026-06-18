@@ -28,8 +28,8 @@ export const DEPOSIT_PERCENT = 0.3;
 /** Ostatak (70%) — platiti ovoliko dana prije dolaska */
 export const BALANCE_DAYS_BEFORE_CHECK_IN = 14;
 
-/** Minimalni boravak: 2 noći */
-export const MIN_NIGHTS = 2;
+/** Minimalni boravak: 1 noć */
+export const MIN_NIGHTS = 1;
 
 /** Nema fiksne naknade za čišćenje (uključeno u cijenu sobe) */
 export const CLEANING_FEE = 0;
@@ -43,6 +43,46 @@ export const HIGH_SEASON_MONTHS: number[] = [7, 8];
 
 export const HIGH_SEASON_LABEL = 'Visoka sezona';
 export const OFF_SEASON_LABEL = 'Van sezone';
+
+// ── Navigacija (raspoloživost → rezervacija) ─────────────────────
+export const AVAILABILITY_SECTION_ID = 'raspolozivost';
+export const AVAILABILITY_SECTION_HREF = `/#${AVAILABILITY_SECTION_ID}` as const;
+
+export function buildAvailabilityHref(params?: {
+  room?: string;
+  checkIn?: string;
+  checkOut?: string;
+  adults?: number | string;
+  children?: number | string;
+}) {
+  if (!params?.room && !params?.checkIn && !params?.checkOut) {
+    return AVAILABILITY_SECTION_HREF;
+  }
+  const q = new URLSearchParams();
+  if (params.room) q.set('room', params.room);
+  if (params.checkIn) q.set('checkIn', params.checkIn);
+  if (params.checkOut) q.set('checkOut', params.checkOut);
+  if (params.adults != null) q.set('adults', String(params.adults));
+  if (params.children != null) q.set('children', String(params.children));
+  return `${AVAILABILITY_SECTION_HREF}?${q.toString()}`;
+}
+
+export function buildBookingHref(params: {
+  room: string;
+  checkIn: string;
+  checkOut: string;
+  adults?: number | string;
+  children?: number | string;
+}) {
+  const q = new URLSearchParams({
+    room: params.room,
+    checkIn: params.checkIn,
+    checkOut: params.checkOut,
+  });
+  if (params.adults != null) q.set('adults', String(params.adults));
+  if (params.children != null) q.set('children', String(params.children));
+  return `/booking?${q.toString()}`;
+}
 
 // ── Admin ─────────────────────────────────────────────────────────
 export const ADMIN_COOKIE_NAME = process.env.ADMIN_COOKIE_NAME ?? 'ginko_admin';

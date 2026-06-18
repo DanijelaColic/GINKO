@@ -6,10 +6,11 @@ import { Menu, X } from 'lucide-react';
 import { Link, usePathname } from '@/i18n/navigation';
 import { localizePath } from '@/i18n/pathnames';
 import type { AppLocale } from '@/i18n/routing';
+import { AVAILABILITY_SECTION_HREF } from '@/modules/booking/booking.config';
 
 const NAV_LINKS = [
   { key: 'rooms', href: '/rooms' },
-  { key: 'booking', href: '/booking' },
+  { key: 'booking', href: AVAILABILITY_SECTION_HREF },
   { key: 'guides', href: '/guides' },
 ] as const;
 
@@ -88,7 +89,7 @@ export default function Navbar() {
             ))}
           </div>
           <Link
-            href="/booking"
+            href={AVAILABILITY_SECTION_HREF}
             className="rounded-lg bg-[--color-primary] px-4 py-2 text-sm font-medium text-white hover:bg-[--color-primary-dark] transition-colors"
           >
             {t('cta')}
@@ -137,7 +138,7 @@ export default function Navbar() {
             ))}
           </div>
           <Link
-            href="/booking"
+            href={AVAILABILITY_SECTION_HREF}
             className="mt-4 block rounded-lg bg-[--color-primary] px-4 py-3 text-center text-sm font-medium text-white hover:bg-[--color-primary-dark] transition-colors"
             onClick={() => setIsOpen(false)}
           >
