@@ -11,6 +11,7 @@ import {
   AVAILABILITY_SECTION_HREF,
   OVERVIEW_SECTION_ID,
   PROPERTY_NAV_ITEMS,
+  PROPERTY_NAV_ITEMS_DESKTOP,
   PROPERTY_SUBNAV_SECTION_IDS,
   propertySectionHref,
   propertySectionIdFromHash,
@@ -163,7 +164,7 @@ export default function Navbar() {
           ref={navListRef}
           className="hidden min-w-0 flex-1 items-center justify-center gap-0.5 overflow-x-auto md:flex [scrollbar-width:none] [&::-webkit-scrollbar]:hidden"
         >
-          {PROPERTY_NAV_ITEMS.map(({ key, id }) => (
+          {PROPERTY_NAV_ITEMS_DESKTOP.map(({ key, id }) => (
             <li key={id} className="shrink-0">
               {renderSectionLink(key, id, sectionLinkClass(isHome && activeSectionId === id))}
             </li>

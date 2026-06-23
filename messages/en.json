@@ -297,6 +297,7 @@
     "sidebar": {
       "title": "Your reservation",
       "propertyLabel": "Property",
+      "roomLabel": "Selected room",
       "checkIn": "Check-in",
       "checkOut": "Check-out",
       "checkInTime": "from 14:00",
@@ -369,9 +370,11 @@
         "checkIn": "Check-in",
         "checkOut": "Check-out"
       },
-      "agreeRules": "I agree with the house rules and booking terms.",
-      "submitting": "Sending…",
-      "submit": "Send booking inquiry · {totalPrice} €"
+      "agreeRules": "I agree with the <houseRules>house rules</houseRules> and <bookingTerms>booking terms</bookingTerms>.",
+      "rulesLinkLabel": "Read house rules and booking terms",
+      "submitting": "Preparing payment…",
+      "continueToPayment": "Continue to payment",
+      "submit": "Continue to payment · {totalPrice} €"
     },
     "success": {
       "title": "Booking inquiry received!",
@@ -402,7 +405,7 @@
     },
     "errors": {
       "maxGuests": "{apartmentName}: maximum {capacity} guests.",
-      "submitFailed": "Sending the booking inquiry failed."
+      "submitFailed": "Could not create the booking. Please try again."
     },
     "policies": {
       "cancellation": {

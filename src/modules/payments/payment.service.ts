@@ -21,6 +21,20 @@ import type {
   PaymentStatus,
 } from './payment.types';
 import { getSiteUrl } from '@/lib/siteUrl';
+import { notifyGuestBookingConfirmed } from '@/lib/email';
+
+async function confirmBookingAfterPayment(bookingId: string): Promise<void> {
+  const { confirmed } = await updateBookingPaymentState(bookingId, {
+    confirmIfPending: true,
+    depositPaid: true,
+  });
+
+  if (confirmed) {
+    void notifyGuestBookingConfirmed(bookingId).catch((err) =>
+      console.error('[email] notifyGuestBookingConfirmed:', err),
+    );
+  }
+}
 
 // ── Create Checkout Session ───────────────────────────────────────
 
@@ -281,10 +295,7 @@ async function handleCheckoutSessionCompleted(
 
   // Update booking: pending → confirmed + deposit_paid
   if (record.booking_id) {
-    await updateBookingPaymentState(record.booking_id, {
-      confirmIfPending: true,
-      depositPaid: true,
-    });
+    await confirmBookingAfterPayment(record.booking_id);
   }
 }
 
@@ -316,10 +327,7 @@ async function handlePaymentIntentSucceeded(pi: Stripe.PaymentIntent): Promise<v
   });
 
   if (record.booking_id) {
-    await updateBookingPaymentState(record.booking_id, {
-      confirmIfPending: true,
-      depositPaid: true,
-    });
+    await confirmBookingAfterPayment(record.booking_id);
   }
 }
 
@@ -619,10 +627,7 @@ export async function reconcilePayments(
     if (stripeStatus === 'succeeded') {
       await updatePaymentIntentStatus(record.stripe_payment_intent_id, 'succeeded');
       if (record.booking_id) {
-        await updateBookingPaymentState(record.booking_id, {
-          confirmIfPending: true,
-          depositPaid: true,
-        });
+        await confirmBookingAfterPayment(record.booking_id);
       }
     } else if (stripeStatus === 'canceled') {
       await updatePaymentIntentStatus(record.stripe_payment_intent_id, 'cancelled');

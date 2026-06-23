@@ -161,7 +161,7 @@ export async function updateBookingPaymentState(
     confirmIfPending?: boolean;   // pending → confirmed
     depositPaid?: boolean;
   },
-): Promise<void> {
+): Promise<{ confirmed: boolean }> {
   const supabase = createServerSupabaseClient();
 
   const updates: Record<string, unknown> = {};
@@ -169,19 +169,26 @@ export async function updateBookingPaymentState(
 
   if (opts.confirmIfPending) {
     // Only flip to 'confirmed' if currently 'pending' — prevents re-confirming
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from('bookings')
       .update({ ...updates, status: 'confirmed' })
       .eq('id', bookingId)
-      .eq('status', 'pending');
+      .eq('status', 'pending')
+      .select('id')
+      .maybeSingle();
     if (error) throw error;
-  } else if (Object.keys(updates).length > 0) {
+    return { confirmed: !!data };
+  }
+
+  if (Object.keys(updates).length > 0) {
     const { error } = await supabase
       .from('bookings')
       .update(updates)
       .eq('id', bookingId);
     if (error) throw error;
   }
+
+  return { confirmed: false };
 }
 
 export async function getTransactionsByPaymentIntentId(

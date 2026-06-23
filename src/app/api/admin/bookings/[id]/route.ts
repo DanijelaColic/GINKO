@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from '@/lib/supabase';
 import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
 import { getRoomBySlug } from '@/modules/rooms/room.repository';
 import { parseLocalDate, diffDays, calculatePrice } from '@/modules/booking/dates';
-import { sendConfirmationEmail } from '@/lib/email';
+import { sendConfirmationEmail, notifyGuestBookingConfirmed } from '@/lib/email';
 import { createBookingViewToken, getBookingConfirmationUrl } from '@/lib/bookingConfirmation';
 import type { Booking } from '@/modules/booking/booking.types';
 
@@ -54,7 +54,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   const needsRecalc = updates.check_in || updates.check_out || updates.room_slug;
 
   let existing: Booking | null = null;
-  if (needsRecalc) {
+  if (needsRecalc || updates.deposit_paid === true) {
     const { data } = await supabase.from('bookings').select('*').eq('id', id).single();
     existing = data;
   }
@@ -87,6 +87,18 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     .single();
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+  // Bankovna uplata: gost prima potvrdu kad admin označi depozit kao plaćen
+  if (
+    existing &&
+    updates.deposit_paid === true &&
+    !existing.deposit_paid
+  ) {
+    void notifyGuestBookingConfirmed(id).catch((err) =>
+      console.error('[email] notifyGuestBookingConfirmed (admin):', err),
+    );
+  }
+
   return NextResponse.json(data);
 }
 

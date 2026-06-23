@@ -297,6 +297,7 @@
     "sidebar": {
       "title": "Vaša rezervacija",
       "propertyLabel": "Smještaj",
+      "roomLabel": "Odabrana soba",
       "checkIn": "Dolazak",
       "checkOut": "Odlazak",
       "checkInTime": "od 14:00",
@@ -369,9 +370,11 @@
         "checkIn": "Dolazak (check-in)",
         "checkOut": "Odlazak (check-out)"
       },
-      "agreeRules": "Slažem se s pravilima i uvjetima rezervacije.",
-      "submitting": "Šaljem…",
-      "submit": "Pošalji upit za rezervaciju · {totalPrice} €"
+      "agreeRules": "Slažem se s <houseRules>pravilima smještaja</houseRules> i <bookingTerms>uvjetima rezervacije</bookingTerms>.",
+      "rulesLinkLabel": "Pročitajte kućni red i uvjete rezervacije",
+      "submitting": "Priprema plaćanja…",
+      "continueToPayment": "Nastavi na plaćanje",
+      "submit": "Nastavi na plaćanje · {totalPrice} €"
     },
     "success": {
       "title": "Upit za rezervaciju zaprimljen!",
@@ -402,7 +405,7 @@
     },
     "errors": {
       "maxGuests": "{apartmentName}: maksimalno {capacity} gostiju.",
-      "submitFailed": "Slanje upita za rezervaciju nije uspjelo."
+      "submitFailed": "Kreiranje rezervacije nije uspjelo. Pokušajte ponovo."
     },
     "policies": {
       "cancellation": {

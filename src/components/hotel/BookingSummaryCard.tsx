@@ -99,17 +99,11 @@ export default function BookingSummaryCard({
       )}
 
       <div className="divide-y divide-stone">
-        {/* ── 2. Objekt · ocjena · adresa · sadržaji ────────────────── */}
+        {/* ── 2. Objekt · ocjena · adresa · soba · sadržaji ─────────── */}
         <div className="p-5 space-y-3">
-          {/* Naziv objekta */}
-          <div>
-            <p className="text-[10px] font-semibold text-muted uppercase tracking-widest mb-0.5">
-              {t('sidebar.propertyLabel')}
-            </p>
-            <h3 className="font-serif text-base font-semibold text-text leading-tight">
-              {SITE_NAME}
-            </h3>
-          </div>
+          <h3 className="font-serif text-base font-semibold text-text leading-tight">
+            {SITE_NAME}
+          </h3>
 
           {/* Ocjena gostiju — Google recenzije */}
           {reviewSummary && reviewScore && reviewCountLabel && reviewLabel && (
@@ -128,6 +122,11 @@ export default function BookingSummaryCard({
           <p className="flex items-start gap-1.5 text-xs text-muted">
             <MapPin size={12} className="mt-0.5 shrink-0 text-primary" />
             {PROPERTY_ADDRESS}
+          </p>
+
+          {/* Naziv sobe */}
+          <p className="font-serif text-sm font-semibold text-text leading-tight">
+            {room.name}
           </p>
 
           {/* Sadržaji */}

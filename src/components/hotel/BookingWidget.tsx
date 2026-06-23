@@ -3,12 +3,12 @@
 // Refactored to multi-step layout (Booking.com style):
 //   Step 1: Room selector + calendar + payment terms
 //   Step 2: Two-column — BookingSummaryCard (sticky) + guest details form
-//   Step 3: Redirect to /booking/confirmation/[id] (or inline success fallback)
-// All API/pricing/submit logic is unchanged.
+//   Step 3: Create booking + redirect to payment (confirmation page)
+// Guest email is sent only after successful deposit payment.
 
 import { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
-import { useRouter } from '@/i18n/navigation';
+import { Link, useRouter } from '@/i18n/navigation';
 import { Check, AlertCircle, Loader2, ChevronLeft } from 'lucide-react';
 import BookingCalendar from './BookingCalendar';
 import BookingStepsBar from './BookingStepsBar';
@@ -30,10 +30,12 @@ import {
   MIN_NIGHTS,
   LONG_STAY_DISCOUNT_NIGHTS,
   LONG_STAY_DISCOUNT_RATE,
+  FACILITIES_SECTION_ID,
+  propertySectionHref,
 } from '@/modules/booking/booking.config';
 import { rooms } from '@/modules/rooms/rooms.config';
 import type { BookingFormData } from '@/modules/booking/booking-form.schema';
-import { BOOKING_FORM_DEFAULTS } from '@/modules/booking/booking-form.schema';
+import { BOOKING_FORM_DEFAULTS, validateBookingForm } from '@/modules/booking/booking-form.schema';
 import type { GoogleReviewSummary } from '@/modules/reviews/google-reviews.types';
 
 const DEPOSIT_PCT_DISPLAY = Math.round(DEPOSIT_PERCENT * 100);
@@ -102,6 +104,8 @@ export default function BookingWidget({
 
   const successRef = useRef<HTMLDivElement>(null);
   const step2Ref = useRef<HTMLDivElement>(null);
+  const step3Ref = useRef<HTMLDivElement>(null);
+  const bookingCreateStarted = useRef(false);
 
   const [checkIn, setCheckIn] = useState<Date | null>(() =>
     initialCheckIn ? parseLocalDate(initialCheckIn) : null,
@@ -111,7 +115,7 @@ export default function BookingWidget({
   );
 
   // Ako su datumi već poznati (proslijeđeni iz URL-a), preskoči na korak 2
-  const [step, setStep] = useState<1 | 2>(() =>
+  const [step, setStep] = useState<1 | 2 | 3>(() =>
     initialCheckIn && initialCheckOut ? 2 : 1,
   );
   const [form, setForm] = useState<BookingFormData>(() => {
@@ -123,7 +127,6 @@ export default function BookingWidget({
       children: ch && ch >= 0 ? String(ch) : BOOKING_FORM_DEFAULTS.children,
     };
   });
-  const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [success, setSuccess] = useState(false);
   const [hub3Barcode, setHub3Barcode] = useState<string | null>(null);
@@ -136,10 +139,13 @@ export default function BookingWidget({
     }
   }, [success]);
 
-  // Scroll na vrh koraka 2 pri prolasku
+  // Scroll na vrh koraka 2 ili 3 pri prolasku
   useEffect(() => {
     if (step === 2 && step2Ref.current) {
       step2Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+    if (step === 3 && step3Ref.current) {
+      step3Ref.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
   }, [step]);
 
@@ -203,27 +209,8 @@ export default function BookingWidget({
     });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!checkIn || !checkOut || !priceData || !selectedRoom) return;
-
-    const totalGuests = parseInt(form.adults) + parseInt(form.children);
-    if (totalGuests > selectedRoom.capacity) {
-      setSubmitError(
-        t('errors.maxGuests', {
-          apartmentName: selectedRoom.name,
-          capacity: selectedRoom.capacity,
-        }),
-      );
-      return;
-    }
-
-    setSubmitting(true);
-    setSubmitError(null);
-
-    // Spoji sve opcionalne podatke u notes (strukturirano)
-    const guestName = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
-    const notesLines = [
+  const buildNotes = useCallback(() => {
+    return [
       form.country ? `Zemlja: ${form.country}` : '',
       form.bookingFor === 'other' && form.guestStayingName
         ? `Rezervacija za drugog gosta: ${form.guestStayingName}`
@@ -237,62 +224,133 @@ export default function BookingWidget({
     ]
       .filter(Boolean)
       .join('\n');
+  }, [form]);
 
-    try {
-      const res = await fetch(bookingsApiPath, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          room_slug: selectedSlug,
-          check_in: formatDate(checkIn),
-          check_out: formatDate(checkOut),
-          locale,
-          guest_name: guestName,
-          guest_first_name: form.firstName.trim(),
-          guest_last_name: form.lastName.trim(),
-          guest_country: form.country,
-          guest_email: form.email,
-          guest_phone: form.phone,
-          adults: parseInt(form.adults),
-          children: parseInt(form.children),
-          booking_for: form.bookingFor,
-          guest_staying_name:
-            form.bookingFor === 'other' ? form.guestStayingName.trim() || null : null,
-          needs_crib: form.needsCrib,
-          is_business: form.isBusiness,
-          company_name: form.isBusiness ? form.companyName.trim() || null : null,
-          vat_id: form.isBusiness ? form.vatId.trim() || null : null,
-          notes: notesLines || null,
-        }),
-      });
+  const createBookingRequest = useCallback(async (): Promise<string | null> => {
+    if (!checkIn || !checkOut || !priceData || !selectedRoom) return null;
 
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error ?? t('errors.submitFailed'));
+    const guestName = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
 
-      if (data.confirmationPath) {
-        router.push(data.confirmationPath);
-        return;
+    const res = await fetch(bookingsApiPath, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        room_slug: selectedSlug,
+        check_in: formatDate(checkIn),
+        check_out: formatDate(checkOut),
+        locale,
+        guest_name: guestName,
+        guest_first_name: form.firstName.trim(),
+        guest_last_name: form.lastName.trim(),
+        guest_country: form.country,
+        guest_email: form.email,
+        guest_phone: form.phone,
+        adults: parseInt(form.adults),
+        children: parseInt(form.children),
+        booking_for: form.bookingFor,
+        guest_staying_name:
+          form.bookingFor === 'other' ? form.guestStayingName.trim() || null : null,
+        needs_crib: form.needsCrib,
+        is_business: form.isBusiness,
+        company_name: form.isBusiness ? form.companyName.trim() || null : null,
+        vat_id: form.isBusiness ? form.vatId.trim() || null : null,
+        notes: buildNotes() || null,
+      }),
+    });
+
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error ?? t('errors.submitFailed'));
+
+    if (data.confirmationPath) return data.confirmationPath as string;
+    if (data.confirmationUrl) {
+      try {
+        const url = new URL(data.confirmationUrl, window.location.origin);
+        return `${url.pathname}${url.search}`;
+      } catch {
+        return data.confirmationUrl as string;
       }
-      if (data.confirmationUrl) {
-        try {
-          const url = new URL(data.confirmationUrl, window.location.origin);
-          router.push(`${url.pathname}${url.search}`);
-        } catch {
-          router.push(data.confirmationUrl);
-        }
-        return;
-      }
-
-      setSuccess(true);
-      if (priceData && data.bookingId) {
-        fetchBarcodes(priceData.deposit, guestName, data.bookingId);
-      }
-    } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : t('errors.submitFailed'));
-    } finally {
-      setSubmitting(false);
     }
+
+    if (data.bookingId) {
+      setSuccess(true);
+      fetchBarcodes(priceData.deposit, guestName, data.bookingId);
+    }
+    return null;
+  }, [
+    bookingsApiPath,
+    buildNotes,
+    checkIn,
+    checkOut,
+    fetchBarcodes,
+    form,
+    locale,
+    priceData,
+    selectedRoom,
+    selectedSlug,
+    t,
+  ]);
+
+  const handleStep2Submit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!checkIn || !checkOut || !priceData || !selectedRoom) return;
+
+    const errors = validateBookingForm(form);
+    if (Object.keys(errors).length > 0) return;
+
+    const totalGuests = parseInt(form.adults) + parseInt(form.children);
+    if (totalGuests > selectedRoom.capacity) {
+      setSubmitError(
+        t('errors.maxGuests', {
+          apartmentName: selectedRoom.name,
+          capacity: selectedRoom.capacity,
+        }),
+      );
+      return;
+    }
+
+    setSubmitError(null);
+    setStep(3);
   };
+
+  // Korak 3: kreiraj rezervaciju i preusmjeri na plaćanje
+  useEffect(() => {
+    if (step !== 3 || bookingCreateStarted.current) return;
+    if (!checkIn || !checkOut || !priceData || !selectedRoom) return;
+
+    bookingCreateStarted.current = true;
+    let cancelled = false;
+
+    (async () => {
+      setSubmitError(null);
+      try {
+        const path = await createBookingRequest();
+        if (cancelled) return;
+        if (path) {
+          router.push(path);
+          return;
+        }
+      } catch (err) {
+        if (!cancelled) {
+          setSubmitError(err instanceof Error ? err.message : t('errors.submitFailed'));
+          setStep(2);
+          bookingCreateStarted.current = false;
+        }
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [
+    step,
+    checkIn,
+    checkOut,
+    priceData,
+    selectedRoom,
+    createBookingRequest,
+    router,
+    t,
+  ]);
 
   // ── Success state (fallback kada nema confirmationPath) ────────────
   if (success) {
@@ -559,7 +617,7 @@ export default function BookingWidget({
         type="button"
         disabled={!checkIn || !checkOut || !priceData}
         onClick={() => setStep(2)}
-        className="w-full bg-accent hover:bg-accent-light disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium py-4 rounded-full transition-colors text-sm"
+        className="w-full bg-primary hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium py-4 rounded-full transition-colors text-sm"
       >
         {t('nav.continue')} →
       </button>
@@ -591,7 +649,7 @@ export default function BookingWidget({
             {t('steps.details')}
           </h2>
 
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form onSubmit={handleStep2Submit} className="space-y-6">
 
             {/* ── 1. Kontakt podaci ─────────────────────────────────── */}
             <div className="space-y-4">
@@ -860,12 +918,18 @@ export default function BookingWidget({
 
             {/* Kućni red */}
             {rulesText ?? (
-              <div className="bg-stone-light rounded-xl p-4 text-xs text-muted space-y-1">
+              <div className="bg-stone-light rounded-xl p-4 text-xs text-muted space-y-2">
                 <p>
                   <strong className="text-text">{t('form.rules.checkIn')}:</strong> 14:00 – 23:00
                   &nbsp;|&nbsp;
                   <strong className="text-text">{t('form.rules.checkOut')}:</strong> 09:00 – 11:00
                 </p>
+                <Link
+                  href={propertySectionHref(FACILITIES_SECTION_ID)}
+                  className="text-primary hover:underline underline-offset-2 font-medium"
+                >
+                  {t('form.rulesLinkLabel')}
+                </Link>
               </div>
             )}
 
@@ -880,7 +944,24 @@ export default function BookingWidget({
                 className="mt-0.5 accent-primary"
               />
               <span className="text-sm text-muted">
-                {t('form.agreeRules')}
+                {t.rich('form.agreeRules', {
+                  houseRules: (chunks) => (
+                    <Link
+                      href={propertySectionHref(FACILITIES_SECTION_ID)}
+                      className="text-primary hover:underline underline-offset-2"
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                  bookingTerms: (chunks) => (
+                    <Link
+                      href={propertySectionHref(FACILITIES_SECTION_ID)}
+                      className="text-primary hover:underline underline-offset-2"
+                    >
+                      {chunks}
+                    </Link>
+                  ),
+                })}
                 <span className="text-red-400"> *</span>
               </span>
             </label>
@@ -893,7 +974,7 @@ export default function BookingWidget({
               </div>
             )}
 
-            {/* Navigacija: natrag + pošalji */}
+            {/* Navigacija: natrag + nastavi na plaćanje */}
             <div className="flex flex-col sm:flex-row gap-3 pt-2">
               <button
                 type="button"
@@ -905,16 +986,48 @@ export default function BookingWidget({
               </button>
               <button
                 type="submit"
-                disabled={submitting || !form.agreeRules}
-                className="flex-1 bg-accent hover:bg-accent-light disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-full transition-colors text-sm flex items-center justify-center gap-2"
+                disabled={!form.agreeRules}
+                className="flex-1 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-full transition-colors text-sm flex items-center justify-center gap-2"
               >
-                {submitting && <Loader2 size={16} className="animate-spin" />}
-                {submitting
-                  ? t('form.submitting')
-                  : t('form.submit', { totalPrice: priceData.totalPrice })}
+                {t('form.submit', { totalPrice: priceData.totalPrice })} →
               </button>
             </div>
           </form>
+        </div>
+      </div>
+    </div>
+  ) : null;
+
+  // ── Korak 3: Priprema plaćanja (kreira rezervaciju → redirect) ───
+  const step3 = checkIn && checkOut && priceData && selectedRoom ? (
+    <div ref={step3Ref} className="scroll-mt-6">
+      <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 items-start">
+        <div className="lg:sticky lg:top-24">
+          <BookingSummaryCard
+            room={selectedRoom}
+            checkIn={checkIn}
+            checkOut={checkOut}
+            priceData={priceData}
+            adults={form.adults}
+            children={form.children}
+            locale={locale}
+            reviewSummary={reviewSummary}
+          />
+        </div>
+
+        <div className="flex flex-col items-center justify-center py-16 text-center">
+          <Loader2 size={36} className="animate-spin text-primary mb-4" />
+          <h2 className="font-serif text-2xl font-semibold text-text mb-2">
+            {t('stepper.step3')}
+          </h2>
+          <p className="text-sm text-muted">{t('form.submitting')}</p>
+
+          {submitError && (
+            <div className="mt-6 flex items-start gap-2 text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-left max-w-md">
+              <AlertCircle size={16} className="shrink-0 mt-0.5" />
+              <span>{submitError}</span>
+            </div>
+          )}
         </div>
       </div>
     </div>
@@ -926,6 +1039,7 @@ export default function BookingWidget({
       <BookingStepsBar currentStep={step} />
       {step === 1 && step1}
       {step === 2 && step2}
+      {step === 3 && step3}
     </div>
   );
 }

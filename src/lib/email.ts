@@ -1,7 +1,7 @@
 // Adapted from Villa-Jurina/src/lib/email.ts — Ginko branding, no QR attachments yet.
 
 import { Resend } from 'resend';
-import { formatDisplayDate } from '@/modules/booking/dates';
+import { formatDisplayDate, parseLocalDate } from '@/modules/booking/dates';
 import {
   OWNER_EMAIL,
   CONTACT_EMAIL,
@@ -14,6 +14,9 @@ import {
   SITE_LOCATION,
   DEPOSIT_PERCENT,
 } from '@/modules/booking/booking.config';
+import { createServerSupabaseClient } from '@/lib/supabase';
+import { createBookingViewToken, getBookingConfirmationUrl } from '@/lib/bookingConfirmation';
+import { getRoomBySlug } from '@/modules/rooms/room.repository';
 
 export type BookingEmailData = {
   guestName: string;
@@ -68,46 +71,59 @@ function buildFullData(data: BookingEmailData): FullData {
   };
 }
 
-/** Gost (potvrda zaprimanja) + vlasnik (nova rezervacija na ginkosobe3@gmail.com). */
-export async function sendNewBookingEmails(data: BookingEmailData): Promise<void> {
+/** Obavijest vlasniku o novoj rezervaciji (bez emaila gostu). */
+export async function sendOwnerNewBookingNotification(data: BookingEmailData): Promise<void> {
   const resend = getResend();
   if (!resend) return;
 
   const d = buildFullData(data);
-  const locale = data.locale ?? 'hr';
-  const depositPct = Math.round(DEPOSIT_PERCENT * 100);
 
-  const [guestResult, ownerResult] = await Promise.allSettled([
-    resend.emails.send({
-      from: FROM(),
-      to: data.guestEmail,
-      subject:
-        locale === 'en'
-          ? `Booking request – ${d.roomName} | ${SITE_NAME}`
-          : locale === 'de'
-            ? `Buchungsanfrage – ${d.roomName} | ${SITE_NAME}`
-            : `Upit za rezervaciju – ${d.roomName} | ${SITE_NAME}`,
-      html: guestReceivedHtml(d, depositPct, locale),
-    }),
-    resend.emails.send({
-      from: FROM(),
-      to: OWNER_INBOX(),
-      subject: `Nova rezervacija – ${d.guestName} | ${d.roomName}`,
-      html: ownerNewBookingHtml(d),
-    }),
-  ]);
+  const result = await resend.emails.send({
+    from: FROM(),
+    to: OWNER_INBOX(),
+    subject: `Nova rezervacija – ${d.guestName} | ${d.roomName}`,
+    html: ownerNewBookingHtml(d),
+  });
 
-  if (guestResult.status === 'rejected') {
-    console.error('[email] Guest email failed:', guestResult.reason);
-  } else if (guestResult.value.error) {
-    console.error('[email] Guest email API error:', guestResult.value.error);
-  }
+  if (result.error) console.error('[email] Owner email API error:', result.error);
+}
 
-  if (ownerResult.status === 'rejected') {
-    console.error('[email] Owner email failed:', ownerResult.reason);
-  } else if (ownerResult.value.error) {
-    console.error('[email] Owner email API error:', ownerResult.value.error);
-  }
+/** @deprecated Koristi sendOwnerNewBookingNotification — gost prima email tek nakon plaćanja. */
+export async function sendNewBookingEmails(data: BookingEmailData): Promise<void> {
+  await sendOwnerNewBookingNotification(data);
+}
+
+/** Potvrda gostu nakon uspješnog plaćanja depozita. */
+export async function notifyGuestBookingConfirmed(bookingId: string): Promise<void> {
+  const supabase = createServerSupabaseClient();
+  const { data: booking, error } = await supabase
+    .from('bookings')
+    .select('*')
+    .eq('id', bookingId)
+    .single();
+
+  if (error || !booking?.guest_email) return;
+
+  const room = getRoomBySlug(booking.room_slug);
+  const token = createBookingViewToken(booking.id, booking.guest_email);
+  const confirmationUrl = getBookingConfirmationUrl(booking.id, token);
+  const locale =
+    booking.locale === 'en' || booking.locale === 'de' ? booking.locale : 'hr';
+
+  await sendConfirmationEmail({
+    guestName: booking.guest_name,
+    guestEmail: booking.guest_email,
+    guestPhone: booking.guest_phone,
+    roomName: room?.name ?? booking.room_slug,
+    checkIn: parseLocalDate(booking.check_in),
+    checkOut: parseLocalDate(booking.check_out),
+    nights: booking.nights,
+    totalPrice: booking.total_price,
+    deposit: booking.deposit,
+    bookingId: booking.id,
+    confirmationUrl,
+    locale,
+  });
 }
 
 /** Ponovno slanje gostu (admin) — potvrda rezervacije. */

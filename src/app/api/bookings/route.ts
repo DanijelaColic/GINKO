@@ -17,7 +17,7 @@ import {
   getBookingConfirmationPath,
   getBookingConfirmationUrlFromRequest,
 } from '@/lib/bookingConfirmation';
-import { sendNewBookingEmails } from '@/lib/email';
+import { sendOwnerNewBookingNotification } from '@/lib/email';
 import type { BookedRange } from '@/modules/booking/booking.types';
 
 // GET /api/bookings?room=slug
@@ -225,8 +225,8 @@ export async function POST(request: NextRequest) {
       origin,
     );
 
-    // Email: gost + obavijest vlasniku (ginkosobe3@gmail.com) — ne blokira odgovor
-    void sendNewBookingEmails({
+    // Email vlasniku odmah; gost prima potvrdu tek nakon plaćanja depozita
+    void sendOwnerNewBookingNotification({
       guestName: guest_name,
       guestEmail: guest_email,
       guestPhone: guest_phone,
@@ -246,7 +246,7 @@ export async function POST(request: NextRequest) {
       bookingId: booking.id,
       confirmationUrl,
       locale,
-    }).catch((err) => console.error('[email] sendNewBookingEmails:', err));
+    }).catch((err) => console.error('[email] sendOwnerNewBookingNotification:', err));
 
     return NextResponse.json(
       { success: true, bookingId: booking.id, confirmationPath, confirmationUrl },

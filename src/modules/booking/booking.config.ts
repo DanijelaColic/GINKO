@@ -92,6 +92,12 @@ export const PROPERTY_NAV_ITEMS = [
   { key: 'facilities', id: FACILITIES_SECTION_ID },
 ] as const;
 
+/** Desktop navbar — samo ključne sekcije; mobilni drawer koristi PROPERTY_NAV_ITEMS */
+export const PROPERTY_NAV_ITEMS_DESKTOP = [
+  { key: 'availability', id: AVAILABILITY_SECTION_ID },
+  { key: 'reviews', id: REVIEWS_SECTION_ID },
+] as const;
+
 export function propertySectionHref(id: string) {
   return `/#${id}`;
 }

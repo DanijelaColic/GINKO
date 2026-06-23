@@ -297,6 +297,7 @@
     "sidebar": {
       "title": "Ihre Buchung",
       "propertyLabel": "Unterkunft",
+      "roomLabel": "Gewähltes Zimmer",
       "checkIn": "Anreise",
       "checkOut": "Abreise",
       "checkInTime": "ab 14:00 Uhr",
@@ -369,9 +370,11 @@
         "checkIn": "Check-in",
         "checkOut": "Check-out"
       },
-      "agreeRules": "Ich stimme den Hausregeln und Buchungsbedingungen zu.",
-      "submitting": "Wird gesendet…",
-      "submit": "Buchungsanfrage senden · {totalPrice} €"
+      "agreeRules": "Ich stimme den <houseRules>Hausregeln</houseRules> und den <bookingTerms>Buchungsbedingungen</bookingTerms> zu.",
+      "rulesLinkLabel": "Hausregeln und Buchungsbedingungen lesen",
+      "submitting": "Zahlung wird vorbereitet…",
+      "continueToPayment": "Weiter zur Zahlung",
+      "submit": "Weiter zur Zahlung · {totalPrice} €"
     },
     "success": {
       "title": "Buchungsanfrage erhalten!",
@@ -402,7 +405,7 @@
     },
     "errors": {
       "maxGuests": "{apartmentName}: maximal {capacity} Gäste.",
-      "submitFailed": "Die Buchungsanfrage konnte nicht gesendet werden."
+      "submitFailed": "Die Buchung konnte nicht erstellt werden. Bitte versuchen Sie es erneut."
     },
     "policies": {
       "cancellation": {
