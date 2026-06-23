@@ -34,6 +34,7 @@ import {
 import { rooms } from '@/modules/rooms/rooms.config';
 import type { BookingFormData } from '@/modules/booking/booking-form.schema';
 import { BOOKING_FORM_DEFAULTS } from '@/modules/booking/booking-form.schema';
+import type { GoogleReviewSummary } from '@/modules/reviews/google-reviews.types';
 
 const DEPOSIT_PCT_DISPLAY = Math.round(DEPOSIT_PERCENT * 100);
 const BALANCE_PCT_DISPLAY = 100 - DEPOSIT_PCT_DISPLAY;
@@ -53,6 +54,7 @@ type Props = {
   bookingsApiPath?: string;
   barcodeApiPath?: string;
   rulesText?: React.ReactNode;
+  reviewSummary?: GoogleReviewSummary | null;
 };
 
 export default function BookingWidget({
@@ -64,6 +66,7 @@ export default function BookingWidget({
   bookingsApiPath = '/api/bookings',
   barcodeApiPath = '/api/generate-barcode',
   rulesText,
+  reviewSummary,
 }: Props) {
   const locale = useLocale();
   const router = useRouter();
@@ -578,6 +581,7 @@ export default function BookingWidget({
             adults={form.adults}
             children={form.children}
             locale={locale}
+            reviewSummary={reviewSummary}
           />
         </div>
 

@@ -3,8 +3,9 @@ import { Suspense } from 'react';
 import Image from 'next/image';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { Car, Wifi, Wind, TreePine, Star, MapPin, ChevronRight, Waves, Phone, Mail } from 'lucide-react';
+import { Car, Wifi, Wind, TreePine, Star, ChevronRight, Waves, Phone, Mail } from 'lucide-react';
 import ShareButton from '@/components/hotel/ShareButton';
+import { PropertyHeaderLocation } from '@/components/hotel/PropertyLocationMap';
 import { getValidLocale } from '@/i18n/messages';
 import { getRootMetadata } from '@/i18n/metadata';
 import { getRooms } from '@/modules/rooms/room.repository';
@@ -17,7 +18,7 @@ import PropertyReviewsSection from '@/components/hotel/PropertyReviewsSection';
 import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSection';
 import PropertySurroundingsSection from '@/components/hotel/PropertySurroundingsSection';
 import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
-import { PROPERTY_ADDRESS, PROPERTY_MAP_URL } from '@/modules/property/property-details.config';
+import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF, OVERVIEW_SECTION_ID, CONTACT_PHONE_TEL, CONTACT_PHONE_DISPLAY } from '@/modules/booking/booking.config';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -50,7 +51,10 @@ const FEATURE_ICONS = [Car, Wifi, Wind, Waves, TreePine, Star];
 export default async function HomePage() {
   const locale = getValidLocale(await getLocale());
   const t = await getTranslations('homePage');
-  const rooms = await getRooms(locale as RoomLocale);
+  const [rooms, googleReviews] = await Promise.all([
+    getRooms(locale as RoomLocale),
+    getGoogleReviews(),
+  ]);
 
   const features = [1, 2, 3, 4, 5, 6].map((n) => ({
     title: t(`feature${n}Title` as Parameters<typeof t>[0]),
@@ -116,15 +120,7 @@ export default async function HomePage() {
             </h2>
 
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-muted">
-              <a
-                href={PROPERTY_MAP_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center gap-1.5 hover:text-primary transition-colors"
-              >
-                <MapPin size={13} className="text-primary shrink-0" />
-                {PROPERTY_ADDRESS}
-              </a>
+              <PropertyHeaderLocation />
 
               <a
                 href={`tel:${CONTACT_PHONE_TEL}`}
@@ -162,18 +158,9 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Lijevo: opis objekta */}
           <div>
-            <p className="text-text text-base leading-relaxed mb-6">
+            <p className="text-text text-base leading-relaxed">
               Ginko Boutique Rooms &amp; Wellness Daruvar smješten je u samom srcu Daruvara, uz park dvorca Janković i u neposrednoj blizini Daruvarskih toplica. Moderne i elegantno uređene sobe nude besplatan Wi-Fi, privatno parkiralište i vrhunsku udobnost, dok wellness zona sa saunom i jacuzzijem pruža savršeno mjesto za opuštanje nakon dana provedenog u istraživanju grada. Idealno za parove, poslovne goste i sve koji traže miran odmor u kontinentalnoj Hrvatskoj.
             </p>
-            <a
-              href={PROPERTY_MAP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-2 text-sm text-muted hover:text-primary transition-colors"
-            >
-              <MapPin size={15} className="text-primary shrink-0" />
-              {PROPERTY_ADDRESS}
-            </a>
           </div>
 
           {/* Desno: 6 ključnih sadržaja */}
@@ -204,7 +191,7 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       {/* RECENZIJE GOSTIJU                                                    */}
       {/* ------------------------------------------------------------------ */}
-      <PropertyReviewsSection />
+      <PropertyReviewsSection data={googleReviews} />
 
       {/* ------------------------------------------------------------------ */}
       {/* PITANJA PUTNIKA                                                      */}

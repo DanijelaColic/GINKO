@@ -8,6 +8,7 @@ import { getValidLocale } from '@/i18n/messages';
 import { getPageMetadata } from '@/i18n/metadata';
 import { buildAvailabilityHref } from '@/modules/booking/booking.config';
 import BookingWidget from '@/components/hotel/BookingWidget';
+import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { redirect } from '@/i18n/navigation';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -23,6 +24,10 @@ export default async function BookingPage({ searchParams }: Props) {
   const locale = getValidLocale(await getLocale());
   const t = await getTranslations('bookingPage');
   const { room, checkIn, checkOut, adults, children } = await searchParams;
+  const googleReviews = await getGoogleReviews();
+  const reviewSummary = googleReviews
+    ? { rating: googleReviews.rating, reviewCount: googleReviews.reviewCount }
+    : null;
 
   if (!checkIn || !checkOut) {
     redirect({ href: buildAvailabilityHref(room ? { room } : undefined), locale });
@@ -39,6 +44,7 @@ export default async function BookingPage({ searchParams }: Props) {
             initialCheckOut={checkOut}
             initialAdults={adults}
             initialChildren={children}
+            reviewSummary={reviewSummary}
           />
         </div>
       </section>

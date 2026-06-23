@@ -10,6 +10,7 @@ import { getSiteUrl } from '@/lib/siteUrl';
 import BookingStepsBar from '@/components/hotel/BookingStepsBar';
 import BookingSummaryCard from '@/components/hotel/BookingSummaryCard';
 import ConfirmationPaymentPanel from '@/components/hotel/ConfirmationPaymentPanel';
+import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -22,9 +23,10 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
 
   if (!id || !token) notFound();
 
-  const [data, locale] = await Promise.all([
+  const [data, locale, googleReviews] = await Promise.all([
     getBookingConfirmationData(id, token),
     getLocale(),
+    getGoogleReviews(),
   ]);
 
   if (!data) notFound();
@@ -47,6 +49,10 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
             body: 'Niste dovršili plaćanje. Rezervacija je i dalje aktivna — možete platiti ispod ili odabrati plaćanje bankovnim prijenosom.',
           }
         : null;
+
+  const reviewSummary = googleReviews
+    ? { rating: googleReviews.rating, reviewCount: googleReviews.reviewCount }
+    : null;
 
   const checkInDate = parseLocalDate(data.checkInIso);
   const checkOutDate = parseLocalDate(data.checkOutIso);
@@ -75,6 +81,7 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
               children={String(data.children)}
               locale={locale}
               readOnly
+              reviewSummary={reviewSummary}
             />
           </div>
 

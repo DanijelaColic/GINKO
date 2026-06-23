@@ -13,11 +13,13 @@ import {
   buildAvailabilityHref,
 } from '@/modules/booking/booking.config';
 import { formatDate } from '@/modules/booking/dates';
+import { PROPERTY_ADDRESS } from '@/modules/property/property-details.config';
+import type { GoogleReviewSummary } from '@/modules/reviews/google-reviews.types';
 import {
-  REVIEWS_COPY,
-  GUEST_REVIEWS,
-  PROPERTY_ADDRESS,
-} from '@/modules/property/property-details.config';
+  formatReviewCountLabel,
+  formatReviewRating,
+  getRatingLabel,
+} from '@/modules/reviews/review-labels';
 import BedTypeIcons from './BedTypeIcons';
 import type { Room } from '@/modules/rooms/room.types';
 import type { PriceBreakdown } from '@/modules/booking/booking.types';
@@ -31,6 +33,7 @@ type Props = {
   children: string;
   locale: string;
   readOnly?: boolean;
+  reviewSummary?: GoogleReviewSummary | null;
 };
 
 const DEPOSIT_PCT = Math.round(DEPOSIT_PERCENT * 100);
@@ -52,6 +55,7 @@ export default function BookingSummaryCard({
   children,
   locale,
   readOnly = false,
+  reviewSummary,
 }: Props) {
   const t = useTranslations('bookingWidget');
 
@@ -72,13 +76,13 @@ export default function BookingSummaryCard({
   const nightsLabel =
     priceData.nights === 1 ? 'noć' : priceData.nights < 5 ? 'noći' : 'noći';
 
-  const reviewCount = GUEST_REVIEWS.length;
-  const reviewScore = REVIEWS_COPY.overallScore.toLocaleString('hr-HR', {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
-  const reviewCountLabel =
-    reviewCount === 1 ? '1 recenzija' : reviewCount < 5 ? `${reviewCount} recenzije` : `${reviewCount} recenzija`;
+  const reviewScore = reviewSummary
+    ? formatReviewRating(reviewSummary.rating)
+    : null;
+  const reviewCountLabel = reviewSummary
+    ? formatReviewCountLabel(reviewSummary.reviewCount)
+    : null;
+  const reviewLabel = reviewSummary ? getRatingLabel(reviewSummary.rating) : null;
 
   return (
     <div className="bg-white border border-stone rounded-2xl overflow-hidden shadow-sm">
@@ -107,16 +111,18 @@ export default function BookingSummaryCard({
             </h3>
           </div>
 
-          {/* Ocjena gostiju — plavi badge kao na Bookingu */}
-          <div className="flex items-center gap-2">
-            <span className="inline-flex items-center justify-center w-9 h-8 rounded-md bg-primary text-white text-sm font-bold shrink-0 leading-none">
-              {reviewScore}
-            </span>
-            <div className="text-sm leading-tight">
-              <span className="font-semibold text-text">{REVIEWS_COPY.overallLabel}</span>
-              <span className="text-muted"> · {reviewCountLabel}</span>
+          {/* Ocjena gostiju — Google recenzije */}
+          {reviewSummary && reviewScore && reviewCountLabel && reviewLabel && (
+            <div className="flex items-center gap-2">
+              <span className="inline-flex items-center justify-center w-9 h-8 rounded-md bg-primary text-white text-sm font-bold shrink-0 leading-none">
+                {reviewScore}
+              </span>
+              <div className="text-sm leading-tight">
+                <span className="font-semibold text-text">{reviewLabel}</span>
+                <span className="text-muted"> · {reviewCountLabel}</span>
+              </div>
             </div>
-          </div>
+          )}
 
           {/* Adresa */}
           <p className="flex items-start gap-1.5 text-xs text-muted">

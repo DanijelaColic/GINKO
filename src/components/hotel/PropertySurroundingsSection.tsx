@@ -1,6 +1,6 @@
 import { UtensilsCrossed, TrainFront, Plane } from 'lucide-react';
+import { PropertyLocationMapPreview } from '@/components/hotel/PropertyLocationMap';
 import {
-  PROPERTY_MAP_URL,
   SURROUNDINGS,
   SURROUNDINGS_COPY,
   type SurroundingItem,
@@ -35,14 +35,6 @@ export default function PropertySurroundingsSection() {
             <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text">
               {SURROUNDINGS_COPY.title}
             </h2>
-            <a
-              href={PROPERTY_MAP_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-block mt-2 text-sm text-primary hover:text-primary-dark transition-colors"
-            >
-              {SURROUNDINGS_COPY.showMap}
-            </a>
           </div>
           <a
             href="#raspolozivost"
@@ -51,6 +43,8 @@ export default function PropertySurroundingsSection() {
             {SURROUNDINGS_COPY.showAvailability}
           </a>
         </div>
+
+        <PropertyLocationMapPreview />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-8">
           {CATEGORIES.map(({ key, icon: Icon }) => (

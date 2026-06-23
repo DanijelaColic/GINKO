@@ -4,6 +4,8 @@ export const PROPERTY_ADDRESS = `${PROPERTY_STREET}, ${PROPERTY_CITY}`;
 
 export const PROPERTY_MAP_URL = `https://maps.google.com/?q=${encodeURIComponent(PROPERTY_ADDRESS)}`;
 
+export const PROPERTY_MAP_EMBED_URL = `https://maps.google.com/maps?q=${encodeURIComponent(PROPERTY_ADDRESS)}&z=16&output=embed`;
+
 export type SurroundingItem = {
   label: string;
   distance: string;
@@ -169,7 +171,9 @@ export const FACILITY_GROUPS: FacilityGroup[] = [
 
 export const SURROUNDINGS_COPY = {
   title: 'Okolica objekta',
-  showMap: 'Prikaži kartu',
+  showMap: 'Prikaži na karti',
+  mapTitle: 'Lokacija objekta',
+  openInGoogleMaps: 'Otvori u Google Maps',
   showAvailability: 'Prikaži raspoloživost',
   categories: {
     restaurants: 'Restorani i kafići',
@@ -298,31 +302,21 @@ export const HOUSE_RULES: HouseRuleItem[] = [
 
 export type ReviewTopicId = 'domacin' | 'lokacija' | 'sobe' | 'cisto' | 'osoblje';
 
-export type GuestReview = {
-  id: string;
-  author: string;
-  country: string;
-  property: string;
-  date: string;
-  text: string;
-  rating: number;
-  topics: readonly ReviewTopicId[];
-};
-
 export const REVIEWS_COPY = {
   title: 'Recenzije gostiju',
   showAvailability: 'Prikaži raspoloživost',
   showAll: 'Prikaži sve recenzije',
   hideAll: 'Sakrij recenzije',
   featuredTitle: 'Što kažu naši gosti',
-  topicsHint: 'Odaberite teme da biste pročitali recenzije:',
-  reviewCountLabel: '{count} recenzija gostiju',
-  overallScore: 5.0,
-  overallLabel: 'Izvrsno',
+  topicsHint: 'Odaberite teme da biste istaknuli ključne riječi u recenzijama:',
+  reviewCountLabel: '{count} recenzija na Googleu',
   highlights: 'Gosti najčešće hvale čistoću, lokaciju i domaćine.',
   readMore: 'Pročitaj više',
   readLess: 'Sakrij',
   noResults: 'Nema recenzija za odabrane teme. Pokušajte s drugim filterom.',
+  googleSource: 'Recenzije s Googlea',
+  viewAllOnGoogle: 'Pogledajte sve recenzije na Googleu',
+  unavailable: 'Recenzije s Googlea trenutno nisu dostupne.',
 } as const;
 
 export const REVIEW_TOPIC_KEYWORDS: Record<ReviewTopicId, readonly string[]> = {
@@ -341,69 +335,3 @@ export const REVIEW_TOPICS: { id: ReviewTopicId; label: string }[] = [
   { id: 'osoblje', label: 'Osoblje' },
 ];
 
-export const GUEST_REVIEWS: GuestReview[] = [
-  {
-    id: 'danijel',
-    author: 'Danijel',
-    country: 'Hrvatska',
-    property: 'Ginko 6',
-    date: '2026-06-14',
-    text: 'Ljep i čisti prostor. Ljubazno osoblje. Svaka pohvala!',
-    rating: 5.0,
-    topics: ['cisto', 'osoblje'],
-  },
-  {
-    id: 'turek',
-    author: 'Turek',
-    country: 'Hrvatska',
-    property: 'Ginko 2',
-    date: '2026-06-14',
-    text:
-      'Domaćin ljubazan, uslužan, dobro organiziran. Lokacija odlična! Soba uredna, kompletno opremljena, WC u sklopu. Sve identično kao i na fotografiji na bookingu.',
-    rating: 5.0,
-    topics: ['domacin', 'lokacija', 'sobe'],
-  },
-  {
-    id: 'filip',
-    author: 'Filip Simunović',
-    country: 'Hrvatska',
-    property: 'Ginko 4',
-    date: '2026-06-06',
-    text:
-      'Smještaj se nalazi par minuta od centra grada u tihoj ulici. Tijekom boravka komunikacija s domaćinim je bila brza te upute oko pronalaska sobe su jasne. Soba je klimatizirana te prostrana. Jedina zamjerka su klizna vrata na kupaonici koja se teže otvaraju i zatvaraju, ali sve u svemu nismo imali drugih zamjerki. Dočekali su nas uredni ručnici te kreveti. Velik plus je ogroman ormar tako da sve kofere možete staviti unutra tijekom boravka. Preporuke!',
-    rating: 5.0,
-    topics: ['lokacija', 'sobe', 'cisto', 'domacin'],
-  },
-  {
-    id: 'taiwo',
-    author: 'Taiwo Elizabeth',
-    country: 'Hrvatska',
-    property: 'Ginko 8',
-    date: '2026-05-28',
-    text:
-      'Great new apartments. Apartments look modern, room is decorated in mahagony wood finish with adjustable LED lights, front doors and apartment doors are opened with a pin so no need to carry keys or cards. Bed is soft and comfortable. Only two minutes walk to the city center but area is really quiet, next to a park.',
-    rating: 5.0,
-    topics: ['sobe', 'lokacija'],
-  },
-  {
-    id: 'mato',
-    author: 'Mato',
-    country: 'Hrvatska',
-    property: 'Ginko 7',
-    date: '2026-05-25',
-    text: 'Smještaj i lokacija odlični. Osoblje prijatno i profesionalno.',
-    rating: 5.0,
-    topics: ['lokacija', 'osoblje'],
-  },
-  {
-    id: 'nikolina',
-    author: 'Nikolina',
-    country: 'Hrvatska',
-    property: 'Ginko 8',
-    date: '2026-05-24',
-    text:
-      'Ljubaznost domaćina, urednost i čistoća apartmana, blizina centra grada, parkova.',
-    rating: 5.0,
-    topics: ['domacin', 'cisto', 'lokacija'],
-  },
-];

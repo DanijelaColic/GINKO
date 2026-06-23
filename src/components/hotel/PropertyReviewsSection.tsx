@@ -1,27 +1,27 @@
 'use client';
 
 import { Fragment, useMemo, useRef, useState } from 'react';
-import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
+import { ChevronLeft, ChevronRight, ExternalLink, Plus, X } from 'lucide-react';
 import {
-  GUEST_REVIEWS,
   REVIEW_TOPIC_KEYWORDS,
   REVIEW_TOPICS,
   REVIEWS_COPY,
-  type GuestReview,
   type ReviewTopicId,
 } from '@/modules/property/property-details.config';
 import { REVIEWS_SECTION_ID } from '@/modules/booking/booking.config';
+import type { GoogleReview, GoogleReviewsData } from '@/modules/reviews/google-reviews.types';
+import {
+  formatReviewRating,
+  getRatingLabel,
+} from '@/modules/reviews/review-labels';
 
 const TEXT_PREVIEW_LENGTH = 180;
 const PREVIEW_COUNT = 3;
 const LOCALE = 'hr-HR';
 
-function formatRating(value: number) {
-  return value.toLocaleString(LOCALE, {
-    minimumFractionDigits: 1,
-    maximumFractionDigits: 1,
-  });
-}
+type Props = {
+  data: GoogleReviewsData | null;
+};
 
 function formatReviewDate(isoDate: string) {
   return new Date(isoDate).toLocaleDateString(LOCALE, {
@@ -49,6 +49,18 @@ function buildHighlightRegex(activeTopics: ReviewTopicId[]) {
   return new RegExp(`(${pattern})`, 'gi');
 }
 
+function reviewMatchesTopics(review: GoogleReview, activeTopics: ReviewTopicId[]) {
+  if (activeTopics.length === 0) return true;
+
+  const regex = buildHighlightRegex(activeTopics);
+  if (!regex) return true;
+
+  return activeTopics.every((topic) => {
+    const topicRegex = buildHighlightRegex([topic]);
+    return topicRegex?.test(review.text) ?? false;
+  });
+}
+
 function renderHighlightedText(text: string, activeTopics: ReviewTopicId[]) {
   const regex = buildHighlightRegex(activeTopics);
   if (!regex) return text;
@@ -70,7 +82,18 @@ function renderHighlightedText(text: string, activeTopics: ReviewTopicId[]) {
   });
 }
 
-function AuthorAvatar({ name }: { name: string }) {
+function AuthorAvatar({ name, photoUrl }: { name: string; photoUrl?: string }) {
+  if (photoUrl) {
+    return (
+      // eslint-disable-next-line @next/next/no-img-element
+      <img
+        src={photoUrl}
+        alt=""
+        className="shrink-0 w-10 h-10 rounded-full object-cover"
+      />
+    );
+  }
+
   const initial = name.trim().charAt(0).toUpperCase();
 
   return (
@@ -85,10 +108,12 @@ function AuthorAvatar({ name }: { name: string }) {
 
 function ReviewCard({
   review,
+  placeName,
   activeTopics,
   compact = false,
 }: {
-  review: GuestReview;
+  review: GoogleReview;
+  placeName: string;
   activeTopics: ReviewTopicId[];
   compact?: boolean;
 }) {
@@ -106,13 +131,15 @@ function ReviewCard({
       }`}
     >
       <div className="flex items-center gap-3">
-        <AuthorAvatar name={review.author} />
+        <AuthorAvatar name={review.author} photoUrl={review.photoUrl} />
         <div className="min-w-0 flex-1">
           <p className="font-semibold text-sm text-text truncate">{review.author}</p>
-          <p className="text-xs text-muted">{review.country}</p>
+          {review.relativeTime && (
+            <p className="text-xs text-muted">{review.relativeTime}</p>
+          )}
         </div>
         <span className="shrink-0 bg-primary text-white text-xs font-bold px-2 py-1 rounded-md">
-          {formatRating(review.rating)}
+          {formatReviewRating(review.rating)}
         </span>
       </div>
 
@@ -131,25 +158,24 @@ function ReviewCard({
       )}
 
       <div className="border-t border-stone pt-3 text-xs text-muted space-y-0.5">
-        <p>{review.property}</p>
+        <p>{placeName}</p>
         <p>{formatReviewDate(review.date)}</p>
       </div>
     </article>
   );
 }
 
-export default function PropertyReviewsSection() {
+export default function PropertyReviewsSection({ data }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const [activeTopics, setActiveTopics] = useState<ReviewTopicId[]>([]);
   const [showAll, setShowAll] = useState(false);
 
+  const reviews = data?.reviews ?? [];
+
   const filteredReviews = useMemo(() => {
-    if (activeTopics.length === 0) return GUEST_REVIEWS;
-    return GUEST_REVIEWS.filter((review) =>
-      activeTopics.every((topic) => review.topics.includes(topic)),
-    );
-  }, [activeTopics]);
+    return reviews.filter((review) => reviewMatchesTopics(review, activeTopics));
+  }, [reviews, activeTopics]);
 
   const visibleReviews = showAll
     ? filteredReviews
@@ -180,6 +206,25 @@ export default function PropertyReviewsSection() {
     });
   };
 
+  if (!data) {
+    return (
+      <section
+        className="py-14 px-4 bg-white border-t border-stone scroll-mt-28"
+        id={REVIEWS_SECTION_ID}
+      >
+        <div className="max-w-6xl mx-auto text-center text-sm text-muted py-8">
+          {REVIEWS_COPY.unavailable}
+        </div>
+      </section>
+    );
+  }
+
+  const ratingLabel = getRatingLabel(data.rating);
+  const reviewCountLabel = REVIEWS_COPY.reviewCountLabel.replace(
+    '{count}',
+    String(data.reviewCount),
+  );
+
   return (
     <section
       ref={sectionRef}
@@ -201,11 +246,10 @@ export default function PropertyReviewsSection() {
 
         <div className="flex flex-wrap items-center gap-3 mb-2">
           <span className="bg-primary text-white font-bold text-lg px-2.5 py-1 rounded-md leading-none">
-            {formatRating(REVIEWS_COPY.overallScore)}
+            {formatReviewRating(data.rating)}
           </span>
           <p className="text-sm text-text font-medium">
-            {REVIEWS_COPY.overallLabel} ·{' '}
-            {REVIEWS_COPY.reviewCountLabel.replace('{count}', String(GUEST_REVIEWS.length))}
+            {ratingLabel} · {reviewCountLabel}
           </p>
           {!showAll && filteredReviews.length > PREVIEW_COUNT && (
             <button
@@ -217,7 +261,8 @@ export default function PropertyReviewsSection() {
             </button>
           )}
         </div>
-        <p className="text-sm text-muted mb-8">{REVIEWS_COPY.highlights}</p>
+        <p className="text-sm text-muted mb-2">{REVIEWS_COPY.highlights}</p>
+        <p className="text-xs text-muted mb-8">{REVIEWS_COPY.googleSource}</p>
 
         <div className="mb-8">
           <p className="text-sm text-text mb-3">{REVIEWS_COPY.topicsHint}</p>
@@ -275,6 +320,7 @@ export default function PropertyReviewsSection() {
                 <ReviewCard
                   key={review.id}
                   review={review}
+                  placeName={data.placeName}
                   activeTopics={activeTopics}
                 />
               ))}
@@ -288,6 +334,7 @@ export default function PropertyReviewsSection() {
                 <ReviewCard
                   key={review.id}
                   review={review}
+                  placeName={data.placeName}
                   activeTopics={activeTopics}
                   compact
                 />
@@ -300,8 +347,8 @@ export default function PropertyReviewsSection() {
           </p>
         )}
 
-        {(showAll || filteredReviews.length > PREVIEW_COUNT) && (
-          <div className="mt-8">
+        <div className="mt-8 flex flex-col sm:flex-row gap-3 sm:items-center">
+          {(showAll || filteredReviews.length > PREVIEW_COUNT) && (
             <button
               type="button"
               onClick={handleToggleShowAll}
@@ -309,8 +356,17 @@ export default function PropertyReviewsSection() {
             >
               {showAll ? REVIEWS_COPY.hideAll : REVIEWS_COPY.showAll}
             </button>
-          </div>
-        )}
+          )}
+          <a
+            href={data.googleMapsUri}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center justify-center gap-2 text-sm text-primary hover:text-primary-dark font-medium transition-colors"
+          >
+            {REVIEWS_COPY.viewAllOnGoogle}
+            <ExternalLink size={14} />
+          </a>
+        </div>
       </div>
     </section>
   );
