@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
-import { CONTACT_EMAIL, SITE_NAME } from '@/modules/booking/booking.config';
+import { CONTACT_EMAIL, CONTACT_PHONE_TEL, SITE_NAME } from '@/modules/booking/booking.config';
 import { PROPERTY_STREET } from '@/modules/property/property-details.config';
 import { routing } from './routing';
 
@@ -190,7 +190,7 @@ export async function getStructuredData(locale: Locale) {
     name: SITE_NAME,
     description: t('description'),
     url: SITE_URL,
-    telephone: '+385959000799',
+    telephone: CONTACT_PHONE_TEL,
     email: CONTACT_EMAIL,
     address: {
       '@type': 'PostalAddress',

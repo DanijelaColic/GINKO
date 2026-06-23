@@ -2,7 +2,8 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Phone } from 'lucide-react';
+import WhatsAppIcon from '@/components/icons/WhatsAppIcon';
 import { Link, usePathname } from '@/i18n/navigation';
 import { localizePath } from '@/i18n/pathnames';
 import type { AppLocale } from '@/i18n/routing';
@@ -12,7 +13,12 @@ import {
   PROPERTY_NAV_ITEMS,
   PROPERTY_SUBNAV_SECTION_IDS,
   propertySectionHref,
+  propertySectionIdFromHash,
+  CONTACT_PHONE_TEL,
+  CONTACT_PHONE_DISPLAY,
+  CONTACT_WHATSAPP_URL,
 } from '@/modules/booking/booking.config';
+import { scrollToSectionId } from '@/lib/scroll-to-section';
 
 const LOCALES: { code: AppLocale; label: string }[] = [
   { code: 'hr', label: 'HR' },
@@ -26,6 +32,10 @@ function sectionLinkClass(isActive: boolean) {
       ? 'bg-primary/10 text-primary'
       : 'text-[--color-text] hover:bg-[--color-stone] hover:text-[--color-primary]'
   }`;
+}
+
+function contactLinkClass() {
+  return 'flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm font-medium text-[--color-muted] hover:bg-[--color-stone] hover:text-[--color-primary] transition-colors whitespace-nowrap';
 }
 
 export default function Navbar() {
@@ -48,12 +58,12 @@ export default function Navbar() {
   useEffect(() => {
     if (!isHome) return;
 
-    const hash = window.location.hash.slice(1);
+    const sectionId = propertySectionIdFromHash(window.location.hash);
     if (
-      hash &&
-      (PROPERTY_SUBNAV_SECTION_IDS as readonly string[]).includes(hash)
+      sectionId &&
+      (PROPERTY_SUBNAV_SECTION_IDS as readonly string[]).includes(sectionId)
     ) {
-      setActiveSectionId(hash);
+      setActiveSectionId(sectionId);
     }
   }, [isHome]);
 
@@ -100,7 +110,7 @@ export default function Navbar() {
   }
 
   function scrollToSection(id: string) {
-    document.getElementById(id)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    scrollToSectionId(id);
     setActiveSectionId(id);
     setIsOpen(false);
   }
@@ -160,8 +170,27 @@ export default function Navbar() {
           ))}
         </ul>
 
-        {/* Desktop: locale switcher + CTA */}
-        <div className="hidden shrink-0 items-center gap-2 lg:gap-3 md:flex">
+        {/* Desktop: kontakt + locale switcher + CTA */}
+        <div className="hidden shrink-0 items-center gap-1.5 lg:gap-2 md:flex">
+          <a
+            href={`tel:${CONTACT_PHONE_TEL}`}
+            className={contactLinkClass()}
+            aria-label={t('phone')}
+          >
+            <Phone size={15} className="shrink-0" />
+            <span className="hidden lg:inline">{CONTACT_PHONE_DISPLAY}</span>
+          </a>
+          <a
+            href={CONTACT_WHATSAPP_URL}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={contactLinkClass()}
+            aria-label={t('whatsapp')}
+          >
+            <WhatsAppIcon size={15} className="shrink-0 text-[#25D366]" />
+            <span className="hidden lg:inline">WhatsApp</span>
+          </a>
+          <div className="mx-0.5 h-5 w-px bg-[--color-stone] hidden lg:block" aria-hidden />
           <div className="flex items-center gap-1 text-xs font-medium text-[--color-muted]">
             {LOCALES.map(({ code, label }) => (
               <button
@@ -214,7 +243,26 @@ export default function Navbar() {
               </li>
             ))}
           </ul>
-          <div className="mt-6 flex items-center gap-2">
+          <div className="mt-6 flex flex-col gap-2 border-t border-[--color-stone] pt-4">
+            <a
+              href={`tel:${CONTACT_PHONE_TEL}`}
+              className="flex items-center gap-2.5 rounded-md px-3 py-2.5 text-base font-medium text-[--color-text] hover:bg-[--color-stone] hover:text-[--color-primary] transition-colors"
+            >
+              <Phone size={18} className="shrink-0 text-[--color-primary]" />
+              {CONTACT_PHONE_DISPLAY}
+            </a>
+            <a
+              href={CONTACT_WHATSAPP_URL}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2.5 rounded-md px-3 py-2.5 text-base font-medium text-[--color-text] hover:bg-[--color-stone] hover:text-[--color-primary] transition-colors"
+              onClick={() => setIsOpen(false)}
+            >
+              <WhatsAppIcon size={18} className="shrink-0 text-[#25D366]" />
+              WhatsApp
+            </a>
+          </div>
+          <div className="mt-4 flex items-center gap-2">
             {LOCALES.map(({ code, label }) => (
               <button
                 key={code}

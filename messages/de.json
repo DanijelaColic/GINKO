@@ -41,7 +41,9 @@
       "guides": "Reiseführer",
       "gallery": "Galerie"
     },
-    "cta": "Jetzt Buchen"
+    "cta": "Jetzt Buchen",
+    "phone": "Anrufen",
+    "whatsapp": "Kontakt über WhatsApp"
   },
   "footer": {
     "brand": "Ginko Boutique Rooms & Wellness",
@@ -67,7 +69,8 @@
     "heroGuests": "Gäste",
     "heroAdults": "Erwachsene",
     "heroChildren": "Kinder",
-    "heroSearch": "Verfügbarkeit prüfen",
+    "heroSearch": "Suchen",
+    "availabilitySearching": "Suchen…",
     "roomsEyebrow": "Unterkunft",
     "roomsTitle": "Unsere Zimmer",
     "roomsSubtitle": "Drei sorgfältig eingerichtete Zimmer für eine Auszeit vom Alltag.",

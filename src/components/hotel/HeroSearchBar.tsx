@@ -3,7 +3,7 @@
 import { useState, FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
-import { Search, CalendarDays, Users } from 'lucide-react';
+import { Search, CalendarDays, Users, AlertCircle } from 'lucide-react';
 import {
   AVAILABILITY_SECTION_HREF,
   buildAvailabilityHref,
@@ -16,23 +16,27 @@ export default function HeroSearchBar() {
   const [checkOut, setCheckOut] = useState('');
   const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+  const [dateError, setDateError] = useState<string | null>(null);
 
   const today = new Date().toISOString().split('T')[0];
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
-    if (checkIn && checkOut && checkIn < checkOut) {
-      router.push(buildAvailabilityHref({ checkIn, checkOut, adults, children }));
-    } else {
+    if (!checkIn || !checkOut || checkIn >= checkOut) {
+      setDateError(t('availabilitySelectDates'));
       router.push(AVAILABILITY_SECTION_HREF);
+      return;
     }
+    setDateError(null);
+    router.push(buildAvailabilityHref({ checkIn, checkOut, adults, children }));
   }
 
   return (
-    <form
-      onSubmit={handleSubmit}
-      className="flex flex-col sm:flex-row items-stretch sm:items-center gap-0 bg-white rounded-2xl shadow-2xl overflow-hidden w-full max-w-3xl"
-    >
+    <div className="w-full max-w-3xl flex flex-col gap-2">
+      <form
+        onSubmit={handleSubmit}
+        className="flex flex-col sm:flex-row items-stretch gap-0 bg-white rounded-2xl shadow-2xl overflow-hidden w-full"
+      >
       {/* Check-in */}
       <label className="flex-1 flex items-center gap-3 px-5 py-4 border-b sm:border-b-0 sm:border-r border-stone cursor-pointer hover:bg-stone-light/60 transition-colors">
         <CalendarDays size={18} className="text-primary shrink-0" />
@@ -115,11 +119,18 @@ export default function HeroSearchBar() {
       {/* Submit */}
       <button
         type="submit"
-        className="flex items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold px-8 py-4 sm:py-0 transition-colors text-sm whitespace-nowrap"
+        className="flex w-full sm:w-auto self-stretch shrink-0 items-center justify-center gap-2 bg-primary hover:bg-primary-dark text-white font-semibold px-6 sm:px-8 py-4 transition-colors text-sm whitespace-nowrap"
       >
         <Search size={17} />
         {t('heroSearch')}
       </button>
     </form>
+      {dateError && (
+        <p className="flex items-center gap-1.5 text-sm text-red-200 drop-shadow text-left px-1">
+          <AlertCircle size={14} className="shrink-0" />
+          {dateError}
+        </p>
+      )}
+    </div>
   );
 }

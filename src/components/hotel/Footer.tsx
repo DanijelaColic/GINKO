@@ -4,6 +4,8 @@ import { Phone, Mail, Clock, MapPin } from 'lucide-react';
 import { PROPERTY_MAP_URL, PROPERTY_STREET, PROPERTY_CITY } from '@/modules/property/property-details.config';
 import {
   CONTACT_EMAIL,
+  CONTACT_PHONE_TEL,
+  CONTACT_PHONE_DISPLAY,
   PROPERTY_NAV_ITEMS,
   propertySectionHref,
 } from '@/modules/booking/booking.config';
@@ -72,11 +74,11 @@ export default async function Footer() {
                 </span>
               </a>
               <a
-                href="tel:+385959000799"
+                href={`tel:${CONTACT_PHONE_TEL}`}
                 className="flex items-center gap-2 text-sm text-white/70 hover:text-white transition-colors"
               >
                 <Phone size={14} className="shrink-0 text-white/40" />
-                095 9000 799
+                {CONTACT_PHONE_DISPLAY}
               </a>
               <a
                 href={`mailto:${CONTACT_EMAIL}`}

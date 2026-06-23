@@ -1,4 +1,5 @@
 import type { Metadata } from 'next';
+import { Suspense } from 'react';
 import Image from 'next/image';
 import { getTranslations, getLocale } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
@@ -17,7 +18,7 @@ import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSectio
 import PropertySurroundingsSection from '@/components/hotel/PropertySurroundingsSection';
 import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
 import { PROPERTY_ADDRESS, PROPERTY_MAP_URL } from '@/modules/property/property-details.config';
-import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF, OVERVIEW_SECTION_ID } from '@/modules/booking/booking.config';
+import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF, OVERVIEW_SECTION_ID, CONTACT_PHONE_TEL, CONTACT_PHONE_DISPLAY } from '@/modules/booking/booking.config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -126,11 +127,11 @@ export default async function HomePage() {
               </a>
 
               <a
-                href="tel:+385959000799"
+                href={`tel:${CONTACT_PHONE_TEL}`}
                 className="flex items-center gap-1.5 hover:text-primary transition-colors"
               >
                 <Phone size={13} className="text-primary shrink-0" />
-                095 9000 799
+                {CONTACT_PHONE_DISPLAY}
               </a>
 
               <a
@@ -196,7 +197,9 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       {/* RASPOLOŽIVOST                                                        */}
       {/* ------------------------------------------------------------------ */}
-      <AvailabilitySection rooms={rooms} />
+      <Suspense fallback={null}>
+        <AvailabilitySection rooms={rooms} />
+      </Suspense>
 
       {/* ------------------------------------------------------------------ */}
       {/* RECENZIJE GOSTIJU                                                    */}

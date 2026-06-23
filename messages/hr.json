@@ -41,7 +41,9 @@
       "guides": "Vodič",
       "gallery": "Galerija"
     },
-    "cta": "Rezervirajte"
+    "cta": "Rezervirajte",
+    "phone": "Nazovi nas",
+    "whatsapp": "Kontakt putem WhatsAppa"
   },
   "footer": {
     "brand": "Ginko Boutique Rooms & Wellness",
@@ -67,7 +69,8 @@
     "heroGuests": "Gosti",
     "heroAdults": "Odrasli",
     "heroChildren": "Djeca",
-    "heroSearch": "Provjeri dostupnost",
+    "heroSearch": "Traži",
+    "availabilitySearching": "Traženje…",
     "roomsEyebrow": "Smještaj",
     "roomsTitle": "Naše sobe",
     "roomsSubtitle": "Tri pažljivo uređene sobe za odmor daleko od svakodnevice.",

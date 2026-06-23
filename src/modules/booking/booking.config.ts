@@ -13,7 +13,28 @@ export const SITE_LOCATION = process.env.NEXT_PUBLIC_SITE_LOCATION ?? 'Hrvatska'
 export const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? 'info@ginko-sobe.com';
 export const OWNER_EMAIL = process.env.OWNER_EMAIL ?? 'ginkosobe3@gmail.com';
 export const OWNER_PHONE = process.env.OWNER_PHONE ?? '';
-export const OWNER_WHATSAPP = process.env.OWNER_WHATSAPP_URL ?? '';
+
+const DEFAULT_CONTACT_PHONE_TEL = '+385959000799';
+const DEFAULT_CONTACT_PHONE_DISPLAY = '095 9000 799';
+
+/** E.164 format za tel: linkove (NEXT_PUBLIC za klijentske komponente) */
+export const CONTACT_PHONE_TEL =
+  process.env.NEXT_PUBLIC_CONTACT_PHONE ||
+  process.env.CONTACT_PHONE ||
+  process.env.OWNER_PHONE ||
+  DEFAULT_CONTACT_PHONE_TEL;
+
+export const CONTACT_PHONE_DISPLAY =
+  process.env.NEXT_PUBLIC_CONTACT_PHONE_DISPLAY || DEFAULT_CONTACT_PHONE_DISPLAY;
+
+/** WhatsApp chat URL */
+export const CONTACT_WHATSAPP_URL =
+  process.env.NEXT_PUBLIC_OWNER_WHATSAPP_URL ||
+  process.env.OWNER_WHATSAPP_URL ||
+  `https://wa.me/${DEFAULT_CONTACT_PHONE_TEL.replace(/\D/g, '')}`;
+
+/** @deprecated Koristi CONTACT_WHATSAPP_URL */
+export const OWNER_WHATSAPP = CONTACT_WHATSAPP_URL;
 
 // ── Plaćanje (HUB3 / SEPA QR) ────────────────────────────────────
 export const RECIPIENT_IBAN = process.env.RECIPIENT_IBAN ?? '';
@@ -92,7 +113,29 @@ export function buildAvailabilityHref(params?: {
   if (params.checkOut) q.set('checkOut', params.checkOut);
   if (params.adults != null) q.set('adults', String(params.adults));
   if (params.children != null) q.set('children', String(params.children));
-  return `${AVAILABILITY_SECTION_HREF}?${q.toString()}`;
+  // Query prije hash-a — inače browser ne parsira checkIn/checkOut iz location.search
+  return `/?${q.toString()}#${AVAILABILITY_SECTION_ID}`;
+}
+
+/** Čita query parametre iz search stringa ili legacy URL-a (/#raspolozivost?checkIn=...) */
+export function getAvailabilitySearchParams(
+  search: string,
+  hash = '',
+): URLSearchParams {
+  const params = new URLSearchParams(search.startsWith('?') ? search.slice(1) : search);
+  if (params.toString()) return params;
+
+  const fragment = hash.startsWith('#') ? hash.slice(1) : hash;
+  const qIndex = fragment.indexOf('?');
+  if (qIndex !== -1) {
+    return new URLSearchParams(fragment.slice(qIndex + 1));
+  }
+  return params;
+}
+
+export function propertySectionIdFromHash(hash: string): string {
+  const fragment = hash.startsWith('#') ? hash.slice(1) : hash;
+  return fragment.split('?')[0];
 }
 
 export function buildBookingHref(params: {

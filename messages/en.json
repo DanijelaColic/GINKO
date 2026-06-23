@@ -41,7 +41,9 @@
       "guides": "Guides",
       "gallery": "Gallery"
     },
-    "cta": "Book Now"
+    "cta": "Book Now",
+    "phone": "Call us",
+    "whatsapp": "Contact via WhatsApp"
   },
   "footer": {
     "brand": "Ginko Boutique Rooms & Wellness",
@@ -67,7 +69,8 @@
     "heroGuests": "Guests",
     "heroAdults": "Adults",
     "heroChildren": "Children",
-    "heroSearch": "Check availability",
+    "heroSearch": "Search",
+    "availabilitySearching": "Searching…",
     "roomsEyebrow": "Accommodation",
     "roomsTitle": "Our Rooms",
     "roomsSubtitle": "Three carefully designed rooms for a retreat away from everyday life.",

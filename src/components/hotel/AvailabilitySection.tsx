@@ -1,7 +1,8 @@
 'use client';
 
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import {
@@ -17,7 +18,10 @@ import {
   CONTACT_EMAIL,
   AVAILABILITY_SECTION_ID,
   buildBookingHref,
+  getAvailabilitySearchParams,
+  propertySectionIdFromHash,
 } from '@/modules/booking/booking.config';
+import { scrollToElement, scrollToSectionId } from '@/lib/scroll-to-section';
 
 type AmenityIconEntry = { icon: React.ElementType; label: string };
 
@@ -48,6 +52,7 @@ type RoomStatus = {
 export default function AvailabilitySection({ rooms }: Props) {
   const t = useTranslations('homePage');
   const router = useRouter();
+  const searchParams = useSearchParams();
 
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
@@ -59,45 +64,28 @@ export default function AvailabilitySection({ rooms }: Props) {
   const [searched, setSearched] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
 
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const lastAutoSearchKey = useRef('');
+
   const today = new Date().toISOString().split('T')[0];
   const hasDates = !!(checkIn && checkOut && checkIn < checkOut);
 
-  // Prefill datuma/sobe/gostiju iz URL query parametara (npr. s hero search bara ili stranice sobe)
-  useEffect(() => {
-    const params = new URLSearchParams(window.location.search);
-    const ci = params.get('checkIn');
-    const co = params.get('checkOut');
-    const room = params.get('room');
-    const a = parseInt(params.get('adults') ?? '');
-    const ch = parseInt(params.get('children') ?? '');
-    if (ci) setCheckIn(ci);
-    if (co) setCheckOut(co);
-    if (room) setHighlightedRoom(room);
-    if (!isNaN(a) && a >= 1) setAdults(a);
-    if (!isNaN(ch) && ch >= 0) setChildren(ch);
-    if (window.location.hash === `#${AVAILABILITY_SECTION_ID}`) {
-      document.getElementById(AVAILABILITY_SECTION_ID)?.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, []);
+  const runAvailabilityCheck = useCallback(
+    async (dates?: { checkIn: string; checkOut: string }, scrollToResults = false) => {
+      const ci = dates?.checkIn ?? checkIn;
+      const co = dates?.checkOut ?? checkOut;
 
-  useEffect(() => {
-    if (hasDates) setDateError(null);
-  }, [hasDates]);
-
-  const handleSearch = useCallback(
-    async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!hasDates) {
+      if (!ci || !co || ci >= co) {
         setDateError(t('availabilitySelectDates'));
-        return;
+        return false;
       }
 
       setDateError(null);
       setLoading(true);
       setSearched(true);
 
-      const ciDate = parseLocalDate(checkIn);
-      const coDate = parseLocalDate(checkOut);
+      const ciDate = parseLocalDate(ci);
+      const coDate = parseLocalDate(co);
 
       const results = await Promise.all(
         rooms.map(async (room) => {
@@ -122,8 +110,65 @@ export default function AvailabilitySection({ rooms }: Props) {
       results.forEach(({ slug, status }) => { map[slug] = status; });
       setStatuses(map);
       setLoading(false);
+
+      if (scrollToResults) {
+        requestAnimationFrame(() => {
+          if (resultsRef.current) {
+            scrollToElement(resultsRef.current);
+          } else {
+            scrollToSectionId(AVAILABILITY_SECTION_ID);
+          }
+        });
+      }
+
+      return true;
     },
-    [hasDates, checkIn, checkOut, rooms, t],
+    [checkIn, checkOut, rooms, t],
+  );
+
+  // Prefill + auto-provjera iz URL-a (hero search bar, linkovi soba)
+  useEffect(() => {
+    const params = getAvailabilitySearchParams(
+      searchParams.toString(),
+      typeof window !== 'undefined' ? window.location.hash : '',
+    );
+
+    const ci = params.get('checkIn');
+    const co = params.get('checkOut');
+    const room = params.get('room');
+    const a = parseInt(params.get('adults') ?? '');
+    const ch = parseInt(params.get('children') ?? '');
+
+    if (ci) setCheckIn(ci);
+    if (co) setCheckOut(co);
+    if (room) setHighlightedRoom(room);
+    if (!isNaN(a) && a >= 1) setAdults(a);
+    if (!isNaN(ch) && ch >= 0) setChildren(ch);
+
+    const sectionId = propertySectionIdFromHash(window.location.hash);
+    if (sectionId === AVAILABILITY_SECTION_ID) {
+      requestAnimationFrame(() => scrollToSectionId(AVAILABILITY_SECTION_ID));
+    }
+
+    if (ci && co && ci < co) {
+      const key = `${ci}|${co}|${params.get('adults') ?? ''}|${params.get('children') ?? ''}|${room ?? ''}`;
+      if (key !== lastAutoSearchKey.current) {
+        lastAutoSearchKey.current = key;
+        void runAvailabilityCheck({ checkIn: ci, checkOut: co }, true);
+      }
+    }
+  }, [searchParams, runAvailabilityCheck]);
+
+  useEffect(() => {
+    if (hasDates) setDateError(null);
+  }, [hasDates]);
+
+  const handleSearch = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      await runAvailabilityCheck(undefined, true);
+    },
+    [runAvailabilityCheck],
   );
 
   const handleReserve = (roomSlug: string) => {
@@ -241,9 +286,9 @@ export default function AvailabilitySection({ rooms }: Props) {
           <button
             type="submit"
             disabled={loading}
-            className="bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-8 py-3 transition-colors text-sm whitespace-nowrap"
+            className="flex w-full sm:w-auto self-stretch shrink-0 items-center justify-center gap-2 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-8 py-3 transition-colors text-sm whitespace-nowrap"
           >
-            {loading ? 'Provjera…' : 'Provjeri dostupnost'}
+            {loading ? t('availabilitySearching') : t('heroSearch')}
           </button>
         </form>
 
@@ -255,7 +300,7 @@ export default function AvailabilitySection({ rooms }: Props) {
         )}
 
         {/* Kartice soba */}
-        <div className="flex flex-col gap-4">
+        <div ref={resultsRef} className="flex flex-col gap-4 scroll-mt-28">
           {availableRooms.map((room) => {
             const status = statuses[room.slug];
             const isHighlighted = highlightedRoom === room.slug;
