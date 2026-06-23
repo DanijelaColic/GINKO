@@ -3,7 +3,6 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { useTranslations } from 'next-intl';
 import { Link, useRouter } from '@/i18n/navigation';
 import {
   CalendarDays, Users, AlertCircle,
@@ -13,7 +12,7 @@ import {
 import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import { calculatePrice, isRangeAvailable, parseLocalDate } from '@/modules/booking/dates';
 import type { BookedRange } from '@/modules/booking/booking.types';
-import type { Room } from '@/modules/rooms/room.types';
+import type { AccommodationType, Room } from '@/modules/rooms/room.types';
 import {
   CONTACT_EMAIL,
   AVAILABILITY_SECTION_ID,
@@ -39,8 +38,30 @@ const AMENITY_ICONS: Record<string, AmenityIconEntry> = {
   'Kućni ljubimci na upit': { icon: PawPrint,        label: 'Kućni ljubimci na upit' },
 };
 
+export type AvailabilityLabels = {
+  selectDates: string;
+  searching: string;
+  search: string;
+  typeFilter: string;
+  typeAll: string;
+  typeRoom: string;
+  typeApartment: string;
+  unitRoom: string;
+  unitApartment: string;
+  noResultsAll: string;
+  noResultsRooms: string;
+  noResultsApartment: string;
+  noResultsHint: string;
+  contactUs: string;
+  reserve: string;
+  perNight: string;
+  nightOne: string;
+  nightMany: string;
+};
+
 type Props = {
   rooms: Room[];
+  labels: AvailabilityLabels;
 };
 
 type RoomStatus = {
@@ -49,8 +70,9 @@ type RoomStatus = {
   nights: number;
 };
 
-export default function AvailabilitySection({ rooms }: Props) {
-  const t = useTranslations('homePage');
+type TypeFilter = 'all' | AccommodationType;
+
+export default function AvailabilitySection({ rooms, labels }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -63,6 +85,7 @@ export default function AvailabilitySection({ rooms }: Props) {
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
 
   const resultsRef = useRef<HTMLDivElement>(null);
   const lastAutoSearchKey = useRef('');
@@ -76,7 +99,7 @@ export default function AvailabilitySection({ rooms }: Props) {
       const co = dates?.checkOut ?? checkOut;
 
       if (!ci || !co || ci >= co) {
-        setDateError(t('availabilitySelectDates'));
+        setDateError(labels.selectDates);
         return false;
       }
 
@@ -123,7 +146,7 @@ export default function AvailabilitySection({ rooms }: Props) {
 
       return true;
     },
-    [checkIn, checkOut, rooms, t],
+    [checkIn, checkOut, rooms, labels.selectDates],
   );
 
   // Prefill + auto-provjera iz URL-a (hero search bar, linkovi soba)
@@ -173,7 +196,7 @@ export default function AvailabilitySection({ rooms }: Props) {
 
   const handleReserve = (roomSlug: string) => {
     if (!hasDates) {
-      setDateError(t('availabilitySelectDates'));
+      setDateError(labels.selectDates);
       return;
     }
     setDateError(null);
@@ -183,11 +206,19 @@ export default function AvailabilitySection({ rooms }: Props) {
   const totalGuests = adults + children;
 
   const availableRooms = rooms.filter((r) => {
+    if (typeFilter !== 'all' && r.accommodationType !== typeFilter) return false;
     if (r.fullyBooked) return false;
     if (r.capacity < totalGuests) return false;
     if (searched && statuses[r.slug]?.available === false) return false;
     return true;
   });
+
+  const noResultsMessage =
+    typeFilter === 'apartman'
+      ? labels.noResultsApartment
+      : typeFilter === 'soba'
+        ? labels.noResultsRooms
+        : labels.noResultsAll;
 
   return (
     <section className="py-14 px-4 bg-stone-light scroll-mt-28" id={AVAILABILITY_SECTION_ID}>
@@ -288,7 +319,7 @@ export default function AvailabilitySection({ rooms }: Props) {
             disabled={loading}
             className="flex w-full sm:w-auto self-stretch shrink-0 items-center justify-center gap-2 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold px-8 py-3 transition-colors text-sm whitespace-nowrap"
           >
-            {loading ? t('availabilitySearching') : t('heroSearch')}
+            {loading ? labels.searching : labels.search}
           </button>
         </form>
 
@@ -298,6 +329,31 @@ export default function AvailabilitySection({ rooms }: Props) {
             <span>{dateError}</span>
           </div>
         )}
+
+        {/* Filter: soba / apartman */}
+        <div className="flex flex-wrap items-center gap-2 mb-6">
+          <span className="text-xs font-semibold uppercase tracking-widest text-muted mr-1">
+            {labels.typeFilter}
+          </span>
+          {([
+            { value: 'all', label: labels.typeAll },
+            { value: 'soba', label: labels.typeRoom },
+            { value: 'apartman', label: labels.typeApartment },
+          ] as const).map(({ value, label }) => (
+            <button
+              key={value}
+              type="button"
+              onClick={() => setTypeFilter(value)}
+              className={`rounded-lg border px-4 py-2 text-sm font-medium transition-colors ${
+                typeFilter === value
+                  ? 'bg-primary border-primary text-white'
+                  : 'bg-white border-stone text-text hover:border-primary/40'
+              }`}
+            >
+              {label}
+            </button>
+          ))}
+        </div>
 
         {/* Kartice soba */}
         <div ref={resultsRef} className="flex flex-col gap-4 scroll-mt-28">
@@ -344,7 +400,9 @@ export default function AvailabilitySection({ rooms }: Props) {
 
                     <p className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 mb-3">
                       <span className="w-2 h-2 bg-emerald-500 rounded-full shrink-0" />
-                      1 soba dostupna
+                      {room.accommodationType === 'apartman'
+                        ? labels.unitApartment
+                        : labels.unitRoom}
                     </p>
 
                     <div className="mb-3 space-y-2">
@@ -381,7 +439,8 @@ export default function AvailabilitySection({ rooms }: Props) {
                             {status.totalPrice} €
                           </p>
                           <p className="text-xs text-muted mt-0.5">
-                            {status.nights} {status.nights === 1 ? 'noć' : 'noći'}
+                            {status.nights}{' '}
+                            {status.nights === 1 ? labels.nightOne : labels.nightMany}
                           </p>
                         </>
                       ) : (
@@ -389,7 +448,7 @@ export default function AvailabilitySection({ rooms }: Props) {
                           <p className="text-2xl font-bold text-primary leading-none">
                             {room.priceOffSeason} €
                           </p>
-                          <p className="text-xs text-muted mt-0.5">po noći</p>
+                          <p className="text-xs text-muted mt-0.5">{labels.perNight}</p>
                         </>
                       )}
                     </div>
@@ -399,7 +458,7 @@ export default function AvailabilitySection({ rooms }: Props) {
                       onClick={() => handleReserve(room.slug)}
                       className="bg-primary hover:bg-primary-dark text-white font-medium px-5 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap"
                     >
-                      Rezerviraj
+                      {labels.reserve}
                     </button>
                   </div>
                 </div>
@@ -410,16 +469,16 @@ export default function AvailabilitySection({ rooms }: Props) {
           {searched && !loading && availableRooms.length === 0 && (
             <div className="text-center py-14 text-muted">
               <p className="font-serif text-xl font-semibold text-text mb-2">
-                Nema dostupnih soba za odabrani period.
+                {noResultsMessage}
               </p>
               <p className="text-sm mb-6">
-                Pokušajte s drugim datumima ili nas kontaktirajte direktno.
+                {labels.noResultsHint}
               </p>
               <a
                 href={`mailto:${CONTACT_EMAIL}`}
                 className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-medium px-6 py-3 rounded-lg transition-colors text-sm"
               >
-                Kontaktirajte nas
+                {labels.contactUs}
               </a>
             </div>
           )}

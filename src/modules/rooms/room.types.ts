@@ -1,7 +1,10 @@
 // Copied from Villa-Jurina/src/lib/apartments.ts → renamed Apartment→Room
 
+export type AccommodationType = 'soba' | 'apartman';
+
 export type Room = {
   slug: string;
+  accommodationType: AccommodationType;
   name: string;
   tagline: string;
   description: string;

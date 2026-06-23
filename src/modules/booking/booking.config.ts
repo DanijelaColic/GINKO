@@ -10,7 +10,8 @@ export const SITE_NAME =
 export const SITE_LOCATION = process.env.NEXT_PUBLIC_SITE_LOCATION ?? 'Hrvatska';
 
 // ── Kontakt ───────────────────────────────────────────────────────
-export const CONTACT_EMAIL = process.env.CONTACT_EMAIL ?? 'info@ginko-sobe.com';
+// Javni kontakt na stranici — uvijek info@ginko-sobe.com (ne iz env-a)
+export const CONTACT_EMAIL = 'info@ginko-sobe.com';
 export const OWNER_EMAIL = process.env.OWNER_EMAIL ?? 'ginkosobe3@gmail.com';
 export const OWNER_PHONE = process.env.OWNER_PHONE ?? '';
 

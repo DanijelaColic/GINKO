@@ -37,7 +37,7 @@ npm run lint
 | Variable | Required | Description |
 |---|---|---|
 | `NEXT_PUBLIC_SITE_URL` | Yes | Canonical site URL (e.g. `https://ginko-sobe.com`) |
-| `CONTACT_EMAIL` | No | Contact/reservation email shown on privacy page |
+| Public contact email | — | Fixed as `info@ginko-sobe.com` in `booking.config.ts` |
 | `CONTACT_PHONE` | No | Contact phone for structured data |
 
 ## Project structure

@@ -3,7 +3,7 @@
 // Public interface is unchanged — all callers continue to work.
 
 import type { Room, RoomLocale } from './room.types';
-import { rooms as staticRooms, roomTranslations } from './rooms.config';
+import { getAccommodationType, rooms as staticRooms, roomTranslations } from './rooms.config';
 import { createServerSupabaseClient } from '@/lib/supabase';
 
 // ── Static helpers (used as fallback + for server-side validation in API) ──
@@ -41,6 +41,7 @@ function mapDbRoom(r: DbRoom, locale: RoomLocale): Room {
 
   return {
     slug: r.slug,
+    accommodationType: getAccommodationType(r.slug),
     name: t?.name ?? r.slug,
     tagline: t?.tagline ?? '',
     description: t?.description ?? '',

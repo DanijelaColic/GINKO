@@ -62,6 +62,27 @@ export default async function HomePage() {
     Icon: FEATURE_ICONS[n - 1],
   }));
 
+  const availabilityLabels = {
+    selectDates: t('availabilitySelectDates'),
+    searching: t('availabilitySearching'),
+    search: t('heroSearch'),
+    typeFilter: t('availabilityTypeFilter'),
+    typeAll: t('availabilityTypeAll'),
+    typeRoom: t('availabilityTypeRoom'),
+    typeApartment: t('availabilityTypeApartment'),
+    unitRoom: t('availabilityUnitRoom'),
+    unitApartment: t('availabilityUnitApartment'),
+    noResultsAll: t('availabilityNoResultsAll'),
+    noResultsRooms: t('availabilityNoResultsRooms'),
+    noResultsApartment: t('availabilityNoResultsApartment'),
+    noResultsHint: t('availabilityNoResultsHint'),
+    contactUs: t('availabilityContactUs'),
+    reserve: t('availabilityReserve'),
+    perNight: t('availabilityPerNight'),
+    nightOne: t('availabilityNightOne'),
+    nightMany: t('availabilityNightMany'),
+  };
+
   return (
     <div className="flex flex-col">
       {/* ------------------------------------------------------------------ */}
@@ -185,7 +206,7 @@ export default async function HomePage() {
       {/* RASPOLOŽIVOST                                                        */}
       {/* ------------------------------------------------------------------ */}
       <Suspense fallback={null}>
-        <AvailabilitySection rooms={rooms} />
+        <AvailabilitySection rooms={rooms} labels={availabilityLabels} />
       </Suspense>
 
       {/* ------------------------------------------------------------------ */}

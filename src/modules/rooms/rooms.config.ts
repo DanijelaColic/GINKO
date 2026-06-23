@@ -2,11 +2,18 @@
 // Images: Unsplash placeholders — replace with real photos before launch
 // EN/DE translations mirror HR until proper translation is done (marked TODO)
 
-import type { Room, RoomLocale } from './room.types';
+import type { AccommodationType, Room, RoomLocale } from './room.types';
+
+export const APARTMENT_SLUGS = ['ginko-spa-2'] as const;
+
+export function getAccommodationType(slug: string): AccommodationType {
+  return (APARTMENT_SLUGS as readonly string[]).includes(slug) ? 'apartman' : 'soba';
+}
 
 export const rooms: Room[] = [
   {
     slug: 'ginko-1',
+    accommodationType: 'soba',
     name: 'Ginko 1',
     tagline: 'Šarmantna i intimna soba u srcu Daruvara.',
     description:
@@ -28,6 +35,7 @@ export const rooms: Room[] = [
   },
   {
     slug: 'ginko-2',
+    accommodationType: 'soba',
     name: 'Ginko 2',
     tagline: 'Prostrana soba s terasom za ugodne večeri.',
     description:
@@ -49,6 +57,7 @@ export const rooms: Room[] = [
   },
   {
     slug: 'ginko-3',
+    accommodationType: 'soba',
     name: 'Ginko 3',
     tagline: 'Privatno utočište s modernim sadržajima i terasom.',
     description:
@@ -70,6 +79,7 @@ export const rooms: Room[] = [
   },
   {
     slug: 'ginko-4',
+    accommodationType: 'soba',
     name: 'Ginko 4',
     tagline: 'Moderna soba s terasom i luksuznim sadržajima.',
     description:
@@ -91,6 +101,7 @@ export const rooms: Room[] = [
   },
   {
     slug: 'ginko-5',
+    accommodationType: 'soba',
     name: 'Ginko 5',
     tagline: 'Elegantna soba za savršen odmor u centru grada.',
     description:
@@ -112,6 +123,7 @@ export const rooms: Room[] = [
   },
   {
     slug: 'ginko-6',
+    accommodationType: 'soba',
     name: 'Ginko 6',
     tagline: 'Idealna za solo putnike — miran i intiman boravak.',
     description:
@@ -133,6 +145,7 @@ export const rooms: Room[] = [
   },
   {
     slug: 'ginko-spa-2',
+    accommodationType: 'apartman',
     name: 'Ginko SPA 2',
     tagline: 'Wellness suita s privatnom saunom i odvojenom kuhinjom.',
     description:
