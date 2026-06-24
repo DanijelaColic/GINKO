@@ -18,9 +18,7 @@ import { getStripeClient, getStripeWebhookSecret } from '@/modules/payments/stri
 import { insertWebhookEvent, markWebhookEventProcessed } from '@/modules/payments/payment.repository';
 import { handleWebhookEvent } from '@/modules/payments/payment.service';
 
-// Tell Next.js not to parse the body — needed for raw access
-export const config = { api: { bodyParser: false } };
-
+// App Router: request.text() vraća raw body (nema bodyParser config kao u Pages Routeru)
 export async function POST(request: NextRequest) {
   // ── 1. Read raw body ─────────────────────────────────────────────
   let body: string;

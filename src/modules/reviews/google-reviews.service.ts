@@ -165,7 +165,9 @@ async function fetchGoogleReviewsUncached(): Promise<GoogleReviewsData | null> {
 }
 
 export async function getGoogleReviews(): Promise<GoogleReviewsData | null> {
-  return unstable_cache(fetchGoogleReviewsUncached, ['google-reviews-data'], {
+  // Ključ uključuje place ID da se Data Cache invalidira kad se env promijeni
+  const cacheKey = process.env.GOOGLE_PLACE_ID?.trim() ?? 'text-search';
+  return unstable_cache(fetchGoogleReviewsUncached, ['google-reviews-data', cacheKey], {
     revalidate: REVALIDATE_SECONDS,
     tags: [CACHE_TAG],
   })();
