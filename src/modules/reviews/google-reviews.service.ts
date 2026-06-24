@@ -8,10 +8,25 @@ import type { GoogleReview, GoogleReviewsData } from './google-reviews.types';
 
 const PLACES_DETAILS_URL = 'https://places.googleapis.com/v1/places';
 const PLACES_SEARCH_URL = 'https://places.googleapis.com/v1/places:searchText';
+/** places.googleapis.com/v1 — New; legacy je maps.googleapis.com/maps/api/place */
+const PLACES_API_VARIANT = 'Places API (New)';
 const FIELD_MASK =
   'rating,userRatingCount,reviews,displayName,googleMapsUri';
 const CACHE_TAG = 'google-reviews';
 const REVALIDATE_SECONDS = 86_400;
+
+function logGoogleApiError(
+  operation: string,
+  url: string,
+  status: number,
+  body: string,
+) {
+  console.error(`[google-reviews] ${operation} failed`);
+  console.error(`[google-reviews] API: ${PLACES_API_VARIANT}`);
+  console.error(`[google-reviews] URL: ${url}`);
+  console.error(`[google-reviews] Status: ${status}`);
+  console.error(`[google-reviews] Response body: ${body}`);
+}
 
 type PlacesReview = {
   name?: string;
@@ -75,23 +90,28 @@ async function resolvePlaceId(apiKey: string): Promise<string | null> {
   });
 
   if (!response.ok) {
-    console.error(
-      '[google-reviews] Text search failed:',
-      response.status,
-      await response.text(),
-    );
+    const body = await response.text();
+    logGoogleApiError('Text search (places:searchText)', PLACES_SEARCH_URL, response.status, body);
     return null;
   }
 
   const data = (await response.json()) as TextSearchResponse;
-  return data.places?.[0]?.id ?? null;
+  const placeId = data.places?.[0]?.id ?? null;
+  if (!placeId) {
+    console.error('[google-reviews] Text search returned no places');
+    console.error(`[google-reviews] API: ${PLACES_API_VARIANT}`);
+    console.error(`[google-reviews] URL: ${PLACES_SEARCH_URL}`);
+    console.error(`[google-reviews] Response body: ${JSON.stringify(data)}`);
+  }
+  return placeId;
 }
 
 async function fetchPlaceDetails(
   apiKey: string,
   placeId: string,
 ): Promise<GoogleReviewsData | null> {
-  const response = await fetch(`${PLACES_DETAILS_URL}/${placeId}`, {
+  const detailsUrl = `${PLACES_DETAILS_URL}/${placeId}`;
+  const response = await fetch(detailsUrl, {
     headers: {
       'X-Goog-Api-Key': apiKey,
       'X-Goog-FieldMask': FIELD_MASK,
@@ -100,11 +120,8 @@ async function fetchPlaceDetails(
   });
 
   if (!response.ok) {
-    console.error(
-      '[google-reviews] Place details failed:',
-      response.status,
-      await response.text(),
-    );
+    const body = await response.text();
+    logGoogleApiError('Place details (GetPlace)', detailsUrl, response.status, body);
     return null;
   }
 
@@ -114,6 +131,10 @@ async function fetchPlaceDetails(
     .filter((review): review is GoogleReview => review != null);
 
   if (place.rating == null || place.userRatingCount == null) {
+    console.error('[google-reviews] Place details missing rating or review count');
+    console.error(`[google-reviews] API: ${PLACES_API_VARIANT}`);
+    console.error(`[google-reviews] URL: ${detailsUrl}`);
+    console.error(`[google-reviews] Response body: ${JSON.stringify(place)}`);
     return null;
   }
 
@@ -129,10 +150,16 @@ async function fetchPlaceDetails(
 
 async function fetchGoogleReviewsUncached(): Promise<GoogleReviewsData | null> {
   const apiKey = process.env.GOOGLE_PLACES_API_KEY?.trim();
-  if (!apiKey) return null;
+  if (!apiKey) {
+    console.error('[google-reviews] GOOGLE_PLACES_API_KEY is not set');
+    return null;
+  }
 
   const placeId = await resolvePlaceId(apiKey);
-  if (!placeId) return null;
+  if (!placeId) {
+    console.error('[google-reviews] Could not resolve place ID');
+    return null;
+  }
 
   return fetchPlaceDetails(apiKey, placeId);
 }
