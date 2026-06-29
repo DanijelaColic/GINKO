@@ -12,16 +12,25 @@ export type SurroundingItem = {
 };
 
 export const SURROUNDINGS = {
+  attractions: [
+    { label: 'Centar grada', distance: '50 m' },
+    { label: 'Stablo Ginka i dvorac grofa Jankovića', distance: '50 m' },
+    { label: 'Daruvarske toplice', distance: '400 m' },
+    { label: 'Aqua park Aquae Ballisae', distance: '400 m' },
+  ],
   restaurants: [
+    { label: 'Fast food · Black & White', distance: '100 m' },
+    { label: 'Kafić · Špica', distance: '100 m' },
     { label: 'Restoran · Domino Food', distance: '150 m' },
     { label: 'Kafić · Caffe bar Masaryk', distance: '200 m' },
+    { label: 'Kavana · Queen', distance: '200 m' },
+    { label: 'Restoran · Terasa', distance: '350 m' },
     { label: 'Restoran · Stari grad', distance: '400 m' },
     { label: 'Kafić · Central', distance: '500 m' },
   ],
   transport: [
-    { label: 'Vlak · Daruvar', distance: '800 m' },
-    { label: 'Autobusna stanica · Daruvar', distance: '1,1 km' },
-    { label: 'Autobus · Centar grada', distance: '450 m' },
+    { label: 'Vlak · Daruvar', distance: '500 m' },
+    { label: 'Autobusna stanica · Daruvar', distance: '500 m' },
   ],
   airports: [
     { label: 'Zračna luka Zagreb', distance: '120 km' },
@@ -61,7 +70,8 @@ export const FACILITY_GROUPS: FacilityGroup[] = [
     items: [
       'Privatno parkiralište',
       'Besplatan Wi-Fi',
-      'Wellness zona (sauna, jacuzzi)',
+      'Wellness zona (jacuzzi)',
+      'Dostupan restoran za doručak',
       'Sobe za nepušače',
       'Obiteljske sobe',
       'Park dvorca Janković u blizini',
@@ -79,7 +89,6 @@ export const FACILITY_GROUPS: FacilityGroup[] = [
       'Ručnici',
       'Sušilo za kosu',
       'Toalet',
-      'Besplatna toaletna papir',
     ],
   },
   {
@@ -112,21 +121,19 @@ export const FACILITY_GROUPS: FacilityGroup[] = [
     title: 'Kućni ljubimci',
     column: 2,
     type: 'text',
-    text: 'Kućni ljubimci nisu dozvoljeni.',
+    text: 'Kućni ljubimci dozvoljeni na upit.',
   },
   {
     id: 'media',
     title: 'Mediji i tehnologija',
     column: 2,
     type: 'list',
-    items: ['LCD televizor', 'Satelitski kanali', 'Klima-uređaj'],
-  },
-  {
-    id: 'internet',
-    title: 'Internet',
-    column: 2,
-    type: 'text',
-    text: 'Besplatan Wi-Fi dostupan je u cijelom objektu.',
+    items: [
+      'LCD televizor',
+      'Satelitski kanali',
+      'Klima-uređaj',
+      'Besplatan Wi-Fi u cijelom objektu',
+    ],
   },
   {
     id: 'parking',
@@ -144,7 +151,6 @@ export const FACILITY_GROUPS: FacilityGroup[] = [
       'Dnevno čišćenje',
       'Recepcija (ograničeno radno vrijeme)',
       'Pomoć pri planiranju izleta',
-      'Wellness zona',
     ],
   },
   {
@@ -157,7 +163,6 @@ export const FACILITY_GROUPS: FacilityGroup[] = [
       'Grijanje',
       'Terasa',
       'Zajednički lounge',
-      'Lift',
     ],
   },
   {
@@ -176,6 +181,7 @@ export const SURROUNDINGS_COPY = {
   openInGoogleMaps: 'Otvori u Google Maps',
   showAvailability: 'Prikaži raspoloživost',
   categories: {
+    attractions: 'Znamenitosti u blizini',
     restaurants: 'Restorani i kafići',
     transport: 'Javni prijevoz',
     airports: 'Najbliže zračne luke',

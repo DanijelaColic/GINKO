@@ -178,9 +178,15 @@ export default async function HomePage() {
       <section className="py-14 px-4 bg-white">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Lijevo: opis objekta */}
-          <div>
+          <div className="space-y-4">
             <p className="text-text text-base leading-relaxed">
-              Ginko Boutique Rooms &amp; Wellness Daruvar smješten je u samom srcu Daruvara, uz park dvorca Janković i u neposrednoj blizini Daruvarskih toplica. Moderne i elegantno uređene sobe nude besplatan Wi-Fi, privatno parkiralište i vrhunsku udobnost, dok wellness zona sa saunom i jacuzzijem pruža savršeno mjesto za opuštanje nakon dana provedenog u istraživanju grada. Idealno za parove, poslovne goste i sve koji traže miran odmor u kontinentalnoj Hrvatskoj.
+              Smješten u samom srcu Daruvara, u ulici T. G. Masaryka 1, GINKO Boutique Rooms &amp; Wellness nudi jedinstven spoj elegancije, udobnosti i opuštanja. Inspiraciju za naziv pronašli smo u najstarijem i najpoznatijem stablu Ginkgo biloba u Europi koje od 18. stoljeća krasi perivoj dvorca Janković.
+            </p>
+            <p className="text-text text-base leading-relaxed">
+              Naše moderno uređene sobe i wellness apartmani nalaze se unutar zaštićene povijesne jezgre grada, na svega nekoliko minuta hoda od Daruvarskih toplica i aqua parka Aquae Balissae. Zahvaljujući izvrsnoj lokaciji, GINKO je idealan izbor za wellness odmor, obiteljski vikend, poslovna putovanja ili oporavak nakon medicinskih i estetskih zahvata.
+            </p>
+            <p className="text-text text-base leading-relaxed">
+              Bilo da želite uživati u privatnom wellnessu, istražiti ljepote Daruvara ili pronaći mirno mjesto za odmor, GINKO Boutique Rooms &amp; Wellness pružit će vam vrhunsku uslugu i osjećaj doma u gradu zelenila i piva.
             </p>
           </div>
 

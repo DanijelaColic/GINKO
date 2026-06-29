@@ -1,4 +1,4 @@
-import { UtensilsCrossed, TrainFront, Plane } from 'lucide-react';
+import { Landmark, UtensilsCrossed, TrainFront, Plane, type LucideIcon } from 'lucide-react';
 import { PropertyLocationMapPreview } from '@/components/hotel/PropertyLocationMap';
 import {
   SURROUNDINGS,
@@ -7,22 +7,34 @@ import {
 } from '@/modules/property/property-details.config';
 import { SURROUNDINGS_SECTION_ID } from '@/modules/booking/booking.config';
 
-const CATEGORIES = [
-  { key: 'restaurants' as const, icon: UtensilsCrossed },
-  { key: 'transport' as const, icon: TrainFront },
-  { key: 'airports' as const, icon: Plane },
-];
-
 function SurroundingList({ items }: { items: readonly SurroundingItem[] }) {
   return (
     <ul className="space-y-2.5">
       {items.map((item) => (
         <li key={item.label} className="flex justify-between gap-4 text-sm">
           <span className="text-text leading-snug">{item.label}</span>
-          <span className="text-muted shrink-0">{item.distance}</span>
+          <span className="text-muted shrink-0 tabular-nums">{item.distance}</span>
         </li>
       ))}
     </ul>
+  );
+}
+
+function SurroundingCategory({
+  categoryKey,
+  icon: Icon,
+}: {
+  categoryKey: keyof typeof SURROUNDINGS;
+  icon: LucideIcon;
+}) {
+  return (
+    <div>
+      <h3 className="flex items-center gap-2 font-semibold text-sm text-text mb-4">
+        <Icon size={16} className="text-muted shrink-0" />
+        {SURROUNDINGS_COPY.categories[categoryKey]}
+      </h3>
+      <SurroundingList items={SURROUNDINGS[categoryKey]} />
+    </div>
   );
 }
 
@@ -46,16 +58,19 @@ export default function PropertySurroundingsSection() {
 
         <PropertyLocationMapPreview />
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-10 mt-8">
-          {CATEGORIES.map(({ key, icon: Icon }) => (
-            <div key={key}>
-              <h3 className="flex items-center gap-2 font-semibold text-sm text-text mb-4">
-                <Icon size={16} className="text-muted shrink-0" />
-                {SURROUNDINGS_COPY.categories[key]}
-              </h3>
-              <SurroundingList items={SURROUNDINGS[key]} />
-            </div>
-          ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-10 mt-8">
+          <SurroundingCategory categoryKey="attractions" icon={Landmark} />
+
+          <div className="lg:row-span-3 lg:row-start-1 lg:col-start-2">
+            <h3 className="flex items-center gap-2 font-semibold text-sm text-text mb-4">
+              <UtensilsCrossed size={16} className="text-muted shrink-0" />
+              {SURROUNDINGS_COPY.categories.restaurants}
+            </h3>
+            <SurroundingList items={SURROUNDINGS.restaurants} />
+          </div>
+
+          <SurroundingCategory categoryKey="transport" icon={TrainFront} />
+          <SurroundingCategory categoryKey="airports" icon={Plane} />
         </div>
 
         <p className="text-xs text-muted mt-8 leading-relaxed">

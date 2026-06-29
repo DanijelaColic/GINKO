@@ -37,7 +37,6 @@ const GROUP_ICONS: Record<string, ElementType> = {
   kitchen: CookingPot,
   pets: PawPrint,
   media: Monitor,
-  internet: Wifi,
   parking: CircleParking,
   services: ConciergeBell,
   general: Info,
