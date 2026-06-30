@@ -81,6 +81,9 @@ export default async function HomePage() {
     perNight: t('availabilityPerNight'),
     nightOne: t('availabilityNightOne'),
     nightMany: t('availabilityNightMany'),
+    planAccommodationOnly: t('availabilityPlanAccommodationOnly'),
+    planWithBreakfast: t('availabilityPlanWithBreakfast'),
+    planBreakfastPerPerson: t('availabilityPlanBreakfastPerPerson'),
   };
 
   return (

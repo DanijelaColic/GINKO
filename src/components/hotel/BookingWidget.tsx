@@ -26,12 +26,11 @@ import {
   RECIPIENT_BIC,
   RECIPIENT_BANK_NAME,
   DEPOSIT_PERCENT,
-  BALANCE_DAYS_BEFORE_CHECK_IN,
   MIN_NIGHTS,
-  LONG_STAY_DISCOUNT_NIGHTS,
-  LONG_STAY_DISCOUNT_RATE,
   FACILITIES_SECTION_ID,
   propertySectionHref,
+  EXTRA_BED_PRICE_PER_NIGHT,
+  CRIB_PRICE_PER_NIGHT,
 } from '@/modules/booking/booking.config';
 import { rooms } from '@/modules/rooms/rooms.config';
 import type { BookingFormData } from '@/modules/booking/booking-form.schema';
@@ -53,6 +52,7 @@ type Props = {
   initialCheckOut?: string;
   initialAdults?: string;
   initialChildren?: string;
+  initialBreakfast?: string;
   bookingsApiPath?: string;
   barcodeApiPath?: string;
   rulesText?: React.ReactNode;
@@ -65,6 +65,7 @@ export default function BookingWidget({
   initialCheckOut,
   initialAdults,
   initialChildren,
+  initialBreakfast,
   bookingsApiPath = '/api/bookings',
   barcodeApiPath = '/api/generate-barcode',
   rulesText,
@@ -121,10 +122,12 @@ export default function BookingWidget({
   const [form, setForm] = useState<BookingFormData>(() => {
     const a = initialAdults ? parseInt(initialAdults) : null;
     const ch = initialChildren ? parseInt(initialChildren) : null;
+    const bf = initialBreakfast ? parseInt(initialBreakfast) : null;
     return {
       ...BOOKING_FORM_DEFAULTS,
       adults: a && a >= 1 ? String(a) : BOOKING_FORM_DEFAULTS.adults,
       children: ch && ch >= 0 ? String(ch) : BOOKING_FORM_DEFAULTS.children,
+      breakfastGuests: bf && bf >= 0 ? String(bf) : BOOKING_FORM_DEFAULTS.breakfastGuests,
     };
   });
   const [submitError, setSubmitError] = useState<string | null>(null);
@@ -152,7 +155,11 @@ export default function BookingWidget({
   const selectedRoom = rooms.find((r) => r.slug === selectedSlug);
   const priceData =
     checkIn && checkOut && selectedRoom
-      ? calculatePrice(checkIn, checkOut, selectedRoom)
+      ? calculatePrice(checkIn, checkOut, selectedRoom, {
+          extraBeds: form.needsExtraBed ? 1 : 0,
+          crib: form.needsCrib,
+          breakfastGuests: parseInt(form.breakfastGuests) || 0,
+        })
       : null;
 
   // ── Barcode fetch (opcionalno — gracefully fails) ──────────────────
@@ -215,7 +222,9 @@ export default function BookingWidget({
       form.bookingFor === 'other' && form.guestStayingName
         ? `Rezervacija za drugog gosta: ${form.guestStayingName}`
         : '',
+      form.needsExtraBed ? 'Pomoćni ležaj: da' : '',
       form.needsCrib ? 'Dječji krevetić: da' : '',
+      parseInt(form.breakfastGuests) > 0 ? `Doručak: ${form.breakfastGuests} osoba` : '',
       form.arrivalTime ? `Procijenjeno vrijeme dolaska: ${form.arrivalTime}` : '',
       form.isBusiness ? 'Poslovno putovanje: da' : '',
       form.isBusiness && form.companyName ? `Tvrtka: ${form.companyName}` : '',
@@ -250,7 +259,9 @@ export default function BookingWidget({
         booking_for: form.bookingFor,
         guest_staying_name:
           form.bookingFor === 'other' ? form.guestStayingName.trim() || null : null,
+        needs_extra_bed: form.needsExtraBed,
         needs_crib: form.needsCrib,
+        breakfast_guests: parseInt(form.breakfastGuests) || 0,
         is_business: form.isBusiness,
         company_name: form.isBusiness ? form.companyName.trim() || null : null,
         vat_id: form.isBusiness ? form.vatId.trim() || null : null,
@@ -411,7 +422,7 @@ export default function BookingWidget({
                 </span>
                 <span className="text-muted">
                   {' '}
-                  — {t('success.summary.balanceNote', { days: BALANCE_DAYS_BEFORE_CHECK_IN })}
+                  — {t('success.summary.balanceNote')}
                 </span>
               </p>
             )}
@@ -537,7 +548,7 @@ export default function BookingWidget({
           >
             {availableRooms.map((r) => (
               <option key={r.slug} value={r.slug}>
-                {r.name} — {r.capacityNote} · {r.priceOffSeason}€/noć
+                {r.name} — {r.capacityNote} · {r.price}€/noć
               </option>
             ))}
           </select>
@@ -592,7 +603,7 @@ export default function BookingWidget({
                 </span>
                 <span className="text-muted">
                   {' '}
-                  — {t('paymentTerms.balanceNote', { days: BALANCE_DAYS_BEFORE_CHECK_IN })}
+                  — {t('paymentTerms.balanceNote')}
                 </span>
               </p>
             )}
@@ -796,9 +807,35 @@ export default function BookingWidget({
               )}
             </div>
 
-            {/* ── 3. Krevetić (samo kad ima djece) ────────────────── */}
-            {parseInt(form.children) > 0 && (
-              <label className="flex items-start gap-3 cursor-pointer">
+            {/* ── 3. Dodatni kreveti (pomoćni ležaj + krevetić) ───── */}
+            <div className="space-y-3">
+              <p className="text-sm font-medium text-text">
+                {t('form.extraBedsSection')}{' '}
+                <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
+              </p>
+
+              {selectedRoom?.extraBedAvailable && (
+                <label className="flex items-start gap-3 cursor-pointer group">
+                  <input
+                    name="needsExtraBed"
+                    type="checkbox"
+                    checked={form.needsExtraBed}
+                    onChange={handleFormChange}
+                    className="mt-0.5 accent-primary"
+                  />
+                  <span className="text-sm text-text">
+                    {t('form.needsExtraBed')}{' '}
+                    <span className="font-semibold text-primary">
+                      +{EXTRA_BED_PRICE_PER_NIGHT} €/{t('form.perNight')}
+                    </span>
+                    <br />
+                    <span className="text-xs text-muted">{t('form.needsExtraBedHint')}</span>
+                  </span>
+                </label>
+              )}
+
+              {/* Dječji krevetić — uvijek vidljiv (dijete može dodati čak i bez prethodnog odabira) */}
+              <label className="flex items-start gap-3 cursor-pointer group">
                 <input
                   name="needsCrib"
                   type="checkbox"
@@ -808,12 +845,20 @@ export default function BookingWidget({
                 />
                 <span className="text-sm text-text">
                   {t('form.needsCrib')}{' '}
-                  <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
+                  <span className="font-semibold text-primary">
+                    +{CRIB_PRICE_PER_NIGHT} €/{t('form.perNight')}
+                  </span>
                   <br />
                   <span className="text-xs text-muted">{t('form.needsCribHint')}</span>
                 </span>
               </label>
-            )}
+
+              {!form.needsCrib && (
+                <p className="text-xs text-muted bg-stone-light border border-stone rounded-lg px-3 py-2">
+                  {t('form.childFreeOnBed')}
+                </p>
+              )}
+            </div>
 
             {/* ── 4. Dolazak i posebni zahtjevi ───────────────────── */}
             <div className="space-y-4">

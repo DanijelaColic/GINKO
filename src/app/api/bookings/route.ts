@@ -38,21 +38,24 @@ export async function GET(request: NextRequest) {
   try {
     const supabase = createServerSupabaseClient();
 
+    // Uključi linked slugove (isti fizički prostor) — npr. ginko-spa-1 ↔ ginko-spa-2
+    const slugsToCheck = [slug, ...(room.linkedSlugs ?? [])];
+
     const [bookingsRes, blockedRes, externalRes] = await Promise.all([
       supabase
         .from('bookings')
         .select('check_in, check_out')
-        .eq('room_slug', slug)
+        .in('room_slug', slugsToCheck)
         .neq('status', 'cancelled'),
       supabase
         .from('blocked_dates')
         .select('check_in, check_out')
-        .eq('room_slug', slug),
+        .in('room_slug', slugsToCheck),
       // Phase 9: include external iCal-imported events
       supabase
         .from('external_calendar_events')
         .select('starts_on, ends_on')
-        .eq('room_slug', slug),
+        .in('room_slug', slugsToCheck),
     ]);
 
     if (bookingsRes.error) throw bookingsRes.error;
@@ -97,6 +100,8 @@ export async function POST(request: NextRequest) {
       booking_for,
       guest_staying_name,
       needs_crib,
+      needs_extra_bed,
+      breakfast_guests,
       is_business,
       company_name,
       vat_id,
@@ -143,23 +148,45 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Validacija pomoćnog ležaja
+    if (needs_extra_bed === true && !room.extraBedAvailable) {
+      return NextResponse.json(
+        { error: `Soba ${room.name} ne podržava pomoćni ležaj.` },
+        { status: 400 },
+      );
+    }
+
+    // Doručak ne može biti za više osoba nego što boravi
+    const bfGuests = typeof breakfast_guests === 'number' ? breakfast_guests : 0;
+    if (bfGuests > (adults ?? 1) + (children ?? 0)) {
+      return NextResponse.json(
+        { error: 'Broj osoba uz doručak ne može biti veći od ukupnog broja gostiju.' },
+        { status: 400 },
+      );
+    }
+
+    const isWellnessApartment = room_slug === 'ginko-spa-2';
+
     const supabase = createServerSupabaseClient();
+
+    // Overlap check uključuje linked slugove (isti fizički prostor)
+    const overlapSlugs = [room_slug, ...(room.linkedSlugs ?? [])];
 
     // Overlap check: confirmed/pending bookings + blocked dates + external iCal events
     const [bookingsRes, blockedRes, externalRes] = await Promise.all([
       supabase
         .from('bookings')
         .select('check_in, check_out')
-        .eq('room_slug', room_slug)
+        .in('room_slug', overlapSlugs)
         .neq('status', 'cancelled'),
       supabase
         .from('blocked_dates')
         .select('check_in, check_out')
-        .eq('room_slug', room_slug),
+        .in('room_slug', overlapSlugs),
       supabase
         .from('external_calendar_events')
         .select('starts_on, ends_on')
-        .eq('room_slug', room_slug),
+        .in('room_slug', overlapSlugs),
     ]);
 
     const existingRanges: BookedRange[] = [
@@ -178,8 +205,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Server-side pricing (source of truth)
-    const priceData = calculatePrice(checkInDate, checkOutDate, room);
+    // Server-side pricing (source of truth) — uključuje sve extras
+    const priceData = calculatePrice(checkInDate, checkOutDate, room, {
+      extraBeds: needs_extra_bed === true ? 1 : 0,
+      crib: needs_crib === true,
+      breakfastGuests: bfGuests,
+    });
     const { totalPrice, deposit } = priceData;
     const avgPricePerNight = Math.round(totalPrice / nights);
 
@@ -201,6 +232,9 @@ export async function POST(request: NextRequest) {
         booking_for: booking_for || 'self',
         guest_staying_name: guest_staying_name || null,
         needs_crib: needs_crib === true,
+        needs_extra_bed: needs_extra_bed === true,
+        breakfast_guests: bfGuests,
+        include_wellness: isWellnessApartment,
         is_business: is_business === true,
         company_name: company_name || null,
         vat_id: vat_id || null,
@@ -232,6 +266,9 @@ export async function POST(request: NextRequest) {
       guestPhone: guest_phone,
       guestCountry: guest_country || null,
       needsCrib: needs_crib === true,
+      needsExtraBed: needs_extra_bed === true,
+      breakfastGuests: bfGuests,
+      includeWellness: isWellnessApartment,
       isBusiness: is_business === true,
       companyName: company_name || null,
       vatId: vat_id || null,

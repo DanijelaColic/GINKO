@@ -44,11 +44,11 @@ export const RECIPIENT_BIC = process.env.RECIPIENT_BIC ?? '';
 export const RECIPIENT_BANK_NAME = process.env.RECIPIENT_BANK_NAME ?? '';
 
 // ── Poslovni uvjeti ───────────────────────────────────────────────
-/** 30% depozit pri rezervaciji */
-export const DEPOSIT_PERCENT = 0.3;
+/** 50% depozit pri rezervaciji; ostatak u smještajnom objektu */
+export const DEPOSIT_PERCENT = 0.5;
 
-/** Ostatak (70%) — platiti ovoliko dana prije dolaska */
-export const BALANCE_DAYS_BEFORE_CHECK_IN = 14;
+/** Ostatak se plaća u smještajnom objektu pri dolasku (ne online) */
+export const BALANCE_DAYS_BEFORE_CHECK_IN = 0;
 
 /** Minimalni boravak: 1 noć */
 export const MIN_NIGHTS = 1;
@@ -56,15 +56,14 @@ export const MIN_NIGHTS = 1;
 /** Nema fiksne naknade za čišćenje (uključeno u cijenu sobe) */
 export const CLEANING_FEE = 0;
 
-/** Popust za dulji boravak: od 7 noći → 10% */
-export const LONG_STAY_DISCOUNT_NIGHTS = 7;
-export const LONG_STAY_DISCOUNT_RATE = 0.1;
+/** Pomoćni ležaj: 20 €/noć */
+export const EXTRA_BED_PRICE_PER_NIGHT = 20;
 
-/** Visoka sezona: srpanj i kolovoz */
-export const HIGH_SEASON_MONTHS: number[] = [7, 8];
+/** Dječji krevetić: 20 €/noć (besplatno ako dijete spava s roditeljima bez krevetića) */
+export const CRIB_PRICE_PER_NIGHT = 20;
 
-export const HIGH_SEASON_LABEL = 'Visoka sezona';
-export const OFF_SEASON_LABEL = 'Van sezone';
+/** Buffet doručak: 15 €/osoba/noć */
+export const BREAKFAST_PRICE_PER_PERSON_PER_NIGHT = 15;
 
 // ── Navigacija (raspoloživost → rezervacija) ─────────────────────
 export const OVERVIEW_SECTION_ID = 'pregled';
@@ -151,6 +150,8 @@ export function buildBookingHref(params: {
   checkOut: string;
   adults?: number | string;
   children?: number | string;
+  /** Broj osoba uz doručak (0 = bez doručka) */
+  breakfast?: number;
 }) {
   const q = new URLSearchParams({
     room: params.room,
@@ -159,6 +160,7 @@ export function buildBookingHref(params: {
   });
   if (params.adults != null) q.set('adults', String(params.adults));
   if (params.children != null) q.set('children', String(params.children));
+  if (params.breakfast != null && params.breakfast > 0) q.set('breakfast', String(params.breakfast));
   return `/booking?${q.toString()}`;
 }
 

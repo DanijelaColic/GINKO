@@ -24,6 +24,9 @@ export type BookingEmailData = {
   guestPhone?: string | null;
   guestCountry?: string | null;
   needsCrib?: boolean;
+  needsExtraBed?: boolean;
+  breakfastGuests?: number;
+  includeWellness?: boolean;
   isBusiness?: boolean;
   companyName?: string | null;
   vatId?: string | null;
@@ -235,8 +238,17 @@ function ownerNewBookingHtml(d: FullData): string {
     d.bookingFor === 'other' && d.guestStayingName
       ? `<tr><td style="padding:8px 0;color:#6b7a6e;">Boravi gost</td><td style="font-weight:600;">${d.guestStayingName}</td></tr>`
       : '',
+    d.needsExtraBed
+      ? `<tr><td style="padding:8px 0;color:#6b7a6e;">Pomoćni ležaj</td><td style="color:#c26c0a;font-weight:600;">Da ⚠️</td></tr>`
+      : '',
     d.needsCrib
       ? `<tr><td style="padding:8px 0;color:#6b7a6e;">Dječji krevetić</td><td style="color:#c26c0a;font-weight:600;">Da ⚠️</td></tr>`
+      : '',
+    d.breakfastGuests && d.breakfastGuests > 0
+      ? `<tr><td style="padding:8px 0;color:#6b7a6e;">Doručak</td><td style="font-weight:600;">${d.breakfastGuests} osoba</td></tr>`
+      : '',
+    d.includeWellness
+      ? `<tr><td style="padding:8px 0;color:#6b7a6e;">Wellness zona</td><td style="color:#1a7a4e;font-weight:600;">Uključena ✓</td></tr>`
       : '',
     d.isBusiness
       ? `<tr><td style="padding:8px 0;color:#6b7a6e;">Poslovno</td><td>Da${d.companyName ? ` — ${d.companyName}` : ''}${d.vatId ? ` | PDV: ${d.vatId}` : ''}</td></tr>`

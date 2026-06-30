@@ -111,6 +111,11 @@
     "availabilityPerNight": "pro Nacht",
     "availabilityNightOne": "Nacht",
     "availabilityNightMany": "Nächte",
+    "availabilityPlanAccommodationOnly": "Nur Unterkunft",
+    "availabilityPlanWithBreakfast": "Mit Frühstück",
+    "availabilityPlanBreakfastPerPerson": "Person/Nacht",
+    "availabilityPlanWithoutWellness": "Ohne Wellnessbereich",
+    "availabilityPlanWithWellness": "Mit privatem Wellnessbereich",
     "subnav": {
       "ariaLabel": "Navigation nach Objektbereichen",
       "overview": "Überblick",
@@ -329,7 +334,7 @@
       "cancellationTitle": "Stornierung"
     },
     "summary": {
-      "line": "{nights, plural, one {{nights}× Nacht} other {{nights}× Nächte}} · {pricePerNight} €",
+      "line": "{label} · {nights, plural, one {{nights}× Nacht} other {{nights}× Nächte}} · {pricePerNight} €",
       "discount": "Rabatt für {nights}+ Nächte ({percent}%)",
       "cleaningFee": "Reinigungsservice",
       "total": "Gesamt"
@@ -353,8 +358,13 @@
       "adults": "Erwachsene",
       "children": "Kinder",
       "maxGuests": "Maximal {capacity} Gäste insgesamt",
+      "extraBedsSection": "Zusatzbetten",
+      "perNight": "Nacht",
+      "needsExtraBed": "Ich benötige ein Zustellbett",
+      "needsExtraBedHint": "Auf Anfrage verfügbar, je nach Verfügbarkeit.",
       "needsCrib": "Ich benötige ein Babybett",
-      "needsCribHint": "Auf Anfrage verfügbar, je nach Verfügbarkeit. Kostenlos für Kinder bis 2 Jahre.",
+      "needsCribHint": "Auf Anfrage verfügbar, je nach Verfügbarkeit.",
+      "childFreeOnBed": "Kinder bis 2 Jahre, die mit den Eltern im Doppelbett schlafen, werden nicht berechnet.",
       "arrivalTime": "Voraussichtliche Ankunftszeit",
       "arrivalTimeHint": "Check-in von 14:00 – 23:00 Uhr",
       "notes": "Besondere Wünsche",

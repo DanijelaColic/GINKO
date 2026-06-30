@@ -111,6 +111,11 @@
     "availabilityPerNight": "po noći",
     "availabilityNightOne": "noć",
     "availabilityNightMany": "noći",
+    "availabilityPlanAccommodationOnly": "Samo smještaj",
+    "availabilityPlanWithBreakfast": "S doručkom",
+    "availabilityPlanBreakfastPerPerson": "osoba/noć",
+    "availabilityPlanWithoutWellness": "Bez wellness zone",
+    "availabilityPlanWithWellness": "S privatnom wellness zonom",
     "subnav": {
       "ariaLabel": "Navigacija po sekcijama objekta",
       "overview": "Pregled",
@@ -193,10 +198,8 @@
     },
     "price": {
       "title": "Cijena po noći",
-      "offSeason": "Izvan sezone",
-      "highSeason": "Srpanj / Kolovoz",
-      "unavailable": "Soba trenutno nije dostupna za rezervaciju.",
-      "perNight": "po noći"
+      "perNight": "po noći",
+      "unavailable": "Soba trenutno nije dostupna za rezervaciju."
     },
     "actions": {
       "details": "Više detalja",
@@ -232,8 +235,7 @@
     },
     "price": {
       "title": "Cijena po noći",
-      "offSeason": "Izvan sezone",
-      "highSeason": "Srpanj / Kolovoz"
+      "perNight": "po noći"
     },
     "rules": {
       "checkInLabel": "Check-in:",
@@ -246,7 +248,7 @@
       "minStayValue": "1 noć",
       "minStay": "Minimalni boravak: 1 noć",
       "depositLabel": "Depozit:",
-      "depositValue": "od ukupnog iznosa"
+      "depositValue": "pri rezervaciji, ostatak u objektu"
     },
     "actions": {
       "bookThis": "Rezerviraj ovu sobu"
@@ -274,7 +276,7 @@
       "minStayLabel": "Min. boravak",
       "minStayValue": "1 noć",
       "depositLabel": "Depozit",
-      "depositValue": "30% pri rezervaciji"
+      "depositValue": "50% pri rezervaciji, ostatak u objektu"
     }
   },
   "bookingWidget": {
@@ -309,7 +311,7 @@
       "deposit": "Depozit ({percent}%)",
       "depositNote": "pri rezervaciji",
       "balance": "Ostatak ({percent}%)",
-      "balanceNote": "platiti do {days} dana prije dolaska",
+      "balanceNote": "plaća se u smještajnom objektu pri dolasku",
       "freeCancellation": "Besplatno otkazivanje do 5 dana prije dolaska",
       "changeDates": "Promijeni datume",
       "directBooking": "Direktna rezervacija • Bez provizija"
@@ -325,11 +327,11 @@
       "depositLabel": "Uplata ({percent}%)",
       "depositNote": "plaća se odmah pri rezervaciji.",
       "balanceLabel": "Ostatak ({percent}%)",
-      "balanceNote": "plaća se najkasnije {days} dana prije dolaska",
+      "balanceNote": "plaća se u smještajnom objektu pri dolasku",
       "cancellationTitle": "Otkazivanje"
     },
     "summary": {
-      "line": "{nights, plural, one {{nights}× noć} few {{nights}× noći} other {{nights}× noći}} · {pricePerNight} €",
+      "line": "{label} · {nights, plural, one {{nights}× noć} few {{nights}× noći} other {{nights}× noći}} · {pricePerNight} €",
       "discount": "Popust {nights}+ noći ({percent}%)",
       "cleaningFee": "Usluga čišćenja",
       "total": "Ukupno"
@@ -353,8 +355,13 @@
       "adults": "Odrasli",
       "children": "Djeca",
       "maxGuests": "Najviše {capacity} gostiju ukupno",
+      "extraBedsSection": "Dodatni kreveti",
+      "perNight": "noć",
+      "needsExtraBed": "Trebam pomoćni ležaj",
+      "needsExtraBedHint": "Dostupan na upit, ovisno o raspoloživosti.",
       "needsCrib": "Trebam dječji krevetić",
-      "needsCribHint": "Dostupan na upit, ovisno o raspoloživosti. Besplatno za djecu do 2 god.",
+      "needsCribHint": "Dostupan na upit, ovisno o raspoloživosti.",
+      "childFreeOnBed": "Dijete do 2 godine koje spava s roditeljima u bračnom krevetu ne naplaćuje se.",
       "arrivalTime": "Procijenjeno vrijeme dolaska",
       "arrivalTimeHint": "Dolazak između 14:00 – 23:00",
       "notes": "Posebni zahtjevi",
@@ -389,7 +396,7 @@
         "deposit": "Uplata ({percent}%)",
         "depositNote": "plaća se odmah pri rezervaciji.",
         "balance": "Ostatak ({percent}%)",
-        "balanceNote": "plaća se najkasnije {days} dana prije dolaska",
+        "balanceNote": "plaća se u smještajnom objektu pri dolasku",
         "cancellationTitle": "Otkazivanje",
         "bankLabel": "Banka",
         "internationalPayments": "uplate iz inozemstva",

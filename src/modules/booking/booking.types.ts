@@ -20,6 +20,9 @@ export type Booking = {
   booking_for: 'self' | 'other';
   guest_staying_name: string | null;
   needs_crib: boolean;
+  needs_extra_bed: boolean;
+  breakfast_guests: number;
+  include_wellness: boolean;
   is_business: boolean;
   company_name: string | null;
   vat_id: string | null;
@@ -107,6 +110,9 @@ export type BookingCreateInput = {
   booking_for?: 'self' | 'other';
   guest_staying_name?: string | null;
   needs_crib?: boolean;
+  needs_extra_bed?: boolean;
+  breakfast_guests?: number;
+  include_wellness?: boolean;
   is_business?: boolean;
   company_name?: string | null;
   vat_id?: string | null;

@@ -3,10 +3,6 @@
 
 import type { Room } from './room.types';
 
-export function getPriceForDate(room: Room, date: Date): number {
-  const month = date.getMonth() + 1; // 1-indexed
-  if (month === 7 || month === 8) {
-    return room.priceHighSeason;
-  }
-  return room.priceOffSeason;
+export function getPriceForDate(room: Room, _date: Date): number {
+  return room.price;
 }

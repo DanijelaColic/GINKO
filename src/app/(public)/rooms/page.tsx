@@ -30,8 +30,6 @@ export default async function RoomsPage() {
     seaView: t('stats.seaView'),
     balcony: t('stats.balcony'),
     priceTitle: t('price.title'),
-    offSeason: t('price.offSeason'),
-    highSeason: t('price.highSeason'),
     perNight: t('price.perNight'),
     unavailable: t('price.unavailable'),
     details: t('actions.details'),

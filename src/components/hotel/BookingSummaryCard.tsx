@@ -6,9 +6,6 @@ import Link from 'next/link';
 import { formatDisplayDate } from '@/modules/booking/dates';
 import {
   DEPOSIT_PERCENT,
-  BALANCE_DAYS_BEFORE_CHECK_IN,
-  LONG_STAY_DISCOUNT_NIGHTS,
-  LONG_STAY_DISCOUNT_RATE,
   SITE_NAME,
   buildAvailabilityHref,
 } from '@/modules/booking/booking.config';
@@ -229,20 +226,6 @@ export default function BookingSummaryCard({
               </div>
             ))}
 
-            {priceData.discountAmount ? (
-              <div className="flex justify-between gap-2">
-                <span className="text-muted">
-                  {t('summary.discount', {
-                    nights: LONG_STAY_DISCOUNT_NIGHTS,
-                    percent: Math.round(LONG_STAY_DISCOUNT_RATE * 100),
-                  })}
-                </span>
-                <span className="text-primary font-medium shrink-0">
-                  − {priceData.discountAmount} €
-                </span>
-              </div>
-            ) : null}
-
             {!!priceData.cleaningFee && (
               <div className="flex justify-between gap-2">
                 <span className="text-muted">{t('summary.cleaningFee')}</span>
@@ -275,7 +258,7 @@ export default function BookingSummaryCard({
               </div>
             )}
             <p className="text-[11px] text-muted/60 border-t border-stone pt-2">
-              {t('sidebar.balanceNote', { days: BALANCE_DAYS_BEFORE_CHECK_IN })}
+              {t('sidebar.balanceNote')}
             </p>
           </div>
         </div>

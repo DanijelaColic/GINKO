@@ -34,6 +34,16 @@ type DbRoom = {
   room_media: { src: string; sort_order: number }[];
 };
 
+function applyStaticOverlay(room: Room): Room {
+  const staticRoom = staticRooms.find((r) => r.slug === room.slug);
+  if (!staticRoom) return room;
+  return {
+    ...room,
+    extraBedAvailable: staticRoom.extraBedAvailable,
+    linkedSlugs: staticRoom.linkedSlugs,
+  };
+}
+
 function mapDbRoom(r: DbRoom, locale: RoomLocale): Room {
   const t = r.room_translations.find((x) => x.locale === locale) ??
     r.room_translations.find((x) => x.locale === 'hr') ??
@@ -52,9 +62,10 @@ function mapDbRoom(r: DbRoom, locale: RoomLocale): Room {
     view: false,
     balcony: false,
     floors: 1,
-    priceOffSeason: r.price_off_season,
-    priceHighSeason: r.price_high_season,
+    price: r.price_off_season,
     fullyBooked: false,
+    extraBedAvailable: false,
+    linkedSlugs: [],
     amenities: r.amenities ?? [],
     images: r.room_media
       .sort((a, b) => a.sort_order - b.sort_order)
@@ -72,7 +83,7 @@ async function fetchRoomsFromDb(locale: RoomLocale): Promise<Room[] | null> {
       .order('sort_order', { ascending: true });
 
     if (error || !data || data.length === 0) return null;
-    return (data as DbRoom[]).map((r) => mapDbRoom(r, locale));
+    return (data as DbRoom[]).map((r) => applyStaticOverlay(mapDbRoom(r, locale)));
   } catch {
     return null;
   }
@@ -89,7 +100,7 @@ async function fetchRoomFromDb(slug: string, locale: RoomLocale): Promise<Room |
       .single();
 
     if (error || !data) return null;
-    return mapDbRoom(data as DbRoom, locale);
+    return applyStaticOverlay(mapDbRoom(data as DbRoom, locale));
   } catch {
     return null;
   }

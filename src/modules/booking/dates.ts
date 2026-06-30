@@ -4,13 +4,11 @@
 import type { BookedRange } from './booking.types';
 import type { Room } from '@/modules/rooms/room.types';
 import {
-  HIGH_SEASON_MONTHS,
-  HIGH_SEASON_LABEL,
-  OFF_SEASON_LABEL,
   DEPOSIT_PERCENT,
-  LONG_STAY_DISCOUNT_NIGHTS,
-  LONG_STAY_DISCOUNT_RATE,
   CLEANING_FEE,
+  EXTRA_BED_PRICE_PER_NIGHT,
+  CRIB_PRICE_PER_NIGHT,
+  BREAKFAST_PRICE_PER_PERSON_PER_NIGHT,
 } from './booking.config';
 import type { PriceBreakdown } from './booking.types';
 
@@ -121,49 +119,77 @@ export function getMonthGrid(year: number, month: number): (Date | null)[] {
 
 // ── Cijena ───────────────────────────────────────────────────────
 
+export type PriceExtras = {
+  /** Broj pomoćnih ležajeva (0 ili 1) */
+  extraBeds?: number;
+  /** Dječji krevetić: true = naplatiti 20 €/noć */
+  crib?: boolean;
+  /** Buffet doručak: broj osoba (0 = bez doručka) */
+  breakfastGuests?: number;
+};
+
+export const EXTRA_BED_LABEL = 'Pomoćni ležaj';
+export const CRIB_LABEL = 'Dječji krevetić';
+export const BREAKFAST_LABEL = 'Doručak (buffet)';
+export const ACCOMMODATION_LABEL = 'Smještaj';
+
 export function calculatePrice(
   checkIn: Date,
   checkOut: Date,
   room: Room,
+  extras?: PriceExtras,
 ): PriceBreakdown {
-  let lowNights = 0;
-  let highNights = 0;
-
-  let d = new Date(checkIn);
-  while (d < checkOut) {
-    const month = d.getMonth() + 1;
-    if (HIGH_SEASON_MONTHS.includes(month)) highNights++;
-    else lowNights++;
-    d = addDays(d, 1);
-  }
-
+  const nights = diffDays(checkOut, checkIn);
   const lines: PriceBreakdown['lines'] = [];
 
-  if (lowNights > 0) {
+  if (nights > 0) {
     lines.push({
-      label: OFF_SEASON_LABEL,
-      nights: lowNights,
-      pricePerNight: room.priceOffSeason,
-      subtotal: lowNights * room.priceOffSeason,
+      label: ACCOMMODATION_LABEL,
+      nights,
+      pricePerNight: room.price,
+      subtotal: nights * room.price,
     });
   }
 
-  if (highNights > 0) {
+  const rawAccommodationPrice = nights * room.price;
+
+  // Dodaci (izvan čišćenja — uvijek puna cijena)
+  const extraBedCount = extras?.extraBeds ?? 0;
+  if (extraBedCount > 0) {
     lines.push({
-      label: HIGH_SEASON_LABEL,
-      nights: highNights,
-      pricePerNight: room.priceHighSeason,
-      subtotal: highNights * room.priceHighSeason,
+      label: EXTRA_BED_LABEL,
+      nights,
+      pricePerNight: EXTRA_BED_PRICE_PER_NIGHT,
+      subtotal: nights * EXTRA_BED_PRICE_PER_NIGHT * extraBedCount,
     });
   }
 
-  const nights = lowNights + highNights;
-  const rawTotalPrice = lines.reduce((sum, l) => sum + l.subtotal, 0);
-  const discountAmount =
-    nights >= LONG_STAY_DISCOUNT_NIGHTS
-      ? Math.round(rawTotalPrice * LONG_STAY_DISCOUNT_RATE)
-      : 0;
-  const totalPrice = rawTotalPrice - discountAmount + CLEANING_FEE;
+  if (extras?.crib) {
+    lines.push({
+      label: CRIB_LABEL,
+      nights,
+      pricePerNight: CRIB_PRICE_PER_NIGHT,
+      subtotal: nights * CRIB_PRICE_PER_NIGHT,
+    });
+  }
+
+  const breakfastCount = extras?.breakfastGuests ?? 0;
+  if (breakfastCount > 0) {
+    const pricePerNight = BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * breakfastCount;
+    lines.push({
+      label: BREAKFAST_LABEL,
+      nights,
+      pricePerNight,
+      subtotal: nights * pricePerNight,
+    });
+  }
+
+  const extrasTotal =
+    (extraBedCount > 0 ? nights * EXTRA_BED_PRICE_PER_NIGHT * extraBedCount : 0) +
+    (extras?.crib ? nights * CRIB_PRICE_PER_NIGHT : 0) +
+    (breakfastCount > 0 ? nights * BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * breakfastCount : 0);
+
+  const totalPrice = rawAccommodationPrice + CLEANING_FEE + extrasTotal;
   const deposit = Math.round(totalPrice * DEPOSIT_PERCENT);
 
   return {
@@ -171,7 +197,7 @@ export function calculatePrice(
     totalPrice,
     deposit,
     lines,
-    discountAmount,
+    discountAmount: 0,
     cleaningFee: CLEANING_FEE,
   };
 }

@@ -4,7 +4,7 @@
 
 import type { AccommodationType, Room, RoomLocale } from './room.types';
 
-export const APARTMENT_SLUGS = ['ginko-spa-2'] as const;
+export const APARTMENT_SLUGS = ['ginko-spa-1', 'ginko-spa-2'] as const;
 
 export function getAccommodationType(slug: string): AccommodationType {
   return (APARTMENT_SLUGS as readonly string[]).includes(slug) ? 'apartman' : 'soba';
@@ -25,9 +25,9 @@ export const rooms: Room[] = [
     view: false,
     balcony: false,
     floors: 1,
-    priceOffSeason: 60,
-    priceHighSeason: 60,
+    price: 60,
     fullyBooked: false,
+    extraBedAvailable: false,
     amenities: ['WiFi', 'LCD TV', 'Klima', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
       '/images/rooms/ginko-1/01-cover.jpg',
@@ -47,9 +47,9 @@ export const rooms: Room[] = [
     view: false,
     balcony: true,
     floors: 1,
-    priceOffSeason: 60,
-    priceHighSeason: 60,
+    price: 60,
     fullyBooked: false,
+    extraBedAvailable: true,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
       '/images/rooms/ginko-2/01-cover.jpg',
@@ -69,9 +69,9 @@ export const rooms: Room[] = [
     view: false,
     balcony: true,
     floors: 1,
-    priceOffSeason: 60,
-    priceHighSeason: 60,
+    price: 60,
     fullyBooked: false,
+    extraBedAvailable: true,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
       '/images/rooms/ginko-3/01-cover.jpg',
@@ -84,21 +84,22 @@ export const rooms: Room[] = [
     tagline: 'Moderna soba s terasom i luksuznim sadržajima.',
     description:
       'Dobrodošli u Ginko 4 — udobnu sobu s pažljivo odabranim sadržajima za savršen odmor. Smještena u srcu Daruvara na Ulici Tomaša Garika Masaryka 1, ova soba nudi vrhunsku lokaciju u blizini gradskih atrakcija. Naše ljubazno osoblje posvećeno je tome da vaš boravak bude nezaboravan. Terasa, sauna i privatno parkiranje dostupni su svim gostima. Kućni ljubimci su dobrodošli na upit.',
-    capacity: 2,
-    capacityNote: '2 osobe',
+    capacity: 3,
+    capacityNote: 'do 3 osobe',
     size: 20,
     beds: '1 bračni krevet',
     view: false,
     balcony: true,
     floors: 1,
-    priceOffSeason: 60,
-    priceHighSeason: 60,
+    price: 60,
     fullyBooked: false,
+    extraBedAvailable: true,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
       '/images/rooms/ginko-4/01-cover.jpg',
     ],
   },
+  // NOTE: capacity was 2 in original — updated to 3 to match spec (extra bed available)
   {
     slug: 'ginko-5',
     accommodationType: 'soba',
@@ -113,9 +114,9 @@ export const rooms: Room[] = [
     view: false,
     balcony: true,
     floors: 1,
-    priceOffSeason: 60,
-    priceHighSeason: 60,
+    price: 60,
     fullyBooked: false,
+    extraBedAvailable: true,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
     images: [
       '/images/rooms/ginko-5/01-cover.jpg',
@@ -135,21 +136,22 @@ export const rooms: Room[] = [
     view: false,
     balcony: true,
     floors: 1,
-    priceOffSeason: 42,
-    priceHighSeason: 42,
+    price: 42,
     fullyBooked: false,
+    extraBedAvailable: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
       '/images/rooms/ginko-6/01-cover.jpg',
     ],
   },
   {
+    // Wellness Apartman — s privatnom saunom/jacuzzijem (234 €/noć)
     slug: 'ginko-spa-2',
     accommodationType: 'apartman',
-    name: 'Ginko SPA 2',
-    tagline: 'Wellness suita s privatnom saunom i odvojenom kuhinjom.',
+    name: 'Wellness Apartman',
+    tagline: 'Privatna sauna i jacuzzi — luksuzno wellness iskustvo.',
     description:
-      'Dobrodošli u Ginko SPA 2 — vašu oazu luksuza i wellness iskustva u Daruvaru. Prostrana suita od 50 m² smještena na drugom katu nudi potpuno drugačije iskustvo od standardnih soba: privatna sauna, terasa s pogledom, odvojena kuhinja i besprijekoran dizajn čine ovu suitu idealnom za parove ili manje grupe koje žele nešto više. Svaki detalj pažljivo je dizajniran za miran, opuštajući i nezaboravan odmor. Kućni ljubimci nisu dozvoljeni.',
+      'Dobrodošli u Wellness Apartman — vašu oazu luksuza i wellness iskustva u Daruvaru. Prostrana suita od 50 m² smještena na drugom katu nudi potpuno drugačije iskustvo od standardnih soba: privatna sauna, jacuzzi, terasa s pogledom, odvojena kuhinja i besprijekoran dizajn čine ovu suitu idealnom za parove ili manje grupe koje žele nešto više. Svaki detalj pažljivo je dizajniran za miran, opuštajući i nezaboravan odmor. Kućni ljubimci nisu dozvoljeni.',
     capacity: 3,
     capacityNote: 'do 3 osobe',
     size: 50,
@@ -157,10 +159,35 @@ export const rooms: Room[] = [
     view: true,
     balcony: true,
     floors: 1,
-    priceOffSeason: 234,
-    priceHighSeason: 234,
+    price: 234,
     fullyBooked: false,
-    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
+    extraBedAvailable: true,
+    linkedSlugs: ['ginko-spa-1'],
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Privatna sauna', 'Jacuzzi', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
+    images: [
+      '/images/rooms/ginko-spa-2/01-cover.png',
+    ],
+  },
+  {
+    // Apartman — isti fizički prostor bez korištenja privatne wellness zone (90 €/noć)
+    slug: 'ginko-spa-1',
+    accommodationType: 'apartman',
+    name: 'Apartman',
+    tagline: 'Prostrani apartman s terasom i odvojenom kuhinjom.',
+    description:
+      'Dobrodošli u Apartman — prostranu suitu od 50 m² smještenu na drugom katu u srcu Daruvara. Terasa s pogledom, odvojena kuhinja i moderno uređen prostor čine ovaj apartman savršenim za opuštajući odmor. Ovaj smještaj ne uključuje pristup privatnoj wellness zoni (sauna i jacuzzi). Kućni ljubimci nisu dozvoljeni.',
+    capacity: 3,
+    capacityNote: 'do 3 osobe',
+    size: 50,
+    beds: 'Spavaća soba 1: 1 bračni krevet\nDnevni boravak: 1 kauč na rasklapanje',
+    view: true,
+    balcony: true,
+    floors: 1,
+    price: 90,
+    fullyBooked: false,
+    extraBedAvailable: true,
+    linkedSlugs: ['ginko-spa-2'],
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
     images: [
       '/images/rooms/ginko-spa-2/01-cover.png',
     ],
@@ -197,7 +224,7 @@ export const roomTranslations: Record<
     'ginko-4': {
       tagline: 'Moderna soba s terasom i luksuznim sadržajima.',
       description: rooms[3].description,
-      capacityNote: '2 osobe',
+      capacityNote: 'do 3 osobe',
       beds: '1 bračni krevet',
       amenities: rooms[3].amenities,
     },
@@ -216,11 +243,18 @@ export const roomTranslations: Record<
       amenities: rooms[5].amenities,
     },
     'ginko-spa-2': {
-      tagline: 'Wellness suita s privatnom saunom i odvojenom kuhinjom.',
+      tagline: 'Privatna sauna i jacuzzi — luksuzno wellness iskustvo.',
       description: rooms[6].description,
       capacityNote: 'do 3 osobe',
       beds: 'Spavaća soba 1: 1 bračni krevet\nDnevni boravak: 1 kauč na rasklapanje',
       amenities: rooms[6].amenities,
+    },
+    'ginko-spa-1': {
+      tagline: 'Prostrani apartman s terasom i odvojenom kuhinjom.',
+      description: rooms[7].description,
+      capacityNote: 'do 3 osobe',
+      beds: 'Spavaća soba 1: 1 bračni krevet\nDnevni boravak: 1 kauč na rasklapanje',
+      amenities: rooms[7].amenities,
     },
   },
   // TODO: Replace with proper EN translations

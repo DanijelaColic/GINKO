@@ -19,6 +19,7 @@ import {
   buildBookingHref,
   getAvailabilitySearchParams,
   propertySectionIdFromHash,
+  BREAKFAST_PRICE_PER_PERSON_PER_NIGHT,
 } from '@/modules/booking/booking.config';
 import { scrollToElement, scrollToSectionId } from '@/lib/scroll-to-section';
 
@@ -57,6 +58,9 @@ export type AvailabilityLabels = {
   perNight: string;
   nightOne: string;
   nightMany: string;
+  planAccommodationOnly: string;
+  planWithBreakfast: string;
+  planBreakfastPerPerson: string;
 };
 
 type Props = {
@@ -72,6 +76,10 @@ type RoomStatus = {
 
 type TypeFilter = 'all' | AccommodationType;
 
+type RoomPlan = {
+  breakfast: boolean;
+};
+
 export default function AvailabilitySection({ rooms, labels }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -86,6 +94,13 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
   const [searched, setSearched] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
+  const [roomPlans, setRoomPlans] = useState<Record<string, RoomPlan>>({});
+
+  const getRoomPlan = (slug: string): RoomPlan =>
+    roomPlans[slug] ?? { breakfast: false };
+
+  const setRoomPlan = (slug: string, plan: Partial<RoomPlan>) =>
+    setRoomPlans((prev) => ({ ...prev, [slug]: { ...getRoomPlan(slug), ...plan } }));
 
   const resultsRef = useRef<HTMLDivElement>(null);
   const lastAutoSearchKey = useRef('');
@@ -200,7 +215,15 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
       return;
     }
     setDateError(null);
-    router.push(buildBookingHref({ room: roomSlug, checkIn, checkOut, adults, children }));
+    const plan = getRoomPlan(roomSlug);
+    router.push(buildBookingHref({
+      room: roomSlug,
+      checkIn,
+      checkOut,
+      adults,
+      children,
+      breakfast: plan.breakfast ? adults : 0,
+    }));
   };
 
   const totalGuests = adults + children;
@@ -428,28 +451,87 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
                         );
                       })}
                     </div>
+
+                    {/* ── Rate plan: samo smještaj / s doručkom ─────── */}
+                    {(() => {
+                      const plan = getRoomPlan(room.slug);
+                      const basePrice = room.price;
+                      const breakfastExtra = BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * adults;
+                      return (
+                        <div className="mt-3 border border-stone rounded-lg overflow-hidden text-sm divide-y divide-stone">
+                          <label className={`flex items-center justify-between px-3 py-2.5 cursor-pointer transition-colors ${!plan.breakfast ? 'bg-primary/5' : 'hover:bg-stone-light/60'}`}>
+                            <span className="flex items-center gap-2">
+                              <input
+                                type="radio"
+                                name={`plan-${room.slug}`}
+                                checked={!plan.breakfast}
+                                onChange={() => setRoomPlan(room.slug, { breakfast: false })}
+                                className="accent-primary"
+                              />
+                              <span className="font-medium text-text">{labels.planAccommodationOnly}</span>
+                            </span>
+                            <span className="font-semibold text-primary shrink-0 ml-3">
+                              {basePrice} € <span className="text-xs font-normal text-muted">/ {labels.perNight}</span>
+                            </span>
+                          </label>
+                          <label className={`flex items-center justify-between px-3 py-2.5 cursor-pointer transition-colors ${plan.breakfast ? 'bg-primary/5' : 'hover:bg-stone-light/60'}`}>
+                            <span className="flex items-center gap-2">
+                              <input
+                                type="radio"
+                                name={`plan-${room.slug}`}
+                                checked={plan.breakfast}
+                                onChange={() => setRoomPlan(room.slug, { breakfast: true })}
+                                className="accent-primary"
+                              />
+                              <span>
+                                <span className="font-medium text-text">{labels.planWithBreakfast}</span>
+                                <span className="text-xs text-muted ml-1">(+{BREAKFAST_PRICE_PER_PERSON_PER_NIGHT} €/{labels.planBreakfastPerPerson})</span>
+                              </span>
+                            </span>
+                            <span className="font-semibold text-primary shrink-0 ml-3">
+                              {basePrice + breakfastExtra} € <span className="text-xs font-normal text-muted">/ {labels.perNight}</span>
+                            </span>
+                          </label>
+                        </div>
+                      );
+                    })()}
                   </div>
 
-                  {/* Desno: cijena + CTA */}
+                  {/* Desno: ukupna cijena + CTA */}
                   <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 sm:border-l border-stone sm:pl-5">
                     <div className="text-right">
                       {searched && status?.available && status.totalPrice ? (
-                        <>
-                          <p className="text-2xl font-bold text-primary leading-none">
-                            {status.totalPrice} €
-                          </p>
-                          <p className="text-xs text-muted mt-0.5">
-                            {status.nights}{' '}
-                            {status.nights === 1 ? labels.nightOne : labels.nightMany}
-                          </p>
-                        </>
+                        (() => {
+                          const plan = getRoomPlan(room.slug);
+                          const nights = status.nights;
+                          const breakfastExtra = plan.breakfast ? BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * adults * nights : 0;
+                          const displayTotal = status.totalPrice + breakfastExtra;
+                          return (
+                            <>
+                              <p className="text-2xl font-bold text-primary leading-none">
+                                {displayTotal} €
+                              </p>
+                              <p className="text-xs text-muted mt-0.5">
+                                {nights}{' '}
+                                {nights === 1 ? labels.nightOne : labels.nightMany}
+                              </p>
+                            </>
+                          );
+                        })()
                       ) : (
-                        <>
-                          <p className="text-2xl font-bold text-primary leading-none">
-                            {room.priceOffSeason} €
-                          </p>
-                          <p className="text-xs text-muted mt-0.5">{labels.perNight}</p>
-                        </>
+                        (() => {
+                          const plan = getRoomPlan(room.slug);
+                          const breakfastExtra = plan.breakfast ? BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * adults : 0;
+                          const displayPrice = room.price + breakfastExtra;
+                          return (
+                            <>
+                              <p className="text-2xl font-bold text-primary leading-none">
+                                {displayPrice} €
+                              </p>
+                              <p className="text-xs text-muted mt-0.5">{labels.perNight}</p>
+                            </>
+                          );
+                        })()
                       )}
                     </div>
 

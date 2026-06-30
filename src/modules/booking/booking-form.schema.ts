@@ -11,7 +11,10 @@ export type BookingFormData = {
   guestStayingName: string;
   adults: string;
   children: string;
+  needsExtraBed: boolean;
   needsCrib: boolean;
+  /** Broj osoba uz buffet doručak (0 = bez doručka) */
+  breakfastGuests: string;
   arrivalTime: string;
   notes: string;
   isBusiness: boolean;
@@ -30,7 +33,9 @@ export const BOOKING_FORM_DEFAULTS: BookingFormData = {
   guestStayingName: '',
   adults: '2',
   children: '0',
+  needsExtraBed: false,
   needsCrib: false,
+  breakfastGuests: '0',
   arrivalTime: '',
   notes: '',
   isBusiness: false,

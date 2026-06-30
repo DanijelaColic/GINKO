@@ -100,17 +100,11 @@ export default function AdminPricing() {
         {/* Base pricing card */}
         {currentRoom && (
           <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-            <h3 className="font-semibold text-gray-800 mb-4">Osnovna cijena — {currentRoom.name}</h3>
+            <h3 className="font-semibold text-gray-800 mb-4">Cijena — {currentRoom.name}</h3>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="bg-gray-50 rounded-xl p-4">
-                <p className="text-xs text-gray-400 mb-1">Van sezone</p>
-                <p className="text-2xl font-bold text-gray-900">{currentRoom.priceOffSeason}€</p>
-                <p className="text-xs text-gray-400 mt-0.5">po noći</p>
-              </div>
               <div className="bg-primary/5 rounded-xl p-4">
-                <p className="text-xs text-gray-400 mb-1">Visoka sezona (7-8)</p>
-                <p className="text-2xl font-bold text-primary">{currentRoom.priceHighSeason}€</p>
-                <p className="text-xs text-gray-400 mt-0.5">po noći</p>
+                <p className="text-xs text-gray-400 mb-1">Cijena po noći</p>
+                <p className="text-2xl font-bold text-primary">{currentRoom.price}€</p>
               </div>
               <div className="bg-gray-50 rounded-xl p-4">
                 <p className="text-xs text-gray-400 mb-1">Kapacitet</p>

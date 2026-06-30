@@ -22,14 +22,14 @@ type Props = {
 
 export default function RoomGrid({ rooms, cardLabels, filterLabels }: Props) {
   const maxGuests = Math.max(...rooms.map((r) => r.capacity), 1);
-  const maxPrice = Math.max(...rooms.map((r) => r.priceHighSeason), 200);
+  const maxPrice = Math.max(...rooms.map((r) => r.price), 200);
 
   const [guests, setGuests] = useState(0);
   const [price, setPrice] = useState(0);
 
   const filtered = rooms.filter((r) => {
     if (guests > 0 && r.capacity < guests) return false;
-    if (price > 0 && r.priceOffSeason > price) return false;
+    if (price > 0 && r.price > price) return false;
     return true;
   });
 

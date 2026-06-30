@@ -12,7 +12,7 @@ import { getRoom } from '@/modules/rooms/room.repository';
 import { getSiteUrl } from '@/lib/siteUrl';
 import { getValidLocale } from '@/i18n/messages';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
-import { SITE_NAME, buildAvailabilityHref } from '@/modules/booking/booking.config';
+import { SITE_NAME, buildAvailabilityHref, DEPOSIT_PERCENT } from '@/modules/booking/booking.config';
 import ImageGallery from '@/components/hotel/ImageGallery';
 import { Link } from '@/i18n/navigation';
 import { InternalLinks } from '@/components/seo/InternalLinks';
@@ -184,8 +184,8 @@ export default async function RoomDetailPage({ params }: Props) {
                 {t('rules.minStayValue')}
               </p>
               <p>
-                <strong className="text-text">{t('rules.depositLabel')}</strong> 30%{' '}
-                {t('rules.depositValue')}
+                <strong className="text-text">{t('rules.depositLabel')}</strong>{' '}
+                {Math.round(DEPOSIT_PERCENT * 100)}% {t('rules.depositValue')}
               </p>
             </div>
           </div>
@@ -198,15 +198,9 @@ export default async function RoomDetailPage({ params }: Props) {
                   <p className="text-xs text-muted uppercase tracking-widest font-medium mb-4">
                     {t('price.title')}
                   </p>
-                  <div className="space-y-3 mb-6">
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted">{t('price.offSeason')}</span>
-                      <span className="text-primary font-semibold">{room.priceOffSeason}€</span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span className="text-sm text-muted">{t('price.highSeason')}</span>
-                      <span className="text-primary font-semibold">{room.priceHighSeason}€</span>
-                    </div>
+                  <div className="flex justify-between items-center mb-6">
+                    <span className="text-sm text-muted">{t('price.perNight')}</span>
+                    <span className="text-2xl text-primary font-bold">{room.price}€</span>
                   </div>
                   <Link
                     href={buildAvailabilityHref({ room: room.slug })}

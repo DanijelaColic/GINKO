@@ -16,8 +16,6 @@ type Props = {
     seaView: string;
     balcony: string;
     priceTitle: string;
-    offSeason: string;
-    highSeason: string;
     perNight: string;
     unavailable: string;
     details: string;
@@ -94,26 +92,10 @@ export default function RoomCard({ room, labels }: Props) {
             <p className="text-xs text-muted uppercase tracking-widest font-medium mb-1.5">
               {labels.priceTitle}
             </p>
-            {room.priceOffSeason === room.priceHighSeason ? (
-              // Flat pricing — same all year
-              <div className="flex items-baseline gap-1.5">
-                <p className="text-primary font-semibold text-lg">{room.priceOffSeason}€</p>
-                <p className="text-xs text-muted">{labels.perNight}</p>
-              </div>
-            ) : (
-              // Seasonal pricing
-              <div className="flex gap-5">
-                <div>
-                  <p className="text-xs text-muted mb-0.5">{labels.offSeason}</p>
-                  <p className="text-primary font-semibold">{room.priceOffSeason}€</p>
-                </div>
-                <div className="w-px bg-stone" />
-                <div>
-                  <p className="text-xs text-muted mb-0.5">{labels.highSeason}</p>
-                  <p className="text-primary font-semibold">{room.priceHighSeason}€</p>
-                </div>
-              </div>
-            )}
+            <div className="flex items-baseline gap-1.5">
+              <p className="text-primary font-semibold text-lg">{room.price}€</p>
+              <p className="text-xs text-muted">{labels.perNight}</p>
+            </div>
           </div>
         ) : (
           <div className="mb-4 p-3 bg-stone-light rounded-xl text-muted text-sm">

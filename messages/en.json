@@ -111,6 +111,11 @@
     "availabilityPerNight": "per night",
     "availabilityNightOne": "night",
     "availabilityNightMany": "nights",
+    "availabilityPlanAccommodationOnly": "Accommodation only",
+    "availabilityPlanWithBreakfast": "With breakfast",
+    "availabilityPlanBreakfastPerPerson": "person/night",
+    "availabilityPlanWithoutWellness": "Without wellness area",
+    "availabilityPlanWithWellness": "With private wellness area",
     "subnav": {
       "ariaLabel": "Property section navigation",
       "overview": "Overview",
@@ -329,7 +334,7 @@
       "cancellationTitle": "Cancellation"
     },
     "summary": {
-      "line": "{nights, plural, one {{nights}× night} other {{nights}× nights}} · {pricePerNight} €",
+      "line": "{label} · {nights, plural, one {{nights}× night} other {{nights}× nights}} · {pricePerNight} €",
       "discount": "Discount for {nights}+ nights ({percent}%)",
       "cleaningFee": "Cleaning service",
       "total": "Total"
@@ -353,8 +358,13 @@
       "adults": "Adults",
       "children": "Children",
       "maxGuests": "Maximum {capacity} guests in total",
+      "extraBedsSection": "Extra beds",
+      "perNight": "night",
+      "needsExtraBed": "I need an extra bed",
+      "needsExtraBedHint": "Available on request, subject to availability.",
       "needsCrib": "I need a baby cot",
-      "needsCribHint": "Available on request, subject to availability. Free for children up to 2 years.",
+      "needsCribHint": "Available on request, subject to availability.",
+      "childFreeOnBed": "Children up to 2 years sleeping with parents in the double bed are free of charge.",
       "arrivalTime": "Estimated arrival time",
       "arrivalTimeHint": "Check-in available from 14:00 – 23:00",
       "notes": "Special requests",

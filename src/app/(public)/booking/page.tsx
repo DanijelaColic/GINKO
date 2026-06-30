@@ -17,13 +17,20 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 type Props = {
-  searchParams: Promise<{ room?: string; checkIn?: string; checkOut?: string; adults?: string; children?: string }>;
+  searchParams: Promise<{
+    room?: string;
+    checkIn?: string;
+    checkOut?: string;
+    adults?: string;
+    children?: string;
+    breakfast?: string;
+  }>;
 };
 
 export default async function BookingPage({ searchParams }: Props) {
   const locale = getValidLocale(await getLocale());
   const t = await getTranslations('bookingPage');
-  const { room, checkIn, checkOut, adults, children } = await searchParams;
+  const { room, checkIn, checkOut, adults, children, breakfast } = await searchParams;
   const googleReviews = await getGoogleReviews();
   const reviewSummary = googleReviews
     ? { rating: googleReviews.rating, reviewCount: googleReviews.reviewCount }
@@ -44,6 +51,7 @@ export default async function BookingPage({ searchParams }: Props) {
             initialCheckOut={checkOut}
             initialAdults={adults}
             initialChildren={children}
+            initialBreakfast={breakfast}
             reviewSummary={reviewSummary}
           />
         </div>

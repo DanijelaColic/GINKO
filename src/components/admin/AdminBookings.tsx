@@ -37,6 +37,7 @@ import {
 import clsx from 'clsx';
 import { rooms } from '@/modules/rooms/rooms.config';
 import { formatDisplayDate, parseLocalDate, calculatePrice } from '@/modules/booking/dates';
+import { DEPOSIT_PERCENT } from '@/modules/booking/booking.config';
 import type { Booking } from '@/modules/booking/booking.types';
 import BookingTimeline from './BookingTimeline';
 import { ToastContainer, type ToastItem } from './Toast';
@@ -1110,7 +1111,7 @@ function PricePreview({
         </div>
       ))}
       <div className="flex justify-between text-xs text-gray-500 mt-1 pt-1 border-t border-blue-100">
-        <span>Depozit (30%)</span>
+        <span>Depozit ({Math.round(DEPOSIT_PERCENT * 100)}%)</span>
         <span className="font-medium">{priceData.deposit}€</span>
       </div>
     </div>

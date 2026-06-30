@@ -261,11 +261,13 @@ export const HOUSE_RULES: HouseRuleItem[] = [
       {
         title: 'Pravila o dječjim krevetima i pomoćnim ležajevima',
         paragraphs: [
-          'Dječji kreveti i pomoćni ležajevi dostupni su na upit i ovisno o raspoloživosti.',
+          'Dječji krevetić (na upit, ovisno o raspoloživosti): 20 €/noć.',
+          'Pomoćni ležaj (dostupan u sobama Ginko 2, 3, 4, 5 i wellness apartmanu): 20 €/noć.',
+          'Dijete do 2 godine koje spava s roditeljima u bračnom krevetu ne naplaćuje se.',
         ],
         highlight: {
           ageRange: '0 – 2 godine',
-          label: 'Dječji krevet na zahtjev',
+          label: 'Dijete u bračnom krevetu s roditeljima',
           price: 'Besplatno',
         },
       },
@@ -288,8 +290,8 @@ export const HOUSE_RULES: HouseRuleItem[] = [
     id: 'payment',
     title: 'Plaćanje pri rezervaciji',
     paragraphs: [
-      'Rezervacija se potvrđuje uplatom depozita od 30% pri slanju upita.',
-      'Ostatak iznosa plaća se najkasnije 14 dana prije dolaska.',
+      'Rezervacija se potvrđuje uplatom depozita od 50% pri slanju upita.',
+      'Ostatak iznosa plaća se u smještajnom objektu pri dolasku.',
     ],
   },
   {
