@@ -152,6 +152,8 @@ export function buildBookingHref(params: {
   children?: number | string;
   /** Broj osoba uz doručak (0 = bez doručka) */
   breakfast?: number;
+  /** Početni korak booking widgeta (1 = datumi, 2 = podaci, 3 = plaćanje) */
+  step?: 1 | 2 | 3;
 }) {
   const q = new URLSearchParams({
     room: params.room,
@@ -161,6 +163,7 @@ export function buildBookingHref(params: {
   if (params.adults != null) q.set('adults', String(params.adults));
   if (params.children != null) q.set('children', String(params.children));
   if (params.breakfast != null && params.breakfast > 0) q.set('breakfast', String(params.breakfast));
+  if (params.step != null) q.set('step', String(params.step));
   return `/booking?${q.toString()}`;
 }
 

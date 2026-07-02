@@ -64,6 +64,8 @@ export default async function HomePage() {
 
   const availabilityLabels = {
     selectDates: t('availabilitySelectDates'),
+    selectGuests: t('availabilitySelectGuests'),
+    unavailableDates: t('availabilityUnavailableDates'),
     searching: t('availabilitySearching'),
     search: t('heroSearch'),
     typeFilter: t('availabilityTypeFilter'),
@@ -72,6 +74,8 @@ export default async function HomePage() {
     typeApartment: t('availabilityTypeApartment'),
     unitRoom: t('availabilityUnitRoom'),
     unitApartment: t('availabilityUnitApartment'),
+    catalogRoom: t('availabilityCatalogRoom'),
+    catalogApartment: t('availabilityCatalogApartment'),
     noResultsAll: t('availabilityNoResultsAll'),
     noResultsRooms: t('availabilityNoResultsRooms'),
     noResultsApartment: t('availabilityNoResultsApartment'),
@@ -215,7 +219,13 @@ export default async function HomePage() {
       {/* RASPOLOŽIVOST                                                        */}
       {/* ------------------------------------------------------------------ */}
       <Suspense fallback={null}>
-        <AvailabilitySection rooms={rooms} labels={availabilityLabels} />
+        <AvailabilitySection
+          rooms={rooms}
+          labels={availabilityLabels}
+          reviewSummary={googleReviews
+            ? { rating: googleReviews.rating, reviewCount: googleReviews.reviewCount }
+            : null}
+        />
       </Suspense>
 
       {/* ------------------------------------------------------------------ */}

@@ -53,6 +53,7 @@ type Props = {
   initialAdults?: string;
   initialChildren?: string;
   initialBreakfast?: string;
+  initialStep?: 1 | 2 | 3;
   bookingsApiPath?: string;
   barcodeApiPath?: string;
   rulesText?: React.ReactNode;
@@ -66,6 +67,7 @@ export default function BookingWidget({
   initialAdults,
   initialChildren,
   initialBreakfast,
+  initialStep,
   bookingsApiPath = '/api/bookings',
   barcodeApiPath = '/api/generate-barcode',
   rulesText,
@@ -116,9 +118,11 @@ export default function BookingWidget({
   );
 
   // Ako su datumi već poznati (proslijeđeni iz URL-a), preskoči na korak 2
-  const [step, setStep] = useState<1 | 2 | 3>(() =>
-    initialCheckIn && initialCheckOut ? 2 : 1,
-  );
+  const [step, setStep] = useState<1 | 2 | 3>(() => {
+    if (initialStep === 2 || initialStep === 3) return initialStep;
+    if (initialCheckIn && initialCheckOut) return 2;
+    return 1;
+  });
   const [form, setForm] = useState<BookingFormData>(() => {
     const a = initialAdults ? parseInt(initialAdults) : null;
     const ch = initialChildren ? parseInt(initialChildren) : null;

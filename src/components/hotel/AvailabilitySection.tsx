@@ -3,16 +3,19 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
-import { Link, useRouter } from '@/i18n/navigation';
+import { useRouter } from '@/i18n/navigation';
 import {
-  CalendarDays, Users, AlertCircle,
-  Wifi, Wind, Car, Waves, Tv, Sun, Flame,
-  PawPrint, UtensilsCrossed, Maximize2,
+  CalendarDays, Users, AlertCircle, Maximize2,
 } from 'lucide-react';
 import BedTypeIcons from '@/components/hotel/BedTypeIcons';
+import RoomDetailModal from '@/components/hotel/RoomDetailModal';
+import SearchFieldCell from '@/components/hotel/SearchFieldCell';
+import { getRoomReserveState } from '@/components/hotel/room-reserve-state';
+import { ROOM_AMENITY_ICONS } from '@/components/hotel/roomAmenityIcons';
 import { calculatePrice, isRangeAvailable, parseLocalDate } from '@/modules/booking/dates';
 import type { BookedRange } from '@/modules/booking/booking.types';
 import type { AccommodationType, Room } from '@/modules/rooms/room.types';
+import type { GoogleReviewSummary } from '@/modules/reviews/google-reviews.types';
 import {
   CONTACT_EMAIL,
   AVAILABILITY_SECTION_ID,
@@ -23,24 +26,17 @@ import {
 } from '@/modules/booking/booking.config';
 import { scrollToElement, scrollToSectionId } from '@/lib/scroll-to-section';
 
-type AmenityIconEntry = { icon: React.ElementType; label: string };
-
-const AMENITY_ICONS: Record<string, AmenityIconEntry> = {
-  'WiFi':                   { icon: Wifi,            label: 'Besplatni Wi-Fi' },
-  'LCD TV':                 { icon: Tv,              label: 'LCD TV' },
-  'Satelitski TV':          { icon: Tv,              label: 'SAT TV' },
-  'Klima':                  { icon: Wind,            label: 'Klima-uređaj' },
-  'Sauna':                  { icon: Waves,           label: 'Sauna' },
-  'Jacuzzi':                { icon: Waves,           label: 'Jacuzzi' },
-  'Terasa':                 { icon: Sun,             label: 'Terasa' },
-  'Parking':                { icon: Car,             label: 'Besplatno parkiralište' },
-  'Grijanje':               { icon: Flame,           label: 'Grijanje' },
-  'Posebna kuhinja':        { icon: UtensilsCrossed, label: 'Kuhinja' },
-  'Kućni ljubimci na upit': { icon: PawPrint,        label: 'Kućni ljubimci na upit' },
-};
+const FIELD_CLASS =
+  'text-text text-sm font-medium bg-transparent outline-none cursor-pointer w-full';
+const SELECT_CLASS =
+  'text-text text-sm font-medium bg-transparent outline-none cursor-pointer w-full';
+const CELL_BORDER =
+  'px-4 py-3 border-b sm:border-b-0 sm:border-r border-stone';
 
 export type AvailabilityLabels = {
   selectDates: string;
+  selectGuests: string;
+  unavailableDates: string;
   searching: string;
   search: string;
   typeFilter: string;
@@ -49,6 +45,8 @@ export type AvailabilityLabels = {
   typeApartment: string;
   unitRoom: string;
   unitApartment: string;
+  catalogRoom: string;
+  catalogApartment: string;
   noResultsAll: string;
   noResultsRooms: string;
   noResultsApartment: string;
@@ -66,6 +64,7 @@ export type AvailabilityLabels = {
 type Props = {
   rooms: Room[];
   labels: AvailabilityLabels;
+  reviewSummary?: GoogleReviewSummary | null;
 };
 
 type RoomStatus = {
@@ -80,13 +79,13 @@ type RoomPlan = {
   breakfast: boolean;
 };
 
-export default function AvailabilitySection({ rooms, labels }: Props) {
+export default function AvailabilitySection({ rooms, labels, reviewSummary }: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [adults, setAdults] = useState(2);
+  const [adults, setAdults] = useState(0);
   const [children, setChildren] = useState(0);
   const [highlightedRoom, setHighlightedRoom] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<Record<string, RoomStatus | null>>({});
@@ -95,6 +94,7 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
   const [dateError, setDateError] = useState<string | null>(null);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [roomPlans, setRoomPlans] = useState<Record<string, RoomPlan>>({});
+  const [detailRoomSlug, setDetailRoomSlug] = useState<string | null>(null);
 
   const getRoomPlan = (slug: string): RoomPlan =>
     roomPlans[slug] ?? { breakfast: false };
@@ -180,7 +180,7 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
     if (ci) setCheckIn(ci);
     if (co) setCheckOut(co);
     if (room) setHighlightedRoom(room);
-    if (!isNaN(a) && a >= 1) setAdults(a);
+    if (!isNaN(a) && a >= 0) setAdults(a);
     if (!isNaN(ch) && ch >= 0) setChildren(ch);
 
     const sectionId = propertySectionIdFromHash(window.location.hash);
@@ -210,8 +210,9 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
   );
 
   const handleReserve = (roomSlug: string) => {
-    if (!hasDates) {
-      setDateError(labels.selectDates);
+    const state = getRoomReserveState(roomSlug, hasDates, adults, searched, statuses);
+    if (state !== 'ready') {
+      handleFixReserve(roomSlug);
       return;
     }
     setDateError(null);
@@ -223,18 +224,43 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
       adults,
       children,
       breakfast: plan.breakfast ? adults : 0,
+      step: 2,
     }));
   };
+
+  const handleFixReserve = useCallback(
+    (roomSlug: string) => {
+      setDetailRoomSlug(null);
+      const state = getRoomReserveState(roomSlug, hasDates, adults, searched, statuses);
+
+      if (state === 'dates') {
+        setDateError(labels.selectDates);
+      } else if (state === 'guests') {
+        setDateError(labels.selectGuests);
+      } else if (state === 'search') {
+        void runAvailabilityCheck(undefined, true);
+      } else if (state === 'unavailable') {
+        setDateError(labels.unavailableDates);
+      }
+
+      requestAnimationFrame(() => scrollToSectionId(AVAILABILITY_SECTION_ID));
+    },
+    [hasDates, adults, searched, statuses, labels, runAvailabilityCheck],
+  );
 
   const totalGuests = adults + children;
 
   const availableRooms = rooms.filter((r) => {
     if (typeFilter !== 'all' && r.accommodationType !== typeFilter) return false;
     if (r.fullyBooked) return false;
-    if (searched && r.capacity < totalGuests) return false;
+    if (searched && totalGuests > 0 && r.capacity < totalGuests) return false;
     if (searched && statuses[r.slug]?.available === false) return false;
     return true;
   });
+
+  const detailRoom = detailRoomSlug
+    ? rooms.find((r) => r.slug === detailRoomSlug) ?? null
+    : null;
 
   const noResultsMessage =
     typeFilter === 'apartman'
@@ -258,84 +284,74 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
           onSubmit={handleSearch}
           className="flex flex-col sm:flex-row items-stretch bg-white border border-stone rounded-xl overflow-hidden mb-8 shadow-sm"
         >
-          <label className="flex-1 flex items-center gap-3 px-4 py-3 border-b sm:border-b-0 sm:border-r border-stone hover:bg-stone-light/60 cursor-pointer">
-            <CalendarDays size={16} className="text-primary shrink-0" />
-            <div className="flex flex-col min-w-0">
-              <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                Dolazak
-              </span>
-              <input
-                type="date"
-                value={checkIn}
-                min={today}
-                onChange={(e) => {
-                  setCheckIn(e.target.value);
-                  if (checkOut && e.target.value >= checkOut) setCheckOut('');
-                  setSearched(false);
-                }}
-                className="text-text text-sm font-medium bg-transparent outline-none cursor-pointer w-full"
-              />
-            </div>
-          </label>
+          <SearchFieldCell
+            icon={CalendarDays}
+            label="Dolazak"
+            className={`flex-1 ${CELL_BORDER}`}
+          >
+            <input
+              type="date"
+              value={checkIn}
+              min={today}
+              onChange={(e) => {
+                setCheckIn(e.target.value);
+                if (checkOut && e.target.value >= checkOut) setCheckOut('');
+                setSearched(false);
+              }}
+              className={FIELD_CLASS}
+            />
+          </SearchFieldCell>
 
-          <label className="flex-1 flex items-center gap-3 px-4 py-3 border-b sm:border-b-0 sm:border-r border-stone hover:bg-stone-light/60 cursor-pointer">
-            <CalendarDays size={16} className="text-primary shrink-0" />
-            <div className="flex flex-col min-w-0">
-              <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                Odlazak
-              </span>
-              <input
-                type="date"
-                value={checkOut}
-                min={checkIn || today}
-                onChange={(e) => { setCheckOut(e.target.value); setSearched(false); }}
-                className="text-text text-sm font-medium bg-transparent outline-none cursor-pointer w-full"
-              />
-            </div>
-          </label>
+          <SearchFieldCell
+            icon={CalendarDays}
+            label="Odlazak"
+            className={`flex-1 ${CELL_BORDER}`}
+          >
+            <input
+              type="date"
+              value={checkOut}
+              min={checkIn || today}
+              onChange={(e) => { setCheckOut(e.target.value); setSearched(false); }}
+              className={FIELD_CLASS}
+            />
+          </SearchFieldCell>
 
-          {/* Odrasli */}
-          <label className="flex items-center gap-3 px-4 py-3 border-b sm:border-b-0 sm:border-r border-stone hover:bg-stone-light/60 cursor-pointer">
-            <Users size={16} className="text-primary shrink-0" />
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                Odrasli
-              </span>
-              <select
-                value={adults}
-                onChange={(e) => {
-                  const a = Number(e.target.value);
-                  setAdults(a);
-                  if (children > 3 - a) setChildren(Math.max(0, 3 - a));
-                  setSearched(false);
-                }}
-                className="text-text text-sm font-medium bg-transparent outline-none cursor-pointer pr-2"
-              >
-                {[1, 2, 3].map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
-          </label>
+          <SearchFieldCell
+            icon={Users}
+            label="Odrasli"
+            className={CELL_BORDER}
+          >
+            <select
+              value={adults}
+              onChange={(e) => {
+                const a = Number(e.target.value);
+                setAdults(a);
+                if (children > 3 - a) setChildren(Math.max(0, 3 - a));
+                setSearched(false);
+              }}
+              className={SELECT_CLASS}
+            >
+              {[0, 1, 2, 3].map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </SearchFieldCell>
 
-          {/* Djeca */}
-          <label className="flex items-center gap-3 px-4 py-3 border-b sm:border-b-0 sm:border-r border-stone hover:bg-stone-light/60 cursor-pointer">
-            <Users size={16} className="text-primary shrink-0" />
-            <div className="flex flex-col">
-              <span className="text-[10px] uppercase tracking-widest font-semibold text-muted">
-                Djeca
-              </span>
-              <select
-                value={children}
-                onChange={(e) => { setChildren(Number(e.target.value)); setSearched(false); }}
-                className="text-text text-sm font-medium bg-transparent outline-none cursor-pointer pr-2"
-              >
-                {Array.from({ length: Math.max(1, 3 - adults + 1) }, (_, i) => i).map((n) => (
-                  <option key={n} value={n}>{n}</option>
-                ))}
-              </select>
-            </div>
-          </label>
+          <SearchFieldCell
+            icon={Users}
+            label="Djeca"
+            className={CELL_BORDER}
+          >
+            <select
+              value={children}
+              onChange={(e) => { setChildren(Number(e.target.value)); setSearched(false); }}
+              className={SELECT_CLASS}
+            >
+              {Array.from({ length: Math.max(1, 3 - adults + 1) }, (_, i) => i).map((n) => (
+                <option key={n} value={n}>{n}</option>
+              ))}
+            </select>
+          </SearchFieldCell>
 
           <button
             type="submit"
@@ -391,10 +407,11 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
                   isHighlighted ? 'border-primary ring-2 ring-primary/20' : 'border-stone'
                 }`}
               >
-                {/* Slika */}
-                <Link
-                  href={`/rooms/${room.slug}`}
-                  className="relative shrink-0 w-full sm:w-56 h-44 sm:h-auto overflow-hidden block"
+                {/* Slika — otvara Booking-stil modal */}
+                <button
+                  type="button"
+                  onClick={() => setDetailRoomSlug(room.slug)}
+                  className="relative shrink-0 w-full sm:w-56 h-44 sm:h-auto overflow-hidden block cursor-pointer text-left"
                 >
                   {room.images[0] ? (
                     <Image
@@ -409,24 +426,34 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
                       — foto dolazi —
                     </div>
                   )}
-                </Link>
+                </button>
 
                 {/* Detalji */}
                 <div className="flex-1 p-5 flex flex-col sm:flex-row gap-4">
                   {/* Lijevo: Booking-stil detalji */}
                   <div className="flex-1 min-w-0">
-                    <Link href={`/rooms/${room.slug}`}>
-                      <h3 className="text-base font-semibold text-primary hover:underline mb-1 leading-tight">
-                        {room.name}
-                      </h3>
-                    </Link>
+                    <button
+                      type="button"
+                      onClick={() => setDetailRoomSlug(room.slug)}
+                      className="text-base font-semibold text-primary hover:underline mb-1 leading-tight text-left"
+                    >
+                      {room.name}
+                    </button>
 
-                    <p className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 mb-3">
-                      <span className="w-2 h-2 bg-emerald-500 rounded-full shrink-0" />
-                      {room.accommodationType === 'apartman'
-                        ? labels.unitApartment
-                        : labels.unitRoom}
-                    </p>
+                    {searched && status?.available ? (
+                      <p className="flex items-center gap-1.5 text-xs font-medium text-emerald-600 mb-3">
+                        <span className="w-2 h-2 bg-emerald-500 rounded-full shrink-0" />
+                        {room.accommodationType === 'apartman'
+                          ? labels.unitApartment
+                          : labels.unitRoom}
+                      </p>
+                    ) : (
+                      <p className="text-xs font-medium text-muted mb-3">
+                        {room.accommodationType === 'apartman'
+                          ? labels.catalogApartment
+                          : labels.catalogRoom}
+                      </p>
+                    )}
 
                     <div className="mb-3 space-y-2">
                       <BedTypeIcons beds={room.beds} iconSize={22} />
@@ -438,7 +465,7 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
 
                     <div className="flex flex-wrap gap-1.5">
                       {room.amenities.map((item) => {
-                        const entry = AMENITY_ICONS[item];
+                        const entry = ROOM_AMENITY_ICONS[item];
                         const Icon = entry?.icon;
                         return (
                           <span
@@ -566,6 +593,31 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
           )}
         </div>
       </div>
+
+      {detailRoom && (
+        <RoomDetailModal
+          room={detailRoom}
+          status={statuses[detailRoom.slug]}
+          searched={searched}
+          plan={getRoomPlan(detailRoom.slug)}
+          adults={adults}
+          labels={labels}
+          reviewSummary={reviewSummary}
+          reserveState={getRoomReserveState(
+            detailRoom.slug,
+            hasDates,
+            adults,
+            searched,
+            statuses,
+          )}
+          onClose={() => setDetailRoomSlug(null)}
+          onReserve={() => {
+            setDetailRoomSlug(null);
+            handleReserve(detailRoom.slug);
+          }}
+          onFixReserve={() => handleFixReserve(detailRoom.slug)}
+        />
+      )}
     </section>
   );
 }
