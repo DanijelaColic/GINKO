@@ -21,12 +21,6 @@ export default function AskQuestionModal({ onClose }: Props) {
   const [success, setSuccess] = useState(false);
 
   const remaining = MAX_QUESTION_LENGTH - question.length;
-  const canSubmit =
-    email.trim().length > 0 &&
-    question.trim().length >= 10 &&
-    question.length <= MAX_QUESTION_LENGTH &&
-    !submitting &&
-    !success;
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -43,9 +37,15 @@ export default function AskQuestionModal({ onClose }: Props) {
     };
   }, []);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!canSubmit) return;
+    if (submitting || success) return;
+
+    const form = e.currentTarget;
+    if (!form.checkValidity()) {
+      form.reportValidity();
+      return;
+    }
 
     setSubmitting(true);
     setError(null);
@@ -145,7 +145,7 @@ export default function AskQuestionModal({ onClose }: Props) {
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder={t('emailPlaceholder')}
-                className="mb-5 w-full rounded-lg border border-stone px-3 py-2.5 text-sm text-text outline-none transition-colors placeholder:text-muted/70 focus:border-primary focus:ring-1 focus:ring-primary"
+                className="mb-5 w-full rounded-lg border border-stone bg-stone-light/30 px-3 py-2.5 text-sm text-text outline-none transition-colors placeholder:text-muted/70 focus:border-primary focus:ring-1 focus:ring-primary/30"
                 required
               />
 
@@ -168,9 +168,9 @@ export default function AskQuestionModal({ onClose }: Props) {
                 }}
                 placeholder={t('questionPlaceholder')}
                 rows={6}
-                className="w-full resize-none rounded-lg border border-stone px-3 py-2.5 text-sm text-text outline-none transition-colors placeholder:text-muted/70 focus:border-primary focus:ring-1 focus:ring-primary"
+                className="w-full resize-none rounded-lg border border-stone bg-stone-light/30 px-3 py-2.5 text-sm text-text outline-none transition-colors placeholder:text-muted/70 focus:border-primary focus:ring-1 focus:ring-primary/30"
                 required
-                minLength={10}
+                minLength={3}
               />
               <p className="mt-1.5 text-xs text-muted">
                 {t('charsRemaining', { count: remaining })}
@@ -187,8 +187,8 @@ export default function AskQuestionModal({ onClose }: Props) {
             <div className="shrink-0 border-t border-stone px-6 py-4">
               <button
                 type="submit"
-                disabled={!canSubmit}
-                className="w-full rounded-lg bg-[#006ce4] px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#0057b8] disabled:cursor-not-allowed disabled:opacity-50"
+                disabled={submitting}
+                className="w-full rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-primary-dark disabled:cursor-not-allowed disabled:opacity-40"
               >
                 {submitting ? t('submitting') : t('submit')}
               </button>

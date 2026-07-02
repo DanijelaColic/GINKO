@@ -29,9 +29,9 @@ export async function POST(request: NextRequest) {
 
   const trimmedQuestion = question.trim();
 
-  if (trimmedQuestion.length < 10) {
+  if (trimmedQuestion.length < 3) {
     return NextResponse.json(
-      { error: 'Pitanje mora imati najmanje 10 znakova' },
+      { error: 'Pitanje mora imati najmanje 3 znaka' },
       { status: 400 },
     );
   }
