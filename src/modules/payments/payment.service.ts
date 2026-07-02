@@ -1,12 +1,21 @@
-// Payment service — Stripe 2 (checkout session) + Stripe 3 (webhook handlers).
+// Payment service — Worldline Hosted Checkout + webhooks.
 
-import type Stripe from 'stripe';
-import { getStripeClient } from './stripe.client';
+import type { Domain } from 'onlinepayments-sdk-nodejs';
+
+type PaymentResponse = Domain.PaymentResponse;
+
+type WebhooksEvent = {
+  id?: string | null;
+  type?: string | null;
+  payment?: PaymentResponse | null;
+  refund?: Domain.RefundResponse | null;
+};
+import { getWorldlineClient, getWorldlineMerchantId } from './worldline.client';
 import {
   createPaymentIntentRecord,
   getPaymentIntentByBookingId,
-  getPaymentIntentByStripeId,
-  getPaymentIntentByCheckoutSessionId,
+  getPaymentIntentByProviderId,
+  getPaymentIntentByHostedCheckoutId,
   updatePaymentIntentStatus,
   createTransactionRecord,
   updateBookingPaymentState,
@@ -19,9 +28,59 @@ import type {
   CreatePaymentIntentInput,
   PaymentIntentResult,
   PaymentStatus,
+  PaymentIntentStatus,
 } from './payment.types';
 import { getSiteUrl } from '@/lib/siteUrl';
 import { notifyGuestBookingConfirmed } from '@/lib/email';
+
+// ── Worldline status mapping ──────────────────────────────────────
+
+export function mapWorldlinePaymentStatus(
+  payment: PaymentResponse | null | undefined,
+  hostedCheckoutStatus?: string | null,
+): PaymentIntentStatus {
+  if (hostedCheckoutStatus === 'CANCELLED_BY_CONSUMER' || hostedCheckoutStatus === 'EXPIRED') {
+    return 'cancelled';
+  }
+
+  if (!payment) return 'requires_payment_method';
+
+  const category = payment.statusOutput?.statusCategory;
+  const status = payment.status;
+
+  if (
+    category === 'COMPLETED' ||
+    status === 'CAPTURED' ||
+    status === 'PAID' ||
+    payment.statusOutput?.isAuthorized === true
+  ) {
+    return 'succeeded';
+  }
+
+  if (
+    category === 'UNSUCCESSFUL' ||
+    status === 'REJECTED' ||
+    status === 'CANCELLED' ||
+    status === 'REJECTED_CAPTURE'
+  ) {
+    return 'cancelled';
+  }
+
+  if (
+    category === 'PENDING' ||
+    status === 'PENDING_CAPTURE' ||
+    status === 'PENDING_PAYMENT' ||
+    status === 'PENDING_COMPLETION'
+  ) {
+    return 'processing';
+  }
+
+  return 'requires_payment_method';
+}
+
+function isPaymentSuccessful(status: PaymentIntentStatus): boolean {
+  return status === 'succeeded';
+}
 
 async function confirmBookingAfterPayment(bookingId: string): Promise<void> {
   const { confirmed } = await updateBookingPaymentState(bookingId, {
@@ -36,135 +95,177 @@ async function confirmBookingAfterPayment(bookingId: string): Promise<void> {
   }
 }
 
-// ── Create Checkout Session ───────────────────────────────────────
+function getWorldlinePaymentId(payment: PaymentResponse): string | null {
+  return payment.id ?? null;
+}
+
+function getHostedCheckoutIdFromPayment(payment: PaymentResponse): string | null {
+  return payment.hostedCheckoutSpecificOutput?.hostedCheckoutId ?? null;
+}
+
+// ── Create Hosted Checkout session ────────────────────────────────
 
 /**
- * Create a Stripe Checkout Session for a booking deposit.
- * Returns the session URL for client-side redirect.
- * Persists a payment_intents row with the Stripe PaymentIntent ID.
- * Amount comes from `input.amount_cents` — API route derives it from DB.
+ * Create a Worldline Hosted Checkout session for a booking deposit.
+ * Returns redirect URL for the guest.
  */
 export async function createCheckoutSession(
   input: CreatePaymentIntentInput & { returnBasePath: string },
 ): Promise<{ url: string } & PaymentIntentResult> {
-  const stripe = getStripeClient();
+  const client = getWorldlineClient();
+  const merchantId = getWorldlineMerchantId();
   const siteUrl = getSiteUrl();
 
-  const successUrl = `${siteUrl}${input.returnBasePath}&payment=success&session_id={CHECKOUT_SESSION_ID}`;
-  const cancelUrl  = `${siteUrl}${input.returnBasePath}&payment=cancelled`;
+  const returnUrl = `${siteUrl}${input.returnBasePath}&payment=success`;
 
-  const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
-    currency: (input.currency ?? 'eur').toLowerCase(),
-    line_items: [
-      {
-        quantity: 1,
-        price_data: {
-          currency: (input.currency ?? 'eur').toLowerCase(),
-          unit_amount: input.amount_cents,
-          product_data: {
-            name: 'Depozit za rezervaciju',
-            description: `Booking ID: ${input.booking_id}`,
-          },
-        },
+  const response = await client.hostedCheckout.createHostedCheckout(merchantId, {
+    order: {
+      amountOfMoney: {
+        currencyCode: (input.currency ?? 'eur').toUpperCase(),
+        amount: input.amount_cents,
       },
-    ],
-    payment_intent_data: {
-      metadata: {
-        booking_id: input.booking_id,
-        payment_type: input.metadata?.payment_type ?? 'deposit',
-        ...(input.metadata ?? {}),
+      references: {
+        merchantReference: input.booking_id,
+      },
+      customer: {
+        merchantCustomerId: input.booking_id,
       },
     },
-    metadata: {
-      booking_id: input.booking_id,
-      payment_type: input.metadata?.payment_type ?? 'deposit',
+    hostedCheckoutSpecificInput: {
+      locale: 'hr-HR',
+      returnUrl,
+      allowedNumberOfPaymentAttempts: 3,
     },
-    success_url: successUrl,
-    cancel_url: cancelUrl,
   });
 
-  if (!session.url) {
-    throw new Error('Stripe nije vratio URL za plaćanje');
+  if (!response.isSuccess) {
+    const errMsg =
+      response.body?.errors?.[0]?.message ??
+      response.body?.errorId ??
+      'Worldline nije vratio URL za plaćanje';
+    throw new Error(errMsg);
   }
 
-  const stripePaymentIntentId =
-    typeof session.payment_intent === 'string'
-      ? session.payment_intent
-      : (session.payment_intent as Stripe.PaymentIntent | null)?.id ?? session.id;
+  const body = response.body;
+  const redirectUrl = body.redirectUrl;
+  const hostedCheckoutId = body.hostedCheckoutId;
+
+  if (!redirectUrl || !hostedCheckoutId) {
+    throw new Error('Worldline nije vratio redirectUrl ili hostedCheckoutId');
+  }
 
   const record = await createPaymentIntentRecord({
     booking_id: input.booking_id,
-    stripe_payment_intent_id: stripePaymentIntentId,
+    provider_payment_id: hostedCheckoutId,
     amount: input.amount_cents,
     currency: (input.currency ?? 'eur').toLowerCase(),
     status: 'requires_payment_method',
     client_secret: null,
     metadata: {
-      checkout_session_id: session.id,
+      hosted_checkout_id: hostedCheckoutId,
+      return_mac: body.RETURNMAC ?? null,
       payment_type: input.metadata?.payment_type ?? 'deposit',
+      provider: 'worldline',
+      ...(input.metadata ?? {}),
     },
   });
 
   return {
-    url: session.url,
+    url: redirectUrl,
     id: record.id,
-    stripe_payment_intent_id: stripePaymentIntentId,
-    client_secret: record.client_secret ?? '',
+    provider_payment_id: hostedCheckoutId,
+    client_secret: '',
     amount: record.amount,
     currency: record.currency,
     status: record.status,
   };
 }
 
-// ── Create Payment Intent for Stripe Elements (inline form) ──────
+// ── Sync hosted checkout status (return URL + reconcile) ──────────
 
 /**
- * Create a Stripe PaymentIntent and return its client_secret for use
- * with Stripe Elements on the confirmation page (no redirect needed).
- * Persists a payment_intents row — webhooks handle confirmation.
+ * Fetch live status from Worldline and update local DB.
+ * Called when guest returns from Hosted Checkout or during reconciliation.
  */
-export async function createPaymentIntentForElements(
-  input: CreatePaymentIntentInput,
-): Promise<{ clientSecret: string } & PaymentIntentResult> {
-  const stripe = getStripeClient();
+export async function syncHostedCheckoutStatus(
+  hostedCheckoutId: string,
+): Promise<PaymentIntentStatus | null> {
+  const record =
+    (await getPaymentIntentByHostedCheckoutId(hostedCheckoutId)) ??
+    (await getPaymentIntentByProviderId(hostedCheckoutId));
 
-  const pi = await stripe.paymentIntents.create({
-    amount: input.amount_cents,
-    currency: (input.currency ?? 'eur').toLowerCase(),
-    automatic_payment_methods: { enabled: true },
-    metadata: {
-      booking_id: input.booking_id,
-      payment_type: input.metadata?.payment_type ?? 'deposit',
-      ...(input.metadata ?? {}),
-    },
-  });
-
-  if (!pi.client_secret) {
-    throw new Error('Stripe nije vratio client_secret za PaymentIntent');
+  if (!record) {
+    console.warn('[worldline] sync: no matching payment_intent for', hostedCheckoutId);
+    return null;
   }
 
-  const record = await createPaymentIntentRecord({
-    booking_id: input.booking_id,
-    stripe_payment_intent_id: pi.id,
-    amount: input.amount_cents,
-    currency: (input.currency ?? 'eur').toLowerCase(),
-    status: 'requires_payment_method',
-    client_secret: pi.client_secret,
-    metadata: {
-      payment_type: input.metadata?.payment_type ?? 'deposit',
-    },
+  const client = getWorldlineClient();
+  const merchantId = getWorldlineMerchantId();
+  const response = await client.hostedCheckout.getHostedCheckout(
+    merchantId,
+    hostedCheckoutId,
+  );
+
+  if (!response.isSuccess) {
+    console.warn('[worldline] getHostedCheckout failed:', hostedCheckoutId);
+    return record.status;
+  }
+
+  const checkout = response.body;
+  const payment = checkout.createdPaymentOutput?.payment ?? null;
+  const newStatus = mapWorldlinePaymentStatus(payment, checkout.status);
+
+  const worldlinePaymentId = payment ? getWorldlinePaymentId(payment) : null;
+  const metadataPatch: Record<string, unknown> = {};
+  if (worldlinePaymentId) metadataPatch.worldline_payment_id = worldlinePaymentId;
+
+  if (newStatus !== record.status || worldlinePaymentId) {
+    await updatePaymentIntentStatus(record.provider_payment_id, newStatus, metadataPatch);
+  }
+
+  await applyPaymentOutcome(record.id, record.booking_id, payment, newStatus, {
+    source: 'hosted_checkout_sync',
+    hosted_checkout_id: hostedCheckoutId,
   });
 
-  return {
-    clientSecret: pi.client_secret,
-    id: record.id,
-    stripe_payment_intent_id: pi.id,
-    client_secret: pi.client_secret,
-    amount: record.amount,
-    currency: record.currency,
-    status: record.status,
-  };
+  return newStatus;
+}
+
+async function applyPaymentOutcome(
+  paymentIntentDbId: string,
+  bookingId: string | null,
+  payment: PaymentResponse | null,
+  status: PaymentIntentStatus,
+  metadata: Record<string, unknown>,
+): Promise<void> {
+  if (!isPaymentSuccessful(status)) return;
+
+  const paymentId = payment ? getWorldlinePaymentId(payment) : null;
+  const chargeId = paymentId ?? `hc_success_${paymentIntentDbId}`;
+
+  const amount =
+    payment?.paymentOutput?.amountOfMoney?.amount ??
+    (await getPaymentIntentByDbId(paymentIntentDbId))?.amount ??
+    0;
+  const currency =
+    payment?.paymentOutput?.amountOfMoney?.currencyCode?.toLowerCase() ?? 'eur';
+
+  await createTransactionRecord({
+    payment_intent_id: paymentIntentDbId,
+    provider_transaction_id: chargeId,
+    type: 'charge',
+    amount,
+    currency,
+    status: 'succeeded',
+    metadata,
+  }).catch((err: unknown) => {
+    const msg = err instanceof Error ? err.message : String(err);
+    if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
+  });
+
+  if (bookingId) {
+    await confirmBookingAfterPayment(bookingId);
+  }
 }
 
 // ── Get Payment Status ────────────────────────────────────────────
@@ -182,248 +283,127 @@ export async function getPaymentStatus(bookingId: string): Promise<PaymentStatus
   };
 }
 
-// Alias kept for index.ts re-export compatibility
-export async function createPaymentIntent(input: CreatePaymentIntentInput): Promise<PaymentIntentResult> {
-  const siteUrl = getSiteUrl();
-  return createCheckoutSession({
+export async function createPaymentIntent(
+  input: CreatePaymentIntentInput,
+): Promise<PaymentIntentResult> {
+  const result = await createCheckoutSession({
     ...input,
     returnBasePath: `/booking/confirmation/${input.booking_id}?token=`,
-  }).then((r) => ({ ...r, url: `${siteUrl}${r.url}` }))
-    .catch(() => { throw new Error('createPaymentIntent: use createCheckoutSession directly'); });
+  });
+  return result;
 }
 
-// ── Webhook event handlers ────────────────────────────────────────
-//
-// Each handler is idempotent. The outer route calls insertWebhookEvent first,
-// which returns null on duplicate stripe_event_id → the route short-circuits.
-// Handlers may still run again if the server crashes mid-handler and Stripe
-// retries; all DB operations here are therefore safe to repeat.
+// ── Webhook handlers ──────────────────────────────────────────────
 
-/**
- * Route a verified Stripe webhook event to the appropriate handler.
- * Idempotency is guaranteed by the caller (insertWebhookEvent checks stripe_event_id).
- *
- * Event → state mapping:
- *
- *  checkout.session.completed    → payment_intents: succeeded
- *                                  bookings: confirmed (if pending), deposit_paid: true
- *                                  payment_transactions: charge/succeeded
- *
- *  payment_intent.succeeded      → payment_intents: succeeded
- *                                  bookings: confirmed (if pending), deposit_paid: true
- *                                  payment_transactions: charge/succeeded
- *
- *  payment_intent.payment_failed → payment_intents: requires_payment_method
- *                                  payment_transactions: charge/failed
- *
- *  checkout.session.expired      → payment_intents: cancelled
- *                                  (booking stays pending — session expired ≠ booking cancelled)
- *
- *  charge.refunded               → payment_transactions: refund/succeeded
- *                                  bookings: deposit_paid: false (full refund only)
- */
-export async function handleWebhookEvent(type: string, event: Stripe.Event): Promise<void> {
-  switch (type) {
-    case 'checkout.session.completed':
-      await handleCheckoutSessionCompleted(event.data.object as Stripe.Checkout.Session);
-      break;
+export async function handleWorldlineWebhookEvent(event: WebhooksEvent): Promise<void> {
+  const type = event.type ?? '';
 
-    case 'payment_intent.succeeded':
-      await handlePaymentIntentSucceeded(event.data.object as Stripe.PaymentIntent);
-      break;
-
-    case 'payment_intent.payment_failed':
-      await handlePaymentIntentFailed(event.data.object as Stripe.PaymentIntent);
-      break;
-
-    case 'checkout.session.expired':
-      await handleCheckoutSessionExpired(event.data.object as Stripe.Checkout.Session);
-      break;
-
-    case 'charge.refunded':
-      await handleChargeRefunded(event.data.object as Stripe.Charge);
-      break;
-
-    default:
-      // Unknown but subscribed event — log and ignore
-      console.warn(`[webhook] Unhandled event type: ${type}`);
+  if (type.startsWith('payment.') && event.payment) {
+    await handleWorldlinePaymentWebhook(event.payment, type);
+    return;
   }
+
+  if (type.startsWith('refund.') && event.refund) {
+    await handleWorldlineRefundWebhook(event);
+    return;
+  }
+
+  console.warn(`[webhook/worldline] Unhandled event type: ${type}`);
 }
 
-// ── Individual handlers ───────────────────────────────────────────
-
-async function handleCheckoutSessionCompleted(
-  session: Stripe.Checkout.Session,
+async function handleWorldlinePaymentWebhook(
+  payment: PaymentResponse,
+  eventType: string,
 ): Promise<void> {
-  // Resolve our payment_intents record via the PI ID from the session,
-  // or fall back to a session-ID metadata lookup.
-  const piStripeId =
-    typeof session.payment_intent === 'string'
-      ? session.payment_intent
-      : (session.payment_intent as Stripe.PaymentIntent | null)?.id;
+  const hostedCheckoutId = getHostedCheckoutIdFromPayment(payment);
+  const merchantRef = payment.paymentOutput?.references?.merchantReference;
 
-  const record = piStripeId
-    ? (await getPaymentIntentByStripeId(piStripeId)) ??
-      (await getPaymentIntentByCheckoutSessionId(session.id))
-    : await getPaymentIntentByCheckoutSessionId(session.id);
+  const record = hostedCheckoutId
+    ? await getPaymentIntentByHostedCheckoutId(hostedCheckoutId)
+    : merchantRef
+      ? await getPaymentIntentByBookingId(merchantRef)
+      : null;
 
   if (!record) {
-    console.warn('[webhook] checkout.session.completed: no matching payment_intent record', session.id);
+    console.warn('[webhook/worldline] payment event: no matching record', eventType);
     return;
   }
 
-  // Update PI status
-  await updatePaymentIntentStatus(record.stripe_payment_intent_id, 'succeeded');
+  const newStatus = mapWorldlinePaymentStatus(payment);
+  const worldlinePaymentId = getWorldlinePaymentId(payment);
 
-  // Record the charge transaction (idempotent — stripe_charge_id is UNIQUE)
-  // The charge ID is accessible on the session's payment_intent expand; we use a
-  // derived identifier so the unique constraint prevents a second insert.
-  const chargeId = piStripeId ? `cs_charge_${piStripeId}` : `cs_charge_${session.id}`;
-  await createTransactionRecord({
-    payment_intent_id: record.id,
-    stripe_charge_id: chargeId,
-    type: 'charge',
-    amount: session.amount_total ?? record.amount,
-    currency: session.currency ?? record.currency,
-    status: 'succeeded',
-    metadata: { source: 'checkout.session.completed', session_id: session.id },
-  }).catch((err: unknown) => {
-    // Unique constraint violation = already recorded → safe to ignore
-    const msg = err instanceof Error ? err.message : String(err);
-    if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
+  await updatePaymentIntentStatus(record.provider_payment_id, newStatus, {
+    worldline_payment_id: worldlinePaymentId,
   });
 
-  // Update booking: pending → confirmed + deposit_paid
-  if (record.booking_id) {
-    await confirmBookingAfterPayment(record.booking_id);
+  if (isPaymentSuccessful(newStatus)) {
+    await applyPaymentOutcome(record.id, record.booking_id, payment, newStatus, {
+      source: eventType,
+    });
+  } else if (newStatus === 'cancelled') {
+    await updatePaymentIntentStatus(record.provider_payment_id, 'cancelled');
+  } else if (eventType.includes('failed') || eventType.includes('rejected')) {
+    const failureReason =
+      payment.statusOutput?.errors?.[0]?.message ?? 'payment_failed';
+
+    await createTransactionRecord({
+      payment_intent_id: record.id,
+      provider_transaction_id: `${worldlinePaymentId ?? record.id}_failed_${Date.now()}`,
+      type: 'charge',
+      amount: record.amount,
+      currency: record.currency,
+      status: 'failed',
+      failure_reason: failureReason,
+      metadata: { source: eventType },
+    }).catch((err: unknown) => {
+      const msg = err instanceof Error ? err.message : String(err);
+      if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
+    });
   }
 }
 
-async function handlePaymentIntentSucceeded(pi: Stripe.PaymentIntent): Promise<void> {
-  const record = await getPaymentIntentByStripeId(pi.id);
+async function handleWorldlineRefundWebhook(event: WebhooksEvent): Promise<void> {
+  const refund = event.refund;
+  if (!refund?.id) return;
 
+  const paymentId = refund.refundOutput?.references?.merchantReference;
+  // Worldline refund references payment — look up by worldline_payment_id in metadata
+  const supabase = createServerSupabaseClient();
+  const { data: records } = await supabase
+    .from('payment_intents')
+    .select('*')
+    .filter('metadata->>worldline_payment_id', 'eq', paymentId ?? '')
+    .limit(1);
+
+  const record = (records?.[0] as import('./payment.types').PaymentIntent | undefined) ?? null;
   if (!record) {
-    console.warn('[webhook] payment_intent.succeeded: no matching record for', pi.id);
+    console.warn('[webhook/worldline] refund: no matching payment_intent');
     return;
   }
 
-  await updatePaymentIntentStatus(pi.id, 'succeeded');
-
-  // Record charge; the latest_charge field holds the charge ID
-  const chargeId =
-    typeof pi.latest_charge === 'string' ? pi.latest_charge : `pi_charge_${pi.id}`;
+  const refundAmount = refund.refundOutput?.amountOfMoney?.amount ?? 0;
+  const currency =
+    refund.refundOutput?.amountOfMoney?.currencyCode?.toLowerCase() ?? record.currency;
 
   await createTransactionRecord({
     payment_intent_id: record.id,
-    stripe_charge_id: chargeId,
-    type: 'charge',
-    amount: pi.amount,
-    currency: pi.currency,
-    status: 'succeeded',
-    metadata: { source: 'payment_intent.succeeded' },
-  }).catch((err: unknown) => {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
-  });
-
-  if (record.booking_id) {
-    await confirmBookingAfterPayment(record.booking_id);
-  }
-}
-
-async function handlePaymentIntentFailed(pi: Stripe.PaymentIntent): Promise<void> {
-  const record = await getPaymentIntentByStripeId(pi.id);
-
-  if (!record) {
-    console.warn('[webhook] payment_intent.payment_failed: no matching record for', pi.id);
-    return;
-  }
-
-  // Revert to requires_payment_method so the guest can retry
-  await updatePaymentIntentStatus(pi.id, 'requires_payment_method');
-
-  const failureReason =
-    pi.last_payment_error?.message ??
-    pi.last_payment_error?.code ??
-    'unknown';
-
-  const chargeId =
-    typeof pi.latest_charge === 'string'
-      ? `${pi.latest_charge}_failed`
-      : `pi_failed_${pi.id}_${Date.now()}`;
-
-  await createTransactionRecord({
-    payment_intent_id: record.id,
-    stripe_charge_id: chargeId,
-    type: 'charge',
-    amount: pi.amount,
-    currency: pi.currency,
-    status: 'failed',
-    failure_reason: failureReason,
-    metadata: { source: 'payment_intent.payment_failed' },
-  }).catch((err: unknown) => {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
-  });
-  // Booking stays 'pending' — guest may retry payment
-}
-
-async function handleCheckoutSessionExpired(
-  session: Stripe.Checkout.Session,
-): Promise<void> {
-  const piStripeId =
-    typeof session.payment_intent === 'string'
-      ? session.payment_intent
-      : (session.payment_intent as Stripe.PaymentIntent | null)?.id;
-
-  const record = piStripeId
-    ? (await getPaymentIntentByStripeId(piStripeId)) ??
-      (await getPaymentIntentByCheckoutSessionId(session.id))
-    : await getPaymentIntentByCheckoutSessionId(session.id);
-
-  if (!record) {
-    console.warn('[webhook] checkout.session.expired: no matching record', session.id);
-    return;
-  }
-
-  await updatePaymentIntentStatus(record.stripe_payment_intent_id, 'cancelled');
-  // Booking intentionally NOT cancelled — session expiry ≠ booking cancellation.
-  // Owner can decide to cancel the booking manually via admin panel.
-}
-
-async function handleChargeRefunded(charge: Stripe.Charge): Promise<void> {
-  const piStripeId =
-    typeof charge.payment_intent === 'string' ? charge.payment_intent : null;
-
-  const record = piStripeId ? await getPaymentIntentByStripeId(piStripeId) : null;
-
-  if (!record) {
-    console.warn('[webhook] charge.refunded: no matching payment_intent record for charge', charge.id);
-    return;
-  }
-
-  const refundAmount = charge.amount_refunded;
-  const isFullRefund = refundAmount >= charge.amount;
-
-  await createTransactionRecord({
-    payment_intent_id: record.id,
-    stripe_charge_id: `${charge.id}_refund`,
+    provider_transaction_id: refund.id,
     type: 'refund',
     amount: refundAmount,
-    currency: charge.currency,
-    status: 'succeeded',
-    metadata: {
-      source: 'charge.refunded',
-      charge_id: charge.id,
-      full_refund: isFullRefund,
-    },
+    currency,
+    status: refund.status === 'REFUNDED' ? 'succeeded' : 'pending',
+    metadata: { source: event.type ?? 'refund' },
   }).catch((err: unknown) => {
     const msg = err instanceof Error ? err.message : String(err);
     if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
   });
 
-  // Only update deposit_paid on full refund — partial refunds don't invalidate the deposit
-  if (record.booking_id && isFullRefund) {
+  const transactions = await getTransactionsByPaymentIntentId(record.id);
+  const totalRefunded = transactions
+    .filter((t) => t.type === 'refund' && t.status === 'succeeded')
+    .reduce((sum, t) => sum + t.amount, 0);
+
+  if (record.booking_id && totalRefunded >= record.amount) {
     await updateBookingPaymentState(record.booking_id, { depositPaid: false });
   }
 }
@@ -431,42 +411,33 @@ async function handleChargeRefunded(charge: Stripe.Charge): Promise<void> {
 // ── Issue Refund ─────────────────────────────────────────────────
 
 export type RefundInput = {
-  /** Our DB `payment_intents.id` (UUID) */
   paymentIntentDbId: string;
-  /** Amount to refund in EUR cents. Omit for full remaining refund. */
   amountCents?: number;
-  /** Stripe refund reason: 'duplicate' | 'fraudulent' | 'requested_by_customer' */
-  reason?: 'duplicate' | 'fraudulent' | 'requested_by_customer';
 };
 
 export type RefundResult = {
-  stripeRefundId: string;
+  providerRefundId: string;
   amountCents: number;
   currency: string;
   alreadyRefunded: boolean;
 };
 
-/**
- * Issue a Stripe refund (full or partial).
- *
- * Idempotency guards:
- *   1. DB check: rejects if requested amount would over-refund
- *   2. Stripe idempotency key: `{pi_id}-refund-{amountCents}` — Stripe deduplicates
- *      within 24 h for the same key
- *   3. UNIQUE stripe_charge_id in payment_transactions prevents a second DB insert
- *      for the same Stripe refund ID
- */
 export async function issueRefund(input: RefundInput): Promise<RefundResult> {
-  // ── Load our PI record ───────────────────────────────────────────
   const record = await getPaymentIntentByDbId(input.paymentIntentDbId);
-  if (!record) throw new Error('Payment intent niet gevonden / not found');
+  if (!record) throw new Error('Payment intent nije pronađen');
   if (record.status !== 'succeeded') {
     throw new Error(
-      `Refund nije moguć: payment intent status je "${record.status}" (mora biti "succeeded")`,
+      `Refund nije moguć: status je "${record.status}" (mora biti "succeeded")`,
     );
   }
 
-  // ── Sum existing refunds ─────────────────────────────────────────
+  const worldlinePaymentId = record.metadata?.worldline_payment_id as string | undefined;
+  if (!worldlinePaymentId) {
+    throw new Error(
+      'Nedostaje worldline_payment_id u metadata — pokreni usklađivanje prije povrata',
+    );
+  }
+
   const transactions = await getTransactionsByPaymentIntentId(record.id);
   const totalRefunded = transactions
     .filter((t) => t.type === 'refund' && t.status === 'succeeded')
@@ -475,7 +446,7 @@ export async function issueRefund(input: RefundInput): Promise<RefundResult> {
   const remaining = record.amount - totalRefunded;
   if (remaining <= 0) {
     return {
-      stripeRefundId: 'already_fully_refunded',
+      providerRefundId: 'already_fully_refunded',
       amountCents: 0,
       currency: record.currency,
       alreadyRefunded: true,
@@ -492,60 +463,49 @@ export async function issueRefund(input: RefundInput): Promise<RefundResult> {
     throw new Error('Iznos povrata mora biti veći od nule');
   }
 
-  // ── Validate the Stripe PI ID ────────────────────────────────────
-  if (!record.stripe_payment_intent_id.startsWith('pi_')) {
-    throw new Error(
-      'Ovaj payment intent nema direktan Stripe PI ID — refund nije moguć putem ovog alata',
-    );
+  const client = getWorldlineClient();
+  const merchantId = getWorldlineMerchantId();
+
+  const response = await client.payments.refundPayment(merchantId, worldlinePaymentId, {
+    amountOfMoney: {
+      currencyCode: record.currency.toUpperCase(),
+      amount: refundAmount,
+    },
+  });
+
+  if (!response.isSuccess) {
+    const errMsg =
+      response.body?.errors?.[0]?.message ??
+      response.body?.errorId ??
+      'Worldline refund greška';
+    throw new Error(errMsg);
   }
 
-  // ── Call Stripe ──────────────────────────────────────────────────
-  const stripe = getStripeClient();
-  const idempotencyKey = `${record.stripe_payment_intent_id}-refund-${refundAmount}`;
+  const refundBody = response.body;
+  const refundId = refundBody.id ?? `refund_${Date.now()}`;
 
-  let stripeRefund: Awaited<ReturnType<typeof stripe.refunds.create>>;
-  try {
-    stripeRefund = await stripe.refunds.create(
-      {
-        payment_intent: record.stripe_payment_intent_id,
-        amount: refundAmount,
-        reason: input.reason ?? 'requested_by_customer',
-      },
-      { idempotencyKey },
-    );
-  } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    throw new Error(`Stripe refund greška: ${msg}`);
-  }
-
-  // ── Persist transaction (idempotent via UNIQUE stripe_charge_id) ──
   await createTransactionRecord({
     payment_intent_id: record.id,
-    stripe_charge_id: stripeRefund.id, // re_xxx — UNIQUE prevents double insert
+    provider_transaction_id: refundId,
     type: 'refund',
-    amount: stripeRefund.amount,
-    currency: stripeRefund.currency,
-    status: stripeRefund.status === 'succeeded' ? 'succeeded' : 'pending',
-    metadata: {
-      reason: stripeRefund.reason ?? input.reason ?? 'requested_by_customer',
-      stripe_refund_id: stripeRefund.id,
-    },
+    amount: refundAmount,
+    currency: record.currency,
+    status: 'succeeded',
+    metadata: { worldline_refund_id: refundId },
   }).catch((err: unknown) => {
     const msg = err instanceof Error ? err.message : String(err);
-    // Unique constraint = already persisted from a previous attempt (Stripe idempotency replay)
     if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
   });
 
-  // ── Update booking deposit_paid on full refund ───────────────────
   const isFullRefund = refundAmount >= remaining;
   if (record.booking_id && isFullRefund) {
     await updateBookingPaymentState(record.booking_id, { depositPaid: false });
   }
 
   return {
-    stripeRefundId: stripeRefund.id,
-    amountCents: stripeRefund.amount,
-    currency: stripeRefund.currency,
+    providerRefundId: refundId,
+    amountCents: refundAmount,
+    currency: record.currency,
     alreadyRefunded: false,
   };
 }
@@ -556,96 +516,59 @@ export type ReconcileResult = {
   checked: number;
   repaired: number;
   skipped: number;
-  details: Array<{ paymentIntentId: string; localStatus: string; stripeStatus: string; action: string }>;
+  details: Array<{
+    paymentIntentId: string;
+    localStatus: string;
+    providerStatus: string;
+    action: string;
+  }>;
 };
 
-/**
- * Re-check ambiguous local payment_intents against the Stripe API and repair drift.
- *
- * Targets: status in (requires_payment_method, requires_confirmation, requires_action,
- *          processing) AND created_at < now() - olderThanMinutes.
- *
- * For each ambiguous PI:
- *   - Fetch live status from Stripe
- *   - If Stripe says "succeeded" but we have something else → repair (confirm booking etc.)
- *   - If Stripe says "canceled"  but we have something else → update to cancelled
- *   - Otherwise: no change, log as skipped
- *
- * Records with cs_xxx IDs are skipped (reconciled via webhook only).
- */
 export async function reconcilePayments(
   olderThanMinutes = 15,
 ): Promise<ReconcileResult> {
   const ambiguous = await getAmbiguousPaymentIntents(olderThanMinutes);
-  const stripe = getStripeClient();
 
-  const result: ReconcileResult = { checked: ambiguous.length, repaired: 0, skipped: 0, details: [] };
+  const result: ReconcileResult = {
+    checked: ambiguous.length,
+    repaired: 0,
+    skipped: 0,
+    details: [],
+  };
 
   for (const record of ambiguous) {
-    // Skip checkout session IDs — only PI IDs can be reconciled directly
-    if (!record.stripe_payment_intent_id.startsWith('pi_')) {
-      result.skipped++;
+    try {
+      const before = record.status;
+      const after = await syncHostedCheckoutStatus(record.provider_payment_id);
+
+      if (!after || after === before) {
+        result.skipped++;
+        result.details.push({
+          paymentIntentId: record.id,
+          localStatus: before,
+          providerStatus: after ?? 'unknown',
+          action: after === before ? 'in_sync' : 'skipped',
+        });
+        continue;
+      }
+
+      result.repaired++;
       result.details.push({
         paymentIntentId: record.id,
-        localStatus: record.status,
-        stripeStatus: 'unknown (cs_ id)',
-        action: 'skipped',
+        localStatus: before,
+        providerStatus: after,
+        action: 'repaired',
       });
-      continue;
-    }
-
-    let stripeStatus: string;
-    try {
-      const pi = await stripe.paymentIntents.retrieve(record.stripe_payment_intent_id);
-      stripeStatus = pi.status;
     } catch (err) {
       const msg = err instanceof Error ? err.message : String(err);
       result.skipped++;
       result.details.push({
         paymentIntentId: record.id,
         localStatus: record.status,
-        stripeStatus: `error: ${msg}`,
+        providerStatus: `error: ${msg}`,
         action: 'skipped (fetch error)',
       });
-      continue;
     }
-
-    if (stripeStatus === record.status) {
-      result.skipped++;
-      result.details.push({
-        paymentIntentId: record.id,
-        localStatus: record.status,
-        stripeStatus,
-        action: 'in_sync',
-      });
-      continue;
-    }
-
-    // ── Repair drift ─────────────────────────────────────────────
-    const action = 'repaired';
-
-    if (stripeStatus === 'succeeded') {
-      await updatePaymentIntentStatus(record.stripe_payment_intent_id, 'succeeded');
-      if (record.booking_id) {
-        await confirmBookingAfterPayment(record.booking_id);
-      }
-    } else if (stripeStatus === 'canceled') {
-      await updatePaymentIntentStatus(record.stripe_payment_intent_id, 'cancelled');
-    } else {
-      // Stripe has a different ambiguous status — update and note it
-      await updatePaymentIntentStatus(
-        record.stripe_payment_intent_id,
-        stripeStatus as import('./payment.types').PaymentIntentStatus,
-      );
-    }
-
-    result.repaired++;
-    result.details.push({
-      paymentIntentId: record.id,
-      localStatus: record.status,
-      stripeStatus,
-      action,
-    });
   }
 
   return result;
@@ -665,5 +588,4 @@ async function getPaymentIntentByDbId(dbId: string) {
   return data as import('./payment.types').PaymentIntent;
 }
 
-// ── Helpers re-exported for convenience ──────────────────────────
 export { eurToCents };

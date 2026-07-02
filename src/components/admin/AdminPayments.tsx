@@ -1,6 +1,6 @@
 'use client';
 
-// New — Stripe 4. Admin payments list with status/date filters.
+// Admin payments list with status/date filters.
 // Shows payment_intents joined with booking guest info.
 // Actions per row: generate/copy payment link.
 
@@ -32,7 +32,7 @@ type BookingEmbed = {
 type PaymentRow = {
   id: string;
   booking_id: string | null;
-  stripe_payment_intent_id: string;
+  provider_payment_id: string;
   amount: number;
   currency: string;
   status: PaymentIntentStatus;
@@ -215,7 +215,7 @@ export default function AdminPayments() {
     const b = r.booking;
     return (
       r.booking_id?.includes(search) ||
-      r.stripe_payment_intent_id.toLowerCase().includes(search) ||
+      r.provider_payment_id.toLowerCase().includes(search) ||
       b?.guest_name.toLowerCase().includes(search) ||
       b?.guest_email.toLowerCase().includes(search) ||
       b?.room_slug.toLowerCase().includes(search)
@@ -231,14 +231,14 @@ export default function AdminPayments() {
           <div>
             <h1 className="text-xl font-serif font-semibold text-gray-900">Plaćanja</h1>
             <p className="text-sm text-gray-500 mt-0.5">
-              Stripe payment intents · {visible.length} zapis{visible.length === 1 ? '' : 'a'}
+              Worldline plaćanja · {visible.length} zapis{visible.length === 1 ? '' : 'a'}
             </p>
           </div>
           <div className="flex items-center gap-2">
             <button
               onClick={handleReconcile}
               disabled={reconciling || loading}
-              title="Uskladi lokalni status s live Stripe API-jem"
+              title="Uskladi lokalni status s Worldline API-jem"
               className="flex items-center gap-2 text-sm border border-amber-200 text-amber-700 px-4 py-2 rounded-full hover:bg-amber-50 transition-colors disabled:opacity-50"
             >
               <RotateCcw size={14} className={clsx(reconciling && 'animate-spin')} />
@@ -326,7 +326,7 @@ export default function AdminPayments() {
               <table className="w-full text-sm">
                 <thead>
                   <tr className="border-b border-gray-100">
-                    {['Gost', 'Soba / Termin', 'Iznos', 'Status', 'Stripe ID', 'Kreirano', 'Akcija'].map((h) => (
+                    {['Gost', 'Soba / Termin', 'Iznos', 'Status', 'Worldline ID', 'Kreirano', 'Akcija'].map((h) => (
                       <th key={h} className="text-left px-4 py-3 text-xs font-semibold text-gray-400 uppercase tracking-wide whitespace-nowrap">
                         {h}
                       </th>
@@ -372,10 +372,10 @@ export default function AdminPayments() {
                         <StatusBadge status={row.status} />
                       </td>
 
-                      {/* Stripe ID */}
+                      {/* Worldline ID */}
                       <td className="px-4 py-3">
                         <span className="font-mono text-xs text-gray-500 truncate block max-w-32">
-                          {row.stripe_payment_intent_id}
+                          {row.provider_payment_id}
                         </span>
                       </td>
 

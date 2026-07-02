@@ -22,7 +22,7 @@ export default async function AdminPage() {
             { href: '/admin/pricing', label: 'Cijene', desc: 'Sezonske cijene', color: 'bg-amber-500' },
             { href: '/admin/rooms', label: 'Sobe', desc: 'Sadržaj i prijevodi', color: 'bg-blue-600' },
             { href: '/admin/channels', label: 'Kanali', desc: 'iCal uvoz/izvoz', color: 'bg-purple-600' },
-            { href: '/admin/payments', label: 'Plaćanja', desc: 'Stripe statusi i linkovi', color: 'bg-rose-600' },
+            { href: '/admin/payments', label: 'Plaćanja', desc: 'Worldline statusi i linkovi', color: 'bg-rose-600' },
           ].map(({ href, label, desc, color }) => (
             <Link
               key={href}

@@ -1,5 +1,4 @@
-// New — Supabase CRUD for payment tables.
-// All functions use the service-role client (server-side only).
+// Supabase CRUD for payment tables (server-side only).
 
 import { createServerSupabaseClient } from '@/lib/supabase';
 import type {
@@ -15,7 +14,7 @@ import type {
 
 export async function createPaymentIntentRecord(data: {
   booking_id: string | null;
-  stripe_payment_intent_id: string;
+  provider_payment_id: string;
   amount: number;
   currency: string;
   status: PaymentIntentStatus;
@@ -27,7 +26,7 @@ export async function createPaymentIntentRecord(data: {
     .from('payment_intents')
     .insert({
       booking_id: data.booking_id,
-      stripe_payment_intent_id: data.stripe_payment_intent_id,
+      provider_payment_id: data.provider_payment_id,
       amount: data.amount,
       currency: data.currency,
       status: data.status,
@@ -41,20 +40,23 @@ export async function createPaymentIntentRecord(data: {
   return row as PaymentIntent;
 }
 
-export async function getPaymentIntentByStripeId(
-  stripeId: string,
+export async function getPaymentIntentByProviderId(
+  providerId: string,
 ): Promise<PaymentIntent | null> {
   const supabase = createServerSupabaseClient();
   const { data, error } = await supabase
     .from('payment_intents')
     .select('*')
-    .eq('stripe_payment_intent_id', stripeId)
+    .eq('provider_payment_id', providerId)
     .single();
 
-  if (error?.code === 'PGRST116') return null; // not found
+  if (error?.code === 'PGRST116') return null;
   if (error) throw error;
   return data as PaymentIntent;
 }
+
+/** @deprecated Use getPaymentIntentByProviderId — kept for transitional imports */
+export const getPaymentIntentByStripeId = getPaymentIntentByProviderId;
 
 export async function getPaymentIntentByBookingId(
   bookingId: string,
@@ -74,23 +76,65 @@ export async function getPaymentIntentByBookingId(
 }
 
 export async function updatePaymentIntentStatus(
-  stripeId: string,
+  providerId: string,
   status: PaymentIntentStatus,
+  metadataPatch?: Record<string, unknown>,
 ): Promise<void> {
   const supabase = createServerSupabaseClient();
+
+  const updates: Record<string, unknown> = {
+    status,
+    updated_at: new Date().toISOString(),
+  };
+
+  if (metadataPatch && Object.keys(metadataPatch).length > 0) {
+    const { data: existing } = await supabase
+      .from('payment_intents')
+      .select('metadata')
+      .eq('provider_payment_id', providerId)
+      .single();
+
+    updates.metadata = {
+      ...((existing?.metadata as Record<string, unknown>) ?? {}),
+      ...metadataPatch,
+    };
+  }
+
   const { error } = await supabase
     .from('payment_intents')
-    .update({ status, updated_at: new Date().toISOString() })
-    .eq('stripe_payment_intent_id', stripeId);
+    .update(updates)
+    .eq('provider_payment_id', providerId);
 
   if (error) throw error;
 }
+
+export async function getPaymentIntentByHostedCheckoutId(
+  hostedCheckoutId: string,
+): Promise<PaymentIntent | null> {
+  const byId = await getPaymentIntentByProviderId(hostedCheckoutId);
+  if (byId) return byId;
+
+  const supabase = createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from('payment_intents')
+    .select('*')
+    .filter('metadata->>hosted_checkout_id', 'eq', hostedCheckoutId)
+    .limit(1)
+    .single();
+
+  if (error?.code === 'PGRST116') return null;
+  if (error) return null;
+  return data as PaymentIntent;
+}
+
+/** @deprecated Use getPaymentIntentByHostedCheckoutId */
+export const getPaymentIntentByCheckoutSessionId = getPaymentIntentByHostedCheckoutId;
 
 // ── PaymentTransaction ────────────────────────────────────────────
 
 export async function createTransactionRecord(data: {
   payment_intent_id: string;
-  stripe_charge_id: string | null;
+  provider_transaction_id: string | null;
   type: TransactionType;
   amount: number;
   currency: string;
@@ -103,7 +147,7 @@ export async function createTransactionRecord(data: {
     .from('payment_transactions')
     .insert({
       payment_intent_id: data.payment_intent_id,
-      stripe_charge_id: data.stripe_charge_id,
+      provider_transaction_id: data.provider_transaction_id,
       type: data.type,
       amount: data.amount,
       currency: data.currency,
@@ -118,47 +162,12 @@ export async function createTransactionRecord(data: {
   return row as PaymentTransaction;
 }
 
-/**
- * Find payment intent by the Stripe Checkout Session ID stored in metadata.
- * Needed for checkout.session.* events when the pi_ ID may not match.
- */
-export async function getPaymentIntentByCheckoutSessionId(
-  checkoutSessionId: string,
-): Promise<PaymentIntent | null> {
-  const supabase = createServerSupabaseClient();
-  // metadata->>'checkout_session_id' via Supabase PostgREST filter
-  const { data, error } = await supabase
-    .from('payment_intents')
-    .select('*')
-    .eq('stripe_payment_intent_id', checkoutSessionId) // fallback: cs_ stored as pi_id
-    .single();
-
-  if (!error && data) return data as PaymentIntent;
-
-  // Try metadata JSON lookup
-  const { data: meta, error: metaErr } = await supabase
-    .from('payment_intents')
-    .select('*')
-    .filter('metadata->>checkout_session_id', 'eq', checkoutSessionId)
-    .limit(1)
-    .single();
-
-  if (metaErr?.code === 'PGRST116') return null;
-  if (metaErr) return null;
-  return meta as PaymentIntent;
-}
-
 // ── Booking payment state ─────────────────────────────────────────
 
-/**
- * Update a booking's payment-related fields.
- * `confirmIfPending` transitions status pending → confirmed atomically.
- * Safe to call multiple times — the WHERE filter prevents double-confirm.
- */
 export async function updateBookingPaymentState(
   bookingId: string,
   opts: {
-    confirmIfPending?: boolean;   // pending → confirmed
+    confirmIfPending?: boolean;
     depositPaid?: boolean;
   },
 ): Promise<{ confirmed: boolean }> {
@@ -168,7 +177,6 @@ export async function updateBookingPaymentState(
   if (opts.depositPaid !== undefined) updates.deposit_paid = opts.depositPaid;
 
   if (opts.confirmIfPending) {
-    // Only flip to 'confirmed' if currently 'pending' — prevents re-confirming
     const { data, error } = await supabase
       .from('bookings')
       .update({ ...updates, status: 'confirmed' })
@@ -205,11 +213,6 @@ export async function getTransactionsByPaymentIntentId(
   return (data ?? []) as PaymentTransaction[];
 }
 
-/**
- * Return payment_intents with a status that may differ from Stripe's ground truth
- * and are old enough that the initial payment flow should have completed.
- * Used by the reconciliation job.
- */
 export async function getAmbiguousPaymentIntents(
   olderThanMinutes = 15,
 ): Promise<PaymentIntent[]> {
@@ -235,27 +238,25 @@ export async function getAmbiguousPaymentIntents(
 
 // ── WebhookEvent ──────────────────────────────────────────────────
 
-/** Returns null if the event already exists (idempotency guard). */
 export async function insertWebhookEvent(data: {
-  stripe_event_id: string;
+  provider_event_id: string;
   type: string;
   payload: Record<string, unknown>;
 }): Promise<WebhookEvent | null> {
   const supabase = createServerSupabaseClient();
 
-  // Check for duplicate first — .upsert with ignoreDuplicates skips returning data
   const { data: existing } = await supabase
     .from('webhook_events')
     .select('id')
-    .eq('stripe_event_id', data.stripe_event_id)
+    .eq('provider_event_id', data.provider_event_id)
     .single();
 
-  if (existing) return null; // already processed or in-flight
+  if (existing) return null;
 
   const { data: row, error } = await supabase
     .from('webhook_events')
     .insert({
-      stripe_event_id: data.stripe_event_id,
+      provider_event_id: data.provider_event_id,
       type: data.type,
       payload: data.payload,
     })

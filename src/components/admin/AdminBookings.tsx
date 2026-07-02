@@ -1574,7 +1574,7 @@ function EditBookingModal({ booking, onClose, onSuccess }: EditModalProps) {
 
           {error && <p className="text-red-500 text-sm">{error}</p>}
 
-          {/* Stripe payment info */}
+          {/* Worldline payment info */}
           <BookingPaymentPanel bookingId={booking.id} depositEur={booking.deposit} />
 
           <div className="flex gap-3 pt-4">

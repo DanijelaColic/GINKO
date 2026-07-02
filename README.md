@@ -78,7 +78,7 @@ src/
 | 5 | Gallery/media architecture (GalleryGrid, lightbox, room images) | ✅ |
 | 6 | Production hardening (error states, analytics, consent, privacy) | ✅ |
 | 7 | Backend integration (Supabase bookings) | 🔜 |
-| 8 | Payments (Stripe) | 🔜 |
+| 8 | Payments (Worldline) | ✅ |
 
 ## Key routes
 

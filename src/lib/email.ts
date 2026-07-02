@@ -96,6 +96,43 @@ export async function sendNewBookingEmails(data: BookingEmailData): Promise<void
   await sendOwnerNewBookingNotification(data);
 }
 
+export type GuestQuestionEmailData = {
+  guestEmail: string;
+  question: string;
+  locale?: 'hr' | 'en' | 'de';
+};
+
+/** Obavijest vlasniku o pitanju s FAQ sekcije. */
+export async function sendGuestQuestionNotification(
+  data: GuestQuestionEmailData,
+): Promise<void> {
+  const resend = getResend();
+  if (!resend) {
+    throw new Error('Email servis nije konfiguriran');
+  }
+
+  const locale = data.locale ?? 'hr';
+  const subject =
+    locale === 'en'
+      ? `Guest question – ${SITE_NAME}`
+      : locale === 'de'
+        ? `Gästefrage – ${SITE_NAME}`
+        : `Pitanje gosta – ${SITE_NAME}`;
+
+  const result = await resend.emails.send({
+    from: FROM(),
+    to: OWNER_INBOX(),
+    replyTo: data.guestEmail,
+    subject,
+    html: guestQuestionHtml(data),
+  });
+
+  if (result.error) {
+    console.error('[email] Guest question API error:', result.error);
+    throw new Error(result.error.message);
+  }
+}
+
 /** Potvrda gostu nakon uspješnog plaćanja depozita. */
 export async function notifyGuestBookingConfirmed(bookingId: string): Promise<void> {
   const supabase = createServerSupabaseClient();
@@ -226,6 +263,35 @@ function guestConfirmedHtml(d: FullData, locale: 'hr' | 'en' | 'de'): string {
           ? `<p style="margin-top:16px;font-size:14px;"><a href="${d.confirmationUrl}" style="color:#3a6b4a;">Otvori potvrdu rezervacije</a></p>`
           : ''
       }
+    </div>
+  `);
+}
+
+function guestQuestionHtml(data: GuestQuestionEmailData): string {
+  const escapedQuestion = data.question
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/\n/g, '<br>');
+
+  return emailShell(`
+    <div style="background:#3a6b4a;padding:20px 24px;">
+      <h1 style="color:#fff;font-size:18px;margin:0;">Novo pitanje gosta</h1>
+    </div>
+    <div style="padding:24px;">
+      <p style="margin:0 0 16px;font-size:14px;color:#6b7a6e;">
+        Pitanje poslano s FAQ sekcije na web stranici.
+      </p>
+      <table style="width:100%;font-size:14px;border-collapse:collapse;">
+        <tr>
+          <td style="padding:8px 0;color:#6b7a6e;width:120px;vertical-align:top;">Email</td>
+          <td><a href="mailto:${data.guestEmail}">${data.guestEmail}</a></td>
+        </tr>
+        <tr>
+          <td style="padding:8px 0;color:#6b7a6e;vertical-align:top;">Pitanje</td>
+          <td style="line-height:1.6;white-space:pre-wrap;">${escapedQuestion}</td>
+        </tr>
+      </table>
     </div>
   `);
 }

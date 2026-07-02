@@ -137,6 +137,21 @@
     "stillLooking": "Noch auf der Suche?",
     "askQuestion": "Frage stellen",
     "answerHint": "Auf die meisten Fragen können wir sofort antworten",
+    "askModal": {
+      "title": "Frage stellen",
+      "aboutProperty": "Zur Unterkunft: {siteName}",
+      "emailLabel": "Ihre E-Mail *",
+      "emailPlaceholder": "z. B. name@beispiel.de",
+      "questionLabel": "Ihre Frage *",
+      "questionPlaceholder": "z. B. bieten Sie Zimmerservice an?",
+      "charsRemaining": "noch {count} Zeichen",
+      "submit": "Frage senden",
+      "submitting": "Wird gesendet…",
+      "close": "Schließen",
+      "successTitle": "Frage gesendet",
+      "successMessage": "Vielen Dank! Wir antworten Ihnen so schnell wie möglich per E-Mail.",
+      "errorGeneric": "Senden fehlgeschlagen. Bitte versuchen Sie es erneut."
+    },
     "qualityTitle": "Was Gäste am meisten schätzen",
     "qualityDesc": "Laut Gästebewertungen heben Besucher besonders den sauberen und gepflegten Aufenthalt, die ruhige Lage im Zentrum von Daruvar und die Gastfreundschaft der Gastgeber hervor. Unten finden Sie Antworten auf die häufigsten Fragen.",
     "faq": {

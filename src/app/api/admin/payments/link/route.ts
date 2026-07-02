@@ -1,11 +1,5 @@
-// New — Stripe 4. Admin-only action: create or recreate a Stripe Checkout Session
-// for a booking. Unlike the public /api/payments/checkout, the admin endpoint:
-//   - is protected by admin cookie (not guest token)
-//   - generates the booking-view token server-side
-//   - can recreate a link for an expired/failed session
-//
 // POST /api/admin/payments/link   body: { bookingId: string }
-// Returns: { url: string, checkoutSessionId: string }
+// Returns: { url: string, provider_payment_id: string }
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
@@ -68,16 +62,16 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       url: result.url,
-      stripe_payment_intent_id: result.stripe_payment_intent_id,
+      provider_payment_id: result.provider_payment_id,
       amount_cents: result.amount,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[admin/payments/link]', message);
 
-    if (message.includes('STRIPE_SECRET_KEY') || message.includes('No API key')) {
+    if (message.includes('WORLDLINE_') || message.includes('Worldline')) {
       return NextResponse.json(
-        { error: 'Stripe nije konfiguriran. Provjeri STRIPE_SECRET_KEY.' },
+        { error: 'Worldline nije konfiguriran. Provjeri env varijable.' },
         { status: 503 },
       );
     }

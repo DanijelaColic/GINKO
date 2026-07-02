@@ -4,7 +4,8 @@ import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MessageCircle, ChevronRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
-import { CONTACT_EMAIL, QUESTIONS_SECTION_ID } from '@/modules/booking/booking.config';
+import AskQuestionModal from '@/components/hotel/AskQuestionModal';
+import { QUESTIONS_SECTION_ID } from '@/modules/booking/booking.config';
 
 const FAQ_COL_1 = ['parking', 'breakfast', 'wifi', 'therms', 'attractions'] as const;
 const FAQ_COL_2 = ['pets', 'checkin', 'checkinTimes', 'wellness', 'families', 'booking'] as const;
@@ -79,6 +80,7 @@ function FaqColumn({
 export default function TravelerQuestionsSection() {
   const t = useTranslations('travelerQuestions');
   const [openId, setOpenId] = useState<string | null>(null);
+  const [askModalOpen, setAskModalOpen] = useState(false);
 
   const toggle = (id: string) => {
     setOpenId((prev) => (prev === id ? null : id));
@@ -114,16 +116,19 @@ export default function TravelerQuestionsSection() {
           {/* CTA kartica */}
           <div className="bg-white border border-stone rounded-xl p-8 flex flex-col items-center justify-center text-center min-h-[200px]">
             <h3 className="font-semibold text-text text-base mb-4">{t('stillLooking')}</h3>
-            <a
-              href={`mailto:${CONTACT_EMAIL}`}
+            <button
+              type="button"
+              onClick={() => setAskModalOpen(true)}
               className="inline-flex items-center justify-center border border-primary text-primary hover:bg-primary/5 font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm"
             >
               {t('askQuestion')}
-            </a>
+            </button>
             <p className="text-xs text-muted mt-3 leading-relaxed">{t('answerHint')}</p>
           </div>
         </div>
       </div>
+
+      {askModalOpen && <AskQuestionModal onClose={() => setAskModalOpen(false)} />}
     </section>
   );
 }

@@ -1,4 +1,4 @@
-// New — Stripe payment foundation types.
+// Payment foundation types — provider-agnostic (Worldline).
 
 // ── Database row types ────────────────────────────────────────────
 
@@ -14,9 +14,9 @@ export type PaymentIntentStatus =
 export type PaymentIntent = {
   id: string;
   booking_id: string | null;
-  stripe_payment_intent_id: string;
-  amount: number;      // in smallest currency unit (EUR cents)
-  currency: string;    // 'eur'
+  provider_payment_id: string;
+  amount: number; // in smallest currency unit (EUR cents)
+  currency: string; // 'eur'
   status: PaymentIntentStatus;
   client_secret: string | null;
   metadata: Record<string, unknown>;
@@ -30,7 +30,7 @@ export type TransactionStatus = 'succeeded' | 'failed' | 'pending';
 export type PaymentTransaction = {
   id: string;
   payment_intent_id: string;
-  stripe_charge_id: string | null;
+  provider_transaction_id: string | null;
   type: TransactionType;
   amount: number;
   currency: string;
@@ -42,7 +42,7 @@ export type PaymentTransaction = {
 
 export type WebhookEvent = {
   id: string;
-  stripe_event_id: string;
+  provider_event_id: string;
   type: string;
   payload: Record<string, unknown>;
   processed: boolean;
@@ -53,20 +53,19 @@ export type WebhookEvent = {
 
 // ── Service-layer types ───────────────────────────────────────────
 
-/** Input to create a new PaymentIntent for a booking deposit */
+/** Input to create a new payment session for a booking deposit */
 export type CreatePaymentIntentInput = {
   booking_id: string;
   /** Amount in EUR cents (e.g. 5000 = €50.00) */
   amount_cents: number;
   currency?: string;
-  /** Arbitrary metadata to forward to Stripe and store locally */
   metadata?: Record<string, string>;
 };
 
 /** Return shape for create + confirm flows */
 export type PaymentIntentResult = {
   id: string;
-  stripe_payment_intent_id: string;
+  provider_payment_id: string;
   client_secret: string;
   amount: number;
   currency: string;

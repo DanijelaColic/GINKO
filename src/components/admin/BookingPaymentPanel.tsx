@@ -1,7 +1,6 @@
 'use client';
 
-// Stripe 4/5. Payment status panel rendered inside EditBookingModal.
-// Stripe 5 additions: refund action (full/partial).
+// Payment status panel rendered inside EditBookingModal.
 
 import { useState, useEffect, useCallback } from 'react';
 import { Loader2, Copy, ExternalLink, RefreshCw, CheckCircle, XCircle, Clock, RotateCcw } from 'lucide-react';
@@ -9,11 +8,9 @@ import clsx from 'clsx';
 import { centsToEur } from '@/modules/payments/payment.types';
 import type { PaymentIntentStatus } from '@/modules/payments/payment.types';
 
-// ── Types ─────────────────────────────────────────────────────────
-
 type PaymentRecord = {
   id: string;
-  stripe_payment_intent_id: string;
+  provider_payment_id: string;
   amount: number;
   currency: string;
   status: PaymentIntentStatus;
@@ -127,10 +124,10 @@ export default function BookingPaymentPanel({ bookingId, depositEur }: Props) {
         reason: 'requested_by_customer',
       }),
     });
-    const data = await res.json() as { ok?: boolean; note?: string; stripeRefundId?: string; amountCents?: number; error?: string };
+    const data = await res.json() as { ok?: boolean; note?: string; providerRefundId?: string; amountCents?: number; error?: string };
     if (res.ok && data.ok) {
       const amtStr = data.amountCents ? ` (${(data.amountCents / 100).toFixed(2)} EUR)` : '';
-      setRefundResult(`Povrat uspješan${amtStr} · ID: ${data.stripeRefundId ?? ''}`);
+      setRefundResult(`Povrat uspješan${amtStr} · ID: ${data.providerRefundId ?? ''}`);
       setRefundAmount('');
       setShowRefund(false);
       await fetchPayment();
@@ -146,7 +143,7 @@ export default function BookingPaymentPanel({ bookingId, depositEur }: Props) {
     <div className="border-t border-gray-100 pt-4 mt-1">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
-          Stripe plaćanje
+          Worldline plaćanje
         </h3>
         <button
           onClick={fetchPayment}
@@ -186,18 +183,18 @@ export default function BookingPaymentPanel({ bookingId, depositEur }: Props) {
               </div>
             </div>
             <div>
-              <span className="text-gray-400">Stripe iznos</span>
+              <span className="text-gray-400">Iznos transakcije</span>
               <div className="font-semibold text-gray-800 mt-0.5">
                 {centsToEur(record.amount).toFixed(2)} {record.currency.toUpperCase()}
               </div>
             </div>
           </div>
 
-          {/* Stripe ID */}
+          {/* Worldline ID */}
           <div className="text-xs">
-            <span className="text-gray-400">Stripe PI ID</span>
+            <span className="text-gray-400">Worldline ID</span>
             <div className="font-mono text-gray-700 mt-0.5 truncate text-xs">
-              {record.stripe_payment_intent_id}
+              {record.provider_payment_id}
             </div>
           </div>
 

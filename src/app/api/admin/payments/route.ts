@@ -1,6 +1,4 @@
-// New — Stripe 4. Admin payment intents list.
 // GET /api/admin/payments?status=...&from=YYYY-MM-DD&to=YYYY-MM-DD
-// Returns payment_intents with embedded booking guest info.
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
@@ -21,7 +19,7 @@ export async function GET(request: NextRequest) {
   let query = supabase
     .from('payment_intents')
     .select(
-      `id, stripe_payment_intent_id, amount, currency, status, metadata, created_at, updated_at,
+      `id, provider_payment_id, amount, currency, status, metadata, created_at, updated_at,
        booking_id,
        booking:bookings(
          id, guest_name, guest_email, room_slug, check_in, check_out,

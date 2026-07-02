@@ -137,6 +137,21 @@
     "stillLooking": "Still looking?",
     "askQuestion": "Ask a question",
     "answerHint": "We can answer most questions right away",
+    "askModal": {
+      "title": "Ask a question",
+      "aboutProperty": "About the property: {siteName}",
+      "emailLabel": "Your email *",
+      "emailPlaceholder": "e.g. name@example.com",
+      "questionLabel": "Your question *",
+      "questionPlaceholder": "e.g. do you offer room service?",
+      "charsRemaining": "{count} characters remaining",
+      "submit": "Send question",
+      "submitting": "Sending…",
+      "close": "Close",
+      "successTitle": "Question sent",
+      "successMessage": "Thank you! We will reply to your email as soon as possible.",
+      "errorGeneric": "Could not send your question. Please try again."
+    },
     "qualityTitle": "What guests value most",
     "qualityDesc": "Based on guest reviews, visitors especially highlight the clean and tidy accommodation, the quiet location in central Daruvar, and the hosts' hospitality. Below are answers to the most common questions.",
     "faq": {

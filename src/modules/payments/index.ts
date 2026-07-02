@@ -1,8 +1,14 @@
-export { getStripeClient, getStripePublishableKey, getStripeWebhookSecret } from './stripe.client';
+export {
+  getWorldlineClient,
+  getWorldlineMerchantId,
+  getWorldlineWebhooksHelper,
+} from './worldline.client';
 export {
   createPaymentIntentRecord,
+  getPaymentIntentByProviderId,
   getPaymentIntentByStripeId,
   getPaymentIntentByBookingId,
+  getPaymentIntentByHostedCheckoutId,
   getPaymentIntentByCheckoutSessionId,
   updatePaymentIntentStatus,
   createTransactionRecord,
@@ -16,9 +22,11 @@ export {
   createPaymentIntent,
   createCheckoutSession,
   getPaymentStatus,
-  handleWebhookEvent,
+  syncHostedCheckoutStatus,
+  handleWorldlineWebhookEvent,
   issueRefund,
   reconcilePayments,
+  mapWorldlinePaymentStatus,
 } from './payment.service';
 export type { RefundInput, RefundResult, ReconcileResult } from './payment.service';
 export type {

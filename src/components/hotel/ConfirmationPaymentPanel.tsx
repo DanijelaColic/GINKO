@@ -2,7 +2,7 @@
 
 import { useState } from 'react';
 import { CreditCard, Building2, ChevronDown } from 'lucide-react';
-import StripePaymentForm from './StripePaymentForm';
+import PayDepositButton from './PayDepositButton';
 
 type PaymentInfo = {
   recipient: string;
@@ -123,11 +123,10 @@ export default function ConfirmationPaymentPanel({
           <div className="px-6 pb-6">
             {/* ── Tab: Kartica ── */}
             {tab === 'card' && (
-              <StripePaymentForm
+              <PayDepositButton
                 bookingId={bookingId}
                 token={token}
                 depositEur={depositEur}
-                confirmationUrl={confirmationUrl}
               />
             )}
 

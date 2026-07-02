@@ -137,6 +137,21 @@
     "stillLooking": "Još uvijek tražite?",
     "askQuestion": "Postavite pitanje",
     "answerHint": "Na većinu pitanja možemo odgovoriti odmah",
+    "askModal": {
+      "title": "Postavite pitanje",
+      "aboutProperty": "O objektu: {siteName}",
+      "emailLabel": "Vaša e-pošta *",
+      "emailPlaceholder": "npr. ime@primjer.com",
+      "questionLabel": "Vaše pitanje *",
+      "questionPlaceholder": "npr. nudite li poslugu u sobu?",
+      "charsRemaining": "preostalo {count} znakova",
+      "submit": "Pošalji pitanje",
+      "submitting": "Slanje…",
+      "close": "Zatvori",
+      "successTitle": "Pitanje je poslano",
+      "successMessage": "Hvala! Odgovorit ćemo vam na navedenu e-poštu čim prije.",
+      "errorGeneric": "Slanje nije uspjelo. Pokušajte ponovo."
+    },
     "qualityTitle": "Što gosti najviše cijene",
     "qualityDesc": "Na temelju recenzija gosti posebno ističu čist i uredan smještaj, mirnu lokaciju u centru Daruvara te ljubaznost domaćina. Ispod su odgovori na najčešća pitanja.",
     "faq": {

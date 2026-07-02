@@ -1,7 +1,7 @@
 'use client';
 
-// New — Stripe 2. Client-side "Pay deposit" button.
-// Calls /api/payments/checkout, then redirects to Stripe Checkout.
+// Client-side "Pay deposit" button.
+// Calls /api/payments/checkout, then redirects to Worldline Hosted Checkout.
 // Receives bookingId + token as props — both already present in the
 // confirmation page URL, so no extra auth surface is added.
 
@@ -44,7 +44,7 @@ export default function PayDepositButton({
         return;
       }
 
-      // Redirect to Stripe Checkout (full page navigation)
+      // Redirect to Worldline Hosted Checkout
       window.location.href = data.url;
     } catch {
       setError('Mrežna greška — pokušajte ponovo');
@@ -71,7 +71,7 @@ export default function PayDepositButton({
         {loading ? (
           <>
             <Loader2 size={18} className="animate-spin" />
-            Preusmjeravanje na Stripe...
+            Preusmjeravanje na plaćanje...
           </>
         ) : (
           <>

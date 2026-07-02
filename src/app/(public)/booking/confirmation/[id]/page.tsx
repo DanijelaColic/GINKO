@@ -11,15 +11,29 @@ import BookingStepsBar from '@/components/hotel/BookingStepsBar';
 import BookingSummaryCard from '@/components/hotel/BookingSummaryCard';
 import ConfirmationPaymentPanel from '@/components/hotel/ConfirmationPaymentPanel';
 import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
+import { syncHostedCheckoutStatus } from '@/modules/payments/payment.service';
 
 type Props = {
   params: Promise<{ id: string }>;
-  searchParams: Promise<{ token?: string; payment?: string; session_id?: string }>;
+  searchParams: Promise<{
+    token?: string;
+    payment?: string;
+    hostedCheckoutId?: string;
+  }>;
 };
 
 export default async function BookingConfirmationPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const { token = '', payment } = await searchParams;
+  const { token = '', payment, hostedCheckoutId } = await searchParams;
+
+  // Sync Worldline status when guest returns from Hosted Checkout
+  if (hostedCheckoutId) {
+    try {
+      await syncHostedCheckoutStatus(hostedCheckoutId);
+    } catch (err) {
+      console.error('[confirmation] syncHostedCheckoutStatus:', err);
+    }
+  }
 
   if (!id || !token) notFound();
 
