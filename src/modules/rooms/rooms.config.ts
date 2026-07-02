@@ -99,16 +99,15 @@ export const rooms: Room[] = [
       '/images/rooms/ginko-4/01-cover.jpg',
     ],
   },
-  // NOTE: capacity was 2 in original — updated to 3 to match spec (extra bed available)
   {
     slug: 'ginko-5',
     accommodationType: 'soba',
     name: 'Ginko 5',
     tagline: 'Elegantna soba za savršen odmor u centru grada.',
     description:
-      'Dobrodošli u Ginko 5, vaš savršeni boravak u kulturnom srcu Hrvatske. Smještena na Ulici Tomaša Garika Masaryka 1 u Daruvaru, ova elegantna soba nudi ugodan i autentičan okus hrvatskog načina života. Privatni, potpuno namješteni prostor pažljivo je dizajniran za smještaj do dvoje gostiju, no prostrani raspored s lakoćom prima i treću osobu. Terasa, sauna i potpuna privatnost dostupni su svim gostima. Kućni ljubimci su dobrodošli na upit.',
-    capacity: 3,
-    capacityNote: 'do 3 osobe',
+      'Dobrodošli u Ginko 5, vaš savršeni boravak u kulturnom srcu Hrvatske. Smještena na Ulici Tomaša Garika Masaryka 1 u Daruvaru, ova elegantna soba nudi ugodan i autentičan okus hrvatskog načina života. Privatni, potpuno namješteni prostor pažljivo je dizajniran za udoban smještaj do dvoje gostiju. Terasa, sauna i potpuna privatnost dostupni su svim gostima. Kućni ljubimci su dobrodošli na upit.',
+    capacity: 2,
+    capacityNote: '2 osobe',
     size: 20,
     beds: '1 bračni krevet',
     view: false,
@@ -116,7 +115,7 @@ export const rooms: Room[] = [
     floors: 1,
     price: 60,
     fullyBooked: false,
-    extraBedAvailable: true,
+    extraBedAvailable: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Sauna', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
     images: [
       '/images/rooms/ginko-5/01-cover.jpg',
@@ -231,7 +230,7 @@ export const roomTranslations: Record<
     'ginko-5': {
       tagline: 'Elegantna soba za savršen odmor u centru grada.',
       description: rooms[4].description,
-      capacityNote: 'do 3 osobe',
+      capacityNote: '2 osobe',
       beds: '1 bračni krevet',
       amenities: rooms[4].amenities,
     },
@@ -290,7 +289,7 @@ export const roomTranslations: Record<
     'ginko-5': {
       tagline: 'Elegant room for a perfect city-centre stay.',
       description: rooms[4].description,
-      capacityNote: 'up to 3 guests',
+      capacityNote: '2 guests',
       beds: '1 double bed',
       amenities: ['WiFi', 'LCD TV', 'SAT TV', 'Air conditioning', 'Sauna', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen'],
     },
@@ -342,7 +341,7 @@ export const roomTranslations: Record<
     'ginko-5': {
       tagline: 'Elegantes Zimmer für einen perfekten Stadtaufenthalt.',
       description: rooms[4].description,
-      capacityNote: 'bis 3 Gäste',
+      capacityNote: '2 Gäste',
       beds: '1 Doppelbett',
       amenities: ['WLAN', 'LCD TV', 'SAT TV', 'Klimaanlage', 'Sauna', 'Terrasse', 'Parkplatz', 'Heizung', 'Handtücher', 'Bettwäsche'],
     },

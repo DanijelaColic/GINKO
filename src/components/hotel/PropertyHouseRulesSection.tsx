@@ -9,6 +9,7 @@ import {
   CreditCard,
   CigaretteOff,
   PartyPopper,
+  VolumeX,
 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import {
@@ -26,6 +27,7 @@ const RULE_ICONS: Record<string, ElementType> = {
   pets: PawPrint,
   payment: CreditCard,
   smoking: CigaretteOff,
+  quiet: VolumeX,
   parties: PartyPopper,
 };
 
@@ -115,7 +117,6 @@ export default function PropertyHouseRulesSection({ embedded = false }: Props) {
           <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-text">
             {HOUSE_RULES_COPY.title}
           </h3>
-          <p className="text-sm text-muted mt-1.5 max-w-2xl">{HOUSE_RULES_COPY.subtitle}</p>
         </div>
         <a
           href="#raspolozivost"

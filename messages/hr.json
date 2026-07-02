@@ -137,12 +137,12 @@
     "qualityDesc": "Na temelju recenzija gosti posebno ističu čist i uredan smještaj, mirnu lokaciju u centru Daruvara te ljubaznost domaćina. Ispod su odgovori na najčešća pitanja.",
     "faq": {
       "parking": {
-        "q": "Nudi li objekt besplatno parkiralište?",
-        "a": "Da, svi gosti imaju besplatan pristup privatnom parkiralištu uz objekt."
+        "q": "Je li parkiralište osigurano i plaća li se?",
+        "a": "Da, svim našim gostima osiguran je besplatan privatan parking odmah uz objekt."
       },
       "breakfast": {
-        "q": "Poslužuje li se u objektu doručak?",
-        "a": "Doručak nije uključen u cijenu smještaja. U blizini se nalaze kafići i restorani s jutarnjom ponudom."
+        "q": "Nudite li doručak?",
+        "a": "Da, u sklopu objekta imamo novouređeni prostor u kojem poslužujemo svjež i bogat doručak za naše goste. Doručak se naručuje pri rezervaciji."
       },
       "wifi": {
         "q": "Je li Wi-Fi besplatan?",
@@ -154,19 +154,23 @@
       },
       "attractions": {
         "q": "Koje su atrakcije u blizini?",
-        "a": "U neposrednoj blizini su park dvorca Janković, Daruvarske toplice, crkva Sv. Tri kralja i centar grada."
+        "a": "U neposrednoj blizini su park dvorca Janković, Daruvarske toplice, crkva Sv. Trojstva i centar grada."
       },
       "pets": {
         "q": "Mogu li doći s kućnim ljubimcima?",
-        "a": "Kućni ljubimci nisu dozvoljeni u objektu."
+        "a": "Da, kućni ljubimci su dobrodošli uz prethodnu najavu prilikom rezervacije. Mogući su dodatni troškovi čišćenja."
       },
       "checkin": {
-        "q": "Koje su radno vrijeme check-in i check-out?",
-        "a": "Check-in je od 14:00 do 23:00, a check-out od 09:00 do 11:00. Po dogovoru možemo prilagoditi vrijeme dolaska."
+        "q": "Kako funkcionira prijava ako stignemo kasno?",
+        "a": "Naš sustav prijave je vrlo fleksibilan. Prije dolaska dobit ćete detaljne i jasne upute za samostalan ulazak i preuzimanje ključeva ili koda, a domaćini su uvijek dostupni za brzu komunikaciju."
+      },
+      "checkinTimes": {
+        "q": "Koje su sati prijave i odjave?",
+        "a": "Prijava je od 14:00 do 22:00 sata, a odjava do 10:00 sata."
       },
       "wellness": {
         "q": "Ima li objekt wellness (sauna, jacuzzi)?",
-        "a": "Da, gosti mogu koristiti wellness zonu sa saunom i jacuzzijem."
+        "a": "Da. Pristup wellness zoni sa saunom i jacuzzijem imaju isključivo gosti koji rezerviraju wellness apartman."
       },
       "families": {
         "q": "Nudite li sobe za obitelji?",
@@ -174,7 +178,7 @@
       },
       "booking": {
         "q": "Kako mogu rezervirati sobu?",
-        "a": "Rezervaciju možete poslati putem obrasca na stranici Rezervacija ili nas kontaktirati e-poštom i telefonom."
+        "a": "Rezervaciju možete poslati putem <bookingLink>obrasca za rezervaciju</bookingLink> ili nas kontaktirati e-poštom i telefonom."
       }
     }
   },

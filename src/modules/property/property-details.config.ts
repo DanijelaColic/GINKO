@@ -21,22 +21,14 @@ export const SURROUNDINGS = {
   restaurants: [
     { label: 'Fast food · Black & White', distance: '100 m' },
     { label: 'Kafić · Špica', distance: '100 m' },
-    { label: 'Restoran · Domino Food', distance: '150 m' },
-    { label: 'Kafić · Caffe bar Masaryk', distance: '200 m' },
     { label: 'Kavana · Queen', distance: '200 m' },
     { label: 'Restoran · Terasa', distance: '350 m' },
-    { label: 'Restoran · Stari grad', distance: '400 m' },
-    { label: 'Kafić · Central', distance: '500 m' },
   ],
   transport: [
     { label: 'Vlak · Daruvar', distance: '500 m' },
     { label: 'Autobusna stanica · Daruvar', distance: '500 m' },
   ],
-  airports: [
-    { label: 'Zračna luka Zagreb', distance: '120 km' },
-    { label: 'Zračna luka Osijek', distance: '85 km' },
-    { label: 'Zračna luka Ljubljana', distance: '210 km' },
-  ],
+  airports: [{ label: 'Zračna luka Zagreb', distance: '120 km' }],
 } as const satisfies Record<string, readonly SurroundingItem[]>;
 
 export const POPULAR_FACILITIES = [
@@ -109,11 +101,8 @@ export const FACILITY_GROUPS: FacilityGroup[] = [
     column: 2,
     type: 'list',
     items: [
-      'Hladnjak',
-      'Ploča za kuhanje',
-      'Pribor za jelo',
-      'Čajna kuhinja',
-      'Kuhinjski pribor',
+      'Apartman ima potpuno opremljenu kuhinju.',
+      'Doručak se poslužuje u prostoriji za buffet doručak.',
     ],
   },
   {
@@ -218,8 +207,6 @@ export type HouseRuleItem = {
 
 export const HOUSE_RULES_COPY = {
   title: 'Kućni red',
-  subtitle:
-    'Objekt Ginko Boutique Rooms & Wellness prima posebne zahtjeve — dodajte zahtjev u sljedećem koraku!',
   showAvailability: 'Prikaži raspoloživost',
 } as const;
 
@@ -228,14 +215,14 @@ export const HOUSE_RULES: HouseRuleItem[] = [
     id: 'checkin',
     title: 'Prijava',
     paragraphs: [
-      'Od 14:00 do 22:00',
-      'Molimo da unaprijed obavijestite objekt o vremenu dolaska.',
+      'Od 14:00 do 22:00 sata.',
+      'Moguća je fleksibilna ili samostalna prijava uz jasne upute domaćina.',
     ],
   },
   {
     id: 'checkout',
     title: 'Odjava',
-    paragraphs: ['Od 05:00 do 10:00'],
+    paragraphs: ['Do 10:00 sati.'],
   },
   {
     id: 'cancellation',
@@ -262,7 +249,7 @@ export const HOUSE_RULES: HouseRuleItem[] = [
         title: 'Pravila o dječjim krevetima i pomoćnim ležajevima',
         paragraphs: [
           'Dječji krevetić (na upit, ovisno o raspoloživosti): 20 €/noć.',
-          'Pomoćni ležaj (dostupan u sobama Ginko 2, 3, 4, 5 i wellness apartmanu): 20 €/noć.',
+          'Pomoćni ležaj (dostupan u sobama Ginko 2, 3, 4 i wellness apartmanu): 20 €/noć.',
           'Dijete do 2 godine koje spava s roditeljima u bračnom krevetu ne naplaćuje se.',
         ],
         highlight: {
@@ -282,8 +269,8 @@ export const HOUSE_RULES: HouseRuleItem[] = [
     id: 'pets',
     title: 'Kućni ljubimci',
     paragraphs: [
-      'U većini soba kućni ljubimci su dobrodošli na upit. Moguća je dodatna naknada.',
-      'U sobi Ginko SPA 2 kućni ljubimci nisu dozvoljeni.',
+      'Boravak kućnih ljubimaca dopušten je uz prethodnu najavu prilikom rezervacije.',
+      'Mogući su dodatni troškovi čišćenja.',
     ],
   },
   {
@@ -296,8 +283,16 @@ export const HOUSE_RULES: HouseRuleItem[] = [
   },
   {
     id: 'smoking',
-    title: 'Za pušače',
-    paragraphs: ['Pušenje nije dozvoljeno'],
+    title: 'Pušenje',
+    paragraphs: [
+      'Pušenje nije dopušteno unutar soba i apartmana.',
+      'Dopušteno je isključivo na otvorenim terasama i u dvorištu.',
+    ],
+  },
+  {
+    id: 'quiet',
+    title: 'Kućni red i mir',
+    paragraphs: ['Gosti ne smiju stvarati buku između 23:00 i 07:00 sata.'],
   },
   {
     id: 'parties',

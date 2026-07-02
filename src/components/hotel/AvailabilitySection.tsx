@@ -231,7 +231,7 @@ export default function AvailabilitySection({ rooms, labels }: Props) {
   const availableRooms = rooms.filter((r) => {
     if (typeFilter !== 'all' && r.accommodationType !== typeFilter) return false;
     if (r.fullyBooked) return false;
-    if (r.capacity < totalGuests) return false;
+    if (searched && r.capacity < totalGuests) return false;
     if (searched && statuses[r.slug]?.available === false) return false;
     return true;
   });

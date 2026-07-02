@@ -3,12 +3,15 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { MessageCircle, ChevronRight } from 'lucide-react';
+import { Link } from '@/i18n/navigation';
 import { CONTACT_EMAIL, QUESTIONS_SECTION_ID } from '@/modules/booking/booking.config';
 
 const FAQ_COL_1 = ['parking', 'breakfast', 'wifi', 'therms', 'attractions'] as const;
-const FAQ_COL_2 = ['pets', 'checkin', 'wellness', 'families', 'booking'] as const;
+const FAQ_COL_2 = ['pets', 'checkin', 'checkinTimes', 'wellness', 'families', 'booking'] as const;
 
 type FaqId = (typeof FAQ_COL_1)[number] | (typeof FAQ_COL_2)[number];
+
+const RICH_ANSWER_IDS = new Set<FaqId>(['booking']);
 
 function FaqColumn({
   ids,
@@ -48,7 +51,22 @@ function FaqColumn({
             </button>
             {isOpen && (
               <div className="px-4 pb-4 pl-11">
-                <p className="text-sm text-muted leading-relaxed">{t(`faq.${id}.a`)}</p>
+                {RICH_ANSWER_IDS.has(id) ? (
+                  <p className="text-sm text-muted leading-relaxed">
+                    {t.rich(`faq.${id}.a`, {
+                      bookingLink: (chunks) => (
+                        <Link
+                          href="/booking"
+                          className="text-primary hover:text-primary-dark underline underline-offset-2"
+                        >
+                          {chunks}
+                        </Link>
+                      ),
+                    })}
+                  </p>
+                ) : (
+                  <p className="text-sm text-muted leading-relaxed">{t(`faq.${id}.a`)}</p>
+                )}
               </div>
             )}
           </div>

@@ -77,18 +77,18 @@ export const PROPERTY_SUBNAV_SECTION_IDS = [
   OVERVIEW_SECTION_ID,
   AVAILABILITY_SECTION_ID,
   REVIEWS_SECTION_ID,
-  QUESTIONS_SECTION_ID,
   SURROUNDINGS_SECTION_ID,
   FACILITIES_SECTION_ID,
+  QUESTIONS_SECTION_ID,
 ] as const;
 
 export const PROPERTY_NAV_ITEMS = [
   { key: 'overview', id: OVERVIEW_SECTION_ID },
   { key: 'availability', id: AVAILABILITY_SECTION_ID },
   { key: 'reviews', id: REVIEWS_SECTION_ID },
-  { key: 'questions', id: QUESTIONS_SECTION_ID },
   { key: 'surroundings', id: SURROUNDINGS_SECTION_ID },
   { key: 'facilities', id: FACILITIES_SECTION_ID },
+  { key: 'questions', id: QUESTIONS_SECTION_ID },
 ] as const;
 
 /** Desktop navbar — samo ključne sekcije; mobilni drawer koristi PROPERTY_NAV_ITEMS */

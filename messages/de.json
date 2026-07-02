@@ -137,12 +137,12 @@
     "qualityDesc": "Laut Gästebewertungen heben Besucher besonders den sauberen und gepflegten Aufenthalt, die ruhige Lage im Zentrum von Daruvar und die Gastfreundschaft der Gastgeber hervor. Unten finden Sie Antworten auf die häufigsten Fragen.",
     "faq": {
       "parking": {
-        "q": "Bietet die Unterkunft kostenlose Parkplätze?",
-        "a": "Ja, alle Gäste haben kostenlosen Zugang zum privaten Parkplatz neben dem Haus."
+        "q": "Ist der Parkplatz gesichert und kostenpflichtig?",
+        "a": "Ja, allen unseren Gästen steht ein kostenloser privater Parkplatz direkt am Haus zur Verfügung."
       },
       "breakfast": {
-        "q": "Wird Frühstück angeboten?",
-        "a": "Frühstück ist im Zimmerpreis nicht enthalten. Cafés und Restaurants mit Morgenangebot sind in der Nähe."
+        "q": "Bieten Sie Frühstück an?",
+        "a": "Ja, im Haus haben wir einen neu renovierten Bereich, in dem wir unseren Gästen ein frisches und reichhaltiges Frühstück servieren. Frühstück kann bei der Buchung hinzugebucht werden."
       },
       "wifi": {
         "q": "Ist WLAN kostenlos?",
@@ -154,19 +154,23 @@
       },
       "attractions": {
         "q": "Welche Sehenswürdigkeiten sind in der Nähe?",
-        "a": "In unmittelbarer Nähe befinden sich der Janković-Park, die Daruvarer Thermen, die Kirche der Heiligen Drei Könige und das Stadtzentrum."
+        "a": "In unmittelbarer Nähe befinden sich der Janković-Park, die Daruvarer Thermen, die Kirche der Heiligen Dreifaltigkeit und das Stadtzentrum."
       },
       "pets": {
         "q": "Sind Haustiere erlaubt?",
-        "a": "Haustiere sind in der Unterkunft nicht gestattet."
+        "a": "Ja, Haustiere sind nach vorheriger Anmeldung bei der Buchung willkommen. Zusätzliche Reinigungskosten können anfallen."
       },
       "checkin": {
+        "q": "Wie funktioniert der Check-in bei später Ankunft?",
+        "a": "Unser Check-in ist sehr flexibel. Vor der Ankunft erhalten Sie detaillierte Anweisungen für den Selbst-Check-in und die Schlüssel- oder Codeübergabe, und die Gastgeber sind jederzeit für eine schnelle Kommunikation erreichbar."
+      },
+      "checkinTimes": {
         "q": "Wann sind Check-in und Check-out?",
-        "a": "Check-in ist von 14:00 bis 23:00 Uhr, Check-out von 09:00 bis 11:00 Uhr. Ankunftszeiten können nach Absprache angepasst werden."
+        "a": "Check-in ist von 14:00 bis 22:00 Uhr, Check-out bis 10:00 Uhr."
       },
       "wellness": {
         "q": "Gibt es Wellness (Sauna, Jacuzzi)?",
-        "a": "Ja, Gäste können den Wellnessbereich mit Sauna und Jacuzzi nutzen."
+        "a": "Ja. Zugang zum Wellnessbereich mit Sauna und Jacuzzi haben ausschließlich Gäste, die das Wellness-Apartment buchen."
       },
       "families": {
         "q": "Gibt es Familienzimmer?",
@@ -174,7 +178,7 @@
       },
       "booking": {
         "q": "Wie kann ich ein Zimmer buchen?",
-        "a": "Sie können eine Anfrage über das Buchungsformular senden oder uns per E-Mail und Telefon kontaktieren."
+        "a": "Sie können eine Anfrage über unser <bookingLink>Buchungsformular</bookingLink> senden oder uns per E-Mail und Telefon kontaktieren."
       }
     }
   },

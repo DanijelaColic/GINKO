@@ -106,6 +106,13 @@ async function fetchRoomFromDb(slug: string, locale: RoomLocale): Promise<Room |
   }
 }
 
+function sortRoomsByStaticOrder(rooms: Room[]): Room[] {
+  const order = new Map(staticRooms.map((room, index) => [room.slug, index]));
+  return [...rooms].sort(
+    (a, b) => (order.get(a.slug) ?? Number.MAX_SAFE_INTEGER) - (order.get(b.slug) ?? Number.MAX_SAFE_INTEGER),
+  );
+}
+
 // ── Public interface ────────────────────────────────────────────────────────
 
 export async function getRoom(slug: string, locale: RoomLocale = 'hr'): Promise<Room | undefined> {
@@ -121,7 +128,12 @@ export async function getRoom(slug: string, locale: RoomLocale = 'hr'): Promise<
 export async function getRooms(locale: RoomLocale = 'hr'): Promise<Room[]> {
   const dbRooms = await fetchRoomsFromDb(locale);
   if (dbRooms && dbRooms.length > 0) {
-    return dbRooms.map((room) => applyLocaleOverlay(room, locale));
+    const dbSlugs = new Set(dbRooms.map((room) => room.slug));
+    const missingStatic = staticRooms
+      .filter((room) => !dbSlugs.has(room.slug))
+      .map((room) => applyLocaleOverlay(room, locale));
+    const merged = [...dbRooms, ...missingStatic].map((room) => applyLocaleOverlay(room, locale));
+    return sortRoomsByStaticOrder(merged);
   }
 
   // Fallback to static config when DB is empty or unavailable

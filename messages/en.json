@@ -137,12 +137,12 @@
     "qualityDesc": "Based on guest reviews, visitors especially highlight the clean and tidy accommodation, the quiet location in central Daruvar, and the hosts' hospitality. Below are answers to the most common questions.",
     "faq": {
       "parking": {
-        "q": "Does the property offer free parking?",
-        "a": "Yes, all guests have free access to private parking next to the property."
+        "q": "Is parking secure and is there a charge?",
+        "a": "Yes, all our guests have free private parking right next to the property."
       },
       "breakfast": {
-        "q": "Is breakfast served at the property?",
-        "a": "Breakfast is not included in the room rate. Cafés and restaurants with morning menus are nearby."
+        "q": "Do you serve breakfast?",
+        "a": "Yes, we have a newly renovated dining area on site where we serve a fresh, hearty breakfast for our guests. Breakfast can be added when booking."
       },
       "wifi": {
         "q": "Is Wi-Fi free?",
@@ -154,19 +154,23 @@
       },
       "attractions": {
         "q": "What attractions are nearby?",
-        "a": "Nearby you'll find Janković Castle park, Daruvar thermal baths, the Church of the Holy Three Kings and the city centre."
+        "a": "Nearby you'll find Janković Castle park, Daruvar thermal baths, the Church of the Holy Trinity and the city centre."
       },
       "pets": {
         "q": "Can I bring pets?",
-        "a": "Pets are not allowed at the property."
+        "a": "Yes, pets are welcome with prior notice when booking. Additional cleaning fees may apply."
       },
       "checkin": {
+        "q": "How does check-in work if we arrive late?",
+        "a": "Our check-in process is very flexible. Before arrival you will receive clear instructions for self check-in and key or code collection, and the hosts are always available for quick communication."
+      },
+      "checkinTimes": {
         "q": "What are the check-in and check-out times?",
-        "a": "Check-in is from 14:00 to 23:00, and check-out from 09:00 to 11:00. Arrival times can be arranged by agreement."
+        "a": "Check-in is from 14:00 to 22:00, and check-out is by 10:00."
       },
       "wellness": {
         "q": "Does the property have wellness (sauna, jacuzzi)?",
-        "a": "Yes, guests can use the wellness area with sauna and jacuzzi."
+        "a": "Yes. Access to the wellness area with sauna and jacuzzi is exclusively for guests who book the wellness apartment."
       },
       "families": {
         "q": "Do you offer family rooms?",
@@ -174,7 +178,7 @@
       },
       "booking": {
         "q": "How can I book a room?",
-        "a": "You can submit a booking request via the Booking page form or contact us by email and phone."
+        "a": "You can submit a booking request via our <bookingLink>booking form</bookingLink> or contact us by email and phone."
       }
     }
   },
