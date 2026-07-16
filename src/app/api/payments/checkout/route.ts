@@ -1,7 +1,7 @@
 // POST /api/payments/checkout
 //
 // Body: { bookingId: string; token: string; paymentType?: 'deposit' }
-// Returns: { url: string } — Worldline Hosted Checkout redirect URL.
+// Returns: { url: string } — Saferpay Payment Page redirect URL.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
@@ -73,9 +73,13 @@ export async function POST(request: NextRequest) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[POST /api/payments/checkout]', message);
 
-    if (message.includes('WORLDLINE_') || message.includes('Worldline')) {
+    if (
+      message.includes('SAFERPAY_') ||
+      message.includes('Saferpay') ||
+      message.includes('Nedostaju Saferpay')
+    ) {
       return NextResponse.json(
-        { error: 'Worldline nije konfiguriran. Provjeri env varijable u .env.local.' },
+        { error: 'Saferpay nije konfiguriran. Provjeri env varijable u .env.local.' },
         { status: 503 },
       );
     }

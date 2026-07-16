@@ -41,8 +41,12 @@ export async function POST(request: NextRequest) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[admin/payments/refund]', message);
 
-    if (message.includes('WORLDLINE_') || message.includes('Worldline')) {
-      return NextResponse.json({ error: 'Worldline nije konfiguriran' }, { status: 503 });
+    if (
+      message.includes('SAFERPAY_') ||
+      message.includes('Saferpay') ||
+      message.includes('Nedostaju Saferpay')
+    ) {
+      return NextResponse.json({ error: 'Saferpay nije konfiguriran' }, { status: 503 });
     }
     return NextResponse.json({ error: message }, { status: 422 });
   }

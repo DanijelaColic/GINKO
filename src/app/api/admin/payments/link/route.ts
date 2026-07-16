@@ -69,9 +69,13 @@ export async function POST(request: NextRequest) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[admin/payments/link]', message);
 
-    if (message.includes('WORLDLINE_') || message.includes('Worldline')) {
+    if (
+      message.includes('SAFERPAY_') ||
+      message.includes('Saferpay') ||
+      message.includes('Nedostaju Saferpay')
+    ) {
       return NextResponse.json(
-        { error: 'Worldline nije konfiguriran. Provjeri env varijable.' },
+        { error: 'Saferpay nije konfiguriran. Provjeri env varijable.' },
         { status: 503 },
       );
     }

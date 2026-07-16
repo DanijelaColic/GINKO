@@ -1,7 +1,7 @@
 'use client';
 
 // Client-side "Pay deposit" button.
-// Calls /api/payments/checkout, then redirects to Worldline Hosted Checkout.
+// Calls /api/payments/checkout, then redirects to Saferpay Payment Page.
 // Receives bookingId + token as props — both already present in the
 // confirmation page URL, so no extra auth surface is added.
 
@@ -44,7 +44,7 @@ export default function PayDepositButton({
         return;
       }
 
-      // Redirect to Worldline Hosted Checkout
+      // Redirect to Saferpay Payment Page
       window.location.href = data.url;
     } catch {
       setError('Mrežna greška — pokušajte ponovo');

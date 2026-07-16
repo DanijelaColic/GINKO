@@ -11,27 +11,31 @@ import BookingStepsBar from '@/components/hotel/BookingStepsBar';
 import BookingSummaryCard from '@/components/hotel/BookingSummaryCard';
 import ConfirmationPaymentPanel from '@/components/hotel/ConfirmationPaymentPanel';
 import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
-import { syncHostedCheckoutStatus } from '@/modules/payments/payment.service';
+import { syncSaferpayPayment } from '@/modules/payments/payment.service';
 
 type Props = {
   params: Promise<{ id: string }>;
   searchParams: Promise<{
     token?: string;
     payment?: string;
+    oid?: string;
+    /** @deprecated Worldline Direct return param */
     hostedCheckoutId?: string;
   }>;
 };
 
 export default async function BookingConfirmationPage({ params, searchParams }: Props) {
   const { id } = await params;
-  const { token = '', payment, hostedCheckoutId } = await searchParams;
+  const { token = '', payment, oid, hostedCheckoutId } = await searchParams;
 
-  // Sync Worldline status when guest returns from Hosted Checkout
-  if (hostedCheckoutId) {
+  // Sync Saferpay status when guest returns from Payment Page (Assert + Capture)
+  const orderId = oid ?? hostedCheckoutId;
+  let syncedStatus: string | null = null;
+  if (orderId) {
     try {
-      await syncHostedCheckoutStatus(hostedCheckoutId);
+      syncedStatus = await syncSaferpayPayment(orderId);
     } catch (err) {
-      console.error('[confirmation] syncHostedCheckoutStatus:', err);
+      console.error('[confirmation] syncSaferpayPayment:', err);
     }
   }
 
@@ -45,8 +49,15 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
 
   if (!data) notFound();
 
-  const paymentBanner =
-    payment === 'success'
+  const showSuccessBanner =
+    payment === 'success' ||
+    (payment === 'return' && syncedStatus === 'succeeded') ||
+    (payment === 'return' && syncedStatus === 'processing');
+  const showCancelledBanner =
+    payment === 'cancelled' ||
+    (payment === 'return' && syncedStatus === 'cancelled');
+
+  const paymentBanner = showSuccessBanner
       ? {
           bg: 'bg-green-50 border-green-200',
           text: 'text-green-800',
@@ -54,7 +65,7 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
           title: 'Plaćanje zaprimljeno',
           body: 'Vaše plaćanje se obrađuje. Rezervacija će biti potvrđena čim sredstva budu evidentirana. Potvrdu ćemo poslati na vašu e-mail adresu.',
         }
-      : payment === 'cancelled'
+      : showCancelledBanner
         ? {
             bg: 'bg-amber-50 border-amber-200',
             text: 'text-amber-800',

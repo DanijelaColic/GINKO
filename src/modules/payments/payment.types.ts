@@ -1,4 +1,4 @@
-// Payment foundation types — provider-agnostic (Worldline).
+// Payment foundation types — provider-agnostic (Saferpay).
 
 // ── Database row types ────────────────────────────────────────────
 

@@ -143,7 +143,7 @@ export default function BookingPaymentPanel({ bookingId, depositEur }: Props) {
     <div className="border-t border-gray-100 pt-4 mt-1">
       <div className="flex items-center justify-between mb-3">
         <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wide">
-          Worldline plaćanje
+          Saferpay plaćanje
         </h3>
         <button
           onClick={fetchPayment}
@@ -190,9 +190,9 @@ export default function BookingPaymentPanel({ bookingId, depositEur }: Props) {
             </div>
           </div>
 
-          {/* Worldline ID */}
+          {/* Saferpay ID */}
           <div className="text-xs">
-            <span className="text-gray-400">Worldline ID</span>
+            <span className="text-gray-400">Saferpay ID</span>
             <div className="font-mono text-gray-700 mt-0.5 truncate text-xs">
               {record.provider_payment_id}
             </div>

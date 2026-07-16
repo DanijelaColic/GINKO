@@ -108,9 +108,30 @@ export async function updatePaymentIntentStatus(
   if (error) throw error;
 }
 
+export async function getPaymentIntentByOrderId(
+  orderId: string,
+): Promise<PaymentIntent | null> {
+  const supabase = createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from('payment_intents')
+    .select('*')
+    .filter('metadata->>order_id', 'eq', orderId)
+    .order('created_at', { ascending: false })
+    .limit(1)
+    .single();
+
+  if (error?.code === 'PGRST116') return null;
+  if (error) return null;
+  return data as PaymentIntent;
+}
+
+/** @deprecated Prefer getPaymentIntentByOrderId (Saferpay) */
 export async function getPaymentIntentByHostedCheckoutId(
   hostedCheckoutId: string,
 ): Promise<PaymentIntent | null> {
+  const byOrder = await getPaymentIntentByOrderId(hostedCheckoutId);
+  if (byOrder) return byOrder;
+
   const byId = await getPaymentIntentByProviderId(hostedCheckoutId);
   if (byId) return byId;
 
@@ -127,7 +148,7 @@ export async function getPaymentIntentByHostedCheckoutId(
   return data as PaymentIntent;
 }
 
-/** @deprecated Use getPaymentIntentByHostedCheckoutId */
+/** @deprecated Use getPaymentIntentByOrderId */
 export const getPaymentIntentByCheckoutSessionId = getPaymentIntentByHostedCheckoutId;
 
 // ── PaymentTransaction ────────────────────────────────────────────

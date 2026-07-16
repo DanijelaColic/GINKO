@@ -1,13 +1,14 @@
 export {
-  getWorldlineClient,
-  getWorldlineMerchantId,
-  getWorldlineWebhooksHelper,
-} from './worldline.client';
+  getSaferpayConfig,
+  isSaferpayConfigured,
+  saferpayRequest,
+} from './saferpay.client';
 export {
   createPaymentIntentRecord,
   getPaymentIntentByProviderId,
   getPaymentIntentByStripeId,
   getPaymentIntentByBookingId,
+  getPaymentIntentByOrderId,
   getPaymentIntentByHostedCheckoutId,
   getPaymentIntentByCheckoutSessionId,
   updatePaymentIntentStatus,
@@ -22,7 +23,9 @@ export {
   createPaymentIntent,
   createCheckoutSession,
   getPaymentStatus,
+  syncSaferpayPayment,
   syncHostedCheckoutStatus,
+  handleSaferpayNotify,
   handleWorldlineWebhookEvent,
   issueRefund,
   reconcilePayments,

@@ -1,47 +1,46 @@
-# Follow-up mail klijentu — Worldline
+# Follow-up mail klijentu — Saferpay (Worldline)
 
-Kopiraj i prilagodi po potrebi. Naslov predloška: **Worldline — dodatne informacije za online plaćanje**
+Kopiraj i prilagodi. Naslov: **Saferpay — podaci za online plaćanje (test)**
 
 ---
 
 Poštovani,
 
-Hvala na suradnji oko pokretanja Worldline računa. U međuvremenu sam na web stranici dovršila tehničku integraciju za online kartično plaćanje — nakon što dobijemo testne podatke, potrebno je samo povezivanje i provjera.
+hvala na informaciji da koristite **Saferpay** (Worldline). Tehnička integracija na webu je spremna za povezivanje — trebaju nam samo pristupni podaci iz Saferpay Backofficea.
 
-Kako bi proces išao što brže, molim Vas da mi uz ranije navedene podatke (Merchant ID, API ključevi i webhook ključevi) javite i sljedeće:
+Linkovi koje ste poslali potvrđuju proizvod; za testiranje trebamo sljedeće korake:
 
-**1. Pristup Merchant Portalu**  
-Idealno je da jedna osoba s naše strane (ili Vi) ima pristup portalu tijekom testiranja — posebno za postavljanje webhooka i provjeru aktivnih načina plaćanja.
+### 1. Test Backoffice račun
+Ako još nemate test pristup, registrirajte se ovdje (besplatno):  
+https://test.saferpay.com/BO/SignUp?lang=en
 
-**2. Aktivacija kartica**  
-Molim potvrdite da su u testnom, a kasnije i produkcijskom okruženju aktivirani prihvat **Visa** i **Mastercard** u **EUR** valuti.
+Ako vam je Worldline već poslao **Customer ID**, **Terminal ID** i login za Backoffice — pošaljite nam to.
 
-**3. Webhook (obavijesti o plaćanjima)**  
-Nakon što dobijete pristup portalu, treba registrirati adresu:
+### 2. JSON API kredencijali (obavezno za web shop)
+U Saferpay Backofficeu:
+1. Prijavite se
+2. **Settings → JSON API basic Authentication**
+3. **Create new JSON API login**
+4. Spremiti **username** i **password** odmah (password se više ne prikazuje)
 
-`https://ginko-sobe.com/api/webhooks/worldline`
+### 3. Što nam treba (test okruženje)
 
-Webhook secret vrijedi samo kratko nakon generiranja — molim da ga odmah spremite i pošaljete nam zajedno s ostalim podacima.
+Molimo pošaljite:
 
-**4. Testno okruženje (preprod)**  
-Molim da eksplicitno zatražite **testno / sandbox** okruženje prije produkcije, kako bismo mogli proći cijeli tok rezervacije i plaćanja bez stvarnog terećenja kartice.
+| Podatak | Primjer / gdje |
+|--------|----------------|
+| **CustomerId** | npr. broj u Backofficeu |
+| **TerminalId** | eCommerce terminal (Settings → Terminals) |
+| **JSON API username** | iz koraka 2 |
+| **JSON API password** | iz koraka 2 |
+| Potvrda da su aktivni **Visa** i **Mastercard** u **EUR** | Settings → Terminals |
 
-**5. Kontakt osoba kod Worldlinea**  
-Ako imate kontakt account managera ili tehničke podrške, podijelite ga s nama — ubrzava rješavanje ako nešto zapne na njihovoj strani.
+### 4. Napomena
+Ne trebamo „Worldline Direct / PSPID / API Key ID“ — to je drugi proizvod. Za Saferpay vrijede samo gornji podaci.
 
----
+Nakon što stignu testni podaci, povežemo plaćanje, prođemo rezervaciju → depozit → potvrdu, pa prelazimo na live (produkcijske) kredencijale.
 
-**Podsjetnik — što nam treba za testiranje:**
-
-- Merchant ID (PSPID)  
-- API Key ID  
-- API Secret  
-- Webhook Key ID  
-- Webhook Secret  
-
-Nakon uspješnog testiranja prelazimo na produkcijske (live) podatke i omogućavamo stvarna online plaćanja gostima.
-
-Ako imate pitanja ili trebate pomoć pri postavljanju u portalu, slobodno se javite.
+Ako trebate pomoć pri kreiranju JSON API logina u Backofficeu, javite se.
 
 Srdačan pozdrav,  
 Danijela

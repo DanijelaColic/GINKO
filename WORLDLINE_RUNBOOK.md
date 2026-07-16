@@ -1,94 +1,75 @@
-# Worldline Runbook — Ginko Sobe
+# Saferpay Runbook — Ginko Sobe
 
-## Environment setup
+## Environment
 
 ```dotenv
-# .env.local
-WORLDLINE_MERCHANT_ID=your-pspid
-WORLDLINE_API_KEY_ID=...
-WORLDLINE_API_SECRET=...
-WORLDLINE_API_HOST=payment.preprod.direct.worldline-solutions.com   # test
-WORLDLINE_WEBHOOK_KEY_ID=...
-WORLDLINE_WEBHOOK_SECRET=...
+SAFERPAY_CUSTOMER_ID=
+SAFERPAY_TERMINAL_ID=
+SAFERPAY_API_USERNAME=
+SAFERPAY_API_PASSWORD=
+SAFERPAY_BASE_URL=https://test.saferpay.com/api
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
 ```
 
-Za produkciju zamijeni `WORLDLINE_API_HOST` s `payment.direct.worldline-solutions.com` i koristi live API ključeve.
+Produkcija: `SAFERPAY_BASE_URL=https://www.saferpay.com/api` + live kredencijali.
+
+Dokumentacija: https://saferpay.github.io/jsonapi/  
+Payment Page guide: https://docs.saferpay.com/home/integration-guide/licences-and-interfaces/payment-page  
+Test signup: https://test.saferpay.com/BO/SignUp?lang=en
 
 ---
 
-## 1. Webhook setup
+## 1. Notify (server-to-server)
 
-### Merchant Portal
+Notify URL se šalje u `PaymentPage/Initialize` (Notification.SuccessNotifyUrl / FailNotifyUrl):
 
-1. Configuration → Webhooks → Generate webhooks keys (spremi secret odmah — vidljiv 60 s)
-2. Add endpoint: `https://your-domain/api/webhooks/worldline`
-3. Odaberi evente: `payment.*`, `refund.*`
+`https://your-domain/api/webhooks/saferpay?oid=<orderId>&result=success|fail`
 
-### Endpoint verification (GET)
+Saferpay zove **GET** bez Tokena — identifikacija je naš `oid`.  
+Handler radi `PaymentPage/Assert` → po potrebi `Transaction/Capture` → potvrda rezervacije.
 
-Worldline šalje GET s headerom `X-GCS-Webhooks-Endpoint-Verification`. Endpoint vraća istu vrijednost kao plain text.
-
-### Test webhook
-
-Merchant Portal → Webhooks → Actions → Test
+Odgovor mora biti **200** (Saferpay inače retrya).
 
 ---
 
-## 2. Guest payment flow
+## 2. Guest flow
 
 ```
 Guest na /booking/confirmation/[id]
-  → klik "Plati depozit"
+  → „Plati depozit”
   → POST /api/payments/checkout
-  → redirect na Worldline Hosted Checkout (hr-HR)
-  → guest plati karticom
-  → redirect na returnUrl (&payment=success&hostedCheckoutId=...)
-  → server: syncHostedCheckoutStatus(hostedCheckoutId)
-  → webhook (fallback): payment.captured / payment.paid
+  → PaymentPage/Initialize → RedirectUrl
+  → gost plati na Saferpay
+  → ReturnUrl: …&payment=return&oid=…
+  → syncSaferpayPayment(oid) = Assert + Capture
+  → (paralelno) SuccessNotifyUrl → isti sync
   → booking: confirmed + deposit_paid
 ```
 
 ---
 
-## 3. Refund Runbook
+## 3. Refund
 
-### Admin UI
+Admin: `/admin/bookings` → rezervacija → Povrat  
+API: `POST /api/admin/payments/refund` s `{ "paymentIntentId": "<uuid>" }`
 
-1. `/admin/bookings` → otvori rezervaciju → "Worldline plaćanje"
-2. Klik **Povrat** (samo kad `status = succeeded`)
-3. Ostavi prazno za puni povrat ili unesi djelomični iznos u EUR
-4. **Potvrdi** — čeka Worldline API odgovor
-
-### API (curl)
-
-```bash
-curl -X POST http://localhost:3000/api/admin/payments/refund \
-  -H "Content-Type: application/json" \
-  -H "Cookie: ginko_admin=<ADMIN_TOKEN>" \
-  -d '{"paymentIntentId": "<payment_intents.id UUID>"}'
-```
-
-Napomena: refund zahtijeva `worldline_payment_id` u metadata — automatski se postavlja nakon uspješnog plaćanja (sync ili webhook).
+Treba `saferpay_capture_id` u metadata (postavlja se nakon Assert/Capture).
 
 ---
 
 ## 4. Reconciliation
 
-Pokreće `syncHostedCheckoutStatus` za sve ambiguous zapise starije od 15 min.
+Admin `/admin/payments` → **Uskladi**  
+ili `POST /api/admin/payments/reconcile`
 
-- Admin: `/admin/payments` → **Uskladi**
-- API: `POST /api/admin/payments/reconcile` s `{ "olderThanMinutes": 15 }`
-
-Pokreni nakon webhook outagea ili ako gost javi "platio sam ali rezervacija je pending".
+Za ambiguous zapise ponovno zove Assert (ne koristiti kao polling u produkciji — samo recovery).
 
 ---
 
 ## 5. Production checklist
 
-- [ ] Live API Key + Secret u Merchant Portalu
-- [ ] `WORLDLINE_API_HOST=payment.direct.worldline-solutions.com`
-- [ ] Live webhook endpoint registriran (HTTPS obavezno)
-- [ ] Migracija `004_worldline_provider_columns.sql` primijenjena u Supabase
-- [ ] Test checkout s testnom karticom, zatim refund
-- [ ] Reconciliation cron svakih 30 min
+- [ ] Live JSON API kredencijali
+- [ ] `SAFERPAY_BASE_URL=https://www.saferpay.com/api`
+- [ ] Visa/Mastercard EUR na live terminalu
+- [ ] Test checkout + refund
+- [ ] Notify URL dostupan javno (HTTPS)

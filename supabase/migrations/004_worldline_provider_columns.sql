@@ -11,10 +11,10 @@ alter table webhook_events
   rename column stripe_event_id to provider_event_id;
 
 comment on column payment_intents.provider_payment_id is
-  'Worldline hostedCheckoutId (or legacy Stripe pi_/cs_ id)';
+  'Saferpay Payment Page Token (or legacy Worldline/Stripe id)';
 
 comment on column payment_transactions.provider_transaction_id is
-  'Worldline payment/refund id (or legacy Stripe charge/refund id)';
+  'Saferpay Transaction/Capture/Refund id (or legacy provider id)';
 
 comment on column webhook_events.provider_event_id is
-  'Worldline webhook event id (or legacy Stripe evt_ id)';
+  'Saferpay notify id (saferpay_<orderId>_<result>) or legacy provider event id';

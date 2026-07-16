@@ -1,22 +1,20 @@
-# Worldline — interni checklist (Ginko)
+# Saferpay — interni checklist (Ginko)
 
-Koristi ovaj dokument dok čekaš podatke od klijenta i nakon što stignu.
+Koristi dok čekaš podatke od klijenta i nakon što stignu.
+
+> PG: **Saferpay** (Worldline Hrvatska), ne Worldline Online Payments / Direct.
 
 ---
 
 ## Faza A — Prije podataka od klijenta
 
-- [ ] Primijenjena migracija `supabase/migrations/004_worldline_provider_columns.sql` u Supabase
-- [ ] Kod deployan na produkciju (bez Worldline env — booking + bankovni prijenos rade)
+- [ ] Migracija `003_payments.sql` (+ `004` ako treba rename kolona) u Supabase
+- [ ] Kod deployan (bez Saferpay env — booking + bankovni prijenos rade)
 - [ ] `NEXT_PUBLIC_SITE_URL` = `https://ginko-sobe.com` (bez trailing slash)
-- [ ] HTTPS radi na produkciji
-- [ ] Endpoint dostupan (ne smije biti 404): `https://ginko-sobe.com/api/webhooks/worldline`
-- [ ] Testiran booking flow bez kartice:
-  - [ ] Rezervacija → confirmation stranica
-  - [ ] Tab „Bankovni prijenos” (IBAN, referenca, iznos)
-  - [ ] Admin: pregled rezervacije, statusi
-- [ ] U Vercel/hostingu pripremljene prazne env varijable (vidi dolje)
-- [ ] Klijentu poslan follow-up mail (`WORLDLINE_KLIJENT_MAIL.md`)
+- [ ] HTTPS radi
+- [ ] Notify endpoint dostupan: `https://ginko-sobe.com/api/webhooks/saferpay`
+- [ ] Testiran booking flow bez kartice (IBAN, admin)
+- [ ] Klijentu poslan mail (`WORLDLINE_KLIJENT_MAIL.md` — Saferpay verzija)
 
 ---
 
@@ -25,68 +23,63 @@ Koristi ovaj dokument dok čekaš podatke od klijenta i nakon što stignu.
 Upis u `.env.local` / Vercel:
 
 ```dotenv
-WORLDLINE_MERCHANT_ID=
-WORLDLINE_API_KEY_ID=
-WORLDLINE_API_SECRET=
-WORLDLINE_API_HOST=payment.preprod.direct.worldline-solutions.com
-WORLDLINE_WEBHOOK_KEY_ID=
-WORLDLINE_WEBHOOK_SECRET=
+SAFERPAY_CUSTOMER_ID=
+SAFERPAY_TERMINAL_ID=
+SAFERPAY_API_USERNAME=
+SAFERPAY_API_PASSWORD=
+SAFERPAY_BASE_URL=https://test.saferpay.com/api
 ```
 
-### Merchant Portal (klijent ili ti s pristupom)
+### Saferpay Backoffice (test)
 
-- [ ] Aktivirane kartice: Visa, Mastercard (min.)
-- [ ] Valuta: EUR
-- [ ] Webhook endpoint: `https://ginko-sobe.com/api/webhooks/worldline`
-- [ ] Webhook eventi: `payment.*`, `refund.*`
-- [ ] Webhook test iz portala → 200 OK
+- [ ] CustomerId + TerminalId (eCommerce) poznati
+- [ ] JSON API Basic Authentication kreiran
+- [ ] Kartice: Visa, Mastercard (min.), valuta EUR
+- [ ] Test kartice iz Saferpay docs za sandbox
 
-### End-to-end test (preprod)
+### End-to-end test
 
 | # | Korak | OK? | Napomena |
 |---|-------|-----|----------|
-| 1 | Nova test rezervacija → „Plati depozit” | | Redirect na Worldline (hr-HR) |
+| 1 | Nova rezervacija → „Plati depozit” | | Redirect na Saferpay Payment Page |
 | 2 | Plaćanje test karticom | | |
-| 3 | Povratak na confirmation | | Banner „Plaćanje zaprimljeno” |
+| 3 | Povratak na confirmation (`?oid=…`) | | Banner + Assert/Capture |
 | 4 | `bookings.status` = confirmed | | |
 | 5 | `bookings.deposit_paid` = true | | |
 | 6 | Email potvrde gostu | | |
 | 7 | Admin → Povrat (refund) | | |
-| 8 | Prekid plaćanja (zatvori Worldline) | | Booking ostaje pending |
-| 9 | Admin → Uskladi (`/admin/payments`) | | |
+| 8 | Prekid plaćanja | | Booking ostaje pending |
+| 9 | Admin → Uskladi | | |
 
 ### Ako nešto ne radi
 
 | Simptom | Provjeri |
 |---------|----------|
-| 503 „Worldline nije konfiguriran” | Env varijable + redeploy |
-| Redirect ne radi | API Key / Secret / PSPID par (test s testom) |
-| Plaćeno, booking pending | Webhook + ručno Uskladi; `hostedCheckoutId` u URL-u |
-| Refund ne radi | `worldline_payment_id` u `payment_intents.metadata` |
+| 503 „Saferpay nije konfiguriran” | Env + redeploy |
+| AUTHENTICATION_FAILED | CustomerId + API user/pass isti račun |
+| Assert greška | Token / oid u URL-u; ne otvaraj RedirectUrl dvaput |
+| Refund ne radi | `saferpay_capture_id` u metadata — pokreni Uskladi |
 
 ---
 
-## Faza C — Go-live (produkcija)
+## Faza C — Go-live
 
-- [ ] Ugovor s Worldlineom potpisan, KYC gotov
-- [ ] Live API Key + Secret izdan
-- [ ] Live webhook ključevi
-- [ ] `WORLDLINE_API_HOST=payment.direct.worldline-solutions.com`
-- [ ] Live webhook endpoint registriran
-- [ ] Jedna mala stvarna transakcija + odmah refund
-- [ ] (Preporuka) Cron usklađivanja svakih 30 min: `POST /api/admin/payments/reconcile`
+- [ ] Live Backoffice + ugovor / KYC
+- [ ] Live CustomerId, TerminalId, JSON API login
+- [ ] `SAFERPAY_BASE_URL=https://www.saferpay.com/api`
+- [ ] Jedna mala stvarna transakcija + refund
+- [ ] (Preporuka) Cron usklađivanja: `POST /api/admin/payments/reconcile`
 
 ---
 
-## Env varijable — brza referenca
+## Env — brza referenca
 
 | Varijabla | Što je |
 |-----------|--------|
-| `WORLDLINE_MERCHANT_ID` | PSPID (merchant ID) |
-| `WORLDLINE_API_KEY_ID` | API Key ID (REST pozivi) |
-| `WORLDLINE_API_SECRET` | API Secret |
-| `WORLDLINE_API_HOST` | Test ili live host |
-| `WORLDLINE_WEBHOOK_KEY_ID` | Key ID za potpis webhooka |
-| `WORLDLINE_WEBHOOK_SECRET` | Secret za webhook (spremi odmah!) |
+| `SAFERPAY_CUSTOMER_ID` | CustomerId iz Backofficea |
+| `SAFERPAY_TERMINAL_ID` | eCommerce TerminalId |
+| `SAFERPAY_API_USERNAME` | JSON API Basic Auth username |
+| `SAFERPAY_API_PASSWORD` | JSON API Basic Auth password |
+| `SAFERPAY_BASE_URL` | `https://test.saferpay.com/api` ili `https://www.saferpay.com/api` |
 
-Detaljniji runbook: `WORLDLINE_RUNBOOK.md`
+Runbook: `WORLDLINE_RUNBOOK.md`

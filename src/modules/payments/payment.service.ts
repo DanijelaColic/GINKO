@@ -1,21 +1,20 @@
-// Payment service — Worldline Hosted Checkout + webhooks.
+// Payment service — Saferpay Payment Page + notify + refund.
 
-import type { Domain } from 'onlinepayments-sdk-nodejs';
-
-type PaymentResponse = Domain.PaymentResponse;
-
-type WebhooksEvent = {
-  id?: string | null;
-  type?: string | null;
-  payment?: PaymentResponse | null;
-  refund?: Domain.RefundResponse | null;
-};
-import { getWorldlineClient, getWorldlineMerchantId } from './worldline.client';
+import {
+  getSaferpayConfig,
+  saferpayRequest,
+  SaferpayApiError,
+  type PaymentPageAssertResponse,
+  type PaymentPageInitializeResponse,
+  type SaferpayTransaction,
+  type TransactionCaptureResponse,
+  type TransactionRefundResponse,
+} from './saferpay.client';
 import {
   createPaymentIntentRecord,
   getPaymentIntentByBookingId,
   getPaymentIntentByProviderId,
-  getPaymentIntentByHostedCheckoutId,
+  getPaymentIntentByOrderId,
   updatePaymentIntentStatus,
   createTransactionRecord,
   updateBookingPaymentState,
@@ -29,53 +28,29 @@ import type {
   PaymentIntentResult,
   PaymentStatus,
   PaymentIntentStatus,
+  PaymentIntent,
 } from './payment.types';
 import { getSiteUrl } from '@/lib/siteUrl';
 import { notifyGuestBookingConfirmed } from '@/lib/email';
 
-// ── Worldline status mapping ──────────────────────────────────────
+// ── Status mapping ────────────────────────────────────────────────
 
-export function mapWorldlinePaymentStatus(
-  payment: PaymentResponse | null | undefined,
-  hostedCheckoutStatus?: string | null,
+function mapSaferpayTransactionStatus(
+  status: string | undefined | null,
 ): PaymentIntentStatus {
-  if (hostedCheckoutStatus === 'CANCELLED_BY_CONSUMER' || hostedCheckoutStatus === 'EXPIRED') {
-    return 'cancelled';
+  switch ((status ?? '').toUpperCase()) {
+    case 'CAPTURED':
+    case 'AUTHORIZED':
+      // AUTHORIZED is treated as success after we Capture (or if already captured).
+      return 'succeeded';
+    case 'CANCELED':
+    case 'CANCELLED':
+      return 'cancelled';
+    case 'PENDING':
+      return 'processing';
+    default:
+      return 'requires_payment_method';
   }
-
-  if (!payment) return 'requires_payment_method';
-
-  const category = payment.statusOutput?.statusCategory;
-  const status = payment.status;
-
-  if (
-    category === 'COMPLETED' ||
-    status === 'CAPTURED' ||
-    status === 'PAID' ||
-    payment.statusOutput?.isAuthorized === true
-  ) {
-    return 'succeeded';
-  }
-
-  if (
-    category === 'UNSUCCESSFUL' ||
-    status === 'REJECTED' ||
-    status === 'CANCELLED' ||
-    status === 'REJECTED_CAPTURE'
-  ) {
-    return 'cancelled';
-  }
-
-  if (
-    category === 'PENDING' ||
-    status === 'PENDING_CAPTURE' ||
-    status === 'PENDING_PAYMENT' ||
-    status === 'PENDING_COMPLETION'
-  ) {
-    return 'processing';
-  }
-
-  return 'requires_payment_method';
 }
 
 function isPaymentSuccessful(status: PaymentIntentStatus): boolean {
@@ -95,85 +70,78 @@ async function confirmBookingAfterPayment(bookingId: string): Promise<void> {
   }
 }
 
-function getWorldlinePaymentId(payment: PaymentResponse): string | null {
-  return payment.id ?? null;
+function centsToSaferpayValue(cents: number): string {
+  return String(Math.round(cents));
 }
 
-function getHostedCheckoutIdFromPayment(payment: PaymentResponse): string | null {
-  return payment.hostedCheckoutSpecificOutput?.hostedCheckoutId ?? null;
-}
-
-// ── Create Hosted Checkout session ────────────────────────────────
+// ── Create Payment Page session ───────────────────────────────────
 
 /**
- * Create a Worldline Hosted Checkout session for a booking deposit.
+ * Create a Saferpay Payment Page session for a booking deposit.
  * Returns redirect URL for the guest.
  */
 export async function createCheckoutSession(
   input: CreatePaymentIntentInput & { returnBasePath: string },
 ): Promise<{ url: string } & PaymentIntentResult> {
-  const client = getWorldlineClient();
-  const merchantId = getWorldlineMerchantId();
+  const { customerId, terminalId } = getSaferpayConfig();
   const siteUrl = getSiteUrl();
+  const orderId = crypto.randomUUID().replace(/-/g, '').slice(0, 32);
 
-  const returnUrl = `${siteUrl}${input.returnBasePath}&payment=success`;
+  // Saferpay returns NO payment data on redirect — we identify via our oid.
+  const returnUrl = `${siteUrl}${input.returnBasePath}&payment=return&oid=${orderId}`;
+  const notifyBase = `${siteUrl}/api/webhooks/saferpay?oid=${orderId}`;
 
-  const response = await client.hostedCheckout.createHostedCheckout(merchantId, {
-    order: {
-      amountOfMoney: {
-        currencyCode: (input.currency ?? 'eur').toUpperCase(),
-        amount: input.amount_cents,
+  const init = await saferpayRequest<PaymentPageInitializeResponse>(
+    '/Payment/v1/PaymentPage/Initialize',
+    {
+      TerminalId: terminalId,
+      Payment: {
+        Amount: {
+          Value: centsToSaferpayValue(input.amount_cents),
+          CurrencyCode: (input.currency ?? 'eur').toUpperCase(),
+        },
+        OrderId: orderId,
+        Description: `Depozit rezervacije ${input.booking_id}`,
       },
-      references: {
-        merchantReference: input.booking_id,
+      Payer: {
+        LanguageCode: 'hr',
       },
-      customer: {
-        merchantCustomerId: input.booking_id,
+      ReturnUrl: {
+        Url: returnUrl,
       },
+      Notification: {
+        SuccessNotifyUrl: `${notifyBase}&result=success`,
+        FailNotifyUrl: `${notifyBase}&result=fail`,
+      },
+      PaymentMethods: ['VISA', 'MASTERCARD', 'MAESTRO'],
     },
-    hostedCheckoutSpecificInput: {
-      locale: 'hr-HR',
-      returnUrl,
-      allowedNumberOfPaymentAttempts: 3,
-    },
-  });
+  );
 
-  if (!response.isSuccess) {
-    const errMsg =
-      response.body?.errors?.[0]?.message ??
-      response.body?.errorId ??
-      'Worldline nije vratio URL za plaćanje';
-    throw new Error(errMsg);
-  }
-
-  const body = response.body;
-  const redirectUrl = body.redirectUrl;
-  const hostedCheckoutId = body.hostedCheckoutId;
-
-  if (!redirectUrl || !hostedCheckoutId) {
-    throw new Error('Worldline nije vratio redirectUrl ili hostedCheckoutId');
+  if (!init.Token || !init.RedirectUrl) {
+    throw new Error('Saferpay nije vratio Token ili RedirectUrl');
   }
 
   const record = await createPaymentIntentRecord({
     booking_id: input.booking_id,
-    provider_payment_id: hostedCheckoutId,
+    provider_payment_id: init.Token,
     amount: input.amount_cents,
     currency: (input.currency ?? 'eur').toLowerCase(),
     status: 'requires_payment_method',
     client_secret: null,
     metadata: {
-      hosted_checkout_id: hostedCheckoutId,
-      return_mac: body.RETURNMAC ?? null,
+      order_id: orderId,
+      saferpay_token: init.Token,
+      saferpay_customer_id: customerId,
       payment_type: input.metadata?.payment_type ?? 'deposit',
-      provider: 'worldline',
+      provider: 'saferpay',
       ...(input.metadata ?? {}),
     },
   });
 
   return {
-    url: redirectUrl,
+    url: init.RedirectUrl,
     id: record.id,
-    provider_payment_id: hostedCheckoutId,
+    provider_payment_id: init.Token,
     client_secret: '',
     amount: record.amount,
     currency: record.currency,
@@ -181,77 +149,145 @@ export async function createCheckoutSession(
   };
 }
 
-// ── Sync hosted checkout status (return URL + reconcile) ──────────
+// ── Assert + Capture (return URL + notify + reconcile) ────────────
 
 /**
- * Fetch live status from Worldline and update local DB.
- * Called when guest returns from Hosted Checkout or during reconciliation.
+ * Finalize a Saferpay Payment Page session (Assert → Capture if needed).
+ * Safe to call from ReturnUrl and NotifyUrl (idempotent).
  */
-export async function syncHostedCheckoutStatus(
-  hostedCheckoutId: string,
+export async function syncSaferpayPayment(
+  orderId: string,
+  opts: { failedNotify?: boolean } = {},
 ): Promise<PaymentIntentStatus | null> {
-  const record =
-    (await getPaymentIntentByHostedCheckoutId(hostedCheckoutId)) ??
-    (await getPaymentIntentByProviderId(hostedCheckoutId));
-
+  const record = await getPaymentIntentByOrderId(orderId);
   if (!record) {
-    console.warn('[worldline] sync: no matching payment_intent for', hostedCheckoutId);
+    console.warn('[saferpay] sync: no matching payment_intent for oid', orderId);
     return null;
   }
 
-  const client = getWorldlineClient();
-  const merchantId = getWorldlineMerchantId();
-  const response = await client.hostedCheckout.getHostedCheckout(
-    merchantId,
-    hostedCheckoutId,
-  );
+  if (record.status === 'succeeded') {
+    return 'succeeded';
+  }
 
-  if (!response.isSuccess) {
-    console.warn('[worldline] getHostedCheckout failed:', hostedCheckoutId);
+  if (opts.failedNotify) {
+    await updatePaymentIntentStatus(record.provider_payment_id, 'cancelled');
+    return 'cancelled';
+  }
+
+  const token =
+    (record.metadata?.saferpay_token as string | undefined) ??
+    record.provider_payment_id;
+
+  let assertBody: PaymentPageAssertResponse;
+  try {
+    assertBody = await saferpayRequest<PaymentPageAssertResponse>(
+      '/Payment/v1/PaymentPage/Assert',
+      { Token: token },
+    );
+  } catch (err) {
+    if (err instanceof SaferpayApiError && err.status >= 400) {
+      console.warn(
+        '[saferpay] Assert failed:',
+        err.message,
+        err.body?.ErrorName,
+      );
+      await updatePaymentIntentStatus(record.provider_payment_id, 'cancelled', {
+        saferpay_assert_error: err.body?.ErrorName ?? err.message,
+      });
+      return 'cancelled';
+    }
+    throw err;
+  }
+
+  const tx = assertBody.Transaction;
+  const transactionId = tx.Id;
+  if (!transactionId) {
+    console.warn('[saferpay] Assert without Transaction.Id');
     return record.status;
   }
 
-  const checkout = response.body;
-  const payment = checkout.createdPaymentOutput?.payment ?? null;
-  const newStatus = mapWorldlinePaymentStatus(payment, checkout.status);
+  let captureId =
+    (record.metadata?.saferpay_capture_id as string | undefined) ??
+    tx.CaptureId ??
+    null;
+  let finalStatus = (tx.Status ?? '').toUpperCase();
 
-  const worldlinePaymentId = payment ? getWorldlinePaymentId(payment) : null;
-  const metadataPatch: Record<string, unknown> = {};
-  if (worldlinePaymentId) metadataPatch.worldline_payment_id = worldlinePaymentId;
-
-  if (newStatus !== record.status || worldlinePaymentId) {
-    await updatePaymentIntentStatus(record.provider_payment_id, newStatus, metadataPatch);
+  // Card payments typically return AUTHORIZED — Capture to settle funds.
+  if (finalStatus === 'AUTHORIZED') {
+    try {
+      const capture = await saferpayRequest<TransactionCaptureResponse>(
+        '/Payment/v1/Transaction/Capture',
+        {
+          TransactionReference: { TransactionId: transactionId },
+        },
+      );
+      captureId = capture.CaptureId ?? transactionId;
+      finalStatus = (capture.Status ?? 'CAPTURED').toUpperCase();
+    } catch (err) {
+      // Already captured (retry / notify race) — treat as success.
+      const msg = err instanceof Error ? err.message : String(err);
+      if (/already|captured|TRANSACTION_ALREADY/i.test(msg)) {
+        captureId = captureId ?? transactionId;
+        finalStatus = 'CAPTURED';
+      } else {
+        throw err;
+      }
+    }
   }
 
-  await applyPaymentOutcome(record.id, record.booking_id, payment, newStatus, {
-    source: 'hosted_checkout_sync',
-    hosted_checkout_id: hostedCheckoutId,
+  const newStatus = mapSaferpayTransactionStatus(finalStatus);
+
+  await updatePaymentIntentStatus(record.provider_payment_id, newStatus, {
+    saferpay_transaction_id: transactionId,
+    saferpay_capture_id: captureId,
+    saferpay_status: finalStatus,
+    six_transaction_reference: tx.SixTransactionReference ?? null,
+    payment_means: assertBody.PaymentMeans?.DisplayText ?? null,
+  });
+
+  await applyPaymentOutcome(record, tx, newStatus, {
+    source: 'saferpay_assert',
+    order_id: orderId,
+    transaction_id: transactionId,
+    capture_id: captureId,
   });
 
   return newStatus;
 }
 
+/** @deprecated Use syncSaferpayPayment — kept for transitional imports */
+export async function syncHostedCheckoutStatus(
+  hostedCheckoutIdOrOrderId: string,
+): Promise<PaymentIntentStatus | null> {
+  // Prefer order_id lookup; fall back to token (provider_payment_id).
+  const byOrder = await getPaymentIntentByOrderId(hostedCheckoutIdOrOrderId);
+  if (byOrder) {
+    const oid = (byOrder.metadata?.order_id as string) ?? hostedCheckoutIdOrOrderId;
+    return syncSaferpayPayment(oid);
+  }
+  const byToken = await getPaymentIntentByProviderId(hostedCheckoutIdOrOrderId);
+  if (byToken?.metadata?.order_id) {
+    return syncSaferpayPayment(byToken.metadata.order_id as string);
+  }
+  return null;
+}
+
 async function applyPaymentOutcome(
-  paymentIntentDbId: string,
-  bookingId: string | null,
-  payment: PaymentResponse | null,
+  record: PaymentIntent,
+  tx: SaferpayTransaction,
   status: PaymentIntentStatus,
   metadata: Record<string, unknown>,
 ): Promise<void> {
   if (!isPaymentSuccessful(status)) return;
 
-  const paymentId = payment ? getWorldlinePaymentId(payment) : null;
-  const chargeId = paymentId ?? `hc_success_${paymentIntentDbId}`;
-
-  const amount =
-    payment?.paymentOutput?.amountOfMoney?.amount ??
-    (await getPaymentIntentByDbId(paymentIntentDbId))?.amount ??
-    0;
-  const currency =
-    payment?.paymentOutput?.amountOfMoney?.currencyCode?.toLowerCase() ?? 'eur';
+  const chargeId = tx.Id ?? `saferpay_success_${record.id}`;
+  const amount = tx.Amount?.Value
+    ? Number.parseInt(tx.Amount.Value, 10)
+    : record.amount;
+  const currency = (tx.Amount?.CurrencyCode ?? record.currency).toLowerCase();
 
   await createTransactionRecord({
-    payment_intent_id: paymentIntentDbId,
+    payment_intent_id: record.id,
     provider_transaction_id: chargeId,
     type: 'charge',
     amount,
@@ -263,8 +299,8 @@ async function applyPaymentOutcome(
     if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
   });
 
-  if (bookingId) {
-    await confirmBookingAfterPayment(bookingId);
+  if (record.booking_id) {
+    await confirmBookingAfterPayment(record.booking_id);
   }
 }
 
@@ -293,119 +329,24 @@ export async function createPaymentIntent(
   return result;
 }
 
-// ── Webhook handlers ──────────────────────────────────────────────
+// ── Notify handler (GET from Saferpay servers) ────────────────────
 
-export async function handleWorldlineWebhookEvent(event: WebhooksEvent): Promise<void> {
-  const type = event.type ?? '';
-
-  if (type.startsWith('payment.') && event.payment) {
-    await handleWorldlinePaymentWebhook(event.payment, type);
-    return;
-  }
-
-  if (type.startsWith('refund.') && event.refund) {
-    await handleWorldlineRefundWebhook(event);
-    return;
-  }
-
-  console.warn(`[webhook/worldline] Unhandled event type: ${type}`);
+export async function handleSaferpayNotify(opts: {
+  orderId: string;
+  result?: string | null;
+}): Promise<void> {
+  const failed = opts.result === 'fail';
+  await syncSaferpayPayment(opts.orderId, { failedNotify: failed });
 }
 
-async function handleWorldlinePaymentWebhook(
-  payment: PaymentResponse,
-  eventType: string,
-): Promise<void> {
-  const hostedCheckoutId = getHostedCheckoutIdFromPayment(payment);
-  const merchantRef = payment.paymentOutput?.references?.merchantReference;
+/** @deprecated */
+export const handleWorldlineWebhookEvent = async (): Promise<void> => {
+  console.warn('[payments] handleWorldlineWebhookEvent is deprecated — use Saferpay notify');
+};
 
-  const record = hostedCheckoutId
-    ? await getPaymentIntentByHostedCheckoutId(hostedCheckoutId)
-    : merchantRef
-      ? await getPaymentIntentByBookingId(merchantRef)
-      : null;
-
-  if (!record) {
-    console.warn('[webhook/worldline] payment event: no matching record', eventType);
-    return;
-  }
-
-  const newStatus = mapWorldlinePaymentStatus(payment);
-  const worldlinePaymentId = getWorldlinePaymentId(payment);
-
-  await updatePaymentIntentStatus(record.provider_payment_id, newStatus, {
-    worldline_payment_id: worldlinePaymentId,
-  });
-
-  if (isPaymentSuccessful(newStatus)) {
-    await applyPaymentOutcome(record.id, record.booking_id, payment, newStatus, {
-      source: eventType,
-    });
-  } else if (newStatus === 'cancelled') {
-    await updatePaymentIntentStatus(record.provider_payment_id, 'cancelled');
-  } else if (eventType.includes('failed') || eventType.includes('rejected')) {
-    const failureReason =
-      payment.statusOutput?.errors?.[0]?.message ?? 'payment_failed';
-
-    await createTransactionRecord({
-      payment_intent_id: record.id,
-      provider_transaction_id: `${worldlinePaymentId ?? record.id}_failed_${Date.now()}`,
-      type: 'charge',
-      amount: record.amount,
-      currency: record.currency,
-      status: 'failed',
-      failure_reason: failureReason,
-      metadata: { source: eventType },
-    }).catch((err: unknown) => {
-      const msg = err instanceof Error ? err.message : String(err);
-      if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
-    });
-  }
-}
-
-async function handleWorldlineRefundWebhook(event: WebhooksEvent): Promise<void> {
-  const refund = event.refund;
-  if (!refund?.id) return;
-
-  const paymentId = refund.refundOutput?.references?.merchantReference;
-  // Worldline refund references payment — look up by worldline_payment_id in metadata
-  const supabase = createServerSupabaseClient();
-  const { data: records } = await supabase
-    .from('payment_intents')
-    .select('*')
-    .filter('metadata->>worldline_payment_id', 'eq', paymentId ?? '')
-    .limit(1);
-
-  const record = (records?.[0] as import('./payment.types').PaymentIntent | undefined) ?? null;
-  if (!record) {
-    console.warn('[webhook/worldline] refund: no matching payment_intent');
-    return;
-  }
-
-  const refundAmount = refund.refundOutput?.amountOfMoney?.amount ?? 0;
-  const currency =
-    refund.refundOutput?.amountOfMoney?.currencyCode?.toLowerCase() ?? record.currency;
-
-  await createTransactionRecord({
-    payment_intent_id: record.id,
-    provider_transaction_id: refund.id,
-    type: 'refund',
-    amount: refundAmount,
-    currency,
-    status: refund.status === 'REFUNDED' ? 'succeeded' : 'pending',
-    metadata: { source: event.type ?? 'refund' },
-  }).catch((err: unknown) => {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
-  });
-
-  const transactions = await getTransactionsByPaymentIntentId(record.id);
-  const totalRefunded = transactions
-    .filter((t) => t.type === 'refund' && t.status === 'succeeded')
-    .reduce((sum, t) => sum + t.amount, 0);
-
-  if (record.booking_id && totalRefunded >= record.amount) {
-    await updateBookingPaymentState(record.booking_id, { depositPaid: false });
-  }
+/** @deprecated */
+export function mapWorldlinePaymentStatus(): PaymentIntentStatus {
+  return 'requires_payment_method';
 }
 
 // ── Issue Refund ─────────────────────────────────────────────────
@@ -431,10 +372,13 @@ export async function issueRefund(input: RefundInput): Promise<RefundResult> {
     );
   }
 
-  const worldlinePaymentId = record.metadata?.worldline_payment_id as string | undefined;
-  if (!worldlinePaymentId) {
+  const captureId =
+    (record.metadata?.saferpay_capture_id as string | undefined) ??
+    (record.metadata?.saferpay_transaction_id as string | undefined);
+
+  if (!captureId) {
     throw new Error(
-      'Nedostaje worldline_payment_id u metadata — pokreni usklađivanje prije povrata',
+      'Nedostaje saferpay_capture_id u metadata — pokreni usklađivanje prije povrata',
     );
   }
 
@@ -463,35 +407,47 @@ export async function issueRefund(input: RefundInput): Promise<RefundResult> {
     throw new Error('Iznos povrata mora biti veći od nule');
   }
 
-  const client = getWorldlineClient();
-  const merchantId = getWorldlineMerchantId();
-
-  const response = await client.payments.refundPayment(merchantId, worldlinePaymentId, {
-    amountOfMoney: {
-      currencyCode: record.currency.toUpperCase(),
-      amount: refundAmount,
+  const refund = await saferpayRequest<TransactionRefundResponse>(
+    '/Payment/v1/Transaction/Refund',
+    {
+      Refund: {
+        Amount: {
+          Value: centsToSaferpayValue(refundAmount),
+          CurrencyCode: record.currency.toUpperCase(),
+        },
+      },
+      CaptureReference: {
+        CaptureId: captureId,
+      },
     },
-  });
+  );
 
-  if (!response.isSuccess) {
-    const errMsg =
-      response.body?.errors?.[0]?.message ??
-      response.body?.errorId ??
-      'Worldline refund greška';
-    throw new Error(errMsg);
+  let refundTxId = refund.Transaction?.Id ?? `refund_${Date.now()}`;
+  let refundStatus = (refund.Transaction?.Status ?? '').toUpperCase();
+
+  // Some refunds return AUTHORIZED and need Capture.
+  if (refundStatus === 'AUTHORIZED' && refund.Transaction?.Id) {
+    const capture = await saferpayRequest<TransactionCaptureResponse>(
+      '/Payment/v1/Transaction/Capture',
+      {
+        TransactionReference: { TransactionId: refund.Transaction.Id },
+      },
+    );
+    refundTxId = capture.CaptureId ?? refundTxId;
+    refundStatus = (capture.Status ?? 'CAPTURED').toUpperCase();
   }
-
-  const refundBody = response.body;
-  const refundId = refundBody.id ?? `refund_${Date.now()}`;
 
   await createTransactionRecord({
     payment_intent_id: record.id,
-    provider_transaction_id: refundId,
+    provider_transaction_id: refundTxId,
     type: 'refund',
     amount: refundAmount,
     currency: record.currency,
     status: 'succeeded',
-    metadata: { worldline_refund_id: refundId },
+    metadata: {
+      saferpay_refund_id: refundTxId,
+      saferpay_refund_status: refundStatus,
+    },
   }).catch((err: unknown) => {
     const msg = err instanceof Error ? err.message : String(err);
     if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
@@ -503,7 +459,7 @@ export async function issueRefund(input: RefundInput): Promise<RefundResult> {
   }
 
   return {
-    providerRefundId: refundId,
+    providerRefundId: refundTxId,
     amountCents: refundAmount,
     currency: record.currency,
     alreadyRefunded: false,
@@ -539,7 +495,19 @@ export async function reconcilePayments(
   for (const record of ambiguous) {
     try {
       const before = record.status;
-      const after = await syncHostedCheckoutStatus(record.provider_payment_id);
+      const orderId = record.metadata?.order_id as string | undefined;
+      if (!orderId) {
+        result.skipped++;
+        result.details.push({
+          paymentIntentId: record.id,
+          localStatus: before,
+          providerStatus: 'missing order_id',
+          action: 'skipped',
+        });
+        continue;
+      }
+
+      const after = await syncSaferpayPayment(orderId);
 
       if (!after || after === before) {
         result.skipped++;
@@ -585,7 +553,7 @@ async function getPaymentIntentByDbId(dbId: string) {
     .single();
   if (error?.code === 'PGRST116') return null;
   if (error) throw error;
-  return data as import('./payment.types').PaymentIntent;
+  return data as PaymentIntent;
 }
 
 export { eurToCents };
