@@ -239,7 +239,11 @@ export default function BookingWidget({
       .join('\n');
   }, [form]);
 
-  const createBookingRequest = useCallback(async (): Promise<string | null> => {
+  const createBookingRequest = useCallback(async (): Promise<{
+    bookingId: string;
+    token: string;
+    confirmationPath: string;
+  } | null> => {
     if (!checkIn || !checkOut || !priceData || !selectedRoom) return null;
 
     const guestName = `${form.firstName.trim()} ${form.lastName.trim()}`.trim();
@@ -276,27 +280,40 @@ export default function BookingWidget({
     const data = await res.json();
     if (!res.ok) throw new Error(data.error ?? t('errors.submitFailed'));
 
-    if (data.confirmationPath) return data.confirmationPath as string;
-    if (data.confirmationUrl) {
-      try {
-        const url = new URL(data.confirmationUrl, window.location.origin);
-        return `${url.pathname}${url.search}`;
-      } catch {
-        return data.confirmationUrl as string;
-      }
+    const bookingId = data.bookingId as string | undefined;
+    if (!bookingId) {
+      throw new Error(t('errors.submitFailed'));
     }
 
-    if (data.bookingId) {
-      setSuccess(true);
-      fetchBarcodes(priceData.deposit, guestName, data.bookingId);
+    let confirmationPath =
+      (data.confirmationPath as string | undefined) ??
+      (data.confirmationUrl
+        ? (() => {
+            try {
+              const url = new URL(data.confirmationUrl as string, window.location.origin);
+              return `${url.pathname}${url.search}`;
+            } catch {
+              return data.confirmationUrl as string;
+            }
+          })()
+        : null);
+
+    if (!confirmationPath) {
+      throw new Error(t('errors.submitFailed'));
     }
-    return null;
+
+    const token =
+      new URL(confirmationPath, window.location.origin).searchParams.get('token') ?? '';
+    if (!token) {
+      throw new Error(t('errors.submitFailed'));
+    }
+
+    return { bookingId, token, confirmationPath };
   }, [
     bookingsApiPath,
     buildNotes,
     checkIn,
     checkOut,
-    fetchBarcodes,
     form,
     locale,
     priceData,
@@ -327,7 +344,7 @@ export default function BookingWidget({
     setStep(3);
   };
 
-  // Korak 3: kreiraj rezervaciju i preusmjeri na plaćanje
+  // Korak 3: kreiraj rezervaciju → Saferpay checkout (bez međukoraka)
   useEffect(() => {
     if (step !== 3 || bookingCreateStarted.current) return;
     if (!checkIn || !checkOut || !priceData || !selectedRoom) return;
@@ -338,12 +355,32 @@ export default function BookingWidget({
     (async () => {
       setSubmitError(null);
       try {
-        const path = await createBookingRequest();
+        const created = await createBookingRequest();
+        if (cancelled || !created) return;
+
+        const checkoutRes = await fetch('/api/payments/checkout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            bookingId: created.bookingId,
+            token: created.token,
+            paymentType: 'deposit',
+          }),
+        });
+        const checkoutData = (await checkoutRes.json()) as {
+          url?: string;
+          error?: string;
+        };
+
         if (cancelled) return;
-        if (path) {
-          router.push(path);
+
+        if (!checkoutRes.ok || !checkoutData.url) {
+          // Booking exists — fall back to confirmation so guest can retry card pay
+          router.push(created.confirmationPath);
           return;
         }
+
+        window.location.href = checkoutData.url;
       } catch (err) {
         if (!cancelled) {
           setSubmitError(err instanceof Error ? err.message : t('errors.submitFailed'));
@@ -1069,7 +1106,7 @@ export default function BookingWidget({
           <h2 className="font-serif text-2xl font-semibold text-text mb-2">
             {t('stepper.step3')}
           </h2>
-          <p className="text-sm text-muted">{t('form.submitting')}</p>
+          <p className="text-sm text-muted">Kreiranje rezervacije i preusmjeravanje na plaćanje…</p>
 
           {submitError && (
             <div className="mt-6 flex items-start gap-2 text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-left max-w-md">

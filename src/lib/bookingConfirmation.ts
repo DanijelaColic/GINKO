@@ -6,7 +6,9 @@ import { getSiteUrl, getSiteUrlFromRequest } from './siteUrl';
 function getBookingViewSecret(): string {
   const secret = process.env.BOOKING_VIEW_SECRET?.trim();
   if (!secret) {
-    throw new Error('BOOKING_VIEW_SECRET nije postavljen u .env.local');
+    throw new Error(
+      'BOOKING_VIEW_SECRET nije postavljen (env.local / Vercel Environment Variables)',
+    );
   }
   return secret;
 }

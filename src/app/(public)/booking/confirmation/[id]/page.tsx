@@ -6,7 +6,6 @@ import Link from 'next/link';
 import { getLocale } from 'next-intl/server';
 import { getBookingConfirmationData } from '@/modules/booking/booking.confirmation';
 import { parseLocalDate } from '@/modules/booking/dates';
-import { getSiteUrl } from '@/lib/siteUrl';
 import BookingStepsBar from '@/components/hotel/BookingStepsBar';
 import BookingSummaryCard from '@/components/hotel/BookingSummaryCard';
 import ConfirmationPaymentPanel from '@/components/hotel/ConfirmationPaymentPanel';
@@ -71,7 +70,7 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
             text: 'text-amber-800',
             icon: '↩',
             title: 'Plaćanje prekinuto',
-            body: 'Niste dovršili plaćanje. Rezervacija je i dalje aktivna — možete platiti ispod ili odabrati plaćanje bankovnim prijenosom.',
+            body: 'Niste dovršili plaćanje. Rezervacija je i dalje aktivna — možete platiti depozit karticom ispod.',
           }
         : null;
 
@@ -81,9 +80,6 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
 
   const checkInDate = parseLocalDate(data.checkInIso);
   const checkOutDate = parseLocalDate(data.checkOutIso);
-
-  const siteUrl = getSiteUrl();
-  const confirmationUrl = `${siteUrl}/booking/confirmation/${id}?token=${encodeURIComponent(token)}`;
 
   return (
     <main className="min-h-screen bg-stone/5 py-10 px-4">
@@ -135,11 +131,8 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
             <ConfirmationPaymentPanel
               bookingId={id}
               token={token}
-              reference={data.reference}
               status={data.status}
               depositEur={data.deposit}
-              payment={data.payment}
-              confirmationUrl={confirmationUrl}
               paymentBanner={paymentBanner}
             />
 
