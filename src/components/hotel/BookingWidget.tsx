@@ -32,10 +32,16 @@ import {
   EXTRA_BED_PRICE_PER_NIGHT,
   CRIB_PRICE_PER_NIGHT,
 } from '@/modules/booking/booking.config';
-import { rooms } from '@/modules/rooms/rooms.config';
+import { rooms as staticRooms } from '@/modules/rooms/rooms.config';
 import type { BookingFormData } from '@/modules/booking/booking-form.schema';
 import { BOOKING_FORM_DEFAULTS, validateBookingForm } from '@/modules/booking/booking-form.schema';
 import type { GoogleReviewSummary } from '@/modules/reviews/google-reviews.types';
+import {
+  calculateBreakfastPerNight,
+  parseChildAgesParam,
+  roomFitsGuests,
+  roomNeedsExtraBed,
+} from '@/modules/booking/guest-occupancy';
 
 const DEPOSIT_PCT_DISPLAY = Math.round(DEPOSIT_PERCENT * 100);
 const BALANCE_PCT_DISPLAY = 100 - DEPOSIT_PCT_DISPLAY;
@@ -52,6 +58,7 @@ type Props = {
   initialCheckOut?: string;
   initialAdults?: string;
   initialChildren?: string;
+  initialChildAges?: string;
   initialBreakfast?: string;
   initialStep?: 1 | 2 | 3;
   bookingsApiPath?: string;
@@ -66,6 +73,7 @@ export default function BookingWidget({
   initialCheckOut,
   initialAdults,
   initialChildren,
+  initialChildAges,
   initialBreakfast,
   initialStep,
   bookingsApiPath = '/api/bookings',
@@ -95,11 +103,11 @@ export default function BookingWidget({
     [t],
   );
 
-  const availableRooms = useMemo(() => rooms.filter((r) => !r.fullyBooked), []);
+  const availableRooms = useMemo(() => staticRooms.filter((r) => !r.fullyBooked), []);
 
   // ── State ──────────────────────────────────────────────────────────
   const [selectedSlug, setSelectedSlug] = useState<string>(() => {
-    if (initialSlug && rooms.find((r) => r.slug === initialSlug && !r.fullyBooked)) {
+    if (initialSlug && staticRooms.find((r) => r.slug === initialSlug && !r.fullyBooked)) {
       return initialSlug;
     }
     return availableRooms[0]?.slug ?? '';
@@ -127,10 +135,12 @@ export default function BookingWidget({
     const a = initialAdults ? parseInt(initialAdults) : null;
     const ch = initialChildren ? parseInt(initialChildren) : null;
     const bf = initialBreakfast ? parseInt(initialBreakfast) : null;
+    const ages = parseChildAgesParam(initialChildAges);
     return {
       ...BOOKING_FORM_DEFAULTS,
       adults: a && a >= 1 ? String(a) : BOOKING_FORM_DEFAULTS.adults,
       children: ch && ch >= 0 ? String(ch) : BOOKING_FORM_DEFAULTS.children,
+      childAges: ages,
       breakfastGuests: bf && bf >= 0 ? String(bf) : BOOKING_FORM_DEFAULTS.breakfastGuests,
     };
   });
@@ -156,13 +166,33 @@ export default function BookingWidget({
     }
   }, [step]);
 
-  const selectedRoom = rooms.find((r) => r.slug === selectedSlug);
+  const selectedRoom = staticRooms.find((r) => r.slug === selectedSlug);
+  const adultsCount = parseInt(form.adults) || 0;
+  const childrenCount = parseInt(form.children) || 0;
+  const childAges = useMemo(() => {
+    const ages = form.childAges ?? [];
+    if (ages.length >= childrenCount) return ages.slice(0, childrenCount);
+    return [
+      ...ages,
+      ...Array.from({ length: Math.max(0, childrenCount - ages.length) }, () => 0),
+    ];
+  }, [form.childAges, childrenCount]);
+
+  const autoExtraBed = selectedRoom
+    ? roomNeedsExtraBed(selectedRoom, adultsCount, childAges)
+    : false;
+
+  const breakfastEnabled = (parseInt(form.breakfastGuests) || 0) > 0;
+  const breakfastPerNight = breakfastEnabled
+    ? calculateBreakfastPerNight(adultsCount, childAges)
+    : 0;
+
   const priceData =
     checkIn && checkOut && selectedRoom
       ? calculatePrice(checkIn, checkOut, selectedRoom, {
-          extraBeds: form.needsExtraBed ? 1 : 0,
+          extraBeds: autoExtraBed ? 1 : 0,
           crib: form.needsCrib,
-          breakfastGuests: parseInt(form.breakfastGuests) || 0,
+          breakfastPerNight,
         })
       : null;
 
@@ -226,9 +256,12 @@ export default function BookingWidget({
       form.bookingFor === 'other' && form.guestStayingName
         ? `Rezervacija za drugog gosta: ${form.guestStayingName}`
         : '',
-      form.needsExtraBed ? 'Pomoćni ležaj: da' : '',
+      childAges.length > 0 ? `Starost djece: ${childAges.join(', ')} g.` : '',
+      autoExtraBed ? 'Pomoćni ležaj: da (automatski)' : '',
       form.needsCrib ? 'Dječji krevetić: da' : '',
-      parseInt(form.breakfastGuests) > 0 ? `Doručak: ${form.breakfastGuests} osoba` : '',
+      breakfastEnabled
+        ? `Doručak: da (${breakfastPerNight} €/noć)`
+        : '',
       form.arrivalTime ? `Procijenjeno vrijeme dolaska: ${form.arrivalTime}` : '',
       form.isBusiness ? 'Poslovno putovanje: da' : '',
       form.isBusiness && form.companyName ? `Tvrtka: ${form.companyName}` : '',
@@ -237,7 +270,7 @@ export default function BookingWidget({
     ]
       .filter(Boolean)
       .join('\n');
-  }, [form]);
+  }, [form, childAges, autoExtraBed, breakfastEnabled, breakfastPerNight]);
 
   const createBookingRequest = useCallback(async (): Promise<{
     bookingId: string;
@@ -262,14 +295,15 @@ export default function BookingWidget({
         guest_country: form.country,
         guest_email: form.email,
         guest_phone: form.phone,
-        adults: parseInt(form.adults),
-        children: parseInt(form.children),
+        adults: adultsCount,
+        children: childrenCount,
+        child_ages: childAges,
         booking_for: form.bookingFor,
         guest_staying_name:
           form.bookingFor === 'other' ? form.guestStayingName.trim() || null : null,
-        needs_extra_bed: form.needsExtraBed,
+        needs_extra_bed: autoExtraBed,
         needs_crib: form.needsCrib,
-        breakfast_guests: parseInt(form.breakfastGuests) || 0,
+        breakfast_guests: breakfastEnabled ? adultsCount + childrenCount : 0,
         is_business: form.isBusiness,
         company_name: form.isBusiness ? form.companyName.trim() || null : null,
         vat_id: form.isBusiness ? form.vatId.trim() || null : null,
@@ -310,10 +344,15 @@ export default function BookingWidget({
 
     return { bookingId, token, confirmationPath };
   }, [
+    adultsCount,
+    autoExtraBed,
     bookingsApiPath,
+    breakfastEnabled,
     buildNotes,
     checkIn,
     checkOut,
+    childAges,
+    childrenCount,
     form,
     locale,
     priceData,
@@ -329,8 +368,7 @@ export default function BookingWidget({
     const errors = validateBookingForm(form);
     if (Object.keys(errors).length > 0) return;
 
-    const totalGuests = parseInt(form.adults) + parseInt(form.children);
-    if (totalGuests > selectedRoom.capacity) {
+    if (!roomFitsGuests(selectedRoom, adultsCount, childAges)) {
       setSubmitError(
         t('errors.maxGuests', {
           apartmentName: selectedRoom.name,
@@ -848,34 +886,20 @@ export default function BookingWidget({
               )}
             </div>
 
-            {/* ── 3. Dodatni kreveti (pomoćni ležaj + krevetić) ───── */}
+            {/* ── 3. Dodatni kreveti (samo krevetić; pomoćni je auto) ───── */}
             <div className="space-y-3">
               <p className="text-sm font-medium text-text">
                 {t('form.extraBedsSection')}{' '}
                 <span className="text-xs font-normal text-muted">{t('form.optional')}</span>
               </p>
 
-              {selectedRoom?.extraBedAvailable && (
-                <label className="flex items-start gap-3 cursor-pointer group">
-                  <input
-                    name="needsExtraBed"
-                    type="checkbox"
-                    checked={form.needsExtraBed}
-                    onChange={handleFormChange}
-                    className="mt-0.5 accent-primary"
-                  />
-                  <span className="text-sm text-text">
-                    {t('form.needsExtraBed')}{' '}
-                    <span className="font-semibold text-primary">
-                      +{EXTRA_BED_PRICE_PER_NIGHT} €/{t('form.perNight')}
-                    </span>
-                    <br />
-                    <span className="text-xs text-muted">{t('form.needsExtraBedHint')}</span>
-                  </span>
-                </label>
+              {autoExtraBed && (
+                <p className="text-sm text-text bg-amber-50 border border-amber-200 rounded-lg px-3 py-2">
+                  {t('form.extraBedAuto', { price: EXTRA_BED_PRICE_PER_NIGHT })}
+                </p>
               )}
 
-              {/* Dječji krevetić — uvijek vidljiv (dijete može dodati čak i bez prethodnog odabira) */}
+              {/* Dječji krevetić — uvijek vidljiv */}
               <label className="flex items-start gap-3 cursor-pointer group">
                 <input
                   name="needsCrib"

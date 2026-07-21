@@ -7,7 +7,7 @@ import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import RoomModalGallery from '@/components/hotel/RoomModalGallery';
 import { ROOM_AMENITY_ICONS } from '@/components/hotel/roomAmenityIcons';
 import { groupRoomAmenities } from '@/modules/rooms/room-amenities.config';
-import { BREAKFAST_PRICE_PER_PERSON_PER_NIGHT, DEPOSIT_PERCENT } from '@/modules/booking/booking.config';
+import { BREAKFAST_PRICE_PER_PERSON_PER_NIGHT, BREAKFAST_PRICE_CHILD_3_12, DEPOSIT_PERCENT, EXTRA_BED_PRICE_PER_NIGHT } from '@/modules/booking/booking.config';
 import type { GoogleReviewSummary } from '@/modules/reviews/google-reviews.types';
 import {
   formatReviewRating,
@@ -16,6 +16,7 @@ import {
 import type { Room } from '@/modules/rooms/room.types';
 import type { RoomReserveState } from '@/components/hotel/room-reserve-state';
 import type { AvailabilityLabels } from '@/components/hotel/AvailabilitySection';
+import { roomNeedsExtraBed } from '@/modules/booking/guest-occupancy';
 
 type RoomStatus = {
   available: boolean;
@@ -33,6 +34,8 @@ type Props = {
   searched: boolean;
   plan: RoomPlan;
   adults: number;
+  childAges: number[];
+  breakfastPerNight: number;
   labels: AvailabilityLabels;
   reviewSummary?: GoogleReviewSummary | null;
   reserveState: RoomReserveState;
@@ -47,6 +50,8 @@ export default function RoomDetailModal({
   searched,
   plan,
   adults,
+  childAges,
+  breakfastPerNight,
   labels,
   reviewSummary,
   reserveState,
@@ -72,16 +77,16 @@ export default function RoomDetailModal({
     };
   }, []);
 
+  const needsExtra = roomNeedsExtraBed(room, adults, childAges);
+  const basePerNight = room.price + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0);
   const breakfastExtra = plan.breakfast
-    ? BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * adults * (status?.nights ?? 1)
+    ? breakfastPerNight * (status?.nights ?? 1)
     : 0;
-  const breakfastPerNight = plan.breakfast
-    ? BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * adults
-    : 0;
+  const breakfastNight = plan.breakfast ? breakfastPerNight : 0;
 
   const displayTotal = searched && status?.available && status.totalPrice
     ? status.totalPrice + breakfastExtra
-    : room.price + breakfastPerNight;
+    : basePerNight + breakfastNight;
 
   const nights = status?.nights ?? 0;
   const showStayTotal = searched && status?.available && nights > 0;
@@ -215,6 +220,11 @@ export default function RoomDetailModal({
 
             {/* Veličina + kreveti */}
             <div className="mb-4 space-y-2 border-b border-stone pb-4">
+              <div className="flex flex-wrap items-center gap-2">
+                <span className="inline-flex items-center gap-1 text-xs font-semibold text-text bg-stone-light border border-stone px-2 py-0.5 rounded">
+                  {labels.capacityLabel} {room.capacityNote}
+                </span>
+              </div>
               <p className="text-sm text-text">
                 <span className="font-semibold">{t('sizeLabel')}</span>{' '}
                 {room.size} m²
@@ -300,8 +310,14 @@ export default function RoomDetailModal({
               </p>
               <p className="text-sm text-muted pl-[23px]">
                 {plan.breakfast
-                  ? t('breakfastIncluded', { price: BREAKFAST_PRICE_PER_PERSON_PER_NIGHT })
-                  : t('breakfastOptional', { price: BREAKFAST_PRICE_PER_PERSON_PER_NIGHT })}
+                  ? t('breakfastIncludedAgeBased', {
+                      adult: BREAKFAST_PRICE_PER_PERSON_PER_NIGHT,
+                      child: BREAKFAST_PRICE_CHILD_3_12,
+                    })
+                  : t('breakfastOptionalAgeBased', {
+                      adult: BREAKFAST_PRICE_PER_PERSON_PER_NIGHT,
+                      child: BREAKFAST_PRICE_CHILD_3_12,
+                    })}
               </p>
               <div className="pt-1 pl-[23px]">
                 <BedTypeIcons beds={room.beds} iconSize={16} />

@@ -23,6 +23,7 @@ type Props = {
     checkOut?: string;
     adults?: string;
     children?: string;
+    childAges?: string;
     breakfast?: string;
     step?: string;
   }>;
@@ -36,7 +37,7 @@ function parseInitialStep(value?: string): 1 | 2 | 3 | undefined {
 export default async function BookingPage({ searchParams }: Props) {
   const locale = getValidLocale(await getLocale());
   const t = await getTranslations('bookingPage');
-  const { room, checkIn, checkOut, adults, children, breakfast, step } = await searchParams;
+  const { room, checkIn, checkOut, adults, children, childAges, breakfast, step } = await searchParams;
   const googleReviews = await getGoogleReviews();
   const reviewSummary = googleReviews
     ? { rating: googleReviews.rating, reviewCount: googleReviews.reviewCount }
@@ -57,6 +58,7 @@ export default async function BookingPage({ searchParams }: Props) {
             initialCheckOut={checkOut}
             initialAdults={adults}
             initialChildren={children}
+            initialChildAges={childAges}
             initialBreakfast={breakfast}
             initialStep={parseInitialStep(step)}
             reviewSummary={reviewSummary}

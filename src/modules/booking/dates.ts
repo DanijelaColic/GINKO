@@ -124,8 +124,13 @@ export type PriceExtras = {
   extraBeds?: number;
   /** Dječji krevetić: true = naplatiti 20 €/noć */
   crib?: boolean;
-  /** Buffet doručak: broj osoba (0 = bez doručka) */
+  /**
+   * Buffet doručak — ili flat broj osoba (legacy admin) ili iznos €/noć
+   * izračunat po dobi (search/booking).
+   */
   breakfastGuests?: number;
+  /** Preferirano: već izračunata cijena doručka po noći (€) */
+  breakfastPerNight?: number;
 };
 
 export const EXTRA_BED_LABEL = 'Pomoćni ležaj';
@@ -173,21 +178,27 @@ export function calculatePrice(
     });
   }
 
-  const breakfastCount = extras?.breakfastGuests ?? 0;
-  if (breakfastCount > 0) {
-    const pricePerNight = BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * breakfastCount;
+  // breakfastPerNight (age-based) ima prednost; inače legacy flat × guests
+  const breakfastPerNight =
+    extras?.breakfastPerNight != null && extras.breakfastPerNight > 0
+      ? extras.breakfastPerNight
+      : (extras?.breakfastGuests ?? 0) > 0
+        ? (extras!.breakfastGuests as number) * BREAKFAST_PRICE_PER_PERSON_PER_NIGHT
+        : 0;
+
+  if (breakfastPerNight > 0) {
     lines.push({
       label: BREAKFAST_LABEL,
       nights,
-      pricePerNight,
-      subtotal: nights * pricePerNight,
+      pricePerNight: breakfastPerNight,
+      subtotal: nights * breakfastPerNight,
     });
   }
 
   const extrasTotal =
     (extraBedCount > 0 ? nights * EXTRA_BED_PRICE_PER_NIGHT * extraBedCount : 0) +
     (extras?.crib ? nights * CRIB_PRICE_PER_NIGHT : 0) +
-    (breakfastCount > 0 ? nights * BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * breakfastCount : 0);
+    (breakfastPerNight > 0 ? nights * breakfastPerNight : 0);
 
   const totalPrice = rawAccommodationPrice + CLEANING_FEE + extrasTotal;
   const deposit = Math.round(totalPrice * DEPOSIT_PERCENT);

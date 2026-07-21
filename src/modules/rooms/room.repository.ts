@@ -15,6 +15,31 @@ function applyLocaleOverlay(room: Room, locale: RoomLocale): Room {
   return { ...room, ...translated };
 }
 
+/**
+ * Kapacitet / kreveti / 2+1|2+2 — uvijek iz rooms.config (+ prijevodi).
+ * Mora biti ZADNJI korak nakon DB mape, inače stari DB capacityNote pregazi config.
+ */
+function applyStaticCapacityOverlay(room: Room, locale: RoomLocale): Room {
+  const staticRoom = staticRooms.find((r) => r.slug === room.slug);
+  if (!staticRoom) return room;
+
+  const localeMap = roomTranslations[locale] ?? roomTranslations.hr;
+  const translated = localeMap[room.slug];
+
+  return {
+    ...room,
+    capacity: staticRoom.capacity,
+    capacityNote: translated?.capacityNote ?? staticRoom.capacityNote,
+    beds: translated?.beds ?? staticRoom.beds,
+    extraBedAvailable: staticRoom.extraBedAvailable,
+    linkedSlugs: staticRoom.linkedSlugs,
+  };
+}
+
+function finalizeRoom(room: Room, locale: RoomLocale): Room {
+  return applyStaticCapacityOverlay(applyLocaleOverlay(room, locale), locale);
+}
+
 /** Quick lookup without locale — used for validation in API routes */
 export function getRoomBySlug(slug: string): Room | undefined {
   return staticRooms.find((r) => r.slug === slug);
@@ -33,16 +58,6 @@ type DbRoom = {
   room_translations: { name: string; tagline: string | null; description: string | null; locale: string }[];
   room_media: { src: string; sort_order: number }[];
 };
-
-function applyStaticOverlay(room: Room): Room {
-  const staticRoom = staticRooms.find((r) => r.slug === room.slug);
-  if (!staticRoom) return room;
-  return {
-    ...room,
-    extraBedAvailable: staticRoom.extraBedAvailable,
-    linkedSlugs: staticRoom.linkedSlugs,
-  };
-}
 
 function mapDbRoom(r: DbRoom, locale: RoomLocale): Room {
   const t = r.room_translations.find((x) => x.locale === locale) ??
@@ -83,7 +98,7 @@ async function fetchRoomsFromDb(locale: RoomLocale): Promise<Room[] | null> {
       .order('sort_order', { ascending: true });
 
     if (error || !data || data.length === 0) return null;
-    return (data as DbRoom[]).map((r) => applyStaticOverlay(mapDbRoom(r, locale)));
+    return (data as DbRoom[]).map((r) => finalizeRoom(mapDbRoom(r, locale), locale));
   } catch {
     return null;
   }
@@ -100,7 +115,7 @@ async function fetchRoomFromDb(slug: string, locale: RoomLocale): Promise<Room |
       .single();
 
     if (error || !data) return null;
-    return applyStaticOverlay(mapDbRoom(data as DbRoom, locale));
+    return finalizeRoom(mapDbRoom(data as DbRoom, locale), locale);
   } catch {
     return null;
   }
@@ -117,12 +132,12 @@ function sortRoomsByStaticOrder(rooms: Room[]): Room[] {
 
 export async function getRoom(slug: string, locale: RoomLocale = 'hr'): Promise<Room | undefined> {
   const dbRoom = await fetchRoomFromDb(slug, locale);
-  if (dbRoom) return applyLocaleOverlay(dbRoom, locale);
+  if (dbRoom) return dbRoom;
 
   // Fallback to static config
   const room = staticRooms.find((r) => r.slug === slug);
   if (!room) return undefined;
-  return applyLocaleOverlay(room, locale);
+  return finalizeRoom(room, locale);
 }
 
 export async function getRooms(locale: RoomLocale = 'hr'): Promise<Room[]> {
@@ -131,13 +146,13 @@ export async function getRooms(locale: RoomLocale = 'hr'): Promise<Room[]> {
     const dbSlugs = new Set(dbRooms.map((room) => room.slug));
     const missingStatic = staticRooms
       .filter((room) => !dbSlugs.has(room.slug))
-      .map((room) => applyLocaleOverlay(room, locale));
-    const merged = [...dbRooms, ...missingStatic].map((room) => applyLocaleOverlay(room, locale));
+      .map((room) => finalizeRoom(room, locale));
+    const merged = [...dbRooms, ...missingStatic];
     return sortRoomsByStaticOrder(merged);
   }
 
   // Fallback to static config when DB is empty or unavailable
-  return staticRooms.map((room) => applyLocaleOverlay(room, locale));
+  return staticRooms.map((room) => finalizeRoom(room, locale));
 }
 
 export async function getAvailableRooms(locale: RoomLocale = 'hr'): Promise<Room[]> {

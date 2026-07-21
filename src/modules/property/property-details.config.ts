@@ -240,16 +240,17 @@ export const HOUSE_RULES: HouseRuleItem[] = [
         title: 'Pravila za boravak djece',
         paragraphs: [
           'Djeca svih dobi su dobrodošla.',
-          'Djeca starija od 13 godina smatraju se odraslima i naplaćuje se puna cijena.',
-          'Djeca od 3 do 12 godina naplaćuju se po sniženoj cijeni — po dogovoru pri rezervaciji.',
-          'Djeca do 2 godine borave besplatno (bez dodatnog kreveta).',
+          'Djeca starija od 13 godina smatraju se odraslima za doručak (puna cijena 15 €).',
+          'Djeca od 3 do 12 godina: doručak 7,50 €/osoba/noć.',
+          'Djeca do 2 godine: doručak gratis; borave besplatno ako spavaju s roditeljima (bez dodatnog kreveta).',
         ],
       },
       {
         title: 'Pravila o dječjim krevetima i pomoćnim ležajevima',
         paragraphs: [
           'Dječji krevetić (na upit, ovisno o raspoloživosti): 20 €/noć.',
-          'Pomoćni ležaj (dostupan u sobama Ginko 2, 3, 4 i wellness apartmanu): 20 €/noć.',
+          'Pomoćni ležaj (dostupan u sobama Ginko 2, 3, 4 i apartmanima): 20 €/noć — automatski se naplaćuje kad treba dodatni ležaj (u sobama za 3. osobu; u apartmanima za 4. osobu uz kauč). Djeca do 2 godine koja spavaju s roditeljima ne broje se.',
+          'Doručak: 0–2 godine gratis · 3–12 godina 7,50 €/osoba/noć · 13+ i odrasli 15 €/osoba/noć.',
           'Dijete do 2 godine koje spava s roditeljima u bračnom krevetu ne naplaćuje se.',
         ],
         highlight: {

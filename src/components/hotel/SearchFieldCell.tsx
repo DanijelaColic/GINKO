@@ -11,6 +11,15 @@ type Props = {
 };
 
 function openField(container: HTMLElement) {
+  // GuestPicker i slični custom triggeri
+  const customTrigger = container.querySelector(
+    '[data-search-trigger]',
+  ) as HTMLButtonElement | null;
+  if (customTrigger) {
+    customTrigger.click();
+    return;
+  }
+
   const field = container.querySelector('input, select') as
     | HTMLInputElement
     | HTMLSelectElement
@@ -46,6 +55,8 @@ export default function SearchFieldCell({
       onClick={(e) => {
         const target = e.target;
         if (target instanceof HTMLInputElement || target instanceof HTMLSelectElement) return;
+        if (target instanceof Element && target.closest('[data-search-trigger]')) return;
+        if (target instanceof Element && target.closest('[role="dialog"]')) return;
         openField(e.currentTarget);
       }}
     >

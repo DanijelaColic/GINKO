@@ -11,6 +11,8 @@ export type BookingFormData = {
   guestStayingName: string;
   adults: string;
   children: string;
+  /** Starosti djece (godine) — duljina = children */
+  childAges: number[];
   needsExtraBed: boolean;
   needsCrib: boolean;
   /** Broj osoba uz buffet doručak (0 = bez doručka) */
@@ -33,6 +35,7 @@ export const BOOKING_FORM_DEFAULTS: BookingFormData = {
   guestStayingName: '',
   adults: '2',
   children: '0',
+  childAges: [],
   needsExtraBed: false,
   needsCrib: false,
   breakfastGuests: '0',

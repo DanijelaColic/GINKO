@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useCallback, useEffect, useRef } from 'react';
+import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from '@/i18n/navigation';
@@ -8,6 +8,7 @@ import {
   CalendarDays, Users, AlertCircle, Maximize2,
 } from 'lucide-react';
 import BedTypeIcons from '@/components/hotel/BedTypeIcons';
+import GuestPicker from '@/components/hotel/GuestPicker';
 import RoomDetailModal from '@/components/hotel/RoomDetailModal';
 import SearchFieldCell from '@/components/hotel/SearchFieldCell';
 import { getRoomReserveState } from '@/components/hotel/room-reserve-state';
@@ -23,12 +24,22 @@ import {
   getAvailabilitySearchParams,
   propertySectionIdFromHash,
   BREAKFAST_PRICE_PER_PERSON_PER_NIGHT,
+  BREAKFAST_PRICE_CHILD_3_12,
+  EXTRA_BED_PRICE_PER_NIGHT,
 } from '@/modules/booking/booking.config';
+import {
+  calculateBreakfastPerNight,
+  childAgesComplete,
+  parseChildAgesParam,
+  resizeChildAges,
+  resolvedChildAges,
+  roomFitsGuestsPartial,
+  roomNeedsExtraBed,
+  serializeChildAges,
+} from '@/modules/booking/guest-occupancy';
 import { scrollToElement, scrollToSectionId } from '@/lib/scroll-to-section';
 
 const FIELD_CLASS =
-  'text-text text-sm font-medium bg-transparent outline-none cursor-pointer w-full';
-const SELECT_CLASS =
   'text-text text-sm font-medium bg-transparent outline-none cursor-pointer w-full';
 const CELL_BORDER =
   'px-4 py-3 border-b sm:border-b-0 sm:border-r border-stone';
@@ -59,6 +70,8 @@ export type AvailabilityLabels = {
   planAccommodationOnly: string;
   planWithBreakfast: string;
   planBreakfastPerPerson: string;
+  selectChildAges: string;
+  capacityLabel: string;
 };
 
 type Props = {
@@ -85,8 +98,9 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
 
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [adults, setAdults] = useState(0);
+  const [adults, setAdults] = useState(2);
   const [children, setChildren] = useState(0);
+  const [childAges, setChildAges] = useState<Array<number | null>>([]);
   const [highlightedRoom, setHighlightedRoom] = useState<string | null>(null);
   const [statuses, setStatuses] = useState<Record<string, RoomStatus | null>>({});
   const [loading, setLoading] = useState(false);
@@ -108,6 +122,16 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
   const today = new Date().toISOString().split('T')[0];
   const hasDates = !!(checkIn && checkOut && checkIn < checkOut);
 
+  const agesResolved = useMemo(
+    () => resolvedChildAges(children, childAges),
+    [children, childAges],
+  );
+
+  const breakfastPerNight = useMemo(
+    () => calculateBreakfastPerNight(adults, agesResolved),
+    [adults, agesResolved],
+  );
+
   const runAvailabilityCheck = useCallback(
     async (dates?: { checkIn: string; checkOut: string }, scrollToResults = false) => {
       const ci = dates?.checkIn ?? checkIn;
@@ -118,12 +142,18 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
         return false;
       }
 
+      if (!childAgesComplete(children, childAges)) {
+        setDateError(labels.selectChildAges);
+        return false;
+      }
+
       setDateError(null);
       setLoading(true);
       setSearched(true);
 
       const ciDate = parseLocalDate(ci);
       const coDate = parseLocalDate(co);
+      const ages = resolvedChildAges(children, childAges);
 
       const results = await Promise.all(
         rooms.map(async (room) => {
@@ -131,7 +161,10 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
             const res = await fetch(`/api/bookings?room=${room.slug}`);
             const bookedRanges: BookedRange[] = res.ok ? await res.json() : [];
             const available = isRangeAvailable(ciDate, coDate, bookedRanges);
-            const priceData = available ? calculatePrice(ciDate, coDate, room) : null;
+            const extraBeds = roomNeedsExtraBed(room, adults, ages) ? 1 : 0;
+            const priceData = available
+              ? calculatePrice(ciDate, coDate, room, { extraBeds })
+              : null;
             return {
               slug: room.slug,
               status: available && priceData
@@ -161,7 +194,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
 
       return true;
     },
-    [checkIn, checkOut, rooms, labels.selectDates],
+    [checkIn, checkOut, rooms, labels.selectDates, labels.selectChildAges, adults, children, childAges],
   );
 
   // Prefill + auto-provjera iz URL-a (hero search bar, linkovi soba)
@@ -176,12 +209,20 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     const room = params.get('room');
     const a = parseInt(params.get('adults') ?? '');
     const ch = parseInt(params.get('children') ?? '');
+    const agesFromUrl = parseChildAgesParam(params.get('childAges'));
 
     if (ci) setCheckIn(ci);
     if (co) setCheckOut(co);
     if (room) setHighlightedRoom(room);
     if (!isNaN(a) && a >= 0) setAdults(a);
-    if (!isNaN(ch) && ch >= 0) setChildren(ch);
+    if (!isNaN(ch) && ch >= 0) {
+      setChildren(ch);
+      setChildAges(
+        agesFromUrl.length === ch
+          ? agesFromUrl
+          : resizeChildAges(agesFromUrl, ch),
+      );
+    }
 
     const sectionId = propertySectionIdFromHash(window.location.hash);
     if (sectionId === AVAILABILITY_SECTION_ID) {
@@ -189,7 +230,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     }
 
     if (ci && co && ci < co) {
-      const key = `${ci}|${co}|${params.get('adults') ?? ''}|${params.get('children') ?? ''}|${room ?? ''}`;
+      const key = `${ci}|${co}|${params.get('adults') ?? ''}|${params.get('children') ?? ''}|${params.get('childAges') ?? ''}|${room ?? ''}`;
       if (key !== lastAutoSearchKey.current) {
         lastAutoSearchKey.current = key;
         void runAvailabilityCheck({ checkIn: ci, checkOut: co }, true);
@@ -217,13 +258,15 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     }
     setDateError(null);
     const plan = getRoomPlan(roomSlug);
+    const ages = resolvedChildAges(children, childAges);
     router.push(buildBookingHref({
       room: roomSlug,
       checkIn,
       checkOut,
       adults,
       children,
-      breakfast: plan.breakfast ? adults : 0,
+      childAges: ages.length ? serializeChildAges(ages) : undefined,
+      breakfast: plan.breakfast ? adults + children : 0,
       step: 2,
     }));
   };
@@ -248,12 +291,16 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     [hasDates, adults, searched, statuses, labels, runAvailabilityCheck],
   );
 
-  const totalGuests = adults + children;
-
   const availableRooms = rooms.filter((r) => {
     if (typeFilter !== 'all' && r.accommodationType !== typeFilter) return false;
     if (r.fullyBooked) return false;
-    if (searched && totalGuests > 0 && r.capacity < totalGuests) return false;
+    // Kapacitet po ležajima — čim su gosti odabrani (npr. 2+dijete 16 → nema Ginko 1)
+    if (
+      (adults > 0 || children > 0) &&
+      !roomFitsGuestsPartial(r, adults, children, childAges)
+    ) {
+      return false;
+    }
     if (searched && statuses[r.slug]?.available === false) return false;
     return true;
   });
@@ -282,7 +329,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
         {/* Search bar */}
         <form
           onSubmit={handleSearch}
-          className="flex flex-col sm:flex-row items-stretch bg-white border border-stone rounded-xl overflow-hidden mb-8 shadow-sm"
+          className="flex flex-col sm:flex-row items-stretch bg-white border border-stone rounded-xl overflow-visible mb-8 shadow-sm relative z-30"
         >
           <SearchFieldCell
             icon={CalendarDays}
@@ -318,39 +365,26 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
 
           <SearchFieldCell
             icon={Users}
-            label="Odrasli"
-            className={CELL_BORDER}
+            label="Gosti"
+            className={`${CELL_BORDER} relative z-40 flex-1 sm:min-w-[180px]`}
           >
-            <select
-              value={adults}
-              onChange={(e) => {
-                const a = Number(e.target.value);
-                setAdults(a);
-                if (children > 3 - a) setChildren(Math.max(0, 3 - a));
-                setSearched(false);
+            <GuestPicker
+              adults={adults}
+              children={children}
+              childAges={childAges}
+              onAdultsChange={(n) => { setAdults(n); setSearched(false); }}
+              onChildrenChange={(n) => { setChildren(n); setSearched(false); }}
+              onChildAgesChange={(ages) => { setChildAges(ages); setSearched(false); }}
+              labels={{
+                adults: 'Odrasli',
+                children: 'Djeca',
+                guests: 'Gosti',
+                childAge: 'Starost djeteta',
+                childAgeNeeded: 'Potrebno',
+                agesHint: labels.selectChildAges,
+                done: 'Gotovo',
               }}
-              className={SELECT_CLASS}
-            >
-              {[0, 1, 2, 3].map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
-          </SearchFieldCell>
-
-          <SearchFieldCell
-            icon={Users}
-            label="Djeca"
-            className={CELL_BORDER}
-          >
-            <select
-              value={children}
-              onChange={(e) => { setChildren(Number(e.target.value)); setSearched(false); }}
-              className={SELECT_CLASS}
-            >
-              {Array.from({ length: Math.max(1, 3 - adults + 1) }, (_, i) => i).map((n) => (
-                <option key={n} value={n}>{n}</option>
-              ))}
-            </select>
+            />
           </SearchFieldCell>
 
           <button
@@ -456,6 +490,11 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                     )}
 
                     <div className="mb-3 space-y-2">
+                      <div className="flex flex-wrap items-center gap-2 mb-1">
+                        <span className="inline-flex items-center gap-1 text-xs font-semibold text-text bg-stone-light border border-stone px-2 py-0.5 rounded">
+                          {labels.capacityLabel} {room.capacityNote}
+                        </span>
+                      </div>
                       <BedTypeIcons beds={room.beds} iconSize={22} />
                       <span className="flex items-center gap-1 text-xs text-muted">
                         <Maximize2 size={12} className="text-text shrink-0" />
@@ -482,8 +521,9 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                     {/* ── Rate plan: samo smještaj / s doručkom ─────── */}
                     {(() => {
                       const plan = getRoomPlan(room.slug);
-                      const basePrice = room.price;
-                      const breakfastExtra = BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * adults;
+                      const needsExtra = roomNeedsExtraBed(room, adults, agesResolved);
+                      const basePrice = room.price + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0);
+                      const bfExtra = breakfastPerNight;
                       return (
                         <div className="mt-3 border border-stone rounded-lg overflow-hidden text-sm divide-y divide-stone">
                           <label className={`flex items-center justify-between px-3 py-2.5 cursor-pointer transition-colors ${!plan.breakfast ? 'bg-primary/5' : 'hover:bg-stone-light/60'}`}>
@@ -502,21 +542,23 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                             </span>
                           </label>
                           <label className={`flex items-center justify-between px-3 py-2.5 cursor-pointer transition-colors ${plan.breakfast ? 'bg-primary/5' : 'hover:bg-stone-light/60'}`}>
-                            <span className="flex items-center gap-2">
+                            <span className="flex items-center gap-2 min-w-0">
                               <input
                                 type="radio"
                                 name={`plan-${room.slug}`}
                                 checked={plan.breakfast}
                                 onChange={() => setRoomPlan(room.slug, { breakfast: true })}
-                                className="accent-primary"
+                                className="accent-primary shrink-0"
                               />
-                              <span>
+                              <span className="min-w-0">
                                 <span className="font-medium text-text">{labels.planWithBreakfast}</span>
-                                <span className="text-xs text-muted ml-1">(+{BREAKFAST_PRICE_PER_PERSON_PER_NIGHT} €/{labels.planBreakfastPerPerson})</span>
+                                <span className="block text-[11px] text-muted leading-snug mt-0.5">
+                                  0–2 gratis · 3–12 {BREAKFAST_PRICE_CHILD_3_12} € · 13+ {BREAKFAST_PRICE_PER_PERSON_PER_NIGHT} €/{labels.planBreakfastPerPerson}
+                                </span>
                               </span>
                             </span>
                             <span className="font-semibold text-primary shrink-0 ml-3">
-                              {basePrice + breakfastExtra} € <span className="text-xs font-normal text-muted">/ {labels.perNight}</span>
+                              {basePrice + bfExtra} € <span className="text-xs font-normal text-muted">/ {labels.perNight}</span>
                             </span>
                           </label>
                         </div>
@@ -531,8 +573,8 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                         (() => {
                           const plan = getRoomPlan(room.slug);
                           const nights = status.nights;
-                          const breakfastExtra = plan.breakfast ? BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * adults * nights : 0;
-                          const displayTotal = status.totalPrice + breakfastExtra;
+                          const bfExtra = plan.breakfast ? breakfastPerNight * nights : 0;
+                          const displayTotal = status.totalPrice + bfExtra;
                           return (
                             <>
                               <p className="text-2xl font-bold text-primary leading-none">
@@ -548,8 +590,9 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                       ) : (
                         (() => {
                           const plan = getRoomPlan(room.slug);
-                          const breakfastExtra = plan.breakfast ? BREAKFAST_PRICE_PER_PERSON_PER_NIGHT * adults : 0;
-                          const displayPrice = room.price + breakfastExtra;
+                          const needsExtra = roomNeedsExtraBed(room, adults, agesResolved);
+                          const basePrice = room.price + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0);
+                          const displayPrice = basePrice + (plan.breakfast ? breakfastPerNight : 0);
                           return (
                             <>
                               <p className="text-2xl font-bold text-primary leading-none">
@@ -601,6 +644,8 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
           searched={searched}
           plan={getRoomPlan(detailRoom.slug)}
           adults={adults}
+          childAges={agesResolved}
+          breakfastPerNight={breakfastPerNight}
           labels={labels}
           reviewSummary={reviewSummary}
           reserveState={getRoomReserveState(

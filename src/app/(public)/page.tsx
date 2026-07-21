@@ -88,6 +88,8 @@ export default async function HomePage() {
     planAccommodationOnly: t('availabilityPlanAccommodationOnly'),
     planWithBreakfast: t('availabilityPlanWithBreakfast'),
     planBreakfastPerPerson: t('availabilityPlanBreakfastPerPerson'),
+    selectChildAges: t('availabilitySelectChildAges'),
+    capacityLabel: t('availabilityCapacityLabel'),
   };
 
   return (
@@ -95,18 +97,20 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       {/* HERO                                                                */}
       {/* ------------------------------------------------------------------ */}
-      <section className="relative min-h-[88vh] flex flex-col items-center justify-center px-4 py-24 overflow-hidden">
-        <Image
-          src="/images/hero/exterior-01.webp"
-          alt="Ginko Boutique Rooms & Wellness — Daruvar"
-          fill
-          priority
-          className="object-cover object-center"
-          sizes="100vw"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/65" />
+      <section className="relative min-h-[88vh] flex flex-col items-center justify-center px-4 py-24">
+        <div className="absolute inset-0 overflow-hidden">
+          <Image
+            src="/images/hero/exterior-01.webp"
+            alt="Ginko Boutique Rooms & Wellness — Daruvar"
+            fill
+            priority
+            className="object-cover object-center"
+            sizes="100vw"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-black/55 via-black/40 to-black/65" />
+        </div>
 
-        <div className="relative z-10 flex flex-col items-center text-center max-w-4xl">
+        <div className="relative z-10 flex flex-col items-center text-center max-w-4xl w-full">
           <span className="text-white/80 text-xs font-semibold uppercase tracking-[0.2em] mb-4">
             Daruvar, Hrvatska
           </span>

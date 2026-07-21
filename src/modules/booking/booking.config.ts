@@ -62,8 +62,11 @@ export const EXTRA_BED_PRICE_PER_NIGHT = 20;
 /** Dječji krevetić: 20 €/noć (besplatno ako dijete spava s roditeljima bez krevetića) */
 export const CRIB_PRICE_PER_NIGHT = 20;
 
-/** Buffet doručak: 15 €/osoba/noć */
+/** Buffet doručak: puna cijena (odrasli i djeca 13+) €/osoba/noć */
 export const BREAKFAST_PRICE_PER_PERSON_PER_NIGHT = 15;
+
+/** Doručak za djecu 3–12 godina (50%) */
+export const BREAKFAST_PRICE_CHILD_3_12 = 7.5;
 
 // ── Navigacija (raspoloživost → rezervacija) ─────────────────────
 export const OVERVIEW_SECTION_ID = 'pregled';
@@ -109,6 +112,8 @@ export function buildAvailabilityHref(params?: {
   checkOut?: string;
   adults?: number | string;
   children?: number | string;
+  /** Starosti djece, npr. "7,3" */
+  childAges?: string;
 }) {
   if (!params?.room && !params?.checkIn && !params?.checkOut) {
     return AVAILABILITY_SECTION_HREF;
@@ -119,6 +124,7 @@ export function buildAvailabilityHref(params?: {
   if (params.checkOut) q.set('checkOut', params.checkOut);
   if (params.adults != null) q.set('adults', String(params.adults));
   if (params.children != null) q.set('children', String(params.children));
+  if (params.childAges) q.set('childAges', params.childAges);
   // Query prije hash-a — inače browser ne parsira checkIn/checkOut iz location.search
   return `/?${q.toString()}#${AVAILABILITY_SECTION_ID}`;
 }
@@ -150,7 +156,9 @@ export function buildBookingHref(params: {
   checkOut: string;
   adults?: number | string;
   children?: number | string;
-  /** Broj osoba uz doručak (0 = bez doručka) */
+  /** Starosti djece, npr. "7,3" */
+  childAges?: string;
+  /** Broj osoba uz doručak (0 = bez doručka); >0 = doručak uključen */
   breakfast?: number;
   /** Početni korak booking widgeta (1 = datumi, 2 = podaci, 3 = plaćanje) */
   step?: 1 | 2 | 3;
@@ -162,6 +170,7 @@ export function buildBookingHref(params: {
   });
   if (params.adults != null) q.set('adults', String(params.adults));
   if (params.children != null) q.set('children', String(params.children));
+  if (params.childAges) q.set('childAges', params.childAges);
   if (params.breakfast != null && params.breakfast > 0) q.set('breakfast', String(params.breakfast));
   if (params.step != null) q.set('step', String(params.step));
   return `/booking?${q.toString()}`;

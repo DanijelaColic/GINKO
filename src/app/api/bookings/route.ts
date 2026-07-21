@@ -13,6 +13,11 @@ import {
 } from '@/modules/booking/dates';
 import { MIN_NIGHTS } from '@/modules/booking/booking.config';
 import {
+  calculateBreakfastPerNight,
+  roomFitsGuests,
+  roomNeedsExtraBed,
+} from '@/modules/booking/guest-occupancy';
+import {
   createBookingViewToken,
   getBookingConfirmationPath,
   getBookingConfirmationUrlFromRequest,
@@ -97,6 +102,7 @@ export async function POST(request: NextRequest) {
       guest_phone,
       adults,
       children,
+      child_ages,
       booking_for,
       guest_staying_name,
       needs_crib,
@@ -140,15 +146,26 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const totalGuests = (adults ?? 1) + (children ?? 0);
-    if (totalGuests > room.capacity) {
+    const adultsCount = typeof adults === 'number' ? adults : 1;
+    const childrenCount = typeof children === 'number' ? children : 0;
+    const childAges: number[] = Array.isArray(child_ages)
+      ? child_ages
+          .map((a: unknown) => (typeof a === 'number' ? a : parseInt(String(a), 10)))
+          .filter((a: number) => !isNaN(a) && a >= 0)
+          .slice(0, childrenCount)
+      : Array.from({ length: childrenCount }, () => 0);
+
+    while (childAges.length < childrenCount) childAges.push(0);
+
+    if (!roomFitsGuests(room, adultsCount, childAges)) {
       return NextResponse.json(
-        { error: `Soba ${room.name} prima maksimalno ${room.capacity} osoba.` },
+        { error: `Soba ${room.name} prima maksimalno ${room.capacity} osoba (ležaja).` },
         { status: 400 },
       );
     }
 
-    // Validacija pomoćnog ležaja
+    // Pomoćni ležaj — server je source of truth (ignorira client ako se ne slaže)
+    const autoExtraBed = roomNeedsExtraBed(room, adultsCount, childAges);
     if (needs_extra_bed === true && !room.extraBedAvailable) {
       return NextResponse.json(
         { error: `Soba ${room.name} ne podržava pomoćni ležaj.` },
@@ -158,12 +175,15 @@ export async function POST(request: NextRequest) {
 
     // Doručak ne može biti za više osoba nego što boravi
     const bfGuests = typeof breakfast_guests === 'number' ? breakfast_guests : 0;
-    if (bfGuests > (adults ?? 1) + (children ?? 0)) {
+    if (bfGuests > adultsCount + childrenCount) {
       return NextResponse.json(
         { error: 'Broj osoba uz doručak ne može biti veći od ukupnog broja gostiju.' },
         { status: 400 },
       );
     }
+
+    const breakfastPerNight =
+      bfGuests > 0 ? calculateBreakfastPerNight(adultsCount, childAges) : 0;
 
     const isWellnessApartment = room_slug === 'ginko-spa-2';
 
@@ -207,9 +227,9 @@ export async function POST(request: NextRequest) {
 
     // Server-side pricing (source of truth) — uključuje sve extras
     const priceData = calculatePrice(checkInDate, checkOutDate, room, {
-      extraBeds: needs_extra_bed === true ? 1 : 0,
+      extraBeds: autoExtraBed ? 1 : 0,
       crib: needs_crib === true,
-      breakfastGuests: bfGuests,
+      breakfastPerNight,
     });
     const { totalPrice, deposit } = priceData;
     const avgPricePerNight = Math.round(totalPrice / nights);
@@ -227,12 +247,12 @@ export async function POST(request: NextRequest) {
         guest_country: guest_country || null,
         guest_email,
         guest_phone: guest_phone || null,
-        adults: adults ?? 1,
-        children: children ?? 0,
+        adults: adultsCount,
+        children: childrenCount,
         booking_for: booking_for || 'self',
         guest_staying_name: guest_staying_name || null,
         needs_crib: needs_crib === true,
-        needs_extra_bed: needs_extra_bed === true,
+        needs_extra_bed: autoExtraBed,
         breakfast_guests: bfGuests,
         include_wellness: isWellnessApartment,
         is_business: is_business === true,
@@ -266,7 +286,7 @@ export async function POST(request: NextRequest) {
       guestPhone: guest_phone,
       guestCountry: guest_country || null,
       needsCrib: needs_crib === true,
-      needsExtraBed: needs_extra_bed === true,
+      needsExtraBed: autoExtraBed,
       breakfastGuests: bfGuests,
       includeWellness: isWellnessApartment,
       isBusiness: is_business === true,

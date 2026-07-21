@@ -7,73 +7,122 @@ type ParsedBed = {
   bedLabel: string;
 };
 
-// Booking.com stil — crne siluete, bočni pogled (krevet) / frontalni (kauč)
+/**
+ * Booking.com bed icons — front view (foot → headboard).
+ * Mattress solid; pillows/headboard outlined (no fill).
+ */
 
-function DoubleBedIcon({ size = 22 }: { size?: number }) {
-  const h = Math.round(size * 0.73);
+function DoubleBedIcon({ size = 26 }: { size?: number }) {
   return (
     <svg
       width={size}
-      height={h}
-      viewBox="0 0 22 16"
-      fill="currentColor"
+      height={Math.round(size * 0.78)}
+      viewBox="0 0 28 22"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <rect x="0" y="2" width="2" height="10" />
-      <rect x="2" y="6" width="20" height="5" />
-      <rect x="3.5" y="7" width="7" height="3" />
-      <rect x="11.5" y="7" width="7" height="3" />
-      <rect x="3.5" y="11" width="1.2" height="3" />
-      <rect x="18.5" y="11" width="1.2" height="3" />
+      {/* headboard — outline */}
+      <rect
+        x="1.5"
+        y="1.5"
+        width="25"
+        height="3.2"
+        rx="1"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      {/* pillows — outline, no fill */}
+      <rect
+        x="3"
+        y="3.8"
+        width="10"
+        height="4.6"
+        rx="1.3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="15"
+        y="3.8"
+        width="10"
+        height="4.6"
+        rx="1.3"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      {/* mattress — solid */}
+      <rect x="1.5" y="8.2" width="25" height="10" rx="1.6" fill="currentColor" />
+      {/* legs */}
+      <rect x="3.5" y="18.2" width="2" height="3.2" rx="0.4" fill="currentColor" />
+      <rect x="22.5" y="18.2" width="2" height="3.2" rx="0.4" fill="currentColor" />
     </svg>
   );
 }
 
-function SingleBedIcon({ size = 16 }: { size?: number }) {
-  const h = Math.round(size * 0.88);
+function SingleBedIcon({ size = 15 }: { size?: number }) {
   return (
     <svg
       width={size}
-      height={h}
-      viewBox="0 0 16 14"
-      fill="currentColor"
+      height={Math.round(size * 1.35)}
+      viewBox="0 0 15 22"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <rect x="0" y="2" width="2" height="9" />
-      <rect x="2" y="5" width="14" height="4.5" />
-      <rect x="3.5" y="6" width="5.5" height="2.5" />
-      <rect x="3.5" y="9.5" width="1.2" height="3" />
-      <rect x="12.5" y="9.5" width="1.2" height="3" />
+      <rect
+        x="1.2"
+        y="1.5"
+        width="12.6"
+        height="3.2"
+        rx="0.9"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <rect
+        x="2.6"
+        y="3.8"
+        width="9.8"
+        height="4.6"
+        rx="1.2"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.5"
+      />
+      <rect x="1.2" y="8.2" width="12.6" height="10" rx="1.4" fill="currentColor" />
+      <rect x="2.6" y="18.2" width="1.8" height="3.2" rx="0.35" fill="currentColor" />
+      <rect x="10.6" y="18.2" width="1.8" height="3.2" rx="0.35" fill="currentColor" />
     </svg>
   );
 }
 
-function SofaBedIcon({ size = 24 }: { size?: number }) {
-  const h = Math.round(size * 0.5);
+function SofaBedIcon({ size = 26 }: { size?: number }) {
   return (
     <svg
       width={size}
-      height={h}
-      viewBox="0 0 24 12"
+      height={Math.round(size * 0.55)}
+      viewBox="0 0 30 16.5"
       fill="currentColor"
       xmlns="http://www.w3.org/2000/svg"
       aria-hidden="true"
     >
-      <rect x="1.5" y="0" width="21" height="3.5" rx="0.5" />
-      <rect x="1.5" y="3.5" width="21" height="4.5" />
-      <rect x="0" y="2" width="2.5" height="6" rx="0.5" />
-      <rect x="21.5" y="2" width="2.5" height="6" rx="0.5" />
-      <rect x="3" y="8" width="1.2" height="3" />
-      <rect x="11" y="8" width="1.2" height="3" />
-      <rect x="19" y="8" width="1.2" height="3" />
+      <rect x="5" y="1" width="20" height="4" rx="1.1" />
+      <rect x="5.3" y="4.8" width="9" height="5.2" rx="1.1" />
+      <rect x="15.7" y="4.8" width="9" height="5.2" rx="1.1" />
+      <rect x="1.2" y="3" width="4" height="7.4" rx="1.1" />
+      <rect x="24.8" y="3" width="4" height="7.4" rx="1.1" />
+      <rect x="1.2" y="10" width="27.6" height="2.5" rx="0.7" />
+      <rect x="3.2" y="12.5" width="1.5" height="2.8" rx="0.3" />
+      <rect x="14.25" y="12.5" width="1.5" height="2.8" rx="0.3" />
+      <rect x="25.3" y="12.5" width="1.5" height="2.8" rx="0.3" />
     </svg>
   );
 }
 
 function BedIcon({ type, size }: { type: BedType; size: number }) {
-  if (type === 'single') return <SingleBedIcon size={size} />;
+  if (type === 'single') return <SingleBedIcon size={Math.round(size * 0.55)} />;
   if (type === 'sofa') return <SofaBedIcon size={size} />;
   return <DoubleBedIcon size={size} />;
 }
@@ -85,7 +134,14 @@ function detectBedType(text: string): BedType {
     lower.includes('jednokrevetni') ||
     lower.includes('single') ||
     lower.includes('einzelbett') ||
-    lower.includes('twin')
+    lower.includes('twin') ||
+    lower.includes('pomoćni') ||
+    lower.includes('pomocni') ||
+    lower.includes('extra bed') ||
+    lower.includes('zustellbett') ||
+    lower.includes('za 1 osobu') ||
+    lower.includes('za jednu osobu') ||
+    lower.includes('1 osobu')
   ) {
     return 'single';
   }
@@ -140,23 +196,24 @@ type Props = {
   iconSize?: number;
 };
 
-export default function BedTypeIcons({ beds, iconSize = 22 }: Props) {
+export default function BedTypeIcons({ beds, iconSize = 26 }: Props) {
   const parsed = parseBeds(beds);
 
   return (
-    <div className="flex flex-col gap-1.5">
+    <div className="flex flex-col gap-1.5 text-text">
       {parsed.map(({ type, count, roomLabel, bedLabel }, i) => {
         const icons = Array.from({ length: Math.min(count, 3) });
 
         return (
-          <div key={i} className="flex items-center gap-2 text-sm text-text leading-snug">
-            <span className="min-w-0">
-              {roomLabel && (
-                <span className="font-semibold text-text">{roomLabel}: </span>
-              )}
-              <span className="text-muted">{bedLabel}</span>
-            </span>
-            <span className="inline-flex shrink-0 items-center gap-0.5 text-text">
+          <div
+            key={i}
+            className="flex flex-wrap items-center gap-x-2 gap-y-1 text-sm leading-snug"
+          >
+            {roomLabel && (
+              <span className="font-semibold text-text">{roomLabel}:</span>
+            )}
+            <span className="text-text">{bedLabel}</span>
+            <span className="inline-flex shrink-0 items-center gap-1 text-[#262626]">
               {icons.map((_, j) => (
                 <BedIcon key={j} type={type} size={iconSize} />
               ))}
