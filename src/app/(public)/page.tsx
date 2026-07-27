@@ -88,7 +88,9 @@ export default async function HomePage() {
     planAccommodationOnly: t('availabilityPlanAccommodationOnly'),
     planWithBreakfast: t('availabilityPlanWithBreakfast'),
     planBreakfastPerPerson: t('availabilityPlanBreakfastPerPerson'),
-    selectChildAges: t('availabilitySelectChildAges'),
+    childAgesHint: t('heroChildAgesHint'),
+    childAgeNeeded: t('heroChildAgeNeeded'),
+    childAgeError: t('heroChildAgeError'),
     capacityLabel: t('availabilityCapacityLabel'),
   };
 

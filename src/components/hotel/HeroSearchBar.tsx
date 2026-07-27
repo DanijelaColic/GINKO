@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, FormEvent } from 'react';
+import { useEffect, useState, FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { Search, CalendarDays, Users, AlertCircle } from 'lucide-react';
@@ -30,8 +30,16 @@ export default function HeroSearchBar() {
   const [children, setChildren] = useState(0);
   const [childAges, setChildAges] = useState<Array<number | null>>([]);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [guestsOpen, setGuestsOpen] = useState(false);
+  const [showAgeErrors, setShowAgeErrors] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
+
+  useEffect(() => {
+    if (showAgeErrors && childAgesComplete(children, childAges)) {
+      setShowAgeErrors(false);
+    }
+  }, [children, childAges, showAgeErrors]);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -41,10 +49,13 @@ export default function HeroSearchBar() {
       return;
     }
     if (!childAgesComplete(children, childAges)) {
-      setDateError(t('availabilitySelectChildAges'));
+      setDateError(null);
+      setShowAgeErrors(true);
+      setGuestsOpen(true);
       return;
     }
     setDateError(null);
+    setShowAgeErrors(false);
     const ages = resolvedChildAges(children, childAges);
     router.push(
       buildAvailabilityHref({
@@ -106,14 +117,21 @@ export default function HeroSearchBar() {
             adults={adults}
             children={children}
             childAges={childAges}
+            open={guestsOpen}
+            onOpenChange={setGuestsOpen}
+            showAgeErrors={showAgeErrors}
             onAdultsChange={setAdults}
-            onChildrenChange={setChildren}
+            onChildrenChange={(n) => {
+              setChildren(n);
+              if (n === 0) setShowAgeErrors(false);
+            }}
             onChildAgesChange={setChildAges}
             labels={{
               adults: t('heroAdults'),
               children: t('heroChildren'),
               guests: t('heroGuests'),
               childAgeNeeded: t('heroChildAgeNeeded'),
+              childAgeError: t('heroChildAgeError'),
               agesHint: t('heroChildAgesHint'),
               done: t('heroGuestsDone'),
             }}

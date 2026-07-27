@@ -70,7 +70,9 @@ export type AvailabilityLabels = {
   planAccommodationOnly: string;
   planWithBreakfast: string;
   planBreakfastPerPerson: string;
-  selectChildAges: string;
+  childAgesHint: string;
+  childAgeNeeded: string;
+  childAgeError: string;
   capacityLabel: string;
 };
 
@@ -106,6 +108,8 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
+  const [guestsOpen, setGuestsOpen] = useState(false);
+  const [showAgeErrors, setShowAgeErrors] = useState(false);
   const [typeFilter, setTypeFilter] = useState<TypeFilter>('all');
   const [roomPlans, setRoomPlans] = useState<Record<string, RoomPlan>>({});
   const [detailRoomSlug, setDetailRoomSlug] = useState<string | null>(null);
@@ -127,33 +131,54 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     [children, childAges],
   );
 
+  useEffect(() => {
+    if (showAgeErrors && childAgesComplete(children, childAges)) {
+      setShowAgeErrors(false);
+    }
+  }, [children, childAges, showAgeErrors]);
+
   const breakfastPerNight = useMemo(
     () => calculateBreakfastPerNight(adults, agesResolved),
     [adults, agesResolved],
   );
 
   const runAvailabilityCheck = useCallback(
-    async (dates?: { checkIn: string; checkOut: string }, scrollToResults = false) => {
+    async (
+      dates?: {
+        checkIn: string;
+        checkOut: string;
+        adults?: number;
+        children?: number;
+        childAges?: Array<number | null>;
+      },
+      scrollToResults = false,
+    ) => {
       const ci = dates?.checkIn ?? checkIn;
       const co = dates?.checkOut ?? checkOut;
+      const adultsCount = dates?.adults ?? adults;
+      const childrenCount = dates?.children ?? children;
+      const agesInput = dates?.childAges ?? childAges;
 
       if (!ci || !co || ci >= co) {
         setDateError(labels.selectDates);
         return false;
       }
 
-      if (!childAgesComplete(children, childAges)) {
-        setDateError(labels.selectChildAges);
+      if (!childAgesComplete(childrenCount, agesInput)) {
+        setDateError(null);
+        setShowAgeErrors(true);
+        setGuestsOpen(true);
         return false;
       }
 
       setDateError(null);
+      setShowAgeErrors(false);
       setLoading(true);
       setSearched(true);
 
       const ciDate = parseLocalDate(ci);
       const coDate = parseLocalDate(co);
-      const ages = resolvedChildAges(children, childAges);
+      const ages = resolvedChildAges(childrenCount, agesInput);
 
       const results = await Promise.all(
         rooms.map(async (room) => {
@@ -161,7 +186,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
             const res = await fetch(`/api/bookings?room=${room.slug}`);
             const bookedRanges: BookedRange[] = res.ok ? await res.json() : [];
             const available = isRangeAvailable(ciDate, coDate, bookedRanges);
-            const extraBeds = roomNeedsExtraBed(room, adults, ages) ? 1 : 0;
+            const extraBeds = roomNeedsExtraBed(room, adultsCount, ages) ? 1 : 0;
             const priceData = available
               ? calculatePrice(ciDate, coDate, room, { extraBeds })
               : null;
@@ -194,10 +219,14 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
 
       return true;
     },
-    [checkIn, checkOut, rooms, labels.selectDates, labels.selectChildAges, adults, children, childAges],
+    [checkIn, checkOut, rooms, labels.selectDates, adults, children, childAges],
   );
 
-  // Prefill + auto-provjera iz URL-a (hero search bar, linkovi soba)
+  // Latest check fn — prefill effect must NOT depend on this (else URL resets guests on every edit)
+  const runAvailabilityCheckRef = useRef(runAvailabilityCheck);
+  runAvailabilityCheckRef.current = runAvailabilityCheck;
+
+  // Prefill + auto-provjera iz URL-a — samo kad se searchParams promijene
   useEffect(() => {
     const params = getAvailabilitySearchParams(
       searchParams.toString(),
@@ -211,17 +240,22 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     const ch = parseInt(params.get('children') ?? '');
     const agesFromUrl = parseChildAgesParam(params.get('childAges'));
 
+    const nextAdults = !isNaN(a) && a >= 0 ? a : undefined;
+    const nextChildren = !isNaN(ch) && ch >= 0 ? ch : undefined;
+    const nextAges =
+      nextChildren !== undefined
+        ? agesFromUrl.length === nextChildren
+          ? agesFromUrl
+          : resizeChildAges(agesFromUrl, nextChildren)
+        : undefined;
+
     if (ci) setCheckIn(ci);
     if (co) setCheckOut(co);
     if (room) setHighlightedRoom(room);
-    if (!isNaN(a) && a >= 0) setAdults(a);
-    if (!isNaN(ch) && ch >= 0) {
-      setChildren(ch);
-      setChildAges(
-        agesFromUrl.length === ch
-          ? agesFromUrl
-          : resizeChildAges(agesFromUrl, ch),
-      );
+    if (nextAdults !== undefined) setAdults(nextAdults);
+    if (nextChildren !== undefined && nextAges !== undefined) {
+      setChildren(nextChildren);
+      setChildAges(nextAges);
     }
 
     const sectionId = propertySectionIdFromHash(window.location.hash);
@@ -233,10 +267,19 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
       const key = `${ci}|${co}|${params.get('adults') ?? ''}|${params.get('children') ?? ''}|${params.get('childAges') ?? ''}|${room ?? ''}`;
       if (key !== lastAutoSearchKey.current) {
         lastAutoSearchKey.current = key;
-        void runAvailabilityCheck({ checkIn: ci, checkOut: co }, true);
+        void runAvailabilityCheckRef.current(
+          {
+            checkIn: ci,
+            checkOut: co,
+            ...(nextAdults !== undefined ? { adults: nextAdults } : {}),
+            ...(nextChildren !== undefined ? { children: nextChildren } : {}),
+            ...(nextAges !== undefined ? { childAges: nextAges } : {}),
+          },
+          true,
+        );
       }
     }
-  }, [searchParams, runAvailabilityCheck]);
+  }, [searchParams]);
 
   useEffect(() => {
     if (hasDates) setDateError(null);
@@ -372,16 +415,27 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
               adults={adults}
               children={children}
               childAges={childAges}
+              open={guestsOpen}
+              onOpenChange={setGuestsOpen}
+              showAgeErrors={showAgeErrors}
               onAdultsChange={(n) => { setAdults(n); setSearched(false); }}
-              onChildrenChange={(n) => { setChildren(n); setSearched(false); }}
-              onChildAgesChange={(ages) => { setChildAges(ages); setSearched(false); }}
+              onChildrenChange={(n) => {
+                setChildren(n);
+                setSearched(false);
+                if (n === 0) setShowAgeErrors(false);
+              }}
+              onChildAgesChange={(ages) => {
+                setChildAges(ages);
+                setSearched(false);
+              }}
               labels={{
                 adults: 'Odrasli',
                 children: 'Djeca',
                 guests: 'Gosti',
                 childAge: 'Starost djeteta',
-                childAgeNeeded: 'Potrebno',
-                agesHint: labels.selectChildAges,
+                childAgeNeeded: labels.childAgeNeeded,
+                childAgeError: labels.childAgeError,
+                agesHint: labels.childAgesHint,
                 done: 'Gotovo',
               }}
             />

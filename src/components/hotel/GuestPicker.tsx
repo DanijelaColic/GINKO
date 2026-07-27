@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { ChevronDown, Minus, Plus } from 'lucide-react';
+import { AlertCircle, ChevronDown, Minus, Plus } from 'lucide-react';
 import {
   MAX_ADULTS,
   MAX_CHILD_AGE,
@@ -17,12 +17,18 @@ type Props = {
   onChildrenChange: (n: number) => void;
   onChildAgesChange: (ages: Array<number | null>) => void;
   className?: string;
+  /** Controlled open — parent can force-open on submit validation */
+  open?: boolean;
+  onOpenChange?: (open: boolean) => void;
+  /** Show Booking-style errors on empty age selects */
+  showAgeErrors?: boolean;
   labels?: {
     adults?: string;
     children?: string;
     guests?: string;
     childAge?: string;
     childAgeNeeded?: string;
+    childAgeError?: string;
     agesHint?: string;
     done?: string;
   };
@@ -91,17 +97,28 @@ export default function GuestPicker({
   onChildrenChange,
   onChildAgesChange,
   className = '',
+  open: openControlled,
+  onOpenChange,
+  showAgeErrors = false,
   labels = {},
 }: Props) {
-  const [open, setOpen] = useState(false);
+  const [openUncontrolled, setOpenUncontrolled] = useState(false);
+  const isControlled = openControlled !== undefined;
+  const open = isControlled ? openControlled : openUncontrolled;
   const rootRef = useRef<HTMLDivElement>(null);
+
+  function setOpen(next: boolean) {
+    if (!isControlled) setOpenUncontrolled(next);
+    onOpenChange?.(next);
+  }
 
   const l = {
     adults: labels.adults ?? 'Odrasli',
     children: labels.children ?? 'Djeca',
     guests: labels.guests ?? 'Gosti',
     childAge: labels.childAge ?? 'Starost djeteta',
-    childAgeNeeded: labels.childAgeNeeded ?? 'Potrebno',
+    childAgeNeeded: labels.childAgeNeeded ?? 'Dob (obavezno)',
+    childAgeError: labels.childAgeError ?? 'Odaberi dob',
     agesHint:
       labels.agesHint ??
       'Da bismo pronašli smještaj s odgovarajućim kapacitetom i prikazali točne cijene, trebamo starost djece u trenutku odjave.',
@@ -110,13 +127,17 @@ export default function GuestPicker({
 
   useEffect(() => {
     if (!open) return;
+    function close() {
+      if (!isControlled) setOpenUncontrolled(false);
+      onOpenChange?.(false);
+    }
     function onDoc(e: MouseEvent) {
       if (rootRef.current && !rootRef.current.contains(e.target as Node)) {
-        setOpen(false);
+        close();
       }
     }
     function onKey(e: KeyboardEvent) {
-      if (e.key === 'Escape') setOpen(false);
+      if (e.key === 'Escape') close();
     }
     document.addEventListener('mousedown', onDoc);
     document.addEventListener('keydown', onKey);
@@ -124,7 +145,7 @@ export default function GuestPicker({
       document.removeEventListener('mousedown', onDoc);
       document.removeEventListener('keydown', onKey);
     };
-  }, [open]);
+  }, [open, isControlled, onOpenChange]);
 
   function setChildrenCount(n: number) {
     onChildrenChange(n);
@@ -153,7 +174,7 @@ export default function GuestPicker({
         onClick={(e) => {
           e.preventDefault();
           e.stopPropagation();
-          setOpen((v) => !v);
+          setOpen(!open);
         }}
         className="w-full flex items-center gap-2 text-left text-text text-sm font-medium bg-transparent outline-none cursor-pointer"
       >
@@ -208,29 +229,50 @@ export default function GuestPicker({
               <div
                 className={`grid gap-2 ${children === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}
               >
-                {Array.from({ length: children }, (_, i) => (
-                  <label key={i} className="block">
-                    <span className="sr-only">
-                      {l.childAge} {i + 1}
-                    </span>
-                    <select
-                      value={childAges[i] ?? ''}
-                      onChange={(e) => {
-                        const v = e.target.value;
-                        setAgeAt(i, v === '' ? null : Number(v));
-                      }}
-                      onClick={(e) => e.stopPropagation()}
-                      className="w-full border border-stone rounded-lg px-3 py-2.5 text-sm text-text bg-white focus:outline-none focus:border-primary"
-                    >
-                      <option value="">{l.childAgeNeeded}</option>
-                      {Array.from({ length: MAX_CHILD_AGE + 1 }, (_, age) => (
-                        <option key={age} value={age}>
-                          {ageLabel(age)}
-                        </option>
-                      ))}
-                    </select>
-                  </label>
-                ))}
+                {Array.from({ length: children }, (_, i) => {
+                  const missing =
+                    showAgeErrors && (childAges[i] === null || childAges[i] === undefined);
+                  return (
+                    <label key={i} className="block">
+                      <span className="sr-only">
+                        {l.childAge} {i + 1}
+                      </span>
+                      <div className="relative">
+                        <select
+                          value={childAges[i] ?? ''}
+                          aria-invalid={missing}
+                          onChange={(e) => {
+                            const v = e.target.value;
+                            setAgeAt(i, v === '' ? null : Number(v));
+                          }}
+                          onClick={(e) => e.stopPropagation()}
+                          className={`w-full border rounded-lg px-3 py-2.5 pr-10 text-sm bg-white focus:outline-none ${
+                            missing
+                              ? 'border-red-500 text-red-700 focus:border-red-500'
+                              : 'border-stone text-text focus:border-primary'
+                          }`}
+                        >
+                          <option value="">{l.childAgeNeeded}</option>
+                          {Array.from({ length: MAX_CHILD_AGE + 1 }, (_, age) => (
+                            <option key={age} value={age}>
+                              {ageLabel(age)}
+                            </option>
+                          ))}
+                        </select>
+                        {missing && (
+                          <AlertCircle
+                            size={16}
+                            className="absolute right-8 top-1/2 -translate-y-1/2 text-red-500 pointer-events-none"
+                            aria-hidden
+                          />
+                        )}
+                      </div>
+                      {missing && (
+                        <p className="mt-1 text-xs text-red-600">{l.childAgeError}</p>
+                      )}
+                    </label>
+                  );
+                })}
               </div>
               <p className="text-xs text-muted leading-relaxed">{l.agesHint}</p>
             </div>
