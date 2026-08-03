@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, FormEvent } from 'react';
+import { useState, FormEvent } from 'react';
 import { useTranslations } from 'next-intl';
 import { useRouter } from '@/i18n/navigation';
 import { Search, CalendarDays, Users, AlertCircle } from 'lucide-react';
@@ -34,12 +34,6 @@ export default function HeroSearchBar() {
   const [showAgeErrors, setShowAgeErrors] = useState(false);
 
   const today = new Date().toISOString().split('T')[0];
-
-  useEffect(() => {
-    if (showAgeErrors && childAgesComplete(children, childAges)) {
-      setShowAgeErrors(false);
-    }
-  }, [children, childAges, showAgeErrors]);
 
   function handleSubmit(e: FormEvent) {
     e.preventDefault();
@@ -115,7 +109,7 @@ export default function HeroSearchBar() {
         >
           <GuestPicker
             adults={adults}
-            children={children}
+            childrenCount={children}
             childAges={childAges}
             open={guestsOpen}
             onOpenChange={setGuestsOpen}
@@ -125,7 +119,12 @@ export default function HeroSearchBar() {
               setChildren(n);
               if (n === 0) setShowAgeErrors(false);
             }}
-            onChildAgesChange={setChildAges}
+            onChildAgesChange={(ages) => {
+              setChildAges(ages);
+              if (showAgeErrors && childAgesComplete(children, ages)) {
+                setShowAgeErrors(false);
+              }
+            }}
             labels={{
               adults: t('heroAdults'),
               children: t('heroChildren'),

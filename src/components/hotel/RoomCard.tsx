@@ -9,6 +9,8 @@ import { buildAvailabilityHref } from '@/modules/booking/booking.config';
 
 type Props = {
   room: Room;
+  /** First card in listing — eager LCP */
+  priority?: boolean;
   labels: {
     itemLabel: string;
     fullyBooked: string;
@@ -23,7 +25,7 @@ type Props = {
   };
 };
 
-export default function RoomCard({ room, labels }: Props) {
+export default function RoomCard({ room, labels, priority = false }: Props) {
   return (
     <div className="rounded-2xl border border-stone bg-white overflow-hidden flex flex-col">
       {/* Cover image */}
@@ -36,6 +38,7 @@ export default function RoomCard({ room, labels }: Props) {
             src={room.images[0]}
             alt={room.name}
             fill
+            priority={priority}
             className="object-cover group-hover:scale-105 transition-transform duration-500"
             sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
           />

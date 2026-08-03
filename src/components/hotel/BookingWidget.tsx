@@ -148,7 +148,6 @@ export default function BookingWidget({
   const [success, setSuccess] = useState(false);
   const [hub3Barcode, setHub3Barcode] = useState<string | null>(null);
   const [epcQR, setEpcQR] = useState<string | null>(null);
-  const [barcodeLoading, setBarcodeLoading] = useState(false);
 
   useEffect(() => {
     if (success && successRef.current) {
@@ -196,30 +195,9 @@ export default function BookingWidget({
         })
       : null;
 
-  // ── Barcode fetch (opcionalno — gracefully fails) ──────────────────
-  const fetchBarcodes = useCallback(
-    async (amount: number, guestName: string, bookingId: string) => {
-      setBarcodeLoading(true);
-      try {
-        const reference = `REZ-${bookingId.substring(0, 8).toUpperCase()}`;
-        const res = await fetch(barcodeApiPath, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ amount, guestName, reference, locale }),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          setHub3Barcode(data.hub3 ?? null);
-          setEpcQR(data.epc ?? null);
-        }
-      } catch {
-        // Barcodes su opcionalani — plaćanje bez QR-a i dalje radi
-      } finally {
-        setBarcodeLoading(false);
-      }
-    },
-    [barcodeApiPath, locale],
-  );
+  // ── Barcode fetch — legacy success UI; API endpoint not wired yet (HUB3 skill)
+  // Kept for when /api/generate-barcode ships; unused until then.
+  void barcodeApiPath;
 
   const handleReset = useCallback(() => {
     setCheckIn(null);
@@ -319,7 +297,7 @@ export default function BookingWidget({
       throw new Error(t('errors.submitFailed'));
     }
 
-    let confirmationPath =
+    const confirmationPath =
       (data.confirmationPath as string | undefined) ??
       (data.confirmationUrl
         ? (() => {
@@ -531,52 +509,45 @@ export default function BookingWidget({
                 </p>
               </div>
             )}
-            {(barcodeLoading || hub3Barcode || epcQR) && (
+            {(hub3Barcode || epcQR) && (
               <div className="pt-4 border-t border-stone">
                 <p className="text-xs font-semibold text-text mb-3 text-center">
                   {t('success.summary.qrTitle')}
                 </p>
-                {barcodeLoading ? (
-                  <div className="flex items-center justify-center gap-2 py-4 text-xs text-muted">
-                    <Loader2 size={14} className="animate-spin" />
-                    {t('success.summary.generatingQr')}
-                  </div>
-                ) : (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    {hub3Barcode && (
-                      <div className="bg-white border border-stone rounded-lg p-3 text-center">
-                        <p className="text-[11px] font-semibold text-text mb-2">
-                          🇭🇷 {t('success.summary.hub3Title')}
-                        </p>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={hub3Barcode}
-                          alt={t('success.summary.hub3Alt')}
-                          className="max-w-full h-auto mx-auto"
-                        />
-                        <p className="text-[10px] text-muted mt-2">
-                          {t('success.summary.hub3Hint')}
-                        </p>
-                      </div>
-                    )}
-                    {epcQR && (
-                      <div className="bg-white border border-stone rounded-lg p-3 text-center">
-                        <p className="text-[11px] font-semibold text-text mb-2">
-                          🌍 {t('success.summary.epcTitle')}
-                        </p>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img
-                          src={epcQR}
-                          alt={t('success.summary.epcAlt')}
-                          className="max-w-full h-auto mx-auto"
-                        />
-                        <p className="text-[10px] text-muted mt-2">
-                          {t('success.summary.epcHint')}
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                )}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  {hub3Barcode && (
+                    <div className="bg-white border border-stone rounded-lg p-3 text-center">
+                      <p className="text-[11px] font-semibold text-text mb-2">
+                        🇭🇷 {t('success.summary.hub3Title')}
+                      </p>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={hub3Barcode}
+                        alt={t('success.summary.hub3Alt')}
+                        className="max-w-full h-auto mx-auto"
+                      />
+                      <p className="text-[10px] text-muted mt-2">
+                        {t('success.summary.hub3Hint')}
+                      </p>
+                    </div>
+                  )}
+                  {epcQR && (
+                    <div className="bg-white border border-stone rounded-lg p-3 text-center">
+                      <p className="text-[11px] font-semibold text-text mb-2">
+                        🌍 {t('success.summary.epcTitle')}
+                      </p>
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={epcQR}
+                        alt={t('success.summary.epcAlt')}
+                        className="max-w-full h-auto mx-auto"
+                      />
+                      <p className="text-[10px] text-muted mt-2">
+                        {t('success.summary.epcHint')}
+                      </p>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
           </div>
@@ -727,7 +698,7 @@ export default function BookingWidget({
             checkOut={checkOut}
             priceData={priceData}
             adults={form.adults}
-            children={form.children}
+            childrenCount={form.children}
             locale={locale}
             reviewSummary={reviewSummary}
           />
@@ -1119,7 +1090,7 @@ export default function BookingWidget({
             checkOut={checkOut}
             priceData={priceData}
             adults={form.adults}
-            children={form.children}
+            childrenCount={form.children}
             locale={locale}
             reviewSummary={reviewSummary}
           />

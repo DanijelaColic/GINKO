@@ -51,8 +51,13 @@ export default function RoomGrid({ rooms, cardLabels, filterLabels }: Props) {
         <p className="text-center text-muted py-16 italic">{filterLabels.noResults}</p>
       ) : (
         <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filtered.map((room) => (
-            <RoomCard key={room.slug} room={room} labels={cardLabels} />
+          {filtered.map((room, index) => (
+            <RoomCard
+              key={room.slug}
+              room={room}
+              labels={cardLabels}
+              priority={index === 0}
+            />
           ))}
         </div>
       )}

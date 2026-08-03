@@ -99,7 +99,7 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
               checkOut={checkOutDate}
               priceData={data.priceBreakdown}
               adults={String(data.adults)}
-              children={String(data.children)}
+              childrenCount={String(data.children)}
               locale={locale}
               readOnly
               reviewSummary={reviewSummary}

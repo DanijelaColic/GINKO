@@ -11,7 +11,8 @@ import {
 
 type Props = {
   adults: number;
-  children: number;
+  /** Broj djece — ne React children (eslint: react/no-children-prop) */
+  childrenCount: number;
   childAges: Array<number | null>;
   onAdultsChange: (n: number) => void;
   onChildrenChange: (n: number) => void;
@@ -91,7 +92,7 @@ function ageLabel(age: number): string {
 
 export default function GuestPicker({
   adults,
-  children,
+  childrenCount,
   childAges,
   onAdultsChange,
   onChildrenChange,
@@ -153,14 +154,16 @@ export default function GuestPicker({
   }
 
   function setAgeAt(index: number, age: number | null) {
-    const next = resizeChildAges(childAges, children);
+    const next = resizeChildAges(childAges, childrenCount);
     next[index] = age;
     onChildAgesChange(next);
   }
 
   const summaryParts: string[] = [];
   if (adults > 0) summaryParts.push(`${adults} ${l.adults.toLowerCase()}`);
-  if (children > 0) summaryParts.push(`${children} ${l.children.toLowerCase()}`);
+  if (childrenCount > 0) {
+    summaryParts.push(`${childrenCount} ${l.children.toLowerCase()}`);
+  }
   const summary =
     summaryParts.length > 0 ? summaryParts.join(' · ') : `0 ${l.adults.toLowerCase()}`;
 
@@ -213,7 +216,7 @@ export default function GuestPicker({
               <p className="text-[11px] text-muted">Max {MAX_CHILDREN}</p>
             </div>
             <Stepper
-              value={children}
+              value={childrenCount}
               min={0}
               max={MAX_CHILDREN}
               onChange={setChildrenCount}
@@ -221,15 +224,15 @@ export default function GuestPicker({
             />
           </div>
 
-          {children > 0 && (
+          {childrenCount > 0 && (
             <div className="space-y-3 pt-3 border-t border-stone">
               <p className="text-xs font-semibold uppercase tracking-widest text-muted">
                 {l.childAge}
               </p>
               <div
-                className={`grid gap-2 ${children === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}
+                className={`grid gap-2 ${childrenCount === 1 ? 'grid-cols-1' : 'grid-cols-2'}`}
               >
-                {Array.from({ length: children }, (_, i) => {
+                {Array.from({ length: childrenCount }, (_, i) => {
                   const missing =
                     showAgeErrors && (childAges[i] === null || childAges[i] === undefined);
                   return (

@@ -5,6 +5,8 @@ import { getLocale, getMessages } from 'next-intl/server';
 import { getValidLocale } from '@/i18n/messages';
 import { getRootMetadata, getStructuredData } from '@/i18n/metadata';
 import { CookieBanner } from '@/components/hotel/CookieBanner';
+import AnalyticsScripts from '@/components/hotel/AnalyticsScripts';
+import ChatLauncher from '@/components/hotel/ChatLauncher';
 import './globals.css';
 
 const inter = Inter({
@@ -46,6 +48,8 @@ export default async function RootLayout({
         <NextIntlClientProvider messages={messages}>
           {children}
           <CookieBanner />
+          <AnalyticsScripts />
+          <ChatLauncher />
         </NextIntlClientProvider>
       </body>
     </html>

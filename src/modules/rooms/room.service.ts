@@ -3,6 +3,6 @@
 
 import type { Room } from './room.types';
 
-export function getPriceForDate(room: Room, _date: Date): number {
+export function getPriceForDate(room: Room): number {
   return room.price;
 }

@@ -171,11 +171,10 @@ export default function PropertyReviewsSection({ data }: Props) {
   const [activeTopics, setActiveTopics] = useState<ReviewTopicId[]>([]);
   const [showAll, setShowAll] = useState(false);
 
-  const reviews = data?.reviews ?? [];
-
   const filteredReviews = useMemo(() => {
+    const reviews = data?.reviews ?? [];
     return reviews.filter((review) => reviewMatchesTopics(review, activeTopics));
-  }, [reviews, activeTopics]);
+  }, [data?.reviews, activeTopics]);
 
   const visibleReviews = showAll
     ? filteredReviews

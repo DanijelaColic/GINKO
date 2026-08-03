@@ -1,6 +1,5 @@
 // Adapted from VJ/src/app/(public)/privatnost/page.tsx
-// Simplified: inline content instead of message-driven structure.
-// Contact details are placeholder — fill in before launch.
+// Contact: CONTACT_EMAIL + PROPERTY_ADDRESS from config.
 
 import type { Metadata } from 'next';
 import { getLocale } from 'next-intl/server';
@@ -8,8 +7,9 @@ import { getValidLocale } from '@/i18n/messages';
 import { Link } from '@/i18n/navigation';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
 import { CONTACT_EMAIL, SITE_NAME } from '@/modules/booking/booking.config';
+import { PROPERTY_ADDRESS } from '@/modules/property/property-details.config';
 
-const LAST_UPDATED = '28. svibnja 2026.';
+const LAST_UPDATED = '3. kolovoza 2026.';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -48,8 +48,9 @@ export default async function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold text-text mb-3">1. Voditelj obrade</h2>
           <p>
-            Voditelj obrade osobnih podataka je vlasnik smještajnog objekta {SITE_NAME}. Za
-            pitanja vezana uz privatnost možete nas kontaktirati putem e-pošte:{' '}
+            Voditelj obrade osobnih podataka je vlasnik smještajnog objekta {SITE_NAME},{' '}
+            {PROPERTY_ADDRESS}. Za pitanja vezana uz privatnost možete nas kontaktirati putem
+            e-pošte:{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">
               {CONTACT_EMAIL}
             </a>

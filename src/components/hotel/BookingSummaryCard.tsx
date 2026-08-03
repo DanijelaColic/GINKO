@@ -27,7 +27,8 @@ type Props = {
   checkOut: Date;
   priceData: PriceBreakdown;
   adults: string;
-  children: string;
+  /** Broj djece kao string — ne React children */
+  childrenCount: string;
   locale: string;
   readOnly?: boolean;
   reviewSummary?: GoogleReviewSummary | null;
@@ -49,7 +50,7 @@ export default function BookingSummaryCard({
   checkOut,
   priceData,
   adults,
-  children,
+  childrenCount,
   locale,
   readOnly = false,
   reviewSummary,
@@ -57,15 +58,15 @@ export default function BookingSummaryCard({
   const t = useTranslations('bookingWidget');
 
   const adultsCount = parseInt(adults) || 1;
-  const childrenCount = parseInt(children) || 0;
+  const kidsCount = parseInt(childrenCount) || 0;
 
   const guestsLabel = (() => {
     const adultLabel =
       adultsCount === 1 ? 'odrasli' : adultsCount < 5 ? 'odrasla' : 'odraslih';
     const parts = [`${adultsCount} ${adultLabel}`];
-    if (childrenCount > 0) {
-      const childLabel = childrenCount === 1 ? 'dijete' : 'djece';
-      parts.push(`${childrenCount} ${childLabel}`);
+    if (kidsCount > 0) {
+      const childLabel = kidsCount === 1 ? 'dijete' : 'djece';
+      parts.push(`${kidsCount} ${childLabel}`);
     }
     return parts.join(', ');
   })();
@@ -197,7 +198,7 @@ export default function BookingSummaryCard({
                 checkIn: formatDate(checkIn),
                 checkOut: formatDate(checkOut),
                 adults,
-                children,
+                children: childrenCount,
               })}
               className="text-[11px] text-primary hover:underline underline-offset-2 inline-block"
             >

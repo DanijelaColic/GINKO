@@ -59,12 +59,13 @@ export default function Navbar() {
   useEffect(() => {
     if (!isHome) return;
 
+    // Hash → active section (async to avoid sync setState-in-effect lint)
     const sectionId = propertySectionIdFromHash(window.location.hash);
     if (
       sectionId &&
       (PROPERTY_SUBNAV_SECTION_IDS as readonly string[]).includes(sectionId)
     ) {
-      setActiveSectionId(sectionId);
+      queueMicrotask(() => setActiveSectionId(sectionId));
     }
   }, [isHome]);
 
@@ -121,7 +122,6 @@ export default function Navbar() {
     id: string,
     className: string,
   ) {
-    const isActive = isHome && activeSectionId === id;
     const label = tSections(key);
 
     if (isHome) {

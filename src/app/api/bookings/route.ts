@@ -303,6 +303,12 @@ export async function POST(request: NextRequest) {
       bookingId: booking.id,
       confirmationUrl,
       locale,
+      adults: adultsCount,
+      children: childrenCount,
+      status: 'pending',
+      depositPaid: false,
+      notes: notes || null,
+      pricePerNight: avgPricePerNight,
     }).catch((err) => console.error('[email] sendOwnerNewBookingNotification:', err));
 
     return NextResponse.json(

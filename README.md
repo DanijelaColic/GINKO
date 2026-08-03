@@ -77,8 +77,10 @@ src/
 | 4 | SEO architecture (metadata, sitemap, InternalLinks, guides) | ✅ |
 | 5 | Gallery/media architecture (GalleryGrid, lightbox, room images) | ✅ |
 | 6 | Production hardening (error states, analytics, consent, privacy) | ✅ |
-| 7 | Backend integration (Supabase bookings) | 🔜 |
-| 8 | Payments (Saferpay) | ✅ |
+| 7 | Backend integration (Supabase bookings) | ✅ |
+| 8 | Payments (Saferpay) | ✅ kod; TEST env lokalno — E2E / live još |
+| 9 | iCal channel sync | ✅ |
+| 10 | Chat/i18n prep (WhatsApp mode + knowledge draft) | ✅ infrastruktura; sadržaj čeka klijenta |
 
 ## Key routes
 
@@ -86,7 +88,7 @@ src/
 |---|---|
 | `/` | Home page |
 | `/rooms` | Room listing with filters |
-| `/rooms/zelena` | Room detail with gallery + booking CTA |
+| `/rooms/ginko-1` | Room detail with gallery + booking CTA |
 | `/booking` | Booking widget |
 | `/gallery` | Full property gallery |
 | `/guides` | SEO guides hub |

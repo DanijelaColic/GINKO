@@ -2,7 +2,7 @@ import type { Metadata } from 'next';
 import { Link } from '@/i18n/navigation';
 import { SITE_NAME } from '@/modules/booking/booking.config';
 
-const LAST_UPDATED = '28. svibnja 2026.';
+const LAST_UPDATED = '3. kolovoza 2026.';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -77,8 +77,10 @@ export default function CookiesPage() {
         <section>
           <h2 className="text-xl font-semibold text-text mb-3">Treće strane</h2>
           <p>
-            Stranica koristi Unsplash za fotografije i Google Fonts za pisma — oba servisa mogu
-            pohraniti tehničke kolačiće. Pogledajte njihove politike privatnosti za detalje.
+            Fotografije se poslužuju s naše domene. Tipografija se učitava putem{' '}
+            <code className="text-xs bg-stone/20 px-1 rounded">next/font</code> (samo-hostirano
+            nakon builda). Ako prihvatite analitiku i konfiguriran je Google Analytics (GA4),
+            Google može postaviti analitičke kolačiće — pogledajte njihovu politiku privatnosti.
           </p>
         </section>
 

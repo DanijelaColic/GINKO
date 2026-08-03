@@ -1,6 +1,6 @@
 // Real room data — Ginko Sobe, Ulica Tomaša Garika Masaryka 1, 43500 Daruvar
-// Images: Unsplash placeholders — replace with real photos before launch
-// EN/DE translations mirror HR until proper translation is done (marked TODO)
+// Images: local /public/images/rooms/...
+// EN/DE translations mirror HR until content is finalised (see TODO below)
 
 import type { AccommodationType, Room, RoomLocale } from './room.types';
 

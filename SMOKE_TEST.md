@@ -6,9 +6,9 @@ Run `npm run dev` and verify each item manually. All items must pass before depl
 
 - [ ] `/` — Home page loads, hero section visible, CTA links work
 - [ ] `/rooms` — Room grid renders with at least 1 card; filters (guests, price) work
-- [ ] `/rooms/zelena` — Room detail renders with gallery, price table, booking CTA
-- [ ] `/rooms/orah` — Renders correctly
-- [ ] `/rooms/bijela` — Renders correctly
+- [ ] `/rooms/ginko-1` — Room detail renders with gallery, price table, booking CTA
+- [ ] `/rooms/ginko-2` — Renders correctly
+- [ ] `/rooms/ginko-spa-1` — Apartman detail renders correctly
 - [ ] `/booking` — Booking widget loads; date picker is interactive
 - [ ] `/gallery` — All gallery sections visible; thumbnail click opens lightbox
 - [ ] `/guides` — Guide listing renders
@@ -19,16 +19,16 @@ Run `npm run dev` and verify each item manually. All items must pass before depl
 ## 2. Room detail fallback
 
 - [ ] `/rooms/nonexistent-slug` — Returns 404, custom not-found page shown
-- [ ] `/en/rooms/zelena` — English locale, correct content
-- [ ] `/de/rooms/zelena` — German locale, correct content
+- [ ] `/en/rooms/ginko-1` — English locale, correct content
+- [ ] `/de/rooms/ginko-1` — German locale, correct content
 
 ## 3. Booking error / success path
 
-- [ ] Booking widget loads with room pre-selected when `?room=zelena` is in URL
+- [ ] Booking widget loads with room pre-selected when `?room=ginko-1` is in URL
 - [ ] Submitting form with invalid data shows validation errors
-- [ ] Submitting form with valid data returns mock success state
-- [ ] Mock booking API `GET /api/bookings?room=zelena` returns `[]`
-- [ ] Mock booking API `POST /api/bookings` returns `{ bookingId: "mock-..." }`
+- [ ] Submitting form with valid data redirects to confirmation / Saferpay
+- [ ] `GET /api/bookings?room=ginko-1` returns JSON array (booked ranges)
+- [ ] `POST /api/bookings` creates booking and returns `{ bookingId, confirmationPath }`
 
 ## 4. Consent / analytics behaviour
 
@@ -67,8 +67,9 @@ Run `npm run dev` and verify each item manually. All items must pass before depl
 - [ ] No layout shift on room cards (fixed aspect containers)
 - [ ] First room image on `/rooms/[slug]` loads with `priority` (eager LCP)
 - [ ] Gallery thumbnails load lazy except the first per section
+- [ ] `/favicon.ico` / `/icon` — brand favicon loads (Next.js `app/icon.tsx`)
 - [ ] No console errors on any core route
 
 ---
 
-_Last updated: 2026-05-28_
+_Last updated: 2026-07-31_

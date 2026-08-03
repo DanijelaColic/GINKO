@@ -131,12 +131,6 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     [children, childAges],
   );
 
-  useEffect(() => {
-    if (showAgeErrors && childAgesComplete(children, childAges)) {
-      setShowAgeErrors(false);
-    }
-  }, [children, childAges, showAgeErrors]);
-
   const breakfastPerNight = useMemo(
     () => calculateBreakfastPerNight(adults, agesResolved),
     [adults, agesResolved],
@@ -222,9 +216,11 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     [checkIn, checkOut, rooms, labels.selectDates, adults, children, childAges],
   );
 
-  // Latest check fn — prefill effect must NOT depend on this (else URL resets guests on every edit)
+  // Latest check fn — keep in ref via effect (avoid updating ref during render)
   const runAvailabilityCheckRef = useRef(runAvailabilityCheck);
-  runAvailabilityCheckRef.current = runAvailabilityCheck;
+  useEffect(() => {
+    runAvailabilityCheckRef.current = runAvailabilityCheck;
+  }, [runAvailabilityCheck]);
 
   // Prefill + auto-provjera iz URL-a — samo kad se searchParams promijene
   useEffect(() => {
@@ -249,14 +245,17 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
           : resizeChildAges(agesFromUrl, nextChildren)
         : undefined;
 
-    if (ci) setCheckIn(ci);
-    if (co) setCheckOut(co);
-    if (room) setHighlightedRoom(room);
-    if (nextAdults !== undefined) setAdults(nextAdults);
-    if (nextChildren !== undefined && nextAges !== undefined) {
-      setChildren(nextChildren);
-      setChildAges(nextAges);
-    }
+    // URL → form sync (legitimate external-system sync; batch in rAF)
+    requestAnimationFrame(() => {
+      if (ci) setCheckIn(ci);
+      if (co) setCheckOut(co);
+      if (room) setHighlightedRoom(room);
+      if (nextAdults !== undefined) setAdults(nextAdults);
+      if (nextChildren !== undefined && nextAges !== undefined) {
+        setChildren(nextChildren);
+        setChildAges(nextAges);
+      }
+    });
 
     const sectionId = propertySectionIdFromHash(window.location.hash);
     if (sectionId === AVAILABILITY_SECTION_ID) {
@@ -280,10 +279,6 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
       }
     }
   }, [searchParams]);
-
-  useEffect(() => {
-    if (hasDates) setDateError(null);
-  }, [hasDates]);
 
   const handleSearch = useCallback(
     async (e: React.FormEvent) => {
@@ -387,6 +382,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                 setCheckIn(e.target.value);
                 if (checkOut && e.target.value >= checkOut) setCheckOut('');
                 setSearched(false);
+                setDateError(null);
               }}
               className={FIELD_CLASS}
             />
@@ -401,7 +397,11 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
               type="date"
               value={checkOut}
               min={checkIn || today}
-              onChange={(e) => { setCheckOut(e.target.value); setSearched(false); }}
+              onChange={(e) => {
+                setCheckOut(e.target.value);
+                setSearched(false);
+                setDateError(null);
+              }}
               className={FIELD_CLASS}
             />
           </SearchFieldCell>
@@ -413,12 +413,15 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
           >
             <GuestPicker
               adults={adults}
-              children={children}
+              childrenCount={children}
               childAges={childAges}
               open={guestsOpen}
               onOpenChange={setGuestsOpen}
               showAgeErrors={showAgeErrors}
-              onAdultsChange={(n) => { setAdults(n); setSearched(false); }}
+              onAdultsChange={(n) => {
+                setAdults(n);
+                setSearched(false);
+              }}
               onChildrenChange={(n) => {
                 setChildren(n);
                 setSearched(false);
@@ -427,6 +430,9 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
               onChildAgesChange={(ages) => {
                 setChildAges(ages);
                 setSearched(false);
+                if (showAgeErrors && childAgesComplete(children, ages)) {
+                  setShowAgeErrors(false);
+                }
               }}
               labels={{
                 adults: 'Odrasli',
