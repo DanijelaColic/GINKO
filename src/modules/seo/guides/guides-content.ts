@@ -6,105 +6,105 @@ export const GUIDE_HUB_BY_LOCALE: Record<
   { title: string; description: string }
 > = {
   hr: {
-    title: 'Vodič – Zadar i okolica',
+    title: 'Vodič – Daruvar i okolica',
     description:
-      'Praktični savjeti za planiranje boravka, izlete i aktivnosti uz direktnu rezervaciju soba.',
+      'Praktični savjeti za planiranje boravka u Daruvaru: toplice, atrakcije, sezona i direktna rezervacija soba.',
   },
   en: {
-    title: 'Guide – Zadar & surroundings',
+    title: 'Guide – Daruvar & surroundings',
     description:
-      'Practical tips for planning your stay, day trips, and activities with direct room booking.',
+      'Practical tips for planning your stay in Daruvar: thermal baths, attractions, season and direct room booking.',
   },
   de: {
-    title: 'Reiseführer – Zadar & Umgebung',
+    title: 'Reiseführer – Daruvar & Umgebung',
     description:
-      'Praktische Tipps zur Planung des Aufenthalts, Tagesausflügen und Aktivitäten mit direkter Zimmerbuchung.',
+      'Praktische Tipps für Ihren Aufenthalt in Daruvar: Thermen, Sehenswürdigkeiten, Saison und direkte Zimmerbuchung.',
   },
 } as const;
 
 export const GUIDES: GuideArticle[] = [
   {
-    slug: 'sto-posjetiti-u-zadru',
+    slug: 'sto-posjetiti-u-daruvaru',
     locale: 'hr',
-    title: 'Što posjetiti u Zadru',
+    title: 'Što posjetiti u Daruvaru',
     description:
-      'Praktični vodič kroz najzanimljivije lokacije, plaže i aktivnosti u Zadru – idealno za planiranje prvog posjeta.',
-    publishedAt: '2026-05-01',
+      'Praktični vodič kroz Daruvarske toplice, dvorac Janković, stablo ginka i okolne atrakcije – idealno uz boravak u Ginko Boutique Rooms.',
+    publishedAt: '2026-08-01',
     readingTime: '6 min',
     keywords: [
-      'što posjetiti u Zadru',
-      'Zadar atrakcije',
-      'Zadar plaže',
-      'izleti Zadar',
-      'Hrvatska odmor',
+      'što posjetiti u Daruvaru',
+      'Daruvar atrakcije',
+      'Daruvarske toplice',
+      'dvorac Janković',
+      'smještaj Daruvar',
     ],
     coverImage: {
-      src: 'https://images.unsplash.com/photo-1555093183-3be7c0f24d89?w=1200&q=80',
-      alt: 'Zadar stari grad pogled na more',
+      src: '/images/property/20240504_154454.jpg',
+      alt: 'Ginko Boutique Rooms & Wellness – objekt u Daruvaru',
     },
     sections: [
       {
-        heading: 'Stari grad i rimska baština',
+        heading: 'Daruvarske toplice i wellness',
         paragraphs: [
-          'Zadar ima jednu od najpotpunijih sačuvanih rimskih urbanih mreža u Dalmaciji. Forum, Crkva sv. Donata i okolne ulice nude šetnju kroz dvije tisuće godina povijesti.',
-          'Večernji obilazak starog grada pruža mirnije iskustvo od jutarnjeg – lokali su otvoreni, a gužva je manja.',
+          'Daruvar je poznat po termalnim izvorima. Daruvarske toplice i aqua park Aquae Ballisae nalaze se na nekoliko minuta hoda od centra – idealno za oporavak, obiteljski dan ili kombinaciju s privatnim wellnessom u smještaju.',
+          'Ako boravite u Ginko Boutique Rooms & Wellness, toplice su doslovno u susjedstvu: možete planirati jutarnji trening ili večernje kupanje bez duge vožnje.',
         ],
       },
       {
-        heading: 'Morske orgulje i Pozdrav Suncu',
+        heading: 'Dvorac Janković i stablo ginka',
         paragraphs: [
-          'Dvije najfotografiranije instalacije u gradu smještene su na rivi. Morske orgulje stvaraju glazbu pomoću valova, a Pozdrav Suncu puni se solarnom energijom danju i sjaji noću.',
-          'Zalazak sunca gledati s rive jedna je od preporučenih aktivnosti za svaki posjet Zadru.',
+          'Park dvorca grofa Jankovića i legendarni ginkgo biloba u samom su srcu grada. Šetnja perivojem i fotografiranje stabla koje je nadahnulo ime našeg objekta ugodan su uvod u boravak.',
+          'Crkva Sv. Trojstva i povijesna jezgra grada udaljene su svega nekoliko minuta pješice od Ulica Tomaša Garika Masaryka 1.',
         ],
       },
       {
-        heading: 'Plaže i blizina prirode',
+        heading: 'Okusi i dnevni ritam',
         paragraphs: [
-          'Gradske plaže dostupne su pješice, a za veće plaže s borovima preporuča se kratka vožnja autom ili biciklom prema Bokanjcu ili Zrću na Pagu.',
-          'NP Paklenica, jezera Vransko i poluotok Pelješac dostupni su na manje od sat vožnje, što čini Zadar odličnom bazom za dnevne izlete.',
+          'Daruvar nudi miran ritam: kafići i restorani u centru, lokalna pivovara i kraće izlete prema Papuku ili okolnim selima. Za duže izlete Zagreb je oko sat i pol vožnje.',
+          'Večeri su mirne – što odgovara gostima koji dolaze na wellness, poslovni put ili oporavak. Kućni red u objektu podržava tišinu nakon 23:00.',
         ],
       },
     ],
   },
   {
-    slug: 'kako-planirati-odmor-u-zadru',
+    slug: 'kako-planirati-odmor-u-daruvaru',
     locale: 'hr',
-    title: 'Kako planirati odmor u Zadru',
+    title: 'Kako planirati odmor u Daruvaru',
     description:
-      'Savjeti za odabir termina, prijevoza i smještaja u Zadru – s posebnim naglaskom na obiteljski i parovima prilagođen boravak.',
-    publishedAt: '2026-05-10',
+      'Savjeti za odabir termina, dolaska i smještaja u Daruvaru – sobe, apartman ili wellness apartman uz direktnu rezervaciju.',
+    publishedAt: '2026-08-01',
     readingTime: '5 min',
     keywords: [
-      'planiranje odmora Zadar',
-      'kada posjetiti Zadar',
-      'smještaj Zadar',
-      'privatne sobe Zadar',
-      'Zadar sezona',
+      'planiranje odmora Daruvar',
+      'kada posjetiti Daruvar',
+      'smještaj Daruvar',
+      'boutique sobe Daruvar',
+      'wellness Daruvar',
     ],
     coverImage: {
-      src: 'https://images.unsplash.com/photo-1534430480872-3498386e7856?w=1200&q=80',
-      alt: 'Zadar luka i jedrilice pogled',
+      src: '/images/hero/exterior-01.webp',
+      alt: 'Ginko Boutique Rooms & Wellness – fasada objekta u Daruvaru',
     },
     sections: [
       {
-        heading: 'Kada je najljepše doći',
+        heading: 'Kada doći',
         paragraphs: [
-          'Lipanj i rujan nude idealan kompromis: more je toplo, gužva manja nego u kolovozu, a cijene smještaja niže. Za kulturne sadržaje i šetnje, travanj i svibanj su izvrsni.',
-          'Srpanj i kolovoz su vrhunac sezone – toplo je i živo, ali i najskuplje i najgužvije. Preporuča se rezervirati smještaj što ranije.',
+          'Proljeće i jesen pogodni su za šetnje, toplice i manje gužve. Ljeto donosi aqua park i duže dane na otvorenom. Zima može biti privlačna zbog termalnog odmora i mirnijeg grada.',
+          'Vikendi u sezoni toplica brzo se pune – preporučujemo rezervirati sobu unaprijed, osobito wellness apartman.',
         ],
       },
       {
-        heading: 'Prijevoz i dolazak',
+        heading: 'Kako stići',
         paragraphs: [
-          'Zadar ima međunarodnu zračnu luku s direktnim letovima iz cijele Europe. Autobusne veze s Dubrovnikom, Splitom i Zagrebom su česte i povoljne.',
-          'Za izlete po okolici preporučamo vlastiti automobil ili rent-a-car – javni prijevoz prema NP Paklenici i manjim plažama je ograničen.',
+          'Najbliža veća zračna luka je Zagreb (oko 120 km). Do Daruvara se stiže automobilom ili autobusom / vlakom do željezničke i autobusne stanice u gradu (oko 500 m od objekta).',
+          'Besplatno privatno parkiralište dostupno je uz objekt, bez potrebe za rezervacijom mjesta.',
         ],
       },
       {
-        heading: 'Smještaj: sobe vs. apartman',
+        heading: 'Soba, apartman ili wellness',
         paragraphs: [
-          'Za kraće boravke do 3-4 noći, privatne sobe s doručkom pružaju lagodnost bez brige oko opremljene kuhinje i domaćinstva.',
-          'Ginko Boutique Rooms & Wellness smješten je u srcu Daruvara, a domaćin može savjetovati o skrivenim lokalnim mjestima i izletima koji nisu u turističkom vodiču.',
+          'Za kraći boravak dovoljna je soba (Ginko 1–6). Za više prostora ili kuhanje birajte apartman; za privatnu saunu i jacuzzi – Wellness apartman.',
+          'Direktna rezervacija na ginko-sobe.com znači bez provizije platforme, jasan depozit od 50 % i ostatak na dolasku. Doručak i pomoćni ležaj mogu se dogovoriti pri rezervaciji.',
         ],
       },
     ],

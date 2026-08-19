@@ -60,8 +60,8 @@
     "credit": "Erstellt von:"
   },
   "homePage": {
-    "heroTitle": "Ginko Boutique Rooms & Wellness Daruvar",
-    "heroSubtitle": "Elegante Unterkunft, Wellness und vollständige Erholung im Herzen von Daruvar.",
+    "heroTitle": "Ginko Boutique Rooms & Wellness",
+    "heroSubtitle": "Elegante Unterkunft, Wellness und vollständige Erholung im Herzen der Stadt",
     "heroCta": "Zimmer ansehen",
     "bookCta": "Jetzt Buchen",
     "heroCheckIn": "Anreise",
@@ -184,7 +184,7 @@
       },
       "pets": {
         "q": "Sind Haustiere erlaubt?",
-        "a": "Ja, Haustiere sind nach vorheriger Anmeldung bei der Buchung willkommen. Zusätzliche Reinigungskosten können anfallen."
+        "a": "Ja, Haustiere sind nach vorheriger Anmeldung bei der Buchung willkommen. Die Reinigungsgebühr für Haustiere beträgt 15 € / Tag."
       },
       "checkin": {
         "q": "Wie funktioniert der Check-in bei später Ankunft?",
@@ -205,6 +205,10 @@
       "booking": {
         "q": "Wie kann ich ein Zimmer buchen?",
         "a": "Sie können eine Anfrage über unser <bookingLink>Buchungsformular</bookingLink> senden oder uns per E-Mail und Telefon kontaktieren."
+      },
+      "cancellation": {
+        "q": "Wie lauten die Stornierungsbedingungen?",
+        "a": "Kostenlose Stornierung und Rückerstattung der Anzahlung bis 14 Tage vor Anreise. Bei Stornierungen innerhalb von 14 Tagen vor Anreise wird die Anzahlung nicht erstattet."
       }
     }
   },
@@ -256,7 +260,7 @@
     "amenityBalcony": "Terrasse / Balkon",
     "noSmoking": "Nichtraucher",
     "basedOnReviews": "basierend auf {count, plural, one {# Bewertung} other {# Bewertungen}}",
-    "freeCancellation": "Kostenlose Stornierung bis 5 Tage vor Anreise",
+    "freeCancellation": "Kostenlose Stornierung bis 14 Tage vor Anreise",
     "depositAtBooking": "Anzahlung ({percent}%): {amount} € bei Buchung",
     "balanceAtProperty": "Restbetrag ({percent}%): {amount} € vor Ort bei Anreise",
     "breakfastIncluded": "Frühstück inklusive ({price} €/Person)",
@@ -376,7 +380,7 @@
       "depositNote": "bei Buchung",
       "balance": "Restbetrag ({percent}%)",
       "balanceNote": "fällig {days} Tage vor Anreise",
-      "freeCancellation": "Kostenlose Stornierung bis 5 Tage vor Anreise",
+      "freeCancellation": "Kostenlose Stornierung bis 14 Tage vor Anreise",
       "changeDates": "Datum ändern",
       "directBooking": "Direktbuchung • Ohne Provision"
     },
@@ -481,8 +485,8 @@
     },
     "policies": {
       "cancellation": {
-        "line1": "Kostenlose Stornierung bis 5 Tage vor geplanter Anreise.",
-        "line2": "Bei Stornierung innerhalb von 5 Tagen vor Anreise ist der volle Buchungsbetrag nicht erstattbar.",
+        "line1": "Kostenlose Stornierung und Rückerstattung der Anzahlung bis 14 Tage vor Anreise.",
+        "line2": "Bei Stornierungen innerhalb von 14 Tagen vor Anreise wird die Anzahlung nicht erstattet.",
         "line3": "Für Sonderfälle kontaktieren Sie uns bitte direkt."
       }
     },

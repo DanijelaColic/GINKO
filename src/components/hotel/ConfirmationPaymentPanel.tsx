@@ -82,8 +82,8 @@ export default function ConfirmationPaymentPanel({
 
       {!paymentCancelled && (
         <p className="text-xs text-text/40 text-center leading-relaxed px-2">
-          Rezervacijom prihvaćate uvjete otkazivanja. Besplatno otkazivanje do 5 dana prije
-          dolaska.
+          Rezervacijom prihvaćate uvjete otkazivanja. Besplatno otkazivanje i povrat depozita
+          do 14 dana prije dolaska.
         </p>
       )}
     </div>

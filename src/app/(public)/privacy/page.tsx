@@ -6,10 +6,15 @@ import { getLocale } from 'next-intl/server';
 import { getValidLocale } from '@/i18n/messages';
 import { Link } from '@/i18n/navigation';
 import { getBreadcrumbStructuredData } from '@/i18n/metadata';
-import { CONTACT_EMAIL, SITE_NAME } from '@/modules/booking/booking.config';
+import {
+  COMPANY_OIB,
+  CONTACT_EMAIL,
+  LEGAL_NAME,
+  SITE_NAME,
+} from '@/modules/booking/booking.config';
 import { PROPERTY_ADDRESS } from '@/modules/property/property-details.config';
 
-const LAST_UPDATED = '3. kolovoza 2026.';
+const LAST_UPDATED = '19. kolovoza 2026.';
 
 export async function generateMetadata(): Promise<Metadata> {
   return {
@@ -48,7 +53,7 @@ export default async function PrivacyPage() {
         <section>
           <h2 className="text-xl font-semibold text-text mb-3">1. Voditelj obrade</h2>
           <p>
-            Voditelj obrade osobnih podataka je vlasnik smještajnog objekta {SITE_NAME},{' '}
+            Voditelj obrade osobnih podataka je {LEGAL_NAME}, OIB {COMPANY_OIB},{' '}
             {PROPERTY_ADDRESS}. Za pitanja vezana uz privatnost možete nas kontaktirati putem
             e-pošte:{' '}
             <a href={`mailto:${CONTACT_EMAIL}`} className="text-accent hover:underline">

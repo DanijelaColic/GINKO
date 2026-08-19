@@ -8,7 +8,7 @@ import AskQuestionModal from '@/components/hotel/AskQuestionModal';
 import { QUESTIONS_SECTION_ID } from '@/modules/booking/booking.config';
 
 const FAQ_COL_1 = ['parking', 'breakfast', 'wifi', 'therms', 'attractions'] as const;
-const FAQ_COL_2 = ['pets', 'checkin', 'checkinTimes', 'wellness', 'families', 'booking'] as const;
+const FAQ_COL_2 = ['pets', 'checkin', 'checkinTimes', 'wellness', 'families', 'booking', 'cancellation'] as const;
 
 type FaqId = (typeof FAQ_COL_1)[number] | (typeof FAQ_COL_2)[number];
 

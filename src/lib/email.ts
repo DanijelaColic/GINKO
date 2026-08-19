@@ -411,7 +411,7 @@ function houseRulesBlock(locale: Locale): string {
           'Check-in 14:00–22:00 · check-out by 10:00',
           'No smoking indoors (terrace/yard OK)',
           'Quiet hours 23:00–07:00',
-          'Pets on request (cleaning fee may apply)',
+          'Pets on request (cleaning fee €15 / day)',
         ]
       : locale === 'de'
         ? [
@@ -419,14 +419,14 @@ function houseRulesBlock(locale: Locale): string {
             'Check-in 14:00–22:00 · Check-out bis 10:00',
             'Rauchen nur auf Terrasse/Hof',
             'Ruhezeiten 23:00–07:00',
-            'Haustiere auf Anfrage (Reinigungsgebühr möglich)',
+            'Haustiere auf Anfrage (Reinigungsgebühr 15 € / Tag)',
           ]
         : [
             'Besplatan privatni parking uz objekt',
             'Prijava 14:00–22:00 · odjava do 10:00',
             'Pušenje samo na terasi / u dvorištu',
             'Mir od 23:00 do 07:00',
-            'Kućni ljubimci na upit (mogući trošak čišćenja)',
+            'Kućni ljubimci na upit (čišćenje 15 € / dan)',
           ];
 
   return `

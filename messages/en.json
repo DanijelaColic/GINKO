@@ -60,8 +60,8 @@
     "credit": "Built by:"
   },
   "homePage": {
-    "heroTitle": "Ginko Boutique Rooms & Wellness Daruvar",
-    "heroSubtitle": "Elegant accommodation, wellness and complete relaxation in the heart of Daruvar.",
+    "heroTitle": "Ginko Boutique Rooms & Wellness",
+    "heroSubtitle": "Elegant accommodation, wellness and complete relaxation in the heart of the city",
     "heroCta": "View Rooms",
     "bookCta": "Book Now",
     "heroCheckIn": "Check-in",
@@ -184,7 +184,7 @@
       },
       "pets": {
         "q": "Can I bring pets?",
-        "a": "Yes, pets are welcome with prior notice when booking. Additional cleaning fees may apply."
+        "a": "Yes, pets are welcome with prior notice when booking. The pet cleaning fee is €15 / day."
       },
       "checkin": {
         "q": "How does check-in work if we arrive late?",
@@ -205,6 +205,10 @@
       "booking": {
         "q": "How can I book a room?",
         "a": "You can submit a booking request via our <bookingLink>booking form</bookingLink> or contact us by email and phone."
+      },
+      "cancellation": {
+        "q": "What is the cancellation policy?",
+        "a": "Free cancellation and deposit refund up to 14 days before arrival. For cancellations within 14 days of arrival, the deposit is non-refundable."
       }
     }
   },
@@ -256,7 +260,7 @@
     "amenityBalcony": "Terrace / balcony",
     "noSmoking": "No smoking",
     "basedOnReviews": "based on {count, plural, one {# review} other {# reviews}}",
-    "freeCancellation": "Free cancellation up to 5 days before arrival",
+    "freeCancellation": "Free cancellation up to 14 days before arrival",
     "depositAtBooking": "Deposit ({percent}%): {amount} € at booking",
     "balanceAtProperty": "Balance ({percent}%): {amount} € at the property on arrival",
     "breakfastIncluded": "Breakfast included ({price} €/person)",
@@ -376,7 +380,7 @@
       "depositNote": "at booking",
       "balance": "Remaining ({percent}%)",
       "balanceNote": "due {days} days before arrival",
-      "freeCancellation": "Free cancellation up to 5 days before arrival",
+      "freeCancellation": "Free cancellation up to 14 days before arrival",
       "changeDates": "Change dates",
       "directBooking": "Direct booking • No commission fees"
     },
@@ -481,8 +485,8 @@
     },
     "policies": {
       "cancellation": {
-        "line1": "Free cancellation up to 5 days before planned arrival.",
-        "line2": "If cancelled within 5 days before arrival, the full booking amount is non-refundable.",
+        "line1": "Free cancellation and deposit refund up to 14 days before arrival.",
+        "line2": "For cancellations within 14 days of arrival, the deposit is non-refundable.",
         "line3": "For special cases, contact us directly."
       }
     },

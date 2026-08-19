@@ -110,7 +110,7 @@ export const FACILITY_GROUPS: FacilityGroup[] = [
     title: 'Kućni ljubimci',
     column: 2,
     type: 'text',
-    text: 'Kućni ljubimci dozvoljeni na upit.',
+    text: 'Kućni ljubimci dozvoljeni na upit. Cijena čišćenja: 15 € / dan.',
   },
   {
     id: 'media',
@@ -228,9 +228,9 @@ export const HOUSE_RULES: HouseRuleItem[] = [
     id: 'cancellation',
     title: 'Otkazivanje/ plaćanje unaprijed',
     paragraphs: [
-      'Pravila otkazivanja i plaćanja unaprijed razlikuju se ovisno o vrsti rezervacije. Provjerite',
+      'Besplatno otkazivanje i povrat depozita do 14 dana prije dolaska.',
+      'Za otkazivanja unutar 14 dana prije dolaska depozit se ne vraća.',
     ],
-    link: { href: '/booking', label: 'uvjete rezervacije' },
   },
   {
     id: 'children',
@@ -271,7 +271,7 @@ export const HOUSE_RULES: HouseRuleItem[] = [
     title: 'Kućni ljubimci',
     paragraphs: [
       'Boravak kućnih ljubimaca dopušten je uz prethodnu najavu prilikom rezervacije.',
-      'Mogući su dodatni troškovi čišćenja.',
+      'Cijena čišćenja za kućne ljubimce: 15 € / dan.',
     ],
   },
   {

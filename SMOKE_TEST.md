@@ -12,7 +12,7 @@ Run `npm run dev` and verify each item manually. All items must pass before depl
 - [ ] `/booking` — Booking widget loads; date picker is interactive
 - [ ] `/gallery` — All gallery sections visible; thumbnail click opens lightbox
 - [ ] `/guides` — Guide listing renders
-- [ ] `/guides/sto-posjetiti-u-zadru` — Guide article renders with breadcrumb JSON-LD
+- [ ] `/guides/sto-posjetiti-u-daruvaru` — Guide article renders with breadcrumb JSON-LD
 - [ ] Navbar links navigate correctly (all locales)
 - [ ] Footer links navigate correctly
 

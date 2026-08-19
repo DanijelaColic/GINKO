@@ -53,8 +53,20 @@ export const BALANCE_DAYS_BEFORE_CHECK_IN = 0;
 /** Minimalni boravak: 1 noć */
 export const MIN_NIGHTS = 1;
 
-/** Nema fiksne naknade za čišćenje (uključeno u cijenu sobe) */
+/** Nema fiksne naknade za čišćenje sobe (uključeno u cijenu) */
 export const CLEANING_FEE = 0;
+
+/** Cijena čišćenja za kućne ljubimce (€ / dan) */
+export const PET_CLEANING_FEE_PER_DAY = 15;
+
+/** Besplatno otkazivanje i povrat depozita do N dana prije dolaska */
+export const FREE_CANCELLATION_DAYS = 14;
+
+/** Puni pravni naziv voditelja obrade (politika privatnosti) */
+export const LEGAL_NAME = 'Ginko sobe Daruvar';
+
+/** OIB voditelja obrade */
+export const COMPANY_OIB = '83373570591';
 
 /** Pomoćni ležaj: 20 €/noć */
 export const EXTRA_BED_PRICE_PER_NIGHT = 20;

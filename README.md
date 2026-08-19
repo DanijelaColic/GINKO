@@ -1,6 +1,6 @@
 # Ginko Sobe — ginko-sobe.com
 
-Next.js 16 web app for Ginko Sobe private accommodation (Zadar, Croatia).
+Next.js 16 web app for Ginko Sobe private accommodation (Daruvar, Croatia).
 
 ## Tech stack
 
@@ -92,7 +92,7 @@ src/
 | `/booking` | Booking widget |
 | `/gallery` | Full property gallery |
 | `/guides` | SEO guides hub |
-| `/guides/sto-posjetiti-u-zadru` | Sample guide article |
+| `/guides/sto-posjetiti-u-daruvaru` | Sample guide article |
 | `/privacy` | Privacy policy |
 | `/cookies` | Cookies policy |
 | `/sitemap.xml` | Sitemap |

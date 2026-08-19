@@ -62,7 +62,7 @@ const ON_SITE_FAQ: KnowledgeTopic[] = [
     messageFaqId: 'pets',
     category: 'policy',
     status: 'draft_on_site',
-    clientPrompt: 'Kućni ljubimci: cijena čišćenja, zabranjene sobe (spa)?',
+    clientPrompt: 'Kućni ljubimci: 15 €/dan čišćenje, zabranjene sobe (spa)?',
   },
   {
     id: 'checkin',
@@ -99,17 +99,17 @@ const ON_SITE_FAQ: KnowledgeTopic[] = [
     status: 'draft_on_site',
     clientPrompt: 'Kanali rezervacije: web, email, telefon, Booking/Airbnb?',
   },
+  {
+    id: 'cancellation',
+    messageFaqId: 'cancellation',
+    category: 'policy',
+    status: 'draft_on_site',
+    clientPrompt: 'Otkazivanje: povrat depozita do 14 dana prije dolaska',
+  },
 ];
 
 /** Predložene teme za bot — prazne dok klijent ne odgovori */
 const PENDING_TOPICS: KnowledgeTopic[] = [
-  {
-    id: 'cancellation',
-    messageFaqId: null,
-    category: 'policy',
-    status: 'pending_client',
-    clientPrompt: 'Politika otkazivanja / refund depozita (rokovi, %)',
-  },
   {
     id: 'deposit_payment',
     messageFaqId: null,

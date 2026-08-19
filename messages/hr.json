@@ -60,8 +60,8 @@
     "credit": "Izradio:"
   },
   "homePage": {
-    "heroTitle": "Ginko Boutique Rooms & Wellness Daruvar",
-    "heroSubtitle": "Elegantan smještaj, wellness i potpuni odmor u srcu Daruvara.",
+    "heroTitle": "Ginko Boutique Rooms & Wellness",
+    "heroSubtitle": "Elegantan smještaj, wellness i potpuni odmor u srcu grada",
     "heroCta": "Pogledajte sobe",
     "bookCta": "Rezervirajte sada",
     "heroCheckIn": "Dolazak",
@@ -184,7 +184,7 @@
       },
       "pets": {
         "q": "Mogu li doći s kućnim ljubimcima?",
-        "a": "Da, kućni ljubimci su dobrodošli uz prethodnu najavu prilikom rezervacije. Mogući su dodatni troškovi čišćenja."
+        "a": "Da, kućni ljubimci su dobrodošli uz prethodnu najavu prilikom rezervacije. Cijena čišćenja za kućne ljubimce iznosi 15 € / dan."
       },
       "checkin": {
         "q": "Kako funkcionira prijava ako stignemo kasno?",
@@ -205,6 +205,10 @@
       "booking": {
         "q": "Kako mogu rezervirati sobu?",
         "a": "Rezervaciju možete poslati putem <bookingLink>obrasca za rezervaciju</bookingLink> ili nas kontaktirati e-poštom i telefonom."
+      },
+      "cancellation": {
+        "q": "Kakva je politika otkazivanja rezervacije?",
+        "a": "Besplatno otkazivanje i povrat depozita do 14 dana prije dolaska. Za otkazivanja unutar 14 dana prije dolaska depozit se ne vraća."
       }
     }
   },
@@ -254,7 +258,7 @@
     "amenityBalcony": "Terasa / balkon",
     "noSmoking": "Pušenje zabranjeno",
     "basedOnReviews": "na temelju {count, plural, one {# recenzije} few {# recenzije} other {# recenzija}}",
-    "freeCancellation": "Besplatno otkazivanje do 5 dana prije dolaska",
+    "freeCancellation": "Besplatno otkazivanje do 14 dana prije dolaska",
     "depositAtBooking": "Depozit ({percent}%): {amount} € pri rezervaciji",
     "balanceAtProperty": "Ostatak ({percent}%): {amount} € u objektu pri dolasku",
     "breakfastIncluded": "Doručak uključen ({price} €/osoba)",
@@ -373,7 +377,7 @@
       "depositNote": "pri rezervaciji",
       "balance": "Ostatak ({percent}%)",
       "balanceNote": "plaća se u smještajnom objektu pri dolasku",
-      "freeCancellation": "Besplatno otkazivanje do 5 dana prije dolaska",
+      "freeCancellation": "Besplatno otkazivanje do 14 dana prije dolaska",
       "changeDates": "Promijeni datume",
       "directBooking": "Direktna rezervacija • Bez provizija"
     },
@@ -478,8 +482,8 @@
     },
     "policies": {
       "cancellation": {
-        "line1": "Besplatno otkazivanje do 5 dana prije planiranog dolaska.",
-        "line2": "U slučaju otkazivanja unutar 5 dana prije dolaska, zadržava se puni iznos rezervacije.",
+        "line1": "Besplatno otkazivanje i povrat depozita do 14 dana prije dolaska.",
+        "line2": "Za otkazivanja unutar 14 dana prije dolaska depozit se ne vraća.",
         "line3": "Za detalje i posebne slučajeve javite nam se direktno."
       }
     },
