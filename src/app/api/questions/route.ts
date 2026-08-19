@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendGuestQuestionNotification } from '@/lib/email';
+import { guestApiError } from '@/lib/guest-api-error';
 import { getValidLocale } from '@/i18n/messages';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -11,37 +12,31 @@ export async function POST(request: NextRequest) {
   try {
     body = await request.json();
   } catch {
-    return NextResponse.json({ error: 'Neispravan zahtjev' }, { status: 400 });
+    return guestApiError('invalidRequest', 400);
   }
 
   if (!body || typeof body !== 'object') {
-    return NextResponse.json({ error: 'Neispravan zahtjev' }, { status: 400 });
+    return guestApiError('invalidRequest', 400);
   }
 
   const { email, question, locale } = body as Record<string, unknown>;
 
   if (typeof email !== 'string' || !EMAIL_RE.test(email.trim())) {
-    return NextResponse.json({ error: 'Unesite ispravnu e-poštu' }, { status: 400 });
+    return guestApiError('invalidEmail', 400);
   }
 
   if (typeof question !== 'string') {
-    return NextResponse.json({ error: 'Unesite pitanje' }, { status: 400 });
+    return guestApiError('missingQuestion', 400);
   }
 
   const trimmedQuestion = question.trim();
 
   if (trimmedQuestion.length < 3) {
-    return NextResponse.json(
-      { error: 'Pitanje mora imati najmanje 3 znaka' },
-      { status: 400 },
-    );
+    return guestApiError('questionTooShort', 400);
   }
 
   if (trimmedQuestion.length > MAX_QUESTION_LENGTH) {
-    return NextResponse.json(
-      { error: `Pitanje može imati najviše ${MAX_QUESTION_LENGTH} znakova` },
-      { status: 400 },
-    );
+    return guestApiError('questionTooLong', 400);
   }
 
   const validLocale = getValidLocale(typeof locale === 'string' ? locale : 'hr');
@@ -54,10 +49,7 @@ export async function POST(request: NextRequest) {
     });
   } catch (err) {
     console.error('[questions] send failed:', err);
-    return NextResponse.json(
-      { error: 'Slanje nije uspjelo. Pokušajte ponovo.' },
-      { status: 500 },
-    );
+    return guestApiError('sendFailed', 500);
   }
 
   return NextResponse.json({ ok: true });

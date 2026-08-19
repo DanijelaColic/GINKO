@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { Loader2, CreditCard, AlertCircle } from 'lucide-react';
+import { guestErrorMessage } from '@/lib/guest-api-error';
 
 type Props = {
   bookingId: string;
@@ -41,7 +42,15 @@ export default function PayDepositButton({
       const data = await res.json() as { url?: string; error?: string };
 
       if (!res.ok || !data.url) {
-        setError(data.error ?? t('errorCreate'));
+        setError(
+          guestErrorMessage(
+            data.error,
+            (key) => t.has(key),
+            (key) => t(key),
+            'checkoutErrors',
+            'errorCreate',
+          ),
+        );
         setLoading(false);
         return;
       }

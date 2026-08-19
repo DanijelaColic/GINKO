@@ -1,7 +1,8 @@
-import { getTranslations } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
 import { Phone, Mail, Clock, MapPin } from 'lucide-react';
-import { PROPERTY_MAP_URL, PROPERTY_STREET, PROPERTY_CITY } from '@/modules/property/property-details.config';
+import { PROPERTY_MAP_URL, PROPERTY_STREET } from '@/modules/property/property-details.config';
+import { getPropertyCityLine } from '@/modules/property/property-details.i18n';
 import {
   CONTACT_EMAIL,
   CONTACT_PHONE_TEL,
@@ -23,8 +24,10 @@ const LEGAL_LINKS = [
 ] as const;
 
 export default async function Footer() {
+  const locale = await getLocale();
   const t = await getTranslations('footer');
   const tSections = await getTranslations('homePage.subnav');
+  const cityLine = getPropertyCityLine(locale);
 
   return (
     <footer className="relative z-10 bg-text text-white shrink-0">
@@ -70,7 +73,7 @@ export default async function Footer() {
                 <MapPin size={14} className="shrink-0 mt-0.5 text-white/40" />
                 <span>
                   {PROPERTY_STREET}<br />
-                  {PROPERTY_CITY}
+                  {cityLine}
                 </span>
               </a>
               <a

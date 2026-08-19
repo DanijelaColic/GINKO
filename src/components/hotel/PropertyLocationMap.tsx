@@ -4,19 +4,27 @@ import { useCallback, useEffect, useState } from 'react';
 import { useLocale } from 'next-intl';
 import { MapPin, X } from 'lucide-react';
 import {
-  PROPERTY_ADDRESS,
   PROPERTY_MAP_EMBED_URL,
   PROPERTY_MAP_URL,
 } from '@/modules/property/property-details.config';
-import { getSurroundingsCopy } from '@/modules/property/property-details.i18n';
+import {
+  getPropertyAddressDisplay,
+  getSurroundingsCopy,
+} from '@/modules/property/property-details.i18n';
 
 function useMapCopy() {
   const locale = useLocale();
   return getSurroundingsCopy(locale).ui;
 }
 
+function useAddressDisplay() {
+  const locale = useLocale();
+  return getPropertyAddressDisplay(locale);
+}
+
 function PropertyLocationMapModal({ onClose }: { onClose: () => void }) {
   const copy = useMapCopy();
+  const address = useAddressDisplay();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -50,7 +58,7 @@ function PropertyLocationMapModal({ onClose }: { onClose: () => void }) {
             <h3 id="property-map-title" className="font-semibold text-text text-sm sm:text-base">
               {copy.mapTitle}
             </h3>
-            <p className="text-muted text-xs mt-0.5 truncate">{PROPERTY_ADDRESS}</p>
+            <p className="text-muted text-xs mt-0.5 truncate">{address}</p>
           </div>
           <button
             type="button"
@@ -98,13 +106,14 @@ function usePropertyLocationMap() {
 export function PropertyHeaderLocation() {
   const { open, openMap, closeMap } = usePropertyLocationMap();
   const copy = useMapCopy();
+  const address = useAddressDisplay();
 
   return (
     <>
       <div className="flex flex-wrap items-center gap-x-1.5 gap-y-1">
         <span className="flex items-center gap-1.5 text-muted">
           <MapPin size={13} className="text-primary shrink-0" />
-          {PROPERTY_ADDRESS}
+          {address}
         </span>
         <span className="text-muted/40 hidden sm:inline" aria-hidden>
           ·
@@ -127,6 +136,7 @@ export function PropertyHeaderLocation() {
 export function PropertyLocationMapPreview() {
   const { open, openMap, closeMap } = usePropertyLocationMap();
   const copy = useMapCopy();
+  const address = useAddressDisplay();
 
   return (
     <>
@@ -144,7 +154,7 @@ export function PropertyLocationMapPreview() {
           <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
           <div className="pointer-events-none absolute bottom-3 left-3 right-3 flex items-center justify-between gap-3">
             <p className="text-white text-sm font-medium drop-shadow-sm truncate">
-              {PROPERTY_ADDRESS}
+              {address}
             </p>
             <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-white/95 px-3 py-1.5 text-xs font-semibold text-primary group-hover:bg-white transition-colors">
               <MapPin size={13} />

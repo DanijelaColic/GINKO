@@ -26,25 +26,28 @@ export async function generateMetadata(): Promise<Metadata> {
   return getRootMetadata(locale);
 }
 
-// Sve property fotografije — pojavljuju se u kolažu i lightboxu
-const PROPERTY_IMAGES: GalleryImage[] = [
-  { src: '/images/property/20240504_154454.jpg', alt: 'Ginko Boutique Rooms & Wellness — objekt, Daruvar' },
-  { src: '/images/property/20240906_085556.jpg', alt: 'Ginko Boutique Rooms & Wellness — pogled na objekt' },
-  { src: '/images/property/20240906_091154.jpg', alt: 'Ginko Boutique Rooms & Wellness — zajednički prostori' },
-  { src: '/images/property/20240906_091257.jpg', alt: 'Ginko Boutique Rooms & Wellness — terasa' },
-  { src: '/images/property/20240906_091321.jpg', alt: 'Ginko Boutique Rooms & Wellness — detalji' },
-  { src: '/images/property/20240906_091344.jpg', alt: 'Ginko Boutique Rooms & Wellness — prostori' },
-  { src: '/images/property/20240929_072608.jpg', alt: 'Ginko Boutique Rooms & Wellness — okolica Daruvara' },
-  { src: '/images/property/20241101_080530.jpg', alt: 'Ginko Boutique Rooms & Wellness — doručak' },
-  { src: '/images/property/20241101_080707.jpg', alt: 'Ginko Boutique Rooms & Wellness — jutarnji obrok' },
-  { src: '/images/property/20250405_085232.jpg', alt: 'Ginko Boutique Rooms & Wellness — proljeće' },
-  { src: '/images/property/20250420_083046.jpg', alt: 'Ginko Boutique Rooms & Wellness — travanj' },
-  { src: '/images/property/20250501_174531.jpg', alt: 'Ginko Boutique Rooms & Wellness — veljača' },
-  { src: '/images/property/20251202_144635.jpg', alt: 'Ginko Boutique Rooms & Wellness — eksterijer' },
-  { src: '/images/property/20251202_144813.jpg', alt: 'Ginko Boutique Rooms & Wellness — fasada' },
-  { src: '/images/property/20251202_150520.jpg', alt: 'Ginko Boutique Rooms & Wellness — objekt zimi' },
-  { src: '/images/property/20251228_151836.jpg', alt: 'Ginko Boutique Rooms & Wellness — Daruvar' },
-];
+const PROPERTY_IMAGE_SRCS = [
+  '/images/property/20240504_154454.jpg',
+  '/images/property/20240906_085556.jpg',
+  '/images/property/20240906_091154.jpg',
+  '/images/property/20240906_091257.jpg',
+  '/images/property/20240906_091321.jpg',
+  '/images/property/20240906_091344.jpg',
+  '/images/property/20240929_072608.jpg',
+  '/images/property/20241101_080530.jpg',
+  '/images/property/20241101_080707.jpg',
+  '/images/property/20250405_085232.jpg',
+  '/images/property/20250420_083046.jpg',
+  '/images/property/20250501_174531.jpg',
+  '/images/property/20251202_144635.jpg',
+  '/images/property/20251202_144813.jpg',
+  '/images/property/20251202_150520.jpg',
+  '/images/property/20251228_151836.jpg',
+] as const;
+
+function propertyImageAltKey(src: string) {
+  return (src.split('/').pop() ?? src).replace(/\.[^.]+$/, '');
+}
 
 const FEATURE_ICONS = [Car, Wifi, Wind, Waves, TreePine, Star];
 
@@ -104,6 +107,11 @@ export default async function HomePage() {
     guestsDone: t('heroGuestsDone'),
   };
 
+  const propertyImages: GalleryImage[] = PROPERTY_IMAGE_SRCS.map((src) => ({
+    src,
+    alt: t(`galleryAlts.${propertyImageAltKey(src)}` as Parameters<typeof t>[0]),
+  }));
+
   return (
     <div className="flex flex-col">
       {/* ------------------------------------------------------------------ */}
@@ -113,7 +121,7 @@ export default async function HomePage() {
         <div className="absolute inset-0 overflow-hidden">
           <Image
             src="/images/hero/exterior-01.webp"
-            alt="Ginko Boutique Rooms & Wellness — Daruvar"
+            alt={t('heroImageAlt')}
             fill
             priority
             className="object-cover object-center"
@@ -124,7 +132,7 @@ export default async function HomePage() {
 
         <div className="relative z-10 flex flex-col items-center text-center max-w-4xl w-full">
           <span className="text-white/80 text-xs font-semibold uppercase tracking-[0.2em] mb-4">
-            Daruvar, Hrvatska
+            {t('heroLocation')}
           </span>
           <h1 className="font-serif text-5xl sm:text-6xl lg:text-7xl font-semibold text-white leading-tight mb-5 drop-shadow-md">
             {t('heroTitle')}
@@ -193,7 +201,7 @@ export default async function HomePage() {
       {/* PROPERTY GALERIJA — full width                                      */}
       {/* ------------------------------------------------------------------ */}
       <div id={OVERVIEW_SECTION_ID} className="scroll-mt-28">
-        <PropertyGallery images={PROPERTY_IMAGES} />
+        <PropertyGallery images={propertyImages} />
 
       {/* ------------------------------------------------------------------ */}
       {/* OPIS OBJEKTA + KLJUČNI SADRŽAJI                                     */}
@@ -202,15 +210,9 @@ export default async function HomePage() {
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
           {/* Lijevo: opis objekta */}
           <div className="space-y-4">
-            <p className="text-text text-base leading-relaxed">
-              Smješten u samom srcu Daruvara, u ulici T. G. Masaryka 1, GINKO Boutique Rooms &amp; Wellness nudi jedinstven spoj elegancije, udobnosti i opuštanja. Inspiraciju za naziv pronašli smo u najstarijem i najpoznatijem stablu Ginkgo biloba u Europi koje od 18. stoljeća krasi perivoj dvorca Janković.
-            </p>
-            <p className="text-text text-base leading-relaxed">
-              Naše moderno uređene sobe i wellness apartmani nalaze se unutar zaštićene povijesne jezgre grada, na svega nekoliko minuta hoda od Daruvarskih toplica i aqua parka Aquae Balissae. Zahvaljujući izvrsnoj lokaciji, GINKO je idealan izbor za wellness odmor, obiteljski vikend, poslovna putovanja ili oporavak nakon medicinskih i estetskih zahvata.
-            </p>
-            <p className="text-text text-base leading-relaxed">
-              Bilo da želite uživati u privatnom wellnessu, istražiti ljepote Daruvara ili pronaći mirno mjesto za odmor, GINKO Boutique Rooms &amp; Wellness pružit će vam vrhunsku uslugu i osjećaj doma u gradu zelenila i piva.
-            </p>
+            <p className="text-text text-base leading-relaxed">{t('aboutP1')}</p>
+            <p className="text-text text-base leading-relaxed">{t('aboutP2')}</p>
+            <p className="text-text text-base leading-relaxed">{t('aboutP3')}</p>
           </div>
 
           {/* Desno: 6 ključnih sadržaja */}

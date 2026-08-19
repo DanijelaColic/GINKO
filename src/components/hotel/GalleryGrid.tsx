@@ -7,6 +7,7 @@
 
 import { useCallback, useEffect, useState } from 'react';
 import Image from 'next/image';
+import { useTranslations } from 'next-intl';
 import { X, ChevronLeft, ChevronRight, ZoomIn } from 'lucide-react';
 import type { GallerySection } from '@/modules/gallery/gallery.types';
 
@@ -15,6 +16,7 @@ type Props = {
 };
 
 export function GalleryGrid({ sections }: Props) {
+  const t = useTranslations('galleryPage');
   const [lightbox, setLightbox] = useState<{ sectionId: string; index: number } | null>(null);
 
   const close = useCallback(() => setLightbox(null), []);
@@ -65,7 +67,7 @@ export function GalleryGrid({ sections }: Props) {
 
             {section.media.length === 0 ? (
               <div className="rounded-xl border border-dashed border-stone/30 bg-stone/5 px-4 py-8 text-center text-sm text-text/50">
-                Fotografije dolaze uskoro.
+                {t('comingSoon')}
               </div>
             ) : (
               <div className="flex gap-3 overflow-x-auto pb-2 snap-x snap-mandatory">
@@ -75,7 +77,7 @@ export function GalleryGrid({ sections }: Props) {
                     type="button"
                     onClick={() => setLightbox({ sectionId: section.id, index: mediaIndex })}
                     className="group relative h-44 w-60 shrink-0 snap-start overflow-hidden rounded-xl shadow-sm bg-stone/10 cursor-zoom-in"
-                    aria-label={`Otvori: ${item.alt}`}
+                    aria-label={t('openPhoto', { alt: item.alt })}
                   >
                     <Image
                       src={item.src}
@@ -117,7 +119,7 @@ export function GalleryGrid({ sections }: Props) {
               <button
                 className="absolute top-4 right-4 p-2 text-white/70 transition-colors hover:text-white"
                 onClick={close}
-                aria-label="Zatvori galeriju"
+                aria-label={t('close')}
               >
                 <X className="size-8" />
               </button>
@@ -128,7 +130,7 @@ export function GalleryGrid({ sections }: Props) {
                   e.stopPropagation();
                   prev();
                 }}
-                aria-label="Prethodna fotografija"
+                aria-label={t('previous')}
               >
                 <ChevronLeft className="size-7" />
               </button>
@@ -153,7 +155,7 @@ export function GalleryGrid({ sections }: Props) {
                   e.stopPropagation();
                   next();
                 }}
-                aria-label="Sljedeća fotografija"
+                aria-label={t('next')}
               >
                 <ChevronRight className="size-7" />
               </button>

@@ -5,6 +5,8 @@ import {
   HOUSE_RULES,
   HOUSE_RULES_COPY,
   POPULAR_FACILITIES,
+  PROPERTY_CITY,
+  PROPERTY_STREET,
   REVIEW_TOPICS,
   REVIEWS_COPY,
   SURROUNDINGS,
@@ -16,6 +18,21 @@ import {
 
 export function getValidPropertyLocale(locale: string | null | undefined): AppLocale {
   return locale === 'en' || locale === 'cs' ? locale : 'hr';
+}
+
+export function getPropertyCityLine(locale: string | null | undefined): string {
+  switch (getValidPropertyLocale(locale)) {
+    case 'en':
+      return '43500 Daruvar, Croatia';
+    case 'cs':
+      return '43500 Daruvar, Chorvatsko';
+    default:
+      return PROPERTY_CITY;
+  }
+}
+
+export function getPropertyAddressDisplay(locale: string | null | undefined): string {
+  return `${PROPERTY_STREET}, ${getPropertyCityLine(locale)}`;
 }
 
 const SURROUNDING_LABELS: Record<

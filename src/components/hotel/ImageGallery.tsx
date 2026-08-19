@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useState, useEffect, useCallback } from 'react';
+import { useTranslations } from 'next-intl';
 import { X, ChevronLeft, ChevronRight, Images } from 'lucide-react';
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export default function ImageGallery({ images, alt }: Props) {
+  const t = useTranslations('galleryPage');
   const [lightbox, setLightbox] = useState<number | null>(null);
 
   const prev = useCallback(() => {
@@ -123,8 +125,8 @@ export default function ImageGallery({ images, alt }: Props) {
         >
           <Images size={14} className="shrink-0" />
           {images.length > 1
-            ? `Prikaži sve fotografije (${images.length})`
-            : 'Prikaži fotografiju'}
+            ? t('showAllPhotos', { count: images.length })
+            : t('showPhoto')}
         </button>
       </div>
 

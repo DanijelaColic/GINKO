@@ -2,10 +2,12 @@
 //
 // Body: { bookingId: string; token: string; paymentType?: 'deposit' }
 // Returns: { url: string } — Saferpay Payment Page redirect URL.
+// Guest-facing failures return a stable `error` code (see bookingConfirmation.checkoutErrors).
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { verifyBookingViewToken } from '@/lib/bookingConfirmation';
+import { guestApiError } from '@/lib/guest-api-error';
 import { createCheckoutSession } from '@/modules/payments/payment.service';
 import { eurToCents } from '@/modules/payments/payment.types';
 import { getSiteUrl } from '@/lib/siteUrl';
@@ -19,10 +21,7 @@ export async function POST(request: NextRequest) {
     };
 
     if (!bookingId || !token) {
-      return NextResponse.json(
-        { error: 'Nedostaju bookingId ili token' },
-        { status: 400 },
-      );
+      return guestApiError('missingParams', 400);
     }
 
     const supabase = createServerSupabaseClient();
@@ -33,23 +32,20 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (bookingErr || !booking) {
-      return NextResponse.json({ error: 'Rezervacija nije pronađena' }, { status: 404 });
+      return guestApiError('bookingNotFound', 404);
     }
 
     if (!verifyBookingViewToken(token, booking.id, booking.guest_email)) {
-      return NextResponse.json({ error: 'Nevažeći pristupni token' }, { status: 403 });
+      return guestApiError('invalidToken', 403);
     }
 
     if (booking.status === 'cancelled') {
-      return NextResponse.json(
-        { error: 'Rezervacija je otkazana — plaćanje nije moguće' },
-        { status: 409 },
-      );
+      return guestApiError('bookingCancelled', 409);
     }
 
     const depositEur: number = booking.deposit as number;
     if (!depositEur || depositEur <= 0) {
-      return NextResponse.json({ error: 'Nevažan iznos depozita' }, { status: 422 });
+      return guestApiError('invalidDeposit', 422);
     }
     const amountCents = eurToCents(depositEur);
 
@@ -78,12 +74,9 @@ export async function POST(request: NextRequest) {
       message.includes('Saferpay') ||
       message.includes('Nedostaju Saferpay')
     ) {
-      return NextResponse.json(
-        { error: 'Saferpay nije konfiguriran. Provjeri env varijable u .env.local.' },
-        { status: 503 },
-      );
+      return guestApiError('paymentUnavailable', 503);
     }
 
-    return NextResponse.json({ error: 'Greška pri kreiranju plaćanja' }, { status: 500 });
+    return guestApiError('createFailed', 500);
   }
 }

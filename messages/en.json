@@ -104,6 +104,32 @@
     "galleryEyebrow": "Gallery",
     "galleryTitle": "Discover Ginko",
     "gallerySubtitle": "Nature, peace and comfort in one place.",
+    "heroLocation": "Daruvar, Croatia",
+    "heroImageAlt": "Ginko Boutique Rooms & Wellness — Daruvar",
+    "share": "Share",
+    "shareAria": "Share link",
+    "shareTitle": "Ginko Boutique Rooms & Wellness Daruvar",
+    "galleryAlts": {
+      "20240504_154454": "Ginko Boutique Rooms & Wellness — property, Daruvar",
+      "20240906_085556": "Ginko Boutique Rooms & Wellness — view of the property",
+      "20240906_091154": "Ginko Boutique Rooms & Wellness — common areas",
+      "20240906_091257": "Ginko Boutique Rooms & Wellness — terrace",
+      "20240906_091321": "Ginko Boutique Rooms & Wellness — details",
+      "20240906_091344": "Ginko Boutique Rooms & Wellness — interiors",
+      "20240929_072608": "Ginko Boutique Rooms & Wellness — Daruvar surroundings",
+      "20241101_080530": "Ginko Boutique Rooms & Wellness — breakfast",
+      "20241101_080707": "Ginko Boutique Rooms & Wellness — morning meal",
+      "20250405_085232": "Ginko Boutique Rooms & Wellness — spring",
+      "20250420_083046": "Ginko Boutique Rooms & Wellness — April",
+      "20250501_174531": "Ginko Boutique Rooms & Wellness — February",
+      "20251202_144635": "Ginko Boutique Rooms & Wellness — exterior",
+      "20251202_144813": "Ginko Boutique Rooms & Wellness — facade",
+      "20251202_150520": "Ginko Boutique Rooms & Wellness — property in winter",
+      "20251228_151836": "Ginko Boutique Rooms & Wellness — Daruvar"
+    },
+    "aboutP1": "Located in the very heart of Daruvar, at T. G. Masaryk Street 1, GINKO Boutique Rooms & Wellness offers a unique blend of elegance, comfort and relaxation. The name was inspired by the oldest and most famous Ginkgo biloba tree in Europe, which has adorned the grounds of Janković Castle since the 18th century.",
+    "aboutP2": "Our modern rooms and wellness apartments sit within the town’s protected historic centre, just a few minutes’ walk from Daruvar Spa and the Aquae Balissae aqua park. Thanks to this excellent location, GINKO is an ideal choice for a wellness stay, a family weekend, business travel or recovery after medical and aesthetic treatments.",
+    "aboutP3": "Whether you want to enjoy a private wellness area, explore the beauty of Daruvar or find a quiet place to rest, GINKO Boutique Rooms & Wellness will give you outstanding service and a feeling of home in the town of greenery and beer.",
     "ctaTitle": "Ready for your getaway?",
     "ctaSubtitle": "Book your room today and secure your spot in our peaceful corner of Slavonia.",
     "ctaButton": "Book Now",
@@ -163,7 +189,15 @@
       "close": "Close",
       "successTitle": "Question sent",
       "successMessage": "Thank you! We will reply to your email as soon as possible.",
-      "errorGeneric": "Could not send your question. Please try again."
+      "errorGeneric": "Could not send your question. Please try again.",
+      "errors": {
+        "invalidRequest": "Invalid request. Please try again.",
+        "invalidEmail": "Please enter a valid email address.",
+        "missingQuestion": "Please enter your question.",
+        "questionTooShort": "The question must be at least 3 characters.",
+        "questionTooLong": "The question can be at most 300 characters.",
+        "sendFailed": "Could not send your question. Please try again."
+      }
     },
     "qualityTitle": "What guests value most",
     "qualityDesc": "Based on guest reviews, visitors especially highlight the clean and tidy accommodation, the quiet location in central Daruvar, and the hosts' hospitality. Below are answers to the most common questions.",
@@ -552,7 +586,14 @@
       "title": "Gallery – Ginko Boutique Rooms & Wellness Daruvar",
       "description": "Photos of rooms, common areas and the surroundings of Daruvar.",
       "imageAlt": "Ginko Boutique Rooms & Wellness – gallery"
-    }
+    },
+    "showAllPhotos": "Show all photos ({count})",
+    "showPhoto": "Show photo",
+    "comingSoon": "Photos coming soon.",
+    "openPhoto": "Open: {alt}",
+    "close": "Close gallery",
+    "previous": "Previous photo",
+    "next": "Next photo"
   },
   "privacyPage": {
     "title": "Privacy Policy",
@@ -660,6 +701,21 @@
     "redirecting": "Redirecting to payment...",
     "alreadyStarted": "Payment has already been started — check your email for confirmation status.",
     "errorCreate": "Could not create the payment",
-    "errorNetwork": "Network error — please try again"
+    "errorNetwork": "Network error — please try again",
+    "checkoutErrors": {
+      "missingParams": "Payment details are missing. Refresh the page and try again.",
+      "bookingNotFound": "Booking not found.",
+      "invalidToken": "This payment link is not valid. Open the confirmation from your email.",
+      "bookingCancelled": "This booking has been cancelled — payment is not possible.",
+      "invalidDeposit": "The deposit amount is not valid. Please contact us.",
+      "paymentUnavailable": "Payment is temporarily unavailable. Please try again or contact us.",
+      "createFailed": "Could not create the payment. Please try again."
+    }
+  },
+  "errorPage": {
+    "title": "Something went wrong",
+    "description": "The page could not be loaded. Please try again or return to the home page.",
+    "retry": "Try again",
+    "home": "Home page"
   }
 }

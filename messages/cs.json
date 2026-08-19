@@ -104,6 +104,32 @@
     "galleryEyebrow": "Galerie",
     "galleryTitle": "Objevte Ginko",
     "gallerySubtitle": "Příroda, klid a pohodlí na jednom místě.",
+    "heroLocation": "Daruvar, Chorvatsko",
+    "heroImageAlt": "Ginko Boutique Rooms & Wellness — Daruvar",
+    "share": "Sdílet",
+    "shareAria": "Sdílet odkaz",
+    "shareTitle": "Ginko Boutique Rooms & Wellness Daruvar",
+    "galleryAlts": {
+      "20240504_154454": "Ginko Boutique Rooms & Wellness — objekt, Daruvar",
+      "20240906_085556": "Ginko Boutique Rooms & Wellness — pohled na objekt",
+      "20240906_091154": "Ginko Boutique Rooms & Wellness — společné prostory",
+      "20240906_091257": "Ginko Boutique Rooms & Wellness — terasa",
+      "20240906_091321": "Ginko Boutique Rooms & Wellness — detaily",
+      "20240906_091344": "Ginko Boutique Rooms & Wellness — prostory",
+      "20240929_072608": "Ginko Boutique Rooms & Wellness — okolí Daruvaru",
+      "20241101_080530": "Ginko Boutique Rooms & Wellness — snídaně",
+      "20241101_080707": "Ginko Boutique Rooms & Wellness — ranní jídlo",
+      "20250405_085232": "Ginko Boutique Rooms & Wellness — jaro",
+      "20250420_083046": "Ginko Boutique Rooms & Wellness — duben",
+      "20250501_174531": "Ginko Boutique Rooms & Wellness — únor",
+      "20251202_144635": "Ginko Boutique Rooms & Wellness — exteriér",
+      "20251202_144813": "Ginko Boutique Rooms & Wellness — fasáda",
+      "20251202_150520": "Ginko Boutique Rooms & Wellness — objekt v zimě",
+      "20251228_151836": "Ginko Boutique Rooms & Wellness — Daruvar"
+    },
+    "aboutP1": "V samém srdci Daruvaru, v ulici T. G. Masaryka 1, nabízí GINKO Boutique Rooms & Wellness jedinečné spojení elegance, pohodlí a odpočinku. Název jsme našli v nejstarším a nejznámějším stromu Ginkgo biloba v Evropě, který od 18. století zdobí park zámku Janković.",
+    "aboutP2": "Naše moderně zařízené pokoje a wellness apartmány se nacházejí v chráněném historickém jádru města, jen pár minut chůze od Daruvarských lázní a aquaparku Aquae Balissae. Díky vynikající poloze je GINKO ideální volbou pro wellness pobyt, rodinný víkend, služební cesty nebo rekonvalescenci po lékařských a estetických zákrocích.",
+    "aboutP3": "Ať už si chcete užít soukromý wellness, objevovat krásy Daruvaru, nebo najít klidné místo k odpočinku, GINKO Boutique Rooms & Wellness vám poskytne špičkový servis a pocit domova ve městě zeleně a piva.",
     "ctaTitle": "Chystáte se na dovolenou?",
     "ctaSubtitle": "Rezervujte si pokoj ještě dnes a zajistěte si místo v našem klidném koutku Slavonie.",
     "ctaButton": "Rezervovat nyní",
@@ -163,7 +189,15 @@
       "close": "Zavřít",
       "successTitle": "Otázka odeslána",
       "successMessage": "Děkujeme! Odpovíme vám na uvedený e-mail co nejdříve.",
-      "errorGeneric": "Odeslání se nezdařilo. Zkuste to znovu."
+      "errorGeneric": "Odeslání se nezdařilo. Zkuste to znovu.",
+      "errors": {
+        "invalidRequest": "Neplatný požadavek. Zkuste to znovu.",
+        "invalidEmail": "Zadejte platnou e-mailovou adresu.",
+        "missingQuestion": "Zadejte otázku.",
+        "questionTooShort": "Otázka musí mít alespoň 3 znaky.",
+        "questionTooLong": "Otázka může mít nejvýše 300 znaků.",
+        "sendFailed": "Odeslání se nezdařilo. Zkuste to znovu."
+      }
     },
     "qualityTitle": "Co hosté oceňují nejvíce",
     "qualityDesc": "Podle recenzí hosté zvláště zdůrazňují čisté a upravené ubytování, klidnou polohu v centru Daruvaru a vstřícnost hostitelů. Níže najdete odpovědi na nejčastější otázky.",
@@ -552,7 +586,14 @@
       "title": "Galerie – Ginko Boutique Rooms & Wellness Daruvar",
       "description": "Fotografie pokojů, společných prostor a okolí Daruvaru.",
       "imageAlt": "Ginko Boutique Rooms & Wellness – galerie"
-    }
+    },
+    "showAllPhotos": "Zobrazit všechny fotografie ({count})",
+    "showPhoto": "Zobrazit fotografii",
+    "comingSoon": "Fotografie již brzy.",
+    "openPhoto": "Otevřít: {alt}",
+    "close": "Zavřít galerii",
+    "previous": "Předchozí fotografie",
+    "next": "Další fotografie"
   },
   "privacyPage": {
     "title": "Zásady ochrany osobních údajů",
@@ -660,6 +701,21 @@
     "redirecting": "Přesměrování na platbu...",
     "alreadyStarted": "Platba už byla zahájena — stav potvrzení najdete v e-mailu.",
     "errorCreate": "Platbu se nepodařilo vytvořit",
-    "errorNetwork": "Chyba sítě — zkuste to znovu"
+    "errorNetwork": "Chyba sítě — zkuste to znovu",
+    "checkoutErrors": {
+      "missingParams": "Chybí údaje pro platbu. Obnovte stránku a zkuste to znovu.",
+      "bookingNotFound": "Rezervace nebyla nalezena.",
+      "invalidToken": "Odkaz na platbu není platný. Otevřete potvrzení z e-mailu.",
+      "bookingCancelled": "Rezervace byla stornována — platba není možná.",
+      "invalidDeposit": "Částka zálohy není platná. Kontaktujte nás.",
+      "paymentUnavailable": "Platba je dočasně nedostupná. Zkuste to znovu nebo nás kontaktujte.",
+      "createFailed": "Platbu se nepodařilo vytvořit. Zkuste to znovu."
+    }
+  },
+  "errorPage": {
+    "title": "Něco se pokazilo",
+    "description": "Stránku se nepodařilo načíst. Zkuste to znovu nebo se vraťte na úvod.",
+    "retry": "Zkusit znovu",
+    "home": "Úvodní stránka"
   }
 }

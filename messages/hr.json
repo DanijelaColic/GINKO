@@ -104,6 +104,32 @@
     "galleryEyebrow": "Galerija",
     "galleryTitle": "Otkrijte Ginko",
     "gallerySubtitle": "Priroda, mir i udobnost na jednom mjestu.",
+    "heroLocation": "Daruvar, Hrvatska",
+    "heroImageAlt": "Ginko Boutique Rooms & Wellness — Daruvar",
+    "share": "Podijeli",
+    "shareAria": "Podijeli link",
+    "shareTitle": "Ginko Boutique Rooms & Wellness Daruvar",
+    "galleryAlts": {
+      "20240504_154454": "Ginko Boutique Rooms & Wellness — objekt, Daruvar",
+      "20240906_085556": "Ginko Boutique Rooms & Wellness — pogled na objekt",
+      "20240906_091154": "Ginko Boutique Rooms & Wellness — zajednički prostori",
+      "20240906_091257": "Ginko Boutique Rooms & Wellness — terasa",
+      "20240906_091321": "Ginko Boutique Rooms & Wellness — detalji",
+      "20240906_091344": "Ginko Boutique Rooms & Wellness — prostori",
+      "20240929_072608": "Ginko Boutique Rooms & Wellness — okolica Daruvara",
+      "20241101_080530": "Ginko Boutique Rooms & Wellness — doručak",
+      "20241101_080707": "Ginko Boutique Rooms & Wellness — jutarnji obrok",
+      "20250405_085232": "Ginko Boutique Rooms & Wellness — proljeće",
+      "20250420_083046": "Ginko Boutique Rooms & Wellness — travanj",
+      "20250501_174531": "Ginko Boutique Rooms & Wellness — veljača",
+      "20251202_144635": "Ginko Boutique Rooms & Wellness — eksterijer",
+      "20251202_144813": "Ginko Boutique Rooms & Wellness — fasada",
+      "20251202_150520": "Ginko Boutique Rooms & Wellness — objekt zimi",
+      "20251228_151836": "Ginko Boutique Rooms & Wellness — Daruvar"
+    },
+    "aboutP1": "Smješten u samom srcu Daruvara, u ulici T. G. Masaryka 1, GINKO Boutique Rooms & Wellness nudi jedinstven spoj elegancije, udobnosti i opuštanja. Inspiraciju za naziv pronašli smo u najstarijem i najpoznatijem stablu Ginkgo biloba u Europi koje od 18. stoljeća krasi perivoj dvorca Janković.",
+    "aboutP2": "Naše moderno uređene sobe i wellness apartmani nalaze se unutar zaštićene povijesne jezgre grada, na svega nekoliko minuta hoda od Daruvarskih toplica i aqua parka Aquae Balissae. Zahvaljujući izvrsnoj lokaciji, GINKO je idealan izbor za wellness odmor, obiteljski vikend, poslovna putovanja ili oporavak nakon medicinskih i estetskih zahvata.",
+    "aboutP3": "Bilo da želite uživati u privatnom wellnessu, istražiti ljepote Daruvara ili pronaći mirno mjesto za odmor, GINKO Boutique Rooms & Wellness pružit će vam vrhunsku uslugu i osjećaj doma u gradu zelenila i piva.",
     "ctaTitle": "Spremi se za odmor?",
     "ctaSubtitle": "Rezerviraj svoju sobu danas i osiguraj mjesto u našem mirnom kutku Slavonije.",
     "ctaButton": "Rezerviraj sada",
@@ -163,7 +189,15 @@
       "close": "Zatvori",
       "successTitle": "Pitanje je poslano",
       "successMessage": "Hvala! Odgovorit ćemo vam na navedenu e-poštu čim prije.",
-      "errorGeneric": "Slanje nije uspjelo. Pokušajte ponovo."
+      "errorGeneric": "Slanje nije uspjelo. Pokušajte ponovo.",
+      "errors": {
+        "invalidRequest": "Neispravan zahtjev. Pokušajte ponovo.",
+        "invalidEmail": "Unesite ispravnu e-poštu.",
+        "missingQuestion": "Unesite pitanje.",
+        "questionTooShort": "Pitanje mora imati najmanje 3 znaka.",
+        "questionTooLong": "Pitanje može imati najviše 300 znakova.",
+        "sendFailed": "Slanje nije uspjelo. Pokušajte ponovo."
+      }
     },
     "qualityTitle": "Što gosti najviše cijene",
     "qualityDesc": "Na temelju recenzija gosti posebno ističu čist i uredan smještaj, mirnu lokaciju u centru Daruvara te ljubaznost domaćina. Ispod su odgovori na najčešća pitanja.",
@@ -552,7 +586,14 @@
       "title": "Galerija – Ginko Boutique Rooms & Wellness Daruvar",
       "description": "Fotografije soba, zajedničkih prostora i okolice Daruvara.",
       "imageAlt": "Ginko Boutique Rooms & Wellness – galerija"
-    }
+    },
+    "showAllPhotos": "Prikaži sve fotografije ({count})",
+    "showPhoto": "Prikaži fotografiju",
+    "comingSoon": "Fotografije dolaze uskoro.",
+    "openPhoto": "Otvori: {alt}",
+    "close": "Zatvori galeriju",
+    "previous": "Prethodna fotografija",
+    "next": "Sljedeća fotografija"
   },
   "privacyPage": {
     "title": "Politika privatnosti",
@@ -660,6 +701,21 @@
     "redirecting": "Preusmjeravanje na plaćanje...",
     "alreadyStarted": "Plaćanje je već pokrenuto — provjerite e-mail za status potvrde.",
     "errorCreate": "Greška pri kreiranju plaćanja",
-    "errorNetwork": "Mrežna greška — pokušajte ponovo"
+    "errorNetwork": "Mrežna greška — pokušajte ponovo",
+    "checkoutErrors": {
+      "missingParams": "Nedostaju podaci za plaćanje. Osvježite stranicu i pokušajte ponovo.",
+      "bookingNotFound": "Rezervacija nije pronađena.",
+      "invalidToken": "Veza za plaćanje nije važeća. Otvorite potvrdu iz e-pošte.",
+      "bookingCancelled": "Rezervacija je otkazana — plaćanje nije moguće.",
+      "invalidDeposit": "Iznos depozita nije važeći. Kontaktirajte nas.",
+      "paymentUnavailable": "Plaćanje trenutno nije dostupno. Pokušajte ponovo ili nas kontaktirajte.",
+      "createFailed": "Greška pri kreiranju plaćanja. Pokušajte ponovo."
+    }
+  },
+  "errorPage": {
+    "title": "Nešto je pošlo po krivu",
+    "description": "Stranica se nije uspjela učitati. Pokušajte ponovo ili se vratite na početnu.",
+    "retry": "Pokušaj ponovo",
+    "home": "Početna stranica"
   }
 }

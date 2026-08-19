@@ -37,7 +37,13 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
     namespace: 'bookingConfirmation',
     bucket: 'ui',
     approxKeys: 22,
-    notes: 'Potvrda rezervacije + kartično plaćanje',
+    notes: 'Potvrda rezervacije + kartično plaćanje + checkout greške',
+  },
+  {
+    namespace: 'errorPage',
+    bucket: 'ui',
+    approxKeys: 4,
+    notes: 'Root error.tsx — gost-facing crash',
   },
   {
     namespace: 'notFoundPage',
@@ -85,7 +91,7 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
     namespace: 'galleryPage',
     bucket: 'ui',
     approxKeys: 7,
-    notes: 'Galerija naslov/meta',
+    notes: 'Galerija naslov/meta + chrome kolaža + kategorije u gallery.i18n',
   },
   {
     namespace: 'privacyPage',

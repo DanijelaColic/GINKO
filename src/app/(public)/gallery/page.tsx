@@ -18,7 +18,7 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function GalleryPage() {
   const locale = getValidLocale(await getLocale());
   const t = await getTranslations('galleryPage');
-  const sections = await getGallerySections();
+  const sections = await getGallerySections(locale);
 
   const breadcrumbJsonLd = getBreadcrumbStructuredData(locale, [
     { name: SITE_NAME, pathname: '/' },

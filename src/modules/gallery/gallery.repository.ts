@@ -3,6 +3,7 @@
 import { createServerSupabaseClient } from '@/lib/supabase';
 import type { GalleryItem } from './gallery.types';
 import { isGalleryCategoryKey, DEFAULT_GALLERY_CATEGORY } from './gallery.categories';
+import { localizeGalleryItems } from './gallery.i18n';
 
 // Static mock — kept as fallback for local dev before DB migration is applied.
 const MOCK_ITEMS: GalleryItem[] = [
@@ -157,7 +158,9 @@ const MOCK_ITEMS: GalleryItem[] = [
   },
 ];
 
-export async function getGalleryItems(): Promise<GalleryItem[]> {
+export async function getGalleryItems(
+  locale: string | null | undefined = 'hr',
+): Promise<GalleryItem[]> {
   try {
     const supabase = createServerSupabaseClient();
     const { data, error } = await supabase
@@ -166,9 +169,11 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
       .order('sort_order', { ascending: true })
       .order('created_at', { ascending: true });
 
-    if (error || !data || data.length === 0) return MOCK_ITEMS;
+    if (error || !data || data.length === 0) {
+      return localizeGalleryItems(MOCK_ITEMS, locale);
+    }
 
-    return data.map((row) => {
+    const rows = data.map((row) => {
       const rawKey = row.category_key as string;
       return {
         id: row.id as string,
@@ -180,7 +185,9 @@ export async function getGalleryItems(): Promise<GalleryItem[]> {
         sort_order: row.sort_order as number,
       } satisfies GalleryItem;
     });
+
+    return localizeGalleryItems(rows, locale);
   } catch {
-    return MOCK_ITEMS;
+    return localizeGalleryItems(MOCK_ITEMS, locale);
   }
 }

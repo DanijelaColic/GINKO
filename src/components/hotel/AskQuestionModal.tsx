@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useLocale, useTranslations } from 'next-intl';
 import { X } from 'lucide-react';
+import { guestErrorMessage } from '@/lib/guest-api-error';
 import { SITE_NAME } from '@/modules/booking/booking.config';
 
 const MAX_QUESTION_LENGTH = 300;
@@ -64,7 +65,15 @@ export default function AskQuestionModal({ onClose }: Props) {
       const data = (await res.json().catch(() => ({}))) as { error?: string };
 
       if (!res.ok) {
-        setError(data.error ?? t('errorGeneric'));
+        setError(
+          guestErrorMessage(
+            data.error,
+            (key) => t.has(key),
+            (key) => t(key),
+            'errors',
+            'errorGeneric',
+          ),
+        );
         return;
       }
 
