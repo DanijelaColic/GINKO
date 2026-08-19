@@ -129,6 +129,7 @@ export default function HeroSearchBar() {
               adults: t('heroAdults'),
               children: t('heroChildren'),
               guests: t('heroGuests'),
+              childAge: t('heroChildAge'),
               childAgeNeeded: t('heroChildAgeNeeded'),
               childAgeError: t('heroChildAgeError'),
               agesHint: t('heroChildAgesHint'),

@@ -70,10 +70,15 @@
     "heroAdults": "Dospělí",
     "heroChildren": "Děti",
     "heroChildAgeNeeded": "Věk (povinné)",
+    "heroChildAge": "Věk dítěte",
     "heroChildAgeError": "Vyberte věk",
     "heroChildAgesHint": "Abychom našli ubytování se správnou kapacitou a zobrazili přesné ceny, potřebujeme věk dětí v den odjezdu.",
     "heroGuestsDone": "Hotovo",
     "heroSearch": "Hledat",
+    "availabilitySubtitle": "Vyberte data a zkontrolujte dostupnost",
+    "ageYearOne": "{age} rok",
+    "ageYearFew": "{age} roky",
+    "ageYearMany": "{age} let",
     "availabilitySearching": "Hledání…",
     "availabilitySelectChildAges": "Před pokračováním vyberte věk každého dítěte.",
     "availabilityExtraBedIncluded": "Přistýlka +{price} €/noc (automaticky pro 3. osobu)",
@@ -352,6 +357,16 @@
         "one": "1 noc",
         "few": "{count} noci",
         "other": "{count} nocí"
+      },
+      "adult": {
+        "one": "1 dospělý",
+        "few": "{count} dospělí",
+        "other": "{count} dospělých"
+      },
+      "child": {
+        "one": "1 dítě",
+        "few": "{count} děti",
+        "other": "{count} dětí"
       }
     },
     "stepper": {
@@ -381,7 +396,11 @@
       "balanceNote": "platí se v objektu při příjezdu",
       "freeCancellation": "Bezplatné storno do 14 dnů před příjezdem",
       "changeDates": "Změnit data",
-      "directBooking": "Přímá rezervace • Bez provize"
+      "directBooking": "Přímá rezervace • Bez provize",
+      "roomCount": "{count, plural, one {# pokoj} few {# pokoje} other {# pokojů}}",
+      "amenityParking": "Parkování zdarma",
+      "amenityWifi": "Wi-Fi zdarma",
+      "amenityWellness": "Wellness (sauna, vířivka)"
     },
     "steps": {
       "room": "0. Výběr pokoje",
@@ -401,7 +420,11 @@
       "line": "{label} · {nights, plural, one {{nights}× noc} few {{nights}× noci} other {{nights}× nocí}} · {pricePerNight} €",
       "discount": "Sleva {nights}+ nocí ({percent} %)",
       "cleaningFee": "Úklid",
-      "total": "Celkem"
+      "total": "Celkem",
+      "accommodation": "Ubytování",
+      "extraBed": "Přistýlka",
+      "crib": "Dětská postýlka",
+      "breakfast": "Snídaně (bufet)"
     },
     "form": {
       "optional": "(není povinné)",
@@ -615,5 +638,28 @@
     "title": "Stránka nenalezena",
     "description": "Požadovaná stránka neexistuje nebo byla přesunuta.",
     "cta": "Zpět na úvod"
+  },
+  "bookingConfirmation": {
+    "title": "Dokončit rezervaci",
+    "reference": "Reference",
+    "statusConfirmed": "Potvrzeno",
+    "statusCancelled": "Zrušeno",
+    "statusPending": "Čeká na potvrzení",
+    "backHome": "Zpět na úvod",
+    "paySuccessTitle": "Platba přijata",
+    "paySuccessBody": "Vaše platba se zpracovává. Rezervace bude potvrzena, jakmile budou prostředky zaevidovány. Potvrzení pošleme na váš e-mail.",
+    "payCancelledTitle": "Platba přerušena",
+    "payCancelledBody": "Platbu jste nedokončili. Rezervace je stále aktivní — zálohu můžete zaplatit kartou níže.",
+    "bookingCancelled": "Tato rezervace byla zrušena.",
+    "bookingCancelledHint": "Pro novou rezervaci navštivte stránku dostupnosti.",
+    "cardPayTitle": "Platba zálohy kartou",
+    "cardPayNote": "Platí se pouze záloha {amount} € — zbytek se platí při příjezdu",
+    "balanceOnArrival": "Zbytek částky se platí při příjezdu. Potvrzení rezervace posíláme e-mailem.",
+    "terms": "Rezervací přijímáte storno podmínky. Bezplatné storno a vrácení zálohy do 14 dnů před příjezdem.",
+    "payButton": "Zaplatit zálohu {amount} € kartou",
+    "redirecting": "Přesměrování na platbu...",
+    "alreadyStarted": "Platba už byla zahájena — stav potvrzení najdete v e-mailu.",
+    "errorCreate": "Platbu se nepodařilo vytvořit",
+    "errorNetwork": "Chyba sítě — zkuste to znovu"
   }
 }

@@ -3,7 +3,7 @@
 // Step 3 of reservation flow — two-column layout mirroring Step 2 ("Vaši podaci").
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { getBookingConfirmationData } from '@/modules/booking/booking.confirmation';
 import { parseLocalDate } from '@/modules/booking/dates';
 import BookingStepsBar from '@/components/hotel/BookingStepsBar';
@@ -40,9 +40,10 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
 
   if (!id || !token) notFound();
 
-  const [data, locale, googleReviews] = await Promise.all([
-    getBookingConfirmationData(id, token),
-    getLocale(),
+  const locale = await getLocale();
+  const t = await getTranslations('bookingConfirmation');
+  const [data, googleReviews] = await Promise.all([
+    getBookingConfirmationData(id, token, locale),
     getGoogleReviews(),
   ]);
 
@@ -58,19 +59,21 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
 
   const paymentBanner = showSuccessBanner
       ? {
+          kind: 'success' as const,
           bg: 'bg-green-50 border-green-200',
           text: 'text-green-800',
           icon: '✓',
-          title: 'Plaćanje zaprimljeno',
-          body: 'Vaše plaćanje se obrađuje. Rezervacija će biti potvrđena čim sredstva budu evidentirana. Potvrdu ćemo poslati na vašu e-mail adresu.',
+          title: t('paySuccessTitle'),
+          body: t('paySuccessBody'),
         }
       : showCancelledBanner
         ? {
+            kind: 'cancelled' as const,
             bg: 'bg-amber-50 border-amber-200',
             text: 'text-amber-800',
             icon: '↩',
-            title: 'Plaćanje prekinuto',
-            body: 'Niste dovršili plaćanje. Rezervacija je i dalje aktivna — možete platiti depozit karticom ispod.',
+            title: t('payCancelledTitle'),
+            body: t('payCancelledBody'),
           }
         : null;
 
@@ -110,10 +113,10 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
           <div>
             <div className="mb-6">
               <h2 className="font-serif text-2xl font-semibold text-text">
-                Dovrši rezervaciju
+                {t('title')}
               </h2>
               <p className="text-sm text-text/50 mt-1">
-                Referenca:{' '}
+                {t('reference')}:{' '}
                 <span className="font-mono font-medium text-text/70">{data.reference}</span>
                 {' · '}
                 <span className={
@@ -123,7 +126,11 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
                       ? 'text-red-500'
                       : 'text-amber-600'
                 }>
-                  {data.status === 'confirmed' ? 'Potvrđena' : data.status === 'cancelled' ? 'Otkazana' : 'Na čekanju'}
+                  {data.status === 'confirmed'
+                    ? t('statusConfirmed')
+                    : data.status === 'cancelled'
+                      ? t('statusCancelled')
+                      : t('statusPending')}
                 </span>
               </p>
             </div>
@@ -142,7 +149,7 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
                 href="/"
                 className="inline-block rounded-full border border-primary px-6 py-3 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-white"
               >
-                Povratak na početnu
+                {t('backHome')}
               </Link>
             </div>
           </div>

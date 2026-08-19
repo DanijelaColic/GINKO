@@ -169,6 +169,7 @@ export const SURROUNDINGS_COPY = {
   mapTitle: 'Lokacija objekta',
   openInGoogleMaps: 'Otvori u Google Maps',
   showAvailability: 'Prikaži raspoloživost',
+  closeMap: 'Zatvori kartu',
   categories: {
     attractions: 'Znamenitosti u blizini',
     restaurants: 'Restorani i kafići',

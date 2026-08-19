@@ -74,7 +74,16 @@ export type AvailabilityLabels = {
   childAgesHint: string;
   childAgeNeeded: string;
   childAgeError: string;
+  childAge: string;
   capacityLabel: string;
+  title: string;
+  subtitle: string;
+  checkIn: string;
+  checkOut: string;
+  guests: string;
+  adults: string;
+  children: string;
+  guestsDone: string;
 };
 
 export function nightCountLabel(
@@ -368,10 +377,10 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     <section className="py-14 px-4 bg-stone-light scroll-mt-28" id={AVAILABILITY_SECTION_ID}>
       <div className="max-w-6xl mx-auto">
         <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text mb-2">
-          Raspoloživost
+          {labels.title}
         </h2>
         <p className="text-muted text-sm mb-6">
-          Odaberite datume i provjerite dostupnost
+          {labels.subtitle}
         </p>
 
         {/* Search bar */}
@@ -381,7 +390,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
         >
           <SearchFieldCell
             icon={CalendarDays}
-            label="Dolazak"
+            label={labels.checkIn}
             className={`flex-1 ${CELL_BORDER}`}
           >
             <input
@@ -400,7 +409,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
 
           <SearchFieldCell
             icon={CalendarDays}
-            label="Odlazak"
+            label={labels.checkOut}
             className={`flex-1 ${CELL_BORDER}`}
           >
             <input
@@ -418,7 +427,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
 
           <SearchFieldCell
             icon={Users}
-            label="Gosti"
+            label={labels.guests}
             className={`${CELL_BORDER} relative z-40 flex-1 sm:min-w-[180px]`}
           >
             <GuestPicker
@@ -445,14 +454,14 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                 }
               }}
               labels={{
-                adults: 'Odrasli',
-                children: 'Djeca',
-                guests: 'Gosti',
-                childAge: 'Starost djeteta',
+                adults: labels.adults,
+                children: labels.children,
+                guests: labels.guests,
+                childAge: labels.childAge,
                 childAgeNeeded: labels.childAgeNeeded,
                 childAgeError: labels.childAgeError,
                 agesHint: labels.childAgesHint,
-                done: 'Gotovo',
+                done: labels.guestsDone,
               }}
             />
           </SearchFieldCell>
@@ -582,7 +591,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                             className="inline-flex items-center gap-1 text-[11px] text-muted bg-stone/70 border border-stone px-2 py-0.5 rounded"
                           >
                             {Icon && <Icon size={11} className="shrink-0 text-primary" />}
-                            {entry?.label ?? item}
+                            {item}
                           </span>
                         );
                       })}

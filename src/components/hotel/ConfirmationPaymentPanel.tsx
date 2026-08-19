@@ -1,5 +1,6 @@
 'use client';
 
+import { useTranslations } from 'next-intl';
 import PayDepositButton from './PayDepositButton';
 
 type Props = {
@@ -8,6 +9,7 @@ type Props = {
   status: 'pending' | 'confirmed' | 'cancelled';
   depositEur: number;
   paymentBanner?: {
+    kind: 'success' | 'cancelled';
     bg: string;
     text: string;
     icon: string;
@@ -23,7 +25,8 @@ export default function ConfirmationPaymentPanel({
   depositEur,
   paymentBanner,
 }: Props) {
-  const paymentSucceeded = paymentBanner?.title === 'Plaćanje zaprimljeno';
+  const t = useTranslations('bookingConfirmation');
+  const paymentSucceeded = paymentBanner?.kind === 'success';
   const paymentCancelled = status === 'cancelled';
 
   return (
@@ -46,22 +49,17 @@ export default function ConfirmationPaymentPanel({
 
       {paymentCancelled && (
         <div className="rounded-2xl border border-stone/20 bg-white shadow-sm px-6 py-6 text-center space-y-2">
-          <p className="text-text/60 text-sm">Ova rezervacija je otkazana.</p>
-          <p className="text-text/50 text-xs">
-            Za novo rezerviranje posjetite stranicu dostupnosti.
-          </p>
+          <p className="text-text/60 text-sm">{t('bookingCancelled')}</p>
+          <p className="text-text/50 text-xs">{t('bookingCancelledHint')}</p>
         </div>
       )}
 
-      {/* Retry card pay after cancelled/interrupted Saferpay — or if checkout failed */}
       {!paymentSucceeded && !paymentCancelled && (
         <div className="rounded-2xl border border-stone/20 bg-white shadow-sm overflow-hidden">
           <div className="px-6 pt-6 pb-4">
-            <h3 className="text-base font-semibold text-text">Plaćanje depozita karticom</h3>
+            <h3 className="text-base font-semibold text-text">{t('cardPayTitle')}</h3>
             <p className="text-xs text-text/50 mt-0.5">
-              Plaća se samo depozit od{' '}
-              <span className="font-semibold text-accent">{depositEur} €</span>
-              {' '}— ostatak se plaća pri dolasku
+              {t('cardPayNote', { amount: depositEur })}
             </p>
           </div>
           <div className="px-6 pb-6">
@@ -76,14 +74,13 @@ export default function ConfirmationPaymentPanel({
 
       {paymentSucceeded && (
         <div className="rounded-2xl border border-stone/20 bg-white shadow-sm px-6 py-5 text-sm text-text/60">
-          Ostatak iznosa plaća se pri dolasku. Potvrdu rezervacije šaljemo na e-mail.
+          {t('balanceOnArrival')}
         </div>
       )}
 
       {!paymentCancelled && (
         <p className="text-xs text-text/40 text-center leading-relaxed px-2">
-          Rezervacijom prihvaćate uvjete otkazivanja. Besplatno otkazivanje i povrat depozita
-          do 14 dana prije dolaska.
+          {t('terms')}
         </p>
       )}
     </div>

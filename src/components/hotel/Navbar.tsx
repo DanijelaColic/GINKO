@@ -27,6 +27,43 @@ const LOCALES: { code: AppLocale; label: string }[] = [
   { code: 'cs', label: 'CS' },
 ];
 
+function LocaleSwitcher({
+  locale,
+  onSwitch,
+  compact = false,
+}: {
+  locale: AppLocale;
+  onSwitch: (next: AppLocale) => void;
+  compact?: boolean;
+}) {
+  return (
+    <div
+      className="flex shrink-0 items-center gap-0.5"
+      role="group"
+      aria-label="Language"
+    >
+      {LOCALES.map(({ code, label }) => (
+        <button
+          key={code}
+          type="button"
+          onClick={() => onSwitch(code)}
+          className={`rounded font-semibold transition-colors ${
+            compact ? 'px-2.5 py-1.5 text-sm' : 'px-2 py-1 text-xs'
+          } ${
+            locale === code
+              ? 'bg-primary text-white'
+              : 'bg-stone text-text hover:bg-primary/15 hover:text-primary'
+          }`}
+          aria-label={`Switch to ${label}`}
+          aria-current={locale === code ? 'true' : undefined}
+        >
+          {label}
+        </button>
+      ))}
+    </div>
+  );
+}
+
 function sectionLinkClass(isActive: boolean) {
   return `rounded-md px-2.5 py-1.5 text-sm font-medium whitespace-nowrap transition-colors ${
     isActive
@@ -154,7 +191,7 @@ export default function Navbar() {
         {/* Brand */}
         <Link
           href="/"
-          className="font-serif text-sm sm:text-base lg:text-lg font-semibold text-primary leading-snug max-w-[40%] sm:max-w-xs lg:max-w-none shrink-0"
+          className="font-serif text-sm sm:text-base lg:text-lg font-semibold text-primary leading-snug min-w-0 max-w-[38%] sm:max-w-[12rem] lg:max-w-none shrink truncate"
         >
           {t('brand')}
         </Link>
@@ -175,39 +212,24 @@ export default function Navbar() {
         <div className="hidden shrink-0 items-center gap-1.5 lg:gap-2 md:flex">
           <a
             href={`tel:${CONTACT_PHONE_TEL}`}
-            className={contactLinkClass()}
+            className={`${contactLinkClass()} hidden lg:flex`}
             aria-label={t('phone')}
           >
             <Phone size={15} className="shrink-0" />
-            <span className="hidden lg:inline">{CONTACT_PHONE_DISPLAY}</span>
+            <span>{CONTACT_PHONE_DISPLAY}</span>
           </a>
           <a
             href={buildWhatsAppHref(locale)}
             target="_blank"
             rel="noopener noreferrer"
-            className={contactLinkClass()}
+            className={`${contactLinkClass()} hidden lg:flex`}
             aria-label={t('whatsapp')}
           >
             <WhatsAppIcon size={15} className="shrink-0 text-[#25D366]" />
-            <span className="hidden lg:inline">WhatsApp</span>
+            <span>WhatsApp</span>
           </a>
           <div className="mx-0.5 h-5 w-px bg-[--color-stone] hidden lg:block" aria-hidden />
-          <div className="flex items-center gap-1 text-xs font-medium text-[--color-muted]">
-            {LOCALES.map(({ code, label }) => (
-              <button
-                key={code}
-                onClick={() => switchLocale(code)}
-                className={`rounded px-2 py-1 transition-colors ${
-                  locale === code
-                    ? 'bg-[--color-primary] text-white'
-                    : 'hover:bg-[--color-stone] text-[--color-muted]'
-                }`}
-                aria-label={`Switch to ${label}`}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
+          <LocaleSwitcher locale={locale} onSwitch={switchLocale} />
           <Link
             href={AVAILABILITY_SECTION_HREF}
             className="rounded-lg bg-[--color-primary] px-3 lg:px-4 py-2 text-sm font-medium text-white hover:bg-[--color-primary-dark] transition-colors whitespace-nowrap"
@@ -216,14 +238,18 @@ export default function Navbar() {
           </Link>
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden text-[--color-text] shrink-0"
-          onClick={() => setIsOpen((v) => !v)}
-          aria-label="Toggle menu"
-        >
-          {isOpen ? <X size={22} /> : <Menu size={22} />}
-        </button>
+        {/* Mobile: jezici uvijek vidljivi + hamburger */}
+        <div className="flex shrink-0 items-center gap-1 md:hidden">
+          <LocaleSwitcher locale={locale} onSwitch={switchLocale} />
+          <button
+            className="text-[--color-text] p-1"
+            onClick={() => setIsOpen((v) => !v)}
+            aria-label="Toggle menu"
+            type="button"
+          >
+            {isOpen ? <X size={22} /> : <Menu size={22} />}
+          </button>
+        </div>
       </nav>
 
       {/* Mobile drawer */}
@@ -263,20 +289,8 @@ export default function Navbar() {
               WhatsApp
             </a>
           </div>
-          <div className="mt-4 flex items-center gap-2">
-            {LOCALES.map(({ code, label }) => (
-              <button
-                key={code}
-                onClick={() => switchLocale(code)}
-                className={`rounded px-3 py-1 text-sm font-medium transition-colors ${
-                  locale === code
-                    ? 'bg-[--color-primary] text-white'
-                    : 'bg-[--color-stone] text-[--color-muted]'
-                }`}
-              >
-                {label}
-              </button>
-            ))}
+          <div className="mt-4">
+            <LocaleSwitcher locale={locale} onSwitch={switchLocale} compact />
           </div>
           <Link
             href={AVAILABILITY_SECTION_HREF}

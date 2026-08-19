@@ -70,10 +70,15 @@
     "heroAdults": "Odrasli",
     "heroChildren": "Djeca",
     "heroChildAgeNeeded": "Dob (obavezno)",
+    "heroChildAge": "Starost djeteta",
     "heroChildAgeError": "Odaberi dob",
     "heroChildAgesHint": "Da bismo pronašli smještaj s odgovarajućim kapacitetom i prikazali točne cijene, trebamo starost djece u trenutku odjave.",
     "heroGuestsDone": "Gotovo",
     "heroSearch": "Traži",
+    "availabilitySubtitle": "Odaberite datume i provjerite dostupnost",
+    "ageYearOne": "{age} godina",
+    "ageYearFew": "{age} godine",
+    "ageYearMany": "{age} godina",
     "availabilitySearching": "Traženje…",
     "availabilitySelectChildAges": "Molimo odaberite starost svakog djeteta prije nastavka.",
     "availabilityExtraBedIncluded": "Pomoćni ležaj +{price} €/noć (auto za 3. osobu)",
@@ -352,6 +357,16 @@
         "one": "1 noć",
         "few": "{count} noći",
         "other": "{count} noći"
+      },
+      "adult": {
+        "one": "1 odrasla",
+        "few": "{count} odrasle",
+        "other": "{count} odraslih"
+      },
+      "child": {
+        "one": "1 dijete",
+        "few": "{count} djece",
+        "other": "{count} djece"
       }
     },
     "stepper": {
@@ -381,7 +396,11 @@
       "balanceNote": "plaća se u smještajnom objektu pri dolasku",
       "freeCancellation": "Besplatno otkazivanje do 14 dana prije dolaska",
       "changeDates": "Promijeni datume",
-      "directBooking": "Direktna rezervacija • Bez provizija"
+      "directBooking": "Direktna rezervacija • Bez provizija",
+      "roomCount": "{count, plural, one {# soba} few {# sobe} other {# soba}}",
+      "amenityParking": "Besplatno parkiralište",
+      "amenityWifi": "Besplatni Wi-Fi",
+      "amenityWellness": "Wellness (sauna, jacuzzi)"
     },
     "steps": {
       "room": "0. Odabir sobe",
@@ -401,7 +420,11 @@
       "line": "{label} · {nights, plural, one {{nights}× noć} few {{nights}× noći} other {{nights}× noći}} · {pricePerNight} €",
       "discount": "Popust {nights}+ noći ({percent}%)",
       "cleaningFee": "Usluga čišćenja",
-      "total": "Ukupno"
+      "total": "Ukupno",
+      "accommodation": "Smještaj",
+      "extraBed": "Pomoćni ležaj",
+      "crib": "Dječji krevetić",
+      "breakfast": "Doručak (buffet)"
     },
     "form": {
       "optional": "(nije obavezno)",
@@ -615,5 +638,28 @@
     "title": "Stranica nije pronađena",
     "description": "Tražena stranica ne postoji ili je premještena.",
     "cta": "Povratak na početnu"
+  },
+  "bookingConfirmation": {
+    "title": "Dovrši rezervaciju",
+    "reference": "Referenca",
+    "statusConfirmed": "Potvrđena",
+    "statusCancelled": "Otkazana",
+    "statusPending": "Na čekanju",
+    "backHome": "Povratak na početnu",
+    "paySuccessTitle": "Plaćanje zaprimljeno",
+    "paySuccessBody": "Vaše plaćanje se obrađuje. Rezervacija će biti potvrđena čim sredstva budu evidentirana. Potvrdu ćemo poslati na vašu e-mail adresu.",
+    "payCancelledTitle": "Plaćanje prekinuto",
+    "payCancelledBody": "Niste dovršili plaćanje. Rezervacija je i dalje aktivna — možete platiti depozit karticom ispod.",
+    "bookingCancelled": "Ova rezervacija je otkazana.",
+    "bookingCancelledHint": "Za novo rezerviranje posjetite stranicu dostupnosti.",
+    "cardPayTitle": "Plaćanje depozita karticom",
+    "cardPayNote": "Plaća se samo depozit od {amount} € — ostatak se plaća pri dolasku",
+    "balanceOnArrival": "Ostatak iznosa plaća se pri dolasku. Potvrdu rezervacije šaljemo na e-mail.",
+    "terms": "Rezervacijom prihvaćate uvjete otkazivanja. Besplatno otkazivanje i povrat depozita do 14 dana prije dolaska.",
+    "payButton": "Plati depozit {amount} € karticom",
+    "redirecting": "Preusmjeravanje na plaćanje...",
+    "alreadyStarted": "Plaćanje je već pokrenuto — provjerite e-mail za status potvrde.",
+    "errorCreate": "Greška pri kreiranju plaćanja",
+    "errorNetwork": "Mrežna greška — pokušajte ponovo"
   }
 }

@@ -1,4 +1,5 @@
 import type { ElementType } from 'react';
+import { getLocale } from 'next-intl/server';
 import {
   Check,
   Car,
@@ -15,16 +16,16 @@ import {
   Info,
   Languages,
 } from 'lucide-react';
+import type { FacilityGroup } from '@/modules/property/property-details.config';
 import {
-  FACILITIES_COPY,
-  FACILITY_GROUPS,
-  POPULAR_FACILITIES,
-  type FacilityGroup,
-} from '@/modules/property/property-details.config';
+  getFacilitiesUi,
+  getFacilityGroupsLocalized,
+  getPopularFacilities,
+} from '@/modules/property/property-details.i18n';
 import { FACILITIES_SECTION_ID } from '@/modules/booking/booking.config';
 import PropertyHouseRulesSection from '@/components/hotel/PropertyHouseRulesSection';
 
-const POPULAR_ICONS: Record<(typeof POPULAR_FACILITIES)[number]['id'], ElementType> = {
+const POPULAR_ICONS: Record<string, ElementType> = {
   parking: Car,
   nonSmoking: Ban,
   wifi: Wifi,
@@ -68,10 +69,14 @@ function FacilityGroupBlock({ group }: { group: FacilityGroup }) {
   );
 }
 
-export default function PropertyFacilitiesSection() {
+export default async function PropertyFacilitiesSection() {
+  const locale = await getLocale();
+  const copy = getFacilitiesUi(locale);
+  const groups = getFacilityGroupsLocalized(locale);
+  const popular = getPopularFacilities(locale);
   const columns: FacilityGroup[][] = [[], [], []];
 
-  for (const group of FACILITY_GROUPS) {
+  for (const group of groups) {
     columns[group.column - 1].push(group);
   }
 
@@ -80,21 +85,21 @@ export default function PropertyFacilitiesSection() {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text">
-            {FACILITIES_COPY.title}
+            {copy.title}
           </h2>
           <a
             href="#raspolozivost"
             className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0"
           >
-            {FACILITIES_COPY.showAvailability}
+            {copy.showAvailability}
           </a>
         </div>
 
         <h3 className="font-semibold text-sm text-text mb-4">
-          {FACILITIES_COPY.popularTitle}
+          {copy.popularTitle}
         </h3>
         <div className="flex flex-wrap gap-x-8 gap-y-3 mb-10">
-          {POPULAR_FACILITIES.map(({ id, label }) => {
+          {popular.map(({ id, label }) => {
             const Icon = POPULAR_ICONS[id];
             return (
               <div key={id} className="flex items-center gap-2 text-sm text-text">

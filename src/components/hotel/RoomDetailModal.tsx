@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect } from 'react';
-import { useTranslations } from 'next-intl';
+import { useTranslations, useLocale } from 'next-intl';
 import { X, Check, Maximize2, Users } from 'lucide-react';
 import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import RoomModalGallery from '@/components/hotel/RoomModalGallery';
@@ -60,6 +60,7 @@ export default function RoomDetailModal({
   onFixReserve,
 }: Props) {
   const t = useTranslations('roomDetailModal');
+  const locale = useLocale();
   const amenityGroups = groupRoomAmenities(room);
 
   useEffect(() => {
@@ -97,9 +98,9 @@ export default function RoomDetailModal({
   const balanceAmount = displayTotal - depositAmount;
 
   const reviewScore = reviewSummary
-    ? formatReviewRating(reviewSummary.rating)
+    ? formatReviewRating(reviewSummary.rating, locale)
     : null;
-  const reviewLabel = reviewSummary ? getRatingLabel(reviewSummary.rating) : null;
+  const reviewLabel = reviewSummary ? getRatingLabel(reviewSummary.rating, locale) : null;
 
   const resolveItemLabel = (item: string) => {
     if (item === '__sea_view__') return t('amenitySeaView');
@@ -212,7 +213,7 @@ export default function RoomDetailModal({
                     className="inline-flex items-center gap-1 text-[11px] text-muted bg-stone/70 border border-stone px-2 py-0.5 rounded"
                   >
                     {Icon && <Icon size={11} className="shrink-0 text-primary" />}
-                    {entry?.label ?? item}
+                    {item}
                   </span>
                 );
               })}

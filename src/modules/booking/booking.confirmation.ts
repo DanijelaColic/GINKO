@@ -2,7 +2,8 @@
 
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { verifyBookingViewToken } from '@/lib/bookingConfirmation';
-import { getRoomBySlug } from '@/modules/rooms/room.repository';
+import { getRoom, getRoomBySlug } from '@/modules/rooms/room.repository';
+import { getValidLocale } from '@/i18n/messages';
 import { formatDisplayDate, parseLocalDate, calculatePrice } from '@/modules/booking/dates';
 import {
   RECIPIENT_IBAN,
@@ -16,9 +17,12 @@ import type { BookingConfirmationData } from './booking.types';
 export async function getBookingConfirmationData(
   bookingId: string,
   token: string,
+  localeRaw?: string,
 ): Promise<BookingConfirmationData | null> {
   const trimmedToken = token.trim();
   if (!bookingId || !trimmedToken) return null;
+
+  const locale = getValidLocale(localeRaw);
 
   try {
     const supabase = createServerSupabaseClient();
@@ -36,7 +40,8 @@ export async function getBookingConfirmationData(
       return null;
     }
 
-    const room = getRoomBySlug(booking.room_slug);
+    const room =
+      (await getRoom(booking.room_slug, locale)) ?? getRoomBySlug(booking.room_slug);
     if (!room) return null;
 
     const checkInDate = parseLocalDate(booking.check_in);
@@ -56,8 +61,8 @@ export async function getBookingConfirmationData(
       guestEmail: booking.guest_email,
       roomName: room.name,
       room,
-      checkIn: formatDisplayDate(checkInDate),
-      checkOut: formatDisplayDate(checkOutDate),
+      checkIn: formatDisplayDate(checkInDate, locale),
+      checkOut: formatDisplayDate(checkOutDate, locale),
       checkInIso: booking.check_in,
       checkOutIso: booking.check_out,
       nights: booking.nights,

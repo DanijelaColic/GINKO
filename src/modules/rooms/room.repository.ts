@@ -12,7 +12,12 @@ function applyLocaleOverlay(room: Room, locale: RoomLocale): Room {
   const localeMap = roomTranslations[locale] ?? roomTranslations.hr;
   const translated = localeMap[room.slug];
   if (!translated) return room;
-  return { ...room, ...translated };
+  const { name, ...rest } = translated;
+  return {
+    ...room,
+    ...rest,
+    ...(name ? { name } : {}),
+  };
 }
 
 /**
@@ -45,6 +50,18 @@ export function getRoomBySlug(slug: string): Room | undefined {
   return staticRooms.find((r) => r.slug === slug);
 }
 
+export function getRoomDisplayName(slug: string, locale: RoomLocale): string {
+  const overlay = roomTranslations[locale]?.[slug];
+  if (overlay?.name) return overlay.name;
+  return getRoomBySlug(slug)?.name ?? slug;
+}
+
+function capacityWord(n: number, locale: RoomLocale): string {
+  if (locale === 'cs') return n === 1 ? 'osoba' : n < 5 ? 'osoby' : 'osob';
+  if (locale === 'en') return n === 1 ? 'guest' : 'guests';
+  return n === 1 ? 'osoba' : n < 5 ? 'osobe' : 'osoba';
+}
+
 // ── DB helpers ──────────────────────────────────────────────────────────────
 
 type DbRoom = {
@@ -71,7 +88,7 @@ function mapDbRoom(r: DbRoom, locale: RoomLocale): Room {
     tagline: t?.tagline ?? '',
     description: t?.description ?? '',
     capacity: r.capacity,
-    capacityNote: `${r.capacity} ${locale === 'hr' ? 'osoba' : locale === 'cs' ? 'osob' : 'guests'}`,
+    capacityNote: `${r.capacity} ${capacityWord(r.capacity, locale)}`,
     size: r.size_m2 ?? 0,
     beds: r.beds ?? '',
     view: false,

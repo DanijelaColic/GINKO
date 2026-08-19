@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { AlertCircle, ChevronDown, Minus, Plus } from 'lucide-react';
 import {
   MAX_ADULTS,
@@ -84,10 +85,13 @@ function Stepper({
   );
 }
 
-function ageLabel(age: number): string {
-  if (age === 1) return '1 godina';
-  if (age >= 2 && age <= 4) return `${age} godine`;
-  return `${age} godina`;
+function ageLabel(
+  age: number,
+  t: ReturnType<typeof useTranslations>,
+): string {
+  if (age === 1) return t('ageYearOne', { age });
+  if (age >= 2 && age <= 4) return t('ageYearFew', { age });
+  return t('ageYearMany', { age });
 }
 
 export default function GuestPicker({
@@ -103,6 +107,7 @@ export default function GuestPicker({
   showAgeErrors = false,
   labels = {},
 }: Props) {
+  const t = useTranslations('homePage');
   const [openUncontrolled, setOpenUncontrolled] = useState(false);
   const isControlled = openControlled !== undefined;
   const open = isControlled ? openControlled : openUncontrolled;
@@ -114,16 +119,14 @@ export default function GuestPicker({
   }
 
   const l = {
-    adults: labels.adults ?? 'Odrasli',
-    children: labels.children ?? 'Djeca',
-    guests: labels.guests ?? 'Gosti',
-    childAge: labels.childAge ?? 'Starost djeteta',
-    childAgeNeeded: labels.childAgeNeeded ?? 'Dob (obavezno)',
-    childAgeError: labels.childAgeError ?? 'Odaberi dob',
-    agesHint:
-      labels.agesHint ??
-      'Da bismo pronašli smještaj s odgovarajućim kapacitetom i prikazali točne cijene, trebamo starost djece u trenutku odjave.',
-    done: labels.done ?? 'Gotovo',
+    adults: labels.adults ?? t('heroAdults'),
+    children: labels.children ?? t('heroChildren'),
+    guests: labels.guests ?? t('heroGuests'),
+    childAge: labels.childAge ?? t('heroChildAge'),
+    childAgeNeeded: labels.childAgeNeeded ?? t('heroChildAgeNeeded'),
+    childAgeError: labels.childAgeError ?? t('heroChildAgeError'),
+    agesHint: labels.agesHint ?? t('heroChildAgesHint'),
+    done: labels.done ?? t('heroGuestsDone'),
   };
 
   useEffect(() => {
@@ -258,7 +261,7 @@ export default function GuestPicker({
                           <option value="">{l.childAgeNeeded}</option>
                           {Array.from({ length: MAX_CHILD_AGE + 1 }, (_, age) => (
                             <option key={age} value={age}>
-                              {ageLabel(age)}
+                              {ageLabel(age, t)}
                             </option>
                           ))}
                         </select>

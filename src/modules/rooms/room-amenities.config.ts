@@ -8,8 +8,8 @@ export type AmenityGroup = {
 };
 
 const BATHROOM_KEYS = new Set([
-  'Ručnici', 'Towels', 'Handtücher',
-  'Posteljina', 'Linen', 'Bettwäsche',
+  'Ručnici', 'Towels', 'Handtücher', 'Ručníky',
+  'Posteljina', 'Linen', 'Bettwäsche', 'Povlečení',
 ]);
 
 const VIEW_KEYS = new Set([
@@ -17,7 +17,12 @@ const VIEW_KEYS = new Set([
 ]);
 
 const WELLNESS_KEYS = new Set([
-  'Sauna', 'Jacuzzi', 'Privatna sauna',
+  'Sauna',
+  'Jacuzzi',
+  'Privatna sauna',
+  'Private sauna',
+  'Soukromá sauna',
+  'Vířivka',
 ]);
 
 /** Grupira sadržaje sobe u Booking.com stil sekcija */

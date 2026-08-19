@@ -1,35 +1,24 @@
 'use client';
 
 import { Fragment, useMemo, useRef, useState } from 'react';
+import { useLocale } from 'next-intl';
 import { ChevronLeft, ChevronRight, ExternalLink, Plus, X } from 'lucide-react';
-import {
-  REVIEW_TOPIC_KEYWORDS,
-  REVIEW_TOPICS,
-  REVIEWS_COPY,
-  type ReviewTopicId,
-} from '@/modules/property/property-details.config';
+import { REVIEW_TOPIC_KEYWORDS, type ReviewTopicId } from '@/modules/property/property-details.config';
+import { getReviewsUi, getReviewTopics } from '@/modules/property/property-details.i18n';
 import { REVIEWS_SECTION_ID } from '@/modules/booking/booking.config';
 import type { GoogleReview, GoogleReviewsData } from '@/modules/reviews/google-reviews.types';
 import {
+  formatReviewDate,
   formatReviewRating,
   getRatingLabel,
 } from '@/modules/reviews/review-labels';
 
 const TEXT_PREVIEW_LENGTH = 180;
 const PREVIEW_COUNT = 3;
-const LOCALE = 'hr-HR';
 
 type Props = {
   data: GoogleReviewsData | null;
 };
-
-function formatReviewDate(isoDate: string) {
-  return new Date(isoDate).toLocaleDateString(LOCALE, {
-    day: 'numeric',
-    month: 'long',
-    year: 'numeric',
-  });
-}
 
 function escapeRegex(value: string) {
   return value.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
@@ -110,11 +99,15 @@ function ReviewCard({
   review,
   placeName,
   activeTopics,
+  locale,
+  copy,
   compact = false,
 }: {
   review: GoogleReview;
   placeName: string;
   activeTopics: ReviewTopicId[];
+  locale: string;
+  copy: { readMore: string; readLess: string };
   compact?: boolean;
 }) {
   const [expanded, setExpanded] = useState(false);
@@ -139,7 +132,7 @@ function ReviewCard({
           )}
         </div>
         <span className="shrink-0 bg-primary text-white text-xs font-bold px-2 py-1 rounded-md">
-          {formatReviewRating(review.rating)}
+          {formatReviewRating(review.rating, locale)}
         </span>
       </div>
 
@@ -153,19 +146,22 @@ function ReviewCard({
           onClick={() => setExpanded((prev) => !prev)}
           className="text-left text-sm text-primary hover:text-primary-dark font-medium transition-colors"
         >
-          {expanded ? REVIEWS_COPY.readLess : REVIEWS_COPY.readMore}
+          {expanded ? copy.readLess : copy.readMore}
         </button>
       )}
 
       <div className="border-t border-stone pt-3 text-xs text-muted space-y-0.5">
         <p>{placeName}</p>
-        <p>{formatReviewDate(review.date)}</p>
+        <p>{formatReviewDate(review.date, locale)}</p>
       </div>
     </article>
   );
 }
 
 export default function PropertyReviewsSection({ data }: Props) {
+  const locale = useLocale();
+  const copy = getReviewsUi(locale);
+  const topics = getReviewTopics(locale);
   const scrollRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   const [activeTopics, setActiveTopics] = useState<ReviewTopicId[]>([]);
@@ -212,14 +208,14 @@ export default function PropertyReviewsSection({ data }: Props) {
         id={REVIEWS_SECTION_ID}
       >
         <div className="max-w-6xl mx-auto text-center text-sm text-muted py-8">
-          {REVIEWS_COPY.unavailable}
+          {copy.unavailable}
         </div>
       </section>
     );
   }
 
-  const ratingLabel = getRatingLabel(data.rating);
-  const reviewCountLabel = REVIEWS_COPY.reviewCountLabel.replace(
+  const ratingLabel = getRatingLabel(data.rating, locale);
+  const reviewCountLabel = copy.reviewCountLabel.replace(
     '{count}',
     String(data.reviewCount),
   );
@@ -233,19 +229,19 @@ export default function PropertyReviewsSection({ data }: Props) {
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text">
-            {REVIEWS_COPY.title}
+            {copy.title}
           </h2>
           <a
             href="#raspolozivost"
             className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0"
           >
-            {REVIEWS_COPY.showAvailability}
+            {copy.showAvailability}
           </a>
         </div>
 
         <div className="flex flex-wrap items-center gap-3 mb-2">
           <span className="bg-primary text-white font-bold text-lg px-2.5 py-1 rounded-md leading-none">
-            {formatReviewRating(data.rating)}
+            {formatReviewRating(data.rating, locale)}
           </span>
           <p className="text-sm text-text font-medium">
             {ratingLabel} · {reviewCountLabel}
@@ -256,17 +252,17 @@ export default function PropertyReviewsSection({ data }: Props) {
               onClick={handleToggleShowAll}
               className="text-sm text-primary hover:text-primary-dark font-medium transition-colors"
             >
-              {REVIEWS_COPY.showAll}
+              {copy.showAll}
             </button>
           )}
         </div>
-        <p className="text-sm text-muted mb-2">{REVIEWS_COPY.highlights}</p>
-        <p className="text-xs text-muted mb-8">{REVIEWS_COPY.googleSource}</p>
+        <p className="text-sm text-muted mb-2">{copy.highlights}</p>
+        <p className="text-xs text-muted mb-8">{copy.googleSource}</p>
 
         <div className="mb-8">
-          <p className="text-sm text-text mb-3">{REVIEWS_COPY.topicsHint}</p>
+          <p className="text-sm text-text mb-3">{copy.topicsHint}</p>
           <div className="flex flex-wrap gap-2">
-            {REVIEW_TOPICS.map(({ id, label }) => {
+            {topics.map(({ id, label }) => {
               const isActive = activeTopics.includes(id);
               return (
                 <button
@@ -289,13 +285,13 @@ export default function PropertyReviewsSection({ data }: Props) {
         </div>
 
         <div className="flex items-center justify-between gap-4 mb-4">
-          <h3 className="font-semibold text-sm text-text">{REVIEWS_COPY.featuredTitle}</h3>
+          <h3 className="font-semibold text-sm text-text">{copy.featuredTitle}</h3>
           {!showAll && visibleReviews.length > 0 && (
             <div className="hidden sm:flex items-center gap-1">
               <button
                 type="button"
                 onClick={() => scrollCarousel('left')}
-                aria-label="Prethodne recenzije"
+                aria-label={copy.prevAria}
                 className="p-2 rounded-lg border border-stone text-muted hover:text-text hover:border-primary/40 transition-colors"
               >
                 <ChevronLeft size={18} />
@@ -303,7 +299,7 @@ export default function PropertyReviewsSection({ data }: Props) {
               <button
                 type="button"
                 onClick={() => scrollCarousel('right')}
-                aria-label="Sljedeće recenzije"
+                aria-label={copy.nextAria}
                 className="p-2 rounded-lg border border-stone text-muted hover:text-text hover:border-primary/40 transition-colors"
               >
                 <ChevronRight size={18} />
@@ -321,6 +317,8 @@ export default function PropertyReviewsSection({ data }: Props) {
                   review={review}
                   placeName={data.placeName}
                   activeTopics={activeTopics}
+                  locale={locale}
+                  copy={copy}
                 />
               ))}
             </div>
@@ -335,6 +333,8 @@ export default function PropertyReviewsSection({ data }: Props) {
                   review={review}
                   placeName={data.placeName}
                   activeTopics={activeTopics}
+                  locale={locale}
+                  copy={copy}
                   compact
                 />
               ))}
@@ -342,7 +342,7 @@ export default function PropertyReviewsSection({ data }: Props) {
           )
         ) : (
           <p className="text-sm text-muted py-8 text-center border border-dashed border-stone rounded-xl">
-            {REVIEWS_COPY.noResults}
+            {copy.noResults}
           </p>
         )}
 
@@ -353,7 +353,7 @@ export default function PropertyReviewsSection({ data }: Props) {
               onClick={handleToggleShowAll}
               className="inline-flex items-center justify-center border border-primary text-primary hover:bg-primary/5 font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm"
             >
-              {showAll ? REVIEWS_COPY.hideAll : REVIEWS_COPY.showAll}
+              {showAll ? copy.hideAll : copy.showAll}
             </button>
           )}
           <a
@@ -362,7 +362,7 @@ export default function PropertyReviewsSection({ data }: Props) {
             rel="noopener noreferrer"
             className="inline-flex items-center justify-center gap-2 text-sm text-primary hover:text-primary-dark font-medium transition-colors"
           >
-            {REVIEWS_COPY.viewAllOnGoogle}
+            {copy.viewAllOnGoogle}
             <ExternalLink size={14} />
           </a>
         </div>

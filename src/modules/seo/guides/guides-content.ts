@@ -195,4 +195,90 @@ export const GUIDES: GuideArticle[] = [
       },
     ],
   },
+  {
+    slug: 'sto-posjetiti-u-daruvaru',
+    locale: 'cs',
+    title: 'Co navštívit v Daruvaru',
+    description:
+      'Praktický průvodce Daruvarskými lázněmi, zámkem Jankovićů, stromem ginkgo a okolními atrakcemi — ideální k pobytu v Ginko Boutique Rooms.',
+    publishedAt: '2026-08-01',
+    readingTime: '6 min',
+    keywords: [
+      'co navštívit v Daruvaru',
+      'Daruvar atrakce',
+      'Daruvarské lázně',
+      'zámek Jankovićů',
+      'ubytování Daruvar',
+    ],
+    coverImage: {
+      src: '/images/property/20240504_154454.jpg',
+      alt: 'Ginko Boutique Rooms & Wellness – objekt v Daruvaru',
+    },
+    sections: [
+      {
+        heading: 'Daruvarské lázně a wellness',
+        paragraphs: [
+          'Daruvar je známý termálními prameny. Daruvarské lázně a aquapark Aquae Ballisae jsou pár minut pěšky od centra — ideální na regeneraci, rodinný den nebo v kombinaci se soukromým wellness v ubytování.',
+          'Pokud bydlíte v Ginko Boutique Rooms & Wellness, lázně máte doslova vedle: ranní trénink nebo večerní koupání zvládnete bez dlouhé cesty.',
+        ],
+      },
+      {
+        heading: 'Zámek Jankovićů a strom ginkgo',
+        paragraphs: [
+          'Park zámku hraběte Jankoviće a legendární ginkgo biloba leží v samém srdci města. Procházka parkem a fotka stromu, který inspiroval název našeho objektu, je příjemný začátek pobytu.',
+          'Kostel Nejsvětější Trojice a historické centrum jsou jen pár minut pěšky od Ulici Tomaša Garika Masaryka 1.',
+        ],
+      },
+      {
+        heading: 'Chutě a denní rytmus',
+        paragraphs: [
+          'Daruvar má klidné tempo: kavárny a restaurace v centru, místní pivovar a kratší výlety směrem na Papuk nebo do okolních vesnic. Na delší výlet je Záhřeb zhruba hodinu a půl autem.',
+          'Večery jsou tiché — což vyhovuje hostům na wellness, služební cestu nebo regeneraci. Domovní řád v objektu podporuje noční klid po 23:00.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'kako-planirati-odmor-u-daruvaru',
+    locale: 'cs',
+    title: 'Jak naplánovat pobyt v Daruvaru',
+    description:
+      'Tipy na termín, příjezd a ubytování v Daruvaru — pokoje, apartmán nebo wellness apartmán s přímou rezervací.',
+    publishedAt: '2026-08-01',
+    readingTime: '5 min',
+    keywords: [
+      'plánování pobytu Daruvar',
+      'kdy navštívit Daruvar',
+      'ubytování Daruvar',
+      'boutique pokoje Daruvar',
+      'wellness Daruvar',
+    ],
+    coverImage: {
+      src: '/images/hero/exterior-01.webp',
+      alt: 'Ginko Boutique Rooms & Wellness – fasáda objektu v Daruvaru',
+    },
+    sections: [
+      {
+        heading: 'Kdy přijet',
+        paragraphs: [
+          'Jaro a podzim se hodí na procházky, lázně a menší provoz. Léto přináší aquapark a delší dny venku. Zima může být lákavá kvůli termálnímu odpočinku a klidnějšímu městu.',
+          'Víkendy v lázeňské sezóně se rychle plní — pokoj doporučujeme rezervovat předem, zvlášť wellness apartmán.',
+        ],
+      },
+      {
+        heading: 'Jak se sem dostat',
+        paragraphs: [
+          'Nejbližší větší letiště je Záhřeb (asi 120 km). Do Daruvaru se dostanete autem, nebo autobusem / vlakem na městské nádraží (asi 500 m od objektu).',
+          'Soukromé parkování u objektu je zdarma, místo není potřeba rezervovat.',
+        ],
+      },
+      {
+        heading: 'Pokoj, apartmán nebo wellness',
+        paragraphs: [
+          'Na kratší pobyt stačí pokoj (Ginko 1–6). Pro více prostoru nebo vaření zvolte apartmán; pro soukromou saunu a vířivku — Wellness apartmán.',
+          'Přímá rezervace na ginko-sobe.com znamená bez provize platformy, jasnou zálohu 50 % a zbytek při příjezdu. Snídani a přistýlku lze domluvit při rezervaci.',
+        ],
+      },
+    ],
+  },
 ];

@@ -1,10 +1,8 @@
 import { Landmark, UtensilsCrossed, TrainFront, Plane, type LucideIcon } from 'lucide-react';
+import { getLocale } from 'next-intl/server';
 import { PropertyLocationMapPreview } from '@/components/hotel/PropertyLocationMap';
-import {
-  SURROUNDINGS,
-  SURROUNDINGS_COPY,
-  type SurroundingItem,
-} from '@/modules/property/property-details.config';
+import { getSurroundingsCopy } from '@/modules/property/property-details.i18n';
+import type { SurroundingItem } from '@/modules/property/property-details.config';
 import { SURROUNDINGS_SECTION_ID } from '@/modules/booking/booking.config';
 
 function SurroundingList({ items }: { items: readonly SurroundingItem[] }) {
@@ -21,60 +19,77 @@ function SurroundingList({ items }: { items: readonly SurroundingItem[] }) {
 }
 
 function SurroundingCategory({
-  categoryKey,
+  title,
+  items,
   icon: Icon,
 }: {
-  categoryKey: keyof typeof SURROUNDINGS;
+  title: string;
+  items: readonly SurroundingItem[];
   icon: LucideIcon;
 }) {
   return (
     <div>
       <h3 className="flex items-center gap-2 font-semibold text-sm text-text mb-4">
         <Icon size={16} className="text-muted shrink-0" />
-        {SURROUNDINGS_COPY.categories[categoryKey]}
+        {title}
       </h3>
-      <SurroundingList items={SURROUNDINGS[categoryKey]} />
+      <SurroundingList items={items} />
     </div>
   );
 }
 
-export default function PropertySurroundingsSection() {
+export default async function PropertySurroundingsSection() {
+  const locale = await getLocale();
+  const { ui, items } = getSurroundingsCopy(locale);
+
   return (
     <section id={SURROUNDINGS_SECTION_ID} className="py-14 px-4 bg-white border-t border-stone scroll-mt-28">
       <div className="max-w-6xl mx-auto">
         <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 mb-2">
           <div>
             <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text">
-              {SURROUNDINGS_COPY.title}
+              {ui.title}
             </h2>
           </div>
           <a
             href="#raspolozivost"
             className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0"
           >
-            {SURROUNDINGS_COPY.showAvailability}
+            {ui.showAvailability}
           </a>
         </div>
 
         <PropertyLocationMapPreview />
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-x-12 gap-y-10 mt-8">
-          <SurroundingCategory categoryKey="attractions" icon={Landmark} />
+          <SurroundingCategory
+            title={ui.categories.attractions}
+            items={items.attractions}
+            icon={Landmark}
+          />
 
           <div className="lg:row-span-3 lg:row-start-1 lg:col-start-2">
             <h3 className="flex items-center gap-2 font-semibold text-sm text-text mb-4">
               <UtensilsCrossed size={16} className="text-muted shrink-0" />
-              {SURROUNDINGS_COPY.categories.restaurants}
+              {ui.categories.restaurants}
             </h3>
-            <SurroundingList items={SURROUNDINGS.restaurants} />
+            <SurroundingList items={items.restaurants} />
           </div>
 
-          <SurroundingCategory categoryKey="transport" icon={TrainFront} />
-          <SurroundingCategory categoryKey="airports" icon={Plane} />
+          <SurroundingCategory
+            title={ui.categories.transport}
+            items={items.transport}
+            icon={TrainFront}
+          />
+          <SurroundingCategory
+            title={ui.categories.airports}
+            items={items.airports}
+            icon={Plane}
+          />
         </div>
 
         <p className="text-xs text-muted mt-8 leading-relaxed">
-          {SURROUNDINGS_COPY.disclaimer}
+          {ui.disclaimer}
         </p>
       </div>
     </section>

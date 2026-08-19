@@ -92,7 +92,16 @@ export default async function HomePage() {
     childAgesHint: t('heroChildAgesHint'),
     childAgeNeeded: t('heroChildAgeNeeded'),
     childAgeError: t('heroChildAgeError'),
+    childAge: t('heroChildAge'),
     capacityLabel: t('availabilityCapacityLabel'),
+    title: t('subnav.availability'),
+    subtitle: t('availabilitySubtitle'),
+    checkIn: t('heroCheckIn'),
+    checkOut: t('heroCheckOut'),
+    guests: t('heroGuests'),
+    adults: t('heroAdults'),
+    children: t('heroChildren'),
+    guestsDone: t('heroGuestsDone'),
   };
 
   return (

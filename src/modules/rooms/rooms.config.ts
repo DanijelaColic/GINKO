@@ -1,6 +1,6 @@
 // Real room data — Ginko Sobe, Ulica Tomaša Garika Masaryka 1, 43500 Daruvar
 // Images: local /public/images/rooms/...
-// HR = source of truth. EN descriptions are translated. CS opisi: Faza 6 (privremeno EN).
+// HR = source of truth. EN and CS descriptions are translated.
 
 import type { AccommodationType, Room, RoomLocale } from './room.types';
 
@@ -195,7 +195,12 @@ export const rooms: Room[] = [
 
 export const roomTranslations: Record<
   RoomLocale,
-  Record<string, Pick<Room, 'tagline' | 'description' | 'capacityNote' | 'beds' | 'amenities'>>
+  Record<
+    string,
+    Pick<Room, 'tagline' | 'description' | 'capacityNote' | 'beds' | 'amenities'> & {
+      name?: string;
+    }
+  >
 > = {
   hr: {
     'ginko-1': {
@@ -305,6 +310,7 @@ export const roomTranslations: Record<
       amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
     },
     'ginko-spa-2': {
+      name: 'Wellness Apartment',
       tagline: 'Private sauna and jacuzzi — a luxury wellness stay.',
       description:
         'Welcome to the Wellness Apartment — your luxury wellness retreat in Daruvar. This 50 m² apartment on the second floor is a different experience from the standard rooms: a private sauna, jacuzzi, terrace with a view, a separate kitchen and a carefully finished interior make it ideal for couples or small groups who want something extra. Every detail is designed for a calm, relaxing stay. Pets are not allowed.',
@@ -313,6 +319,7 @@ export const roomTranslations: Record<
       amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Private sauna', 'Jacuzzi', 'Terrace', 'Separate kitchen', 'Parking', 'Heating', 'Towels', 'Linen'],
     },
     'ginko-spa-1': {
+      name: 'Apartment',
       tagline: 'Spacious apartment with a terrace and a separate kitchen.',
       description:
         'Welcome to the Apartment — a spacious 50 m² stay on the second floor in the heart of Daruvar. A terrace with a view, a separate kitchen and a modern interior make it perfect for a relaxing break. This listing does not include access to the private wellness area (sauna and jacuzzi). Pets are not allowed.',
@@ -321,71 +328,72 @@ export const roomTranslations: Record<
       amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Separate kitchen', 'Parking', 'Heating', 'Towels', 'Linen'],
     },
   },
-  // TODO Faza 6: pravi CS opisi (privremeno EN)
   cs: {
     'ginko-1': {
-      tagline: 'Charming and intimate room in the heart of Daruvar.',
+      tagline: 'Okouzlující a intimní pokoj v srdci Daruvaru.',
       description:
-        'Welcome to Ginko 1, a charming and intimate room in the heart of Daruvar. Located at Ulica Tomaša Garika Masaryka 1, it is designed for anyone looking for peace and comfort — and sleeps two comfortably. A spacious bedroom with a double bed, a modern bathroom and a warm atmosphere give you everything you need for a relaxing stay. Pets are welcome on request.',
-      capacityNote: '2 guests',
-      beds: '1 double bed',
-      amenities: ['WiFi', 'LCD TV', 'Air conditioning', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
+        'Vítejte v Ginko 1, okouzlujícím a intimním pokoji v srdci Daruvaru. Nachází se na Ulici Tomaša Garika Masaryka 1 a je navržený pro každého, kdo hledá klid a pohodlí — a pohodlně ubytuje i dva hosty. Prostorná ložnice s manželskou postelí, moderní koupelna a hřejivá atmosféra vám dají vše pro odpočinkový pobyt. Domácí mazlíčci jsou vítáni na vyžádání.',
+      capacityNote: '2 osoby',
+      beds: '1 manželská postel',
+      amenities: ['WiFi', 'LCD TV', 'Klimatizace', 'Parkování', 'Topení', 'Ručníky', 'Povlečení', 'Domácí mazlíčci na vyžádání'],
     },
     'ginko-2': {
-      tagline: 'Spacious room with a terrace for pleasant evenings.',
+      tagline: 'Prostorný pokoj s terasou pro příjemné večery.',
       description:
-        'Discover Ginko 2, a charming room in the heart of picturesque Daruvar. At Ulica Tomaša Garika Masaryka 1 you are close to the town’s history and character. The room sleeps two comfortably, with space for a third guest when needed. A terrace and satellite TV make this one of our guests’ favourites. Pets are welcome on request.',
+        'Objevte Ginko 2, okouzlující pokoj v srdci malebného Daruvaru. Na Ulici Tomaša Garika Masaryka 1 jste blízko historie a charakteru města. Pokoj pohodlně ubytuje dva hosty a v případě potřeby i třetí osobu. Terasa a satelitní TV z něj dělají jeden z oblíbených pokojů našich hostů. Domácí mazlíčci jsou vítáni na vyžádání.',
       capacityNote: '2+1',
-      beds: '1 double bed\n1 single bed (extra bed)',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
+      beds: '1 manželská postel\n1 jednolůžko (přistýlka)',
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Parkování', 'Topení', 'Ručníky', 'Povlečení', 'Domácí mazlíčci na vyžádání'],
     },
     'ginko-3': {
-      tagline: 'A private retreat with modern amenities and a terrace.',
+      tagline: 'Soukromé útočiště s moderním vybavením a terasou.',
       description:
-        'Welcome to Ginko 3, your private retreat in the heart of Daruvar. Our charming room at Ulica Tomaša Garika Masaryka 1 offers an authentic Croatian stay in a lively, historic town centre. It is fully equipped with modern amenities and sleeps 2 guests, or up to 3 when needed. The terrace and complete privacy make the stay special. Pets are welcome on request.',
+        'Vítejte v Ginko 3, vašem soukromém útočišti v srdci Daruvaru. Náš okouzlující pokoj na Ulici Tomaša Garika Masaryka 1 nabízí autentický chorvatský pobyt v živém historickém centru. Je plně vybavený moderním zázemím a ubytuje 2 hosty, případně až 3. Terasa a úplné soukromí dělají pobyt výjimečným. Domácí mazlíčci jsou vítáni na vyžádání.',
       capacityNote: '2+1',
-      beds: '1 double bed\n1 single bed (extra bed)',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
+      beds: '1 manželská postel\n1 jednolůžko (přistýlka)',
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Parkování', 'Topení', 'Ručníky', 'Povlečení', 'Domácí mazlíčci na vyžádání'],
     },
     'ginko-4': {
-      tagline: 'Modern room with a terrace and thoughtful amenities.',
+      tagline: 'Moderní pokoj s terasou a promyšleným vybavením.',
       description:
-        'Welcome to Ginko 4 — a comfortable room with carefully chosen amenities for a proper rest. In the heart of Daruvar at Ulica Tomaša Garika Masaryka 1, it puts you close to the town’s attractions. Our hosts are dedicated to making your stay memorable. A terrace and private parking are available to all guests. Pets are welcome on request.',
+        'Vítejte v Ginko 4 — pohodlném pokoji s pečlivě vybraným vybavením pro pořádný odpočinek. V srdci Daruvaru na Ulici Tomaša Garika Masaryka 1 jste blízko městských atrakcí. Naši hostitelé se snaží, aby byl váš pobyt nezapomenutelný. Terasa a soukromé parkování jsou k dispozici všem hostům. Domácí mazlíčci jsou vítáni na vyžádání.',
       capacityNote: '2+1',
-      beds: '1 double bed\n1 single bed (extra bed)',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
+      beds: '1 manželská postel\n1 jednolůžko (přistýlka)',
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Parkování', 'Topení', 'Ručníky', 'Povlečení', 'Domácí mazlíčci na vyžádání'],
     },
     'ginko-5': {
-      tagline: 'Elegant room for a perfect stay in the town centre.',
+      tagline: 'Elegantní pokoj pro dokonalý pobyt v centru města.',
       description:
-        'Welcome to Ginko 5, your stay in the cultural heart of continental Croatia. At Ulica Tomaša Garika Masaryka 1 in Daruvar, this elegant room offers a comfortable, authentic taste of Croatian life. The private, fully furnished space is designed for up to two guests. A terrace and complete privacy are available to all guests. Pets are welcome on request.',
-      capacityNote: '2 guests',
-      beds: '1 double bed',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen'],
+        'Vítejte v Ginko 5, vašem pobytu v kulturním srdci kontinentálního Chorvatska. Na Ulici Tomaša Garika Masaryka 1 v Daruvaru nabízí tento elegantní pokoj pohodlnou a autentickou chuť chorvatského života. Soukromý, plně zařízený prostor je navržený až pro dva hosty. Terasa a úplné soukromí jsou k dispozici všem hostům. Domácí mazlíčci jsou vítáni na vyžádání.',
+      capacityNote: '2 osoby',
+      beds: '1 manželská postel',
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Parkování', 'Topení', 'Ručníky', 'Povlečení'],
     },
     'ginko-6': {
-      tagline: 'Ideal for solo travellers — a quiet, intimate stay.',
+      tagline: 'Ideální pro sólové cestovatele — klidný a intimní pobyt.',
       description:
-        'Welcome to Ginko 6, a cosy room in the heart of Daruvar at Ulica Tomaša Garika Masaryka 1. It is designed for solo travellers or business guests looking for a quiet stay. A comfortable bedroom with a single bed, a modern bathroom and a terrace give you everything you need for a peaceful night. Pets are welcome on request.',
-      capacityNote: '1 guest',
-      beds: '1 single bed',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
+        'Vítejte v Ginko 6, útulném pokoji v srdci Daruvaru na Ulici Tomaša Garika Masaryka 1. Je navržený pro sólové cestovatele nebo služební hosty, kteří hledají klidný pobyt. Pohodlná ložnice s jednolůžkem, moderní koupelna a terasa vám dají vše pro klidnou noc. Domácí mazlíčci jsou vítáni na vyžádání.',
+      capacityNote: '1 osoba',
+      beds: '1 jednolůžko',
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Parkování', 'Topení', 'Ručníky', 'Povlečení', 'Domácí mazlíčci na vyžádání'],
     },
     'ginko-spa-2': {
-      tagline: 'Private sauna and jacuzzi — a luxury wellness stay.',
+      name: 'Wellness apartmán',
+      tagline: 'Soukromá sauna a vířivka — luxusní wellness pobyt.',
       description:
-        'Welcome to the Wellness Apartment — your luxury wellness retreat in Daruvar. This 50 m² apartment on the second floor is a different experience from the standard rooms: a private sauna, jacuzzi, terrace with a view, a separate kitchen and a carefully finished interior make it ideal for couples or small groups who want something extra. Every detail is designed for a calm, relaxing stay. Pets are not allowed.',
+        'Vítejte ve Wellness apartmánu — vaší luxusní wellness oáze v Daruvaru. Tento 50 m² apartmán v druhém patře je jiný zážitek než standardní pokoje: soukromá sauna, vířivka, terasa s výhledem, oddělená kuchyň a pečlivě dotažený interiér z něj dělají ideální volbu pro páry nebo menší skupiny, které chtějí něco navíc. Každý detail je navržený pro klidný a odpočinkový pobyt. Domácí mazlíčci nejsou povoleni.',
       capacityNote: '2+2',
-      beds: 'Bedroom 1: 1 double bed\nLiving room: 1 sofa bed\nExtra: 1 single bed (extra bed)',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Private sauna', 'Jacuzzi', 'Terrace', 'Separate kitchen', 'Parking', 'Heating', 'Towels', 'Linen'],
+      beds: 'Ložnice 1: 1 manželská postel\nObývací pokoj: 1 rozkládací pohovka\nNavíc: 1 jednolůžko (přistýlka)',
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Soukromá sauna', 'Vířivka', 'Terasa', 'Oddělená kuchyň', 'Parkování', 'Topení', 'Ručníky', 'Povlečení'],
     },
     'ginko-spa-1': {
-      tagline: 'Spacious apartment with a terrace and a separate kitchen.',
+      name: 'Apartmán',
+      tagline: 'Prostorný apartmán s terasou a oddělenou kuchyní.',
       description:
-        'Welcome to the Apartment — a spacious 50 m² stay on the second floor in the heart of Daruvar. A terrace with a view, a separate kitchen and a modern interior make it perfect for a relaxing break. This listing does not include access to the private wellness area (sauna and jacuzzi). Pets are not allowed.',
+        'Vítejte v Apartmánu — prostorném 50 m² ubytování v druhém patře v srdci Daruvaru. Terasa s výhledem, oddělená kuchyň a moderní interiér z něj dělají ideální místo k odpočinku. Tato varianta nezahrnuje přístup do soukromé wellness zóny (sauna a vířivka). Domácí mazlíčci nejsou povoleni.',
       capacityNote: '2+2',
-      beds: 'Bedroom 1: 1 double bed\nLiving room: 1 sofa bed\nExtra: 1 single bed (extra bed)',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Separate kitchen', 'Parking', 'Heating', 'Towels', 'Linen'],
+      beds: 'Ložnice 1: 1 manželská postel\nObývací pokoj: 1 rozkládací pohovka\nNavíc: 1 jednolůžko (přistýlka)',
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Oddělená kuchyň', 'Parkování', 'Topení', 'Ručníky', 'Povlečení'],
     },
   },
 };

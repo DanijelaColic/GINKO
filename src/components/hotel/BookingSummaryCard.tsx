@@ -20,6 +20,12 @@ import {
 import BedTypeIcons from './BedTypeIcons';
 import type { Room } from '@/modules/rooms/room.types';
 import type { PriceBreakdown } from '@/modules/booking/booking.types';
+import {
+  ACCOMMODATION_LABEL,
+  EXTRA_BED_LABEL,
+  CRIB_LABEL,
+  BREAKFAST_LABEL,
+} from '@/modules/booking/dates';
 
 type Props = {
   room: Room;
@@ -37,11 +43,17 @@ type Props = {
 const DEPOSIT_PCT = Math.round(DEPOSIT_PERCENT * 100);
 const BALANCE_PCT = 100 - DEPOSIT_PCT;
 
-// 3 ključna sadržaja prikazana uz svaku sobu u sidebaru
-const SIDEBAR_AMENITIES = [
-  { icon: Car, label: 'Besplatno parkiralište' },
-  { icon: Wifi, label: 'Besplatni Wi-Fi' },
-  { icon: Sparkles, label: 'Wellness (sauna, jacuzzi)' },
+const PRICE_LINE_KEYS: Record<string, 'summary.accommodation' | 'summary.extraBed' | 'summary.crib' | 'summary.breakfast'> = {
+  [ACCOMMODATION_LABEL]: 'summary.accommodation',
+  [EXTRA_BED_LABEL]: 'summary.extraBed',
+  [CRIB_LABEL]: 'summary.crib',
+  [BREAKFAST_LABEL]: 'summary.breakfast',
+};
+
+const SIDEBAR_AMENITY_KEYS = [
+  { icon: Car, key: 'sidebar.amenityParking' },
+  { icon: Wifi, key: 'sidebar.amenityWifi' },
+  { icon: Sparkles, key: 'sidebar.amenityWellness' },
 ] as const;
 
 export default function BookingSummaryCard({
@@ -60,27 +72,40 @@ export default function BookingSummaryCard({
   const adultsCount = parseInt(adults) || 1;
   const kidsCount = parseInt(childrenCount) || 0;
 
-  const guestsLabel = (() => {
-    const adultLabel =
-      adultsCount === 1 ? 'odrasli' : adultsCount < 5 ? 'odrasla' : 'odraslih';
-    const parts = [`${adultsCount} ${adultLabel}`];
-    if (kidsCount > 0) {
-      const childLabel = kidsCount === 1 ? 'dijete' : 'djece';
-      parts.push(`${kidsCount} ${childLabel}`);
+  const countLabel = (
+    kind: 'night' | 'adult' | 'child',
+    n: number,
+  ) => {
+    if (kind === 'night') {
+      if (n === 1) return t('labels.night.one');
+      if (n >= 2 && n <= 4) return t('labels.night.few', { count: n });
+      return t('labels.night.other', { count: n });
     }
+    if (kind === 'adult') {
+      if (n === 1) return t('labels.adult.one');
+      if (n >= 2 && n <= 4) return t('labels.adult.few', { count: n });
+      return t('labels.adult.other', { count: n });
+    }
+    if (n === 1) return t('labels.child.one');
+    if (n >= 2 && n <= 4) return t('labels.child.few', { count: n });
+    return t('labels.child.other', { count: n });
+  };
+
+  const guestsLabel = (() => {
+    const parts = [countLabel('adult', adultsCount)];
+    if (kidsCount > 0) parts.push(countLabel('child', kidsCount));
     return parts.join(', ');
   })();
 
-  const nightsLabel =
-    priceData.nights === 1 ? 'noć' : priceData.nights < 5 ? 'noći' : 'noći';
+  const nightsLabel = countLabel('night', priceData.nights);
 
   const reviewScore = reviewSummary
-    ? formatReviewRating(reviewSummary.rating)
+    ? formatReviewRating(reviewSummary.rating, locale)
     : null;
   const reviewCountLabel = reviewSummary
-    ? formatReviewCountLabel(reviewSummary.reviewCount)
+    ? formatReviewCountLabel(reviewSummary.reviewCount, locale)
     : null;
-  const reviewLabel = reviewSummary ? getRatingLabel(reviewSummary.rating) : null;
+  const reviewLabel = reviewSummary ? getRatingLabel(reviewSummary.rating, locale) : null;
 
   return (
     <div className="bg-white border border-stone rounded-2xl overflow-hidden shadow-sm">
@@ -129,13 +154,13 @@ export default function BookingSummaryCard({
 
           {/* Sadržaji */}
           <div className="flex flex-wrap gap-1.5">
-            {SIDEBAR_AMENITIES.map(({ icon: Icon, label }) => (
+            {SIDEBAR_AMENITY_KEYS.map(({ icon: Icon, key }) => (
               <span
-                key={label}
+                key={key}
                 className="inline-flex items-center gap-1 text-[11px] text-muted bg-stone-light border border-stone px-2 py-1 rounded-md"
               >
                 <Icon size={11} className="text-primary shrink-0" />
-                {label}
+                {t(key)}
               </span>
             ))}
           </div>
@@ -175,8 +200,11 @@ export default function BookingSummaryCard({
           <div className="flex items-center gap-1.5 text-sm">
             <Users size={13} className="text-primary shrink-0" />
             <span className="text-muted">
-              <span className="font-medium text-text">{priceData.nights}</span>{' '}
-              {nightsLabel} · 1 soba · {guestsLabel}
+              <span className="font-medium text-text">{nightsLabel}</span>
+              {' · '}
+              {t('sidebar.roomCount', { count: 1 })}
+              {' · '}
+              {guestsLabel}
             </span>
           </div>
 
@@ -219,7 +247,9 @@ export default function BookingSummaryCard({
                 <span className="text-muted">
                   {t('summary.line', {
                     nights: line.nights,
-                    label: line.label,
+                    label: PRICE_LINE_KEYS[line.label]
+                      ? t(PRICE_LINE_KEYS[line.label])
+                      : line.label,
                     pricePerNight: line.pricePerNight,
                   })}
                 </span>

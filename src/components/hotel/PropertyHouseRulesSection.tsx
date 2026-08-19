@@ -12,11 +12,12 @@ import {
   VolumeX,
 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
+import { getLocale } from 'next-intl/server';
 import {
-  HOUSE_RULES,
-  HOUSE_RULES_COPY,
-  type HouseRuleItem,
-} from '@/modules/property/property-details.config';
+  getHouseRules,
+  getHouseRulesUi,
+} from '@/modules/property/property-details.i18n';
+import type { HouseRuleItem } from '@/modules/property/property-details.config';
 
 const RULE_ICONS: Record<string, ElementType> = {
   checkin: DoorOpen,
@@ -109,24 +110,28 @@ type Props = {
   embedded?: boolean;
 };
 
-export default function PropertyHouseRulesSection({ embedded = false }: Props) {
+export default async function PropertyHouseRulesSection({ embedded = false }: Props) {
+  const locale = await getLocale();
+  const copy = getHouseRulesUi(locale);
+  const rules = getHouseRules(locale);
+
   const content = (
     <div className="border border-stone rounded-xl overflow-hidden bg-white">
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 px-5 py-5 border-b border-stone bg-stone-light/30">
         <div>
           <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-text">
-            {HOUSE_RULES_COPY.title}
+            {copy.title}
           </h3>
         </div>
         <a
           href="#raspolozivost"
           className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0"
         >
-          {HOUSE_RULES_COPY.showAvailability}
+          {copy.showAvailability}
         </a>
       </div>
 
-      {HOUSE_RULES.map((rule) => (
+      {rules.map((rule) => (
         <HouseRuleRow key={rule.id} rule={rule} />
       ))}
     </div>

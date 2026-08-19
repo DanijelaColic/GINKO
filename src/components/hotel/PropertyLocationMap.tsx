@@ -1,15 +1,22 @@
 'use client';
 
 import { useCallback, useEffect, useState } from 'react';
+import { useLocale } from 'next-intl';
 import { MapPin, X } from 'lucide-react';
 import {
   PROPERTY_ADDRESS,
   PROPERTY_MAP_EMBED_URL,
   PROPERTY_MAP_URL,
-  SURROUNDINGS_COPY,
 } from '@/modules/property/property-details.config';
+import { getSurroundingsCopy } from '@/modules/property/property-details.i18n';
+
+function useMapCopy() {
+  const locale = useLocale();
+  return getSurroundingsCopy(locale).ui;
+}
 
 function PropertyLocationMapModal({ onClose }: { onClose: () => void }) {
+  const copy = useMapCopy();
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
       if (e.key === 'Escape') onClose();
@@ -41,7 +48,7 @@ function PropertyLocationMapModal({ onClose }: { onClose: () => void }) {
         <div className="flex items-start justify-between gap-4 border-b border-stone px-4 py-3 sm:px-5">
           <div className="min-w-0">
             <h3 id="property-map-title" className="font-semibold text-text text-sm sm:text-base">
-              {SURROUNDINGS_COPY.mapTitle}
+              {copy.mapTitle}
             </h3>
             <p className="text-muted text-xs mt-0.5 truncate">{PROPERTY_ADDRESS}</p>
           </div>
@@ -49,14 +56,14 @@ function PropertyLocationMapModal({ onClose }: { onClose: () => void }) {
             type="button"
             onClick={onClose}
             className="shrink-0 rounded-lg p-2 text-muted hover:bg-stone-light hover:text-text transition-colors"
-            aria-label="Zatvori kartu"
+            aria-label={copy.closeMap}
           >
             <X size={20} />
           </button>
         </div>
 
         <iframe
-          title={SURROUNDINGS_COPY.mapTitle}
+          title={copy.mapTitle}
           src={PROPERTY_MAP_EMBED_URL}
           className="min-h-0 flex-1 w-full border-0"
           loading="lazy"
@@ -72,7 +79,7 @@ function PropertyLocationMapModal({ onClose }: { onClose: () => void }) {
             className="inline-flex items-center gap-1.5 text-sm text-primary hover:text-primary-dark font-medium transition-colors"
           >
             <MapPin size={14} className="shrink-0" />
-            {SURROUNDINGS_COPY.openInGoogleMaps}
+            {copy.openInGoogleMaps}
           </a>
         </div>
       </div>
@@ -90,6 +97,7 @@ function usePropertyLocationMap() {
 /** Adresa + jasan link u property headeru (iznad galerije) */
 export function PropertyHeaderLocation() {
   const { open, openMap, closeMap } = usePropertyLocationMap();
+  const copy = useMapCopy();
 
   return (
     <>
@@ -106,7 +114,7 @@ export function PropertyHeaderLocation() {
           onClick={openMap}
           className="text-primary hover:text-primary-dark font-medium transition-colors whitespace-nowrap"
         >
-          {SURROUNDINGS_COPY.showMap}
+          {copy.showMap}
         </button>
       </div>
 
@@ -118,6 +126,7 @@ export function PropertyHeaderLocation() {
 /** Vidljivi preview karte u sekciji Okolica */
 export function PropertyLocationMapPreview() {
   const { open, openMap, closeMap } = usePropertyLocationMap();
+  const copy = useMapCopy();
 
   return (
     <>
@@ -139,7 +148,7 @@ export function PropertyLocationMapPreview() {
             </p>
             <span className="inline-flex shrink-0 items-center gap-1.5 rounded-lg bg-white/95 px-3 py-1.5 text-xs font-semibold text-primary group-hover:bg-white transition-colors">
               <MapPin size={13} />
-              {SURROUNDINGS_COPY.showMap}
+              {copy.showMap}
             </span>
           </div>
         </div>
@@ -147,7 +156,7 @@ export function PropertyLocationMapPreview() {
           type="button"
           onClick={openMap}
           className="absolute inset-0 z-10 cursor-pointer rounded-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary/40"
-          aria-label={SURROUNDINGS_COPY.showMap}
+          aria-label={copy.showMap}
         />
       </div>
 

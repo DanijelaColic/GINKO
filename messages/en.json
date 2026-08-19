@@ -70,10 +70,15 @@
     "heroAdults": "Adults",
     "heroChildren": "Children",
     "heroChildAgeNeeded": "Age (required)",
+    "heroChildAge": "Child's age",
     "heroChildAgeError": "Select age",
     "heroChildAgesHint": "To find accommodation with the right capacity and show correct prices, we need the age of your children at check-out.",
     "heroGuestsDone": "Done",
     "heroSearch": "Search",
+    "availabilitySubtitle": "Select dates and check availability",
+    "ageYearOne": "{age} year",
+    "ageYearFew": "{age} years",
+    "ageYearMany": "{age} years",
     "availabilitySearching": "Searching…",
     "availabilitySelectChildAges": "Please select the age of each child before continuing.",
     "availabilityExtraBedIncluded": "Extra bed +{price} €/night (auto for 3rd guest)",
@@ -352,6 +357,16 @@
         "one": "1 night",
         "few": "{count} nights",
         "other": "{count} nights"
+      },
+      "adult": {
+        "one": "1 adult",
+        "few": "{count} adults",
+        "other": "{count} adults"
+      },
+      "child": {
+        "one": "1 child",
+        "few": "{count} children",
+        "other": "{count} children"
       }
     },
     "stepper": {
@@ -381,7 +396,11 @@
       "balanceNote": "paid at the property on arrival",
       "freeCancellation": "Free cancellation up to 14 days before arrival",
       "changeDates": "Change dates",
-      "directBooking": "Direct booking • No commission fees"
+      "directBooking": "Direct booking • No commission fees",
+      "roomCount": "{count, plural, one {# room} other {# rooms}}",
+      "amenityParking": "Free parking",
+      "amenityWifi": "Free Wi-Fi",
+      "amenityWellness": "Wellness (sauna, jacuzzi)"
     },
     "steps": {
       "room": "0. Select room",
@@ -401,7 +420,11 @@
       "line": "{label} · {nights, plural, one {{nights}× night} other {{nights}× nights}} · {pricePerNight} €",
       "discount": "Discount for {nights}+ nights ({percent}%)",
       "cleaningFee": "Cleaning service",
-      "total": "Total"
+      "total": "Total",
+      "accommodation": "Accommodation",
+      "extraBed": "Extra bed",
+      "crib": "Baby crib",
+      "breakfast": "Breakfast (buffet)"
     },
     "form": {
       "optional": "(optional)",
@@ -615,5 +638,28 @@
     "title": "Page Not Found",
     "description": "The requested page does not exist or has been moved.",
     "cta": "Back to Home"
+  },
+  "bookingConfirmation": {
+    "title": "Complete your booking",
+    "reference": "Reference",
+    "statusConfirmed": "Confirmed",
+    "statusCancelled": "Cancelled",
+    "statusPending": "Pending",
+    "backHome": "Back to home",
+    "paySuccessTitle": "Payment received",
+    "paySuccessBody": "Your payment is being processed. The booking will be confirmed once the funds are recorded. We will send confirmation to your email.",
+    "payCancelledTitle": "Payment interrupted",
+    "payCancelledBody": "You did not complete the payment. The booking is still active — you can pay the deposit by card below.",
+    "bookingCancelled": "This booking has been cancelled.",
+    "bookingCancelledHint": "To make a new booking, visit the availability page.",
+    "cardPayTitle": "Pay the deposit by card",
+    "cardPayNote": "Only the {amount} € deposit is charged now — the balance is paid on arrival",
+    "balanceOnArrival": "The remaining balance is paid on arrival. We send the booking confirmation by email.",
+    "terms": "By booking you accept the cancellation terms. Free cancellation and deposit refund up to 14 days before arrival.",
+    "payButton": "Pay {amount} € deposit by card",
+    "redirecting": "Redirecting to payment...",
+    "alreadyStarted": "Payment has already been started — check your email for confirmation status.",
+    "errorCreate": "Could not create the payment",
+    "errorNetwork": "Network error — please try again"
   }
 }

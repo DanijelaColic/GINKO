@@ -6,6 +6,7 @@
 // confirmation page URL, so no extra auth surface is added.
 
 import { useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { Loader2, CreditCard, AlertCircle } from 'lucide-react';
 
 type Props = {
@@ -22,6 +23,7 @@ export default function PayDepositButton({
   depositEur,
   alreadyInitiated = false,
 }: Props) {
+  const t = useTranslations('bookingConfirmation');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -39,7 +41,7 @@ export default function PayDepositButton({
       const data = await res.json() as { url?: string; error?: string };
 
       if (!res.ok || !data.url) {
-        setError(data.error ?? 'Greška pri kreiranju plaćanja');
+        setError(data.error ?? t('errorCreate'));
         setLoading(false);
         return;
       }
@@ -47,7 +49,7 @@ export default function PayDepositButton({
       // Redirect to Saferpay Payment Page
       window.location.href = data.url;
     } catch {
-      setError('Mrežna greška — pokušajte ponovo');
+      setError(t('errorNetwork'));
       setLoading(false);
     }
   };
@@ -56,7 +58,7 @@ export default function PayDepositButton({
     return (
       <div className="flex items-center gap-2 text-sm text-amber-700 bg-amber-50 border border-amber-200 rounded-xl px-5 py-3">
         <CreditCard size={16} className="shrink-0" />
-        Plaćanje je već pokrenuto — provjeri e-mail za status potvrde.
+        {t('alreadyStarted')}
       </div>
     );
   }
@@ -71,12 +73,12 @@ export default function PayDepositButton({
         {loading ? (
           <>
             <Loader2 size={18} className="animate-spin" />
-            Preusmjeravanje na plaćanje...
+            {t('redirecting')}
           </>
         ) : (
           <>
             <CreditCard size={18} />
-            Plati depozit {depositEur} € karticom
+            {t('payButton', { amount: depositEur })}
           </>
         )}
       </button>

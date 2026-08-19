@@ -34,6 +34,12 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
     notes: 'Footer linkovi',
   },
   {
+    namespace: 'bookingConfirmation',
+    bucket: 'ui',
+    approxKeys: 22,
+    notes: 'Potvrda rezervacije + kartično plaćanje',
+  },
+  {
     namespace: 'notFoundPage',
     bucket: 'ui',
     approxKeys: 3,
@@ -73,7 +79,7 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
     namespace: 'guidesPage',
     bucket: 'ui',
     approxKeys: 7,
-    notes: 'Hub chrome + CTA na članku; članci u modules/seo/guides (EN Faza 3)',
+    notes: 'Hub chrome + CTA na članku; članci u modules/seo/guides (HR/EN/CS)',
   },
   {
     namespace: 'galleryPage',
@@ -130,17 +136,22 @@ export const I18N_OUTSIDE_MESSAGES = [
   {
     path: 'src/modules/rooms/rooms.config.ts → roomTranslations',
     bucket: 'marketing' as const,
-    notes: 'EN opisi gotovi (Faza 1); CS u Fazi 6',
+    notes: 'EN opisi gotovi (Faza 1); CS opisi gotovi (Faza 6)',
   },
   {
     path: 'src/modules/seo/guides/guides-content.ts',
     bucket: 'marketing' as const,
-    notes: 'SEO guide članci — HR + EN (CS u Fazi 7)',
+    notes: 'SEO guide članci — HR + EN + CS (Faza 7)',
+  },
+  {
+    path: 'src/modules/property/property-details.i18n.ts',
+    bucket: 'marketing' as const,
+    notes: 'Naslovnica: sadržaji, okolica, kućni red, recenzije chrome — HR/EN/CS',
   },
   {
     path: 'src/lib/email.ts',
     bucket: 'ui' as const,
-    notes: 'Email predmeti/tijela hr/en; CS pada na EN do Faze 6',
+    notes: 'Email predmeti/tijela hr/en/cs',
   },
 ] as const;
 
