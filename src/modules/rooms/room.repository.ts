@@ -71,7 +71,7 @@ function mapDbRoom(r: DbRoom, locale: RoomLocale): Room {
     tagline: t?.tagline ?? '',
     description: t?.description ?? '',
     capacity: r.capacity,
-    capacityNote: `${r.capacity} ${locale === 'en' ? 'guests' : locale === 'de' ? 'Gäste' : 'osoba'}`,
+    capacityNote: `${r.capacity} ${locale === 'hr' ? 'osoba' : locale === 'cs' ? 'osob' : 'guests'}`,
     size: r.size_m2 ?? 0,
     beds: r.beds ?? '',
     view: false,

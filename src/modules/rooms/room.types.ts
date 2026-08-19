@@ -1,5 +1,7 @@
 // Copied from Villa-Jurina/src/lib/apartments.ts → renamed Apartment→Room
 
+import type { AppLocale } from '@/i18n/routing';
+
 export type AccommodationType = 'soba' | 'apartman';
 
 export type Room = {
@@ -28,4 +30,4 @@ export type Room = {
   linkedSlugs?: string[];
 };
 
-export type RoomLocale = 'hr' | 'en' | 'de';
+export type RoomLocale = AppLocale;

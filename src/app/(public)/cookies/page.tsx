@@ -1,95 +1,77 @@
+import type { ReactNode } from 'react';
 import type { Metadata } from 'next';
+import { getLocale, getTranslations } from 'next-intl/server';
 import { Link } from '@/i18n/navigation';
-import { SITE_NAME } from '@/modules/booking/booking.config';
+import { getValidLocale } from '@/i18n/messages';
+import { getPageMetadata } from '@/i18n/metadata';
 
-const LAST_UPDATED = '3. kolovoza 2026.';
-
-export async function generateMetadata(): Promise<Metadata> {
-  return {
-    title: 'Politika kolačića',
-    description:
-      `Politika kolačića ${SITE_NAME} — koje kolačiće koristimo i kako upravljati vašim postavkama.`,
-    robots: { index: true },
-    alternates: { canonical: '/cookies' },
-  };
+function codeTag(chunks: ReactNode) {
+  return <code className="text-xs bg-stone/20 px-1 rounded">{chunks}</code>;
 }
 
-export default function CookiesPage() {
+export async function generateMetadata(): Promise<Metadata> {
+  const locale = getValidLocale(await getLocale());
+  return getPageMetadata({
+    locale,
+    pathname: '/cookies',
+    namespace: 'cookiesPage',
+    robots: { index: true },
+  });
+}
+
+export default async function CookiesPage() {
+  const t = await getTranslations('cookiesPage');
+
   return (
     <div className="mx-auto max-w-3xl px-4 py-16 sm:px-6 lg:px-8">
       <div className="mb-10">
         <p className="mb-2 text-xs font-semibold uppercase tracking-widest text-accent">
-          Pravni dokumenti
+          {t('eyebrow')}
         </p>
-        <h1 className="text-4xl font-bold text-text mb-2">Politika kolačića</h1>
-        <p className="text-sm text-text/50">Zadnja izmjena: {LAST_UPDATED}</p>
+        <h1 className="text-4xl font-bold text-text mb-2">{t('title')}</h1>
+        <p className="text-sm text-text/50">{t('lastUpdated')}</p>
       </div>
 
       <div className="space-y-10 text-text/70 leading-relaxed">
         <section>
-          <h2 className="text-xl font-semibold text-text mb-3">Što su kolačići?</h2>
-          <p>
-            Kolačići (cookies) su male tekstualne datoteke koje web stranice pohranjuju u vašem
-            pregledniku. Koriste se za pamćenje vaših postavki i analizu korištenja stranice.
-          </p>
+          <h2 className="text-xl font-semibold text-text mb-3">{t('whatTitle')}</h2>
+          <p>{t('whatBody')}</p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-text mb-3">Kolačići koje koristimo</h2>
+          <h2 className="text-xl font-semibold text-text mb-3">{t('weUseTitle')}</h2>
           <div className="space-y-3">
             <div className="rounded-xl border border-stone/20 bg-stone/5 p-4">
-              <p className="font-medium text-text mb-1">Neophodne (uvijek aktivne)</p>
-              <p className="text-sm">
-                Kolačić za odabir jezika (<code className="text-xs bg-stone/20 px-1 rounded">NEXT_LOCALE</code>)
-                — pamti vaš odabrani jezik i neophodan je za ispravan prikaz sadržaja. Ne zahtijeva
-                pristanak.
-              </p>
+              <p className="font-medium text-text mb-1">{t('necessaryTitle')}</p>
+              <p className="text-sm">{t.rich('necessaryBody', { code: codeTag })}</p>
             </div>
             <div className="rounded-xl border border-stone/20 bg-stone/5 p-4">
-              <p className="font-medium text-text mb-1">Analitički (uz pristanak)</p>
-              <p className="text-sm">
-                Kolačiće za analitiku koristimo samo ako ste prihvatili. Prikupljamo anonimne
-                podatke o posjetu (pregledane stranice, trajanje posjeta) radi poboljšanja
-                korisničkog iskustva. Nema osobnih podataka.
-              </p>
+              <p className="font-medium text-text mb-1">{t('analyticsTitle')}</p>
+              <p className="text-sm">{t('analyticsBody')}</p>
             </div>
             <div className="rounded-xl border border-stone/20 bg-stone/5 p-4">
-              <p className="font-medium text-text mb-1">Suglasnost za kolačiće</p>
-              <p className="text-sm">
-                Kolačić{' '}
-                <code className="text-xs bg-stone/20 px-1 rounded">ginko_cookie_consent</code>{' '}
-                pohranjuje vašu odluku (prihvaćeno/odbijeno) kako ne bismo ponavljali upit pri
-                svakom posjetu.
-              </p>
+              <p className="font-medium text-text mb-1">{t('consentTitle')}</p>
+              <p className="text-sm">{t.rich('consentBody', { code: codeTag })}</p>
             </div>
           </div>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-text mb-3">Upravljanje kolačićima</h2>
-          <p>
-            Analitiku možete odbiti ili opozvati u svakom trenutku putem bannera koji se
-            pojavljuje pri prvom posjetu. Kolačiće možete i izbrisati izravno u postavkama svog
-            preglednika.
-          </p>
+          <h2 className="text-xl font-semibold text-text mb-3">{t('manageTitle')}</h2>
+          <p>{t('manageBody')}</p>
         </section>
 
         <section>
-          <h2 className="text-xl font-semibold text-text mb-3">Treće strane</h2>
-          <p>
-            Fotografije se poslužuju s naše domene. Tipografija se učitava putem{' '}
-            <code className="text-xs bg-stone/20 px-1 rounded">next/font</code> (samo-hostirano
-            nakon builda). Ako prihvatite analitiku i konfiguriran je Google Analytics (GA4),
-            Google može postaviti analitičke kolačiće — pogledajte njihovu politiku privatnosti.
-          </p>
+          <h2 className="text-xl font-semibold text-text mb-3">{t('thirdTitle')}</h2>
+          <p>{t.rich('thirdBody', { code: codeTag })}</p>
         </section>
 
         <div className="flex gap-4 border-t border-stone/20 pt-6">
           <Link href="/privacy" className="text-sm font-medium text-accent hover:underline">
-            Politika privatnosti
+            {t('privacyLink')}
           </Link>
           <Link href="/" className="text-sm font-medium text-accent hover:underline">
-            ← Početna
+            {t('homeLink')}
           </Link>
         </div>
       </div>

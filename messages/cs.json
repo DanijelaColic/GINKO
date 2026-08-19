@@ -1,0 +1,619 @@
+{
+  "siteMetadata": {
+    "title": "Ginko Boutique Rooms & Wellness",
+    "description": "Příjemné ubytování v srdci Daruvaru. Rezervujte si pokoj na ginko-sobe.com.",
+    "openGraphAlt": "Ginko Boutique Rooms & Wellness – pohled na ubytování"
+  },
+  "metadata": {
+    "layout": {
+      "title": {
+        "default": "Ginko Boutique Rooms & Wellness Daruvar",
+        "template": "%s | Ginko Boutique Rooms & Wellness Daruvar"
+      },
+      "description": "Boutique pokoje v srdci Daruvaru v Chorvatsku — WiFi, klimatizace, sauna a parkování zdarma. Rezervujte přímo, bez zprostředkovatele.",
+      "openGraph": {
+        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
+        "description": "Boutique pokoje v srdci Daruvaru. Sauna, terasa, parkování zdarma. Rezervujte přímo.",
+        "imageAlt": "Ginko Boutique Rooms & Wellness – Daruvar, Chorvatsko"
+      },
+      "twitter": {
+        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
+        "description": "Boutique pokoje v srdci Daruvaru v Chorvatsku. Rezervujte přímo."
+      }
+    },
+    "structuredData": {
+      "description": "Ginko Boutique Rooms & Wellness nabízí příjemné boutique pokoje v srdci Daruvaru s WiFi, klimatizací, saunou a parkováním zdarma.",
+      "amenities": {
+        "wifi": "WiFi zdarma",
+        "airConditioning": "Klimatizace",
+        "parking": "Parkování zdarma"
+      }
+    }
+  },
+  "navbar": {
+    "brand": "Ginko Boutique Rooms & Wellness",
+    "localeLabel": "Jazyk",
+    "menuLabel": "Navigace",
+    "links": {
+      "home": "Domů",
+      "rooms": "Pokoje",
+      "booking": "Rezervace",
+      "guides": "Průvodce",
+      "gallery": "Galerie"
+    },
+    "cta": "Rezervovat",
+    "phone": "Zavolejte nám",
+    "whatsapp": "Kontaktovat přes WhatsApp"
+  },
+  "footer": {
+    "brand": "Ginko Boutique Rooms & Wellness",
+    "tagline": "Ulica Tomaša Garika Masaryka 1, 43500 Daruvar",
+    "navTitle": "Sekce",
+    "contactTitle": "Kontakt",
+    "rights": "Všechna práva vyhrazena.",
+    "legal": {
+      "privacy": "Zásady ochrany osobních údajů",
+      "cookies": "Cookies"
+    },
+    "checkIn": "Check-in od 14:00",
+    "checkOut": "Check-out do 10:00",
+    "credit": "Vytvořil:"
+  },
+  "homePage": {
+    "heroTitle": "Ginko Boutique Rooms & Wellness",
+    "heroSubtitle": "Elegantní ubytování, wellness a úplný odpočinek v srdci města",
+    "heroCta": "Prohlédnout pokoje",
+    "bookCta": "Rezervovat nyní",
+    "heroCheckIn": "Příjezd",
+    "heroCheckOut": "Odjezd",
+    "heroGuests": "Hosté",
+    "heroAdults": "Dospělí",
+    "heroChildren": "Děti",
+    "heroChildAgeNeeded": "Věk (povinné)",
+    "heroChildAgeError": "Vyberte věk",
+    "heroChildAgesHint": "Abychom našli ubytování se správnou kapacitou a zobrazili přesné ceny, potřebujeme věk dětí v den odjezdu.",
+    "heroGuestsDone": "Hotovo",
+    "heroSearch": "Hledat",
+    "availabilitySearching": "Hledání…",
+    "availabilitySelectChildAges": "Před pokračováním vyberte věk každého dítěte.",
+    "availabilityExtraBedIncluded": "Přistýlka +{price} €/noc (automaticky pro 3. osobu)",
+    "availabilityCapacityLabel": "Kapacita",
+    "roomsEyebrow": "Ubytování",
+    "roomsTitle": "Naše pokoje",
+    "roomsSubtitle": "Pečlivě zařízené pokoje pro odpočinek daleko od každodennosti.",
+    "roomsViewAll": "Zobrazit všechny pokoje",
+    "featuresEyebrow": "Výhody",
+    "featuresTitle": "Vše, co potřebujete k dokonalému pobytu",
+    "feature1Title": "Parkování zdarma",
+    "feature1Desc": "Soukromé parkoviště k dispozici všem hostům.",
+    "feature2Title": "WiFi zdarma",
+    "feature2Desc": "Rychlé internetové připojení ve všech pokojích.",
+    "feature3Title": "Klimatizace",
+    "feature3Desc": "Příjemná teplota v každém ročním období.",
+    "feature4Title": "Klidná lokalita",
+    "feature4Desc": "Obklopeni přírodou, daleko od hluku.",
+    "feature5Title": "Domácí atmosféra",
+    "feature5Desc": "Vřelé přivítání a tipy od místních hostitelů.",
+    "feature6Title": "Flexibilní check-in",
+    "feature6Desc": "Přizpůsobíme se vašemu času příjezdu.",
+    "galleryEyebrow": "Galerie",
+    "galleryTitle": "Objevte Ginko",
+    "gallerySubtitle": "Příroda, klid a pohodlí na jednom místě.",
+    "ctaTitle": "Chystáte se na dovolenou?",
+    "ctaSubtitle": "Rezervujte si pokoj ještě dnes a zajistěte si místo v našem klidném koutku Slavonie.",
+    "ctaButton": "Rezervovat nyní",
+    "availabilitySelectDates": "Před pokračováním vyberte datum příjezdu a odjezdu.",
+    "availabilitySelectGuests": "Před pokračováním vyberte počet dospělých hostů.",
+    "availabilityUnavailableDates": "Pokoj není v vybraných datech dostupný. Zkuste jiná data.",
+    "availabilityTypeFilter": "Typ ubytování",
+    "availabilityTypeAll": "Vše",
+    "availabilityTypeRoom": "Pokoje",
+    "availabilityTypeApartment": "Apartmán",
+    "availabilityUnitRoom": "1 pokoj k dispozici",
+    "availabilityUnitApartment": "1 apartmán k dispozici",
+    "availabilityCatalogRoom": "Pokoj",
+    "availabilityCatalogApartment": "Apartmán",
+    "availabilityNoResultsAll": "Pro vybrané období není k dispozici žádné ubytování.",
+    "availabilityNoResultsRooms": "Pro vybrané období nejsou k dispozici žádné pokoje.",
+    "availabilityNoResultsApartment": "Pro vybrané období není k dispozici žádný apartmán.",
+    "availabilityNoResultsHint": "Zkuste jiná data nebo nás kontaktujte přímo.",
+    "availabilityContactUs": "Kontaktujte nás",
+    "availabilityReserve": "Rezervovat",
+    "availabilityPerNight": "za noc",
+    "availabilityNightOne": "noc",
+    "availabilityNightFew": "noci",
+    "availabilityNightMany": "nocí",
+    "availabilityPlanAccommodationOnly": "Pouze ubytování",
+    "availabilityPlanWithBreakfast": "Se snídaní",
+    "availabilityPlanBreakfastPerPerson": "osoba/noc",
+    "availabilityPlanWithoutWellness": "Bez wellness zóny",
+    "availabilityPlanWithWellness": "Se soukromou wellness zónou",
+    "subnav": {
+      "ariaLabel": "Navigace po sekcích objektu",
+      "overview": "Přehled",
+      "availability": "Dostupnost",
+      "reviews": "Recenze",
+      "questions": "Otázky",
+      "surroundings": "Okolí",
+      "facilities": "Vybavení",
+      "bookCta": "Rezervovat"
+    }
+  },
+  "travelerQuestions": {
+    "title": "Otázky cestovatelů",
+    "showAvailability": "Zobrazit dostupnost",
+    "stillLooking": "Stále hledáte?",
+    "askQuestion": "Položit otázku",
+    "answerHint": "Na většinu otázek dokážeme odpovědět hned",
+    "askModal": {
+      "title": "Položit otázku",
+      "aboutProperty": "O objektu: {siteName}",
+      "emailLabel": "Váš e-mail *",
+      "emailPlaceholder": "např. jmeno@example.com",
+      "questionLabel": "Vaše otázka *",
+      "questionPlaceholder": "např. nabízíte pokojový servis?",
+      "charsRemaining": "zbývá {count} znaků",
+      "submit": "Odeslat otázku",
+      "submitting": "Odesílání…",
+      "close": "Zavřít",
+      "successTitle": "Otázka odeslána",
+      "successMessage": "Děkujeme! Odpovíme vám na uvedený e-mail co nejdříve.",
+      "errorGeneric": "Odeslání se nezdařilo. Zkuste to znovu."
+    },
+    "qualityTitle": "Co hosté oceňují nejvíce",
+    "qualityDesc": "Podle recenzí hosté zvláště zdůrazňují čisté a upravené ubytování, klidnou polohu v centru Daruvaru a vstřícnost hostitelů. Níže najdete odpovědi na nejčastější otázky.",
+    "faq": {
+      "parking": {
+        "q": "Je parkování zajištěné a platí se za něj?",
+        "a": "Ano, všichni naši hosté mají zdarma soukromé parkování přímo u objektu."
+      },
+      "breakfast": {
+        "q": "Nabízíte snídani?",
+        "a": "Ano, v objektu máme nově zařízený prostor, kde hostům podáváme čerstvou a vydatnou snídani. Snídani si objednáte při rezervaci."
+      },
+      "wifi": {
+        "q": "Je Wi-Fi zdarma?",
+        "a": "Ano, Wi-Fi zdarma je k dispozici ve všech pokojích i společných prostorách."
+      },
+      "therms": {
+        "q": "Jak daleko jsou Daruvarské lázně?",
+        "a": "Daruvarské lázně jsou od objektu vzdálené jen několik minut chůze."
+      },
+      "attractions": {
+        "q": "Jaké atrakce jsou v okolí?",
+        "a": "V bezprostřední blízkosti jsou park zámku Janković, Daruvarské lázně, kostel Nejsvětější Trojice a centrum města."
+      },
+      "pets": {
+        "q": "Mohu přijet s domácími mazlíčky?",
+        "a": "Ano, domácí mazlíčci jsou vítáni po předchozí nahlášení při rezervaci. Poplatek za úklid je 15 € / den."
+      },
+      "checkin": {
+        "q": "Jak probíhá check-in, když přijedeme pozdě?",
+        "a": "Náš check-in je velmi flexibilní. Před příjezdem obdržíte jasné pokyny k samostatnému vstupu a vyzvednutí klíčů nebo kódu a hostitelé jsou vždy k dispozici pro rychlou komunikaci."
+      },
+      "checkinTimes": {
+        "q": "Jaké jsou časy příjezdu a odjezdu?",
+        "a": "Check-in je od 14:00 do 22:00, check-out do 10:00."
+      },
+      "wellness": {
+        "q": "Má objekt wellness (sauna, vířivka)?",
+        "a": "Ano. Přístup do wellness zóny se saunou a vířivkou mají výhradně hosté, kteří si rezervují wellness apartmán."
+      },
+      "families": {
+        "q": "Nabízíte pokoje pro rodiny?",
+        "a": "Ano, některé pokoje ubytují až 4 hosty a hodí se pro rodinný pobyt."
+      },
+      "booking": {
+        "q": "Jak si mohu rezervovat pokoj?",
+        "a": "Rezervaci můžete odeslat přes <bookingLink>rezervační formulář</bookingLink> nebo nás kontaktovat e-mailem a telefonem."
+      },
+      "cancellation": {
+        "q": "Jaká je storno politika?",
+        "a": "Bezplatné storno a vrácení zálohy do 14 dnů před příjezdem. Při stornech do 14 dnů před příjezdem se záloha nevrací."
+      }
+    }
+  },
+  "roomsPage": {
+    "eyebrow": "Ubytování",
+    "title": "Naše pokoje",
+    "description": "Pokoje pečlivě zařízené s přírodními materiály a příjemnou atmosférou.",
+    "openGraph": {
+      "title": "Pokoje – Ginko Boutique Rooms & Wellness Daruvar",
+      "description": "Příjemné boutique pokoje v Daruvaru s přímou rezervací bez provize.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – pokoje v Daruvaru"
+    },
+    "itemLabel": "Pokoj",
+    "badges": {
+      "fullyBooked": "Obsazeno"
+    },
+    "stats": {
+      "duplex": "Mezonet",
+      "seaView": "Výhled do přírody",
+      "balcony": "Balkon / terasa"
+    },
+    "price": {
+      "title": "Cena za noc",
+      "perNight": "za noc",
+      "unavailable": "Tento pokoj momentálně nelze rezervovat."
+    },
+    "actions": {
+      "details": "Více detailů",
+      "book": "Rezervovat"
+    },
+    "filters": {
+      "guestsLabel": "Min. hostů",
+      "maxPriceLabel": "Max. cena/noc",
+      "any": "Libovolné",
+      "noResults": "Žádné pokoje neodpovídají filtru."
+    }
+  },
+  "roomDetailModal": {
+    "close": "Zavřít",
+    "sizeLabel": "Velikost",
+    "groupBathroom": "Ve vaší koupelně",
+    "groupView": "Výhled",
+    "groupFacilities": "Vybavení pokoje",
+    "groupWellness": "Wellness",
+    "groupSmoking": "Kouření",
+    "amenitySeaView": "Výhled na moře",
+    "amenityBalcony": "Terasa / balkon",
+    "noSmoking": "Zákaz kouření",
+    "basedOnReviews": "na základě {count, plural, one {# recenze} few {# recenzí} other {# recenzí}}",
+    "freeCancellation": "Bezplatné storno do 14 dnů před příjezdem",
+    "depositAtBooking": "Záloha ({percent} %): {amount} € při rezervaci",
+    "balanceAtProperty": "Zbytek ({percent} %): {amount} € v objektu při příjezdu",
+    "breakfastIncluded": "Snídaně v ceně ({price} €/osoba)",
+    "breakfastOptional": "Snídaně {price} €/osoba",
+    "breakfastIncludedAgeBased": "Snídaně v ceně (0–2 zdarma · 3–12 {child} € · 13+ {adult} €)",
+    "breakfastOptionalAgeBased": "Snídaně: 0–2 zdarma · 3–12 {child} € · 13+ {adult} €",
+    "bookInMinutes": "Za pouhé 2 minuty",
+    "depositAtBookingNote": "Záloha se platí ihned při rezervaci",
+    "forNights": "za {nights} {label}",
+    "selectDatesCta": "Vyberte data",
+    "selectDatesHint": "Zadejte příjezd a odjezd ve vyhledávání výše.",
+    "selectGuestsCta": "Vyberte počet hostů",
+    "selectGuestsHint": "Vyberte počet dospělých ve vyhledávání výše.",
+    "checkAvailabilityCta": "Zkontrolovat dostupnost",
+    "checkAvailabilityHint": "Klikněte na Hledat a ověřte dostupnost pro vybraná data.",
+    "changeDatesCta": "Změnit data",
+    "unavailableHint": "Pokoj v tomto období není volný — zkuste jiná data."
+  },
+  "roomDetailPage": {
+    "eyebrow": "Pokoj",
+    "breadcrumb": {
+      "home": "Domů",
+      "rooms": "Pokoje"
+    },
+    "metadata": {
+      "titlePrefix": "Pokoj",
+      "descriptionSuffix": "Ginko Boutique Rooms & Wellness."
+    },
+    "stats": {
+      "duplex": "Mezonet",
+      "seaView": "Výhled do přírody",
+      "balcony": "Balkon / terasa"
+    },
+    "beds": {
+      "title": "Lůžka"
+    },
+    "amenities": {
+      "title": "Co je v ceně"
+    },
+    "price": {
+      "title": "Cena za noc",
+      "perNight": "za noc"
+    },
+    "rules": {
+      "checkInLabel": "Check-in:",
+      "checkOutLabel": "Check-out:",
+      "petsLabel": "Domácí mazlíčci:",
+      "petsValue": "Nejsou povoleni",
+      "smokingLabel": "Kouření:",
+      "smokingValue": "Není povoleno",
+      "minStayLabel": "Minimální pobyt:",
+      "minStayValue": "1 noc",
+      "minStay": "Minimální pobyt: 1 noc",
+      "depositLabel": "Záloha:",
+      "depositValue": "při rezervaci, zbytek v objektu"
+    },
+    "actions": {
+      "bookThis": "Rezervovat tento pokoj"
+    },
+    "unavailable": {
+      "title": "Pokoj momentálně není k dispozici.",
+      "description": "Prohlédněte si ostatní dostupné pokoje.",
+      "cta": "Další pokoje"
+    }
+  },
+  "bookingPage": {
+    "eyebrow": "Rezervace",
+    "title": "Rezervujte si pokoj",
+    "description": "Vyberte pokoj, data a odešlete poptávku — bez zprostředkovatele.",
+    "openGraph": {
+      "title": "Rezervujte si pokoj – Ginko Boutique Rooms & Wellness Daruvar",
+      "description": "Přímá rezervace pokoje v Daruvaru bez zprostředkovatele a bez provize.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – rezervace"
+    },
+    "strip": {
+      "checkInLabel": "Příjezd",
+      "checkInValue": "od 14:00",
+      "checkOutLabel": "Odjezd",
+      "checkOutValue": "do 11:00",
+      "minStayLabel": "Min. pobyt",
+      "minStayValue": "1 noc",
+      "depositLabel": "Záloha",
+      "depositValue": "50 % při rezervaci, zbytek v objektu"
+    }
+  },
+  "bookingWidget": {
+    "description": "Ginko Boutique Rooms & Wellness nabízí příjemné ubytování v srdci Daruvaru. Přímá rezervace bez provize.",
+    "labels": {
+      "night": {
+        "one": "1 noc",
+        "few": "{count} noci",
+        "other": "{count} nocí"
+      }
+    },
+    "stepper": {
+      "step1": "Výběr dat",
+      "step2": "Vaše údaje",
+      "step3": "Dokončit rezervaci"
+    },
+    "nav": {
+      "continue": "Pokračovat",
+      "back": "Zpět"
+    },
+    "sidebar": {
+      "title": "Vaše rezervace",
+      "propertyLabel": "Ubytování",
+      "roomLabel": "Vybraný pokoj",
+      "checkIn": "Příjezd",
+      "checkOut": "Odjezd",
+      "checkInTime": "od 14:00",
+      "checkOutTime": "do 11:00",
+      "guests": "Hosté",
+      "reservationDetails": "Detaily vaší rezervace",
+      "priceBreakdown": "Přehled ceny",
+      "allFeesIncluded": "Všechny poplatky v ceně",
+      "deposit": "Záloha ({percent} %)",
+      "depositNote": "při rezervaci",
+      "balance": "Zbytek ({percent} %)",
+      "balanceNote": "platí se v objektu při příjezdu",
+      "freeCancellation": "Bezplatné storno do 14 dnů před příjezdem",
+      "changeDates": "Změnit data",
+      "directBooking": "Přímá rezervace • Bez provize"
+    },
+    "steps": {
+      "room": "0. Výběr pokoje",
+      "dates": "1. Výběr dat",
+      "summary": "2. Souhrn ceny",
+      "details": "3. Vaše údaje"
+    },
+    "paymentTerms": {
+      "title": "Platební a storno podmínky",
+      "depositLabel": "Platba ({percent} %)",
+      "depositNote": "platí se ihned při rezervaci.",
+      "balanceLabel": "Zbytek ({percent} %)",
+      "balanceNote": "platí se v objektu při příjezdu",
+      "cancellationTitle": "Storno"
+    },
+    "summary": {
+      "line": "{label} · {nights, plural, one {{nights}× noc} few {{nights}× noci} other {{nights}× nocí}} · {pricePerNight} €",
+      "discount": "Sleva {nights}+ nocí ({percent} %)",
+      "cleaningFee": "Úklid",
+      "total": "Celkem"
+    },
+    "form": {
+      "optional": "(není povinné)",
+      "firstName": "Jméno",
+      "firstNamePlaceholder": "Anna",
+      "lastName": "Příjmení",
+      "lastNamePlaceholder": "Nováková",
+      "email": "E-mail",
+      "emailPlaceholder": "anna@example.com",
+      "country": "Země / region",
+      "phone": "Telefonní číslo",
+      "phonePlaceholder": "+420 777 123 456",
+      "bookingForTitle": "Pro koho je tato rezervace?",
+      "bookingForSelf": "V objektu budu bydlet já",
+      "bookingForOther": "Bydlet bude někdo jiný",
+      "guestStayingName": "Jméno a příjmení ubytovaného hosta",
+      "guestStayingNamePlaceholder": "Jan Novák",
+      "adults": "Dospělí",
+      "children": "Děti",
+      "maxGuests": "Nejvýše {capacity} hostů celkem",
+      "extraBedsSection": "Přistýlky",
+      "perNight": "noc",
+      "needsExtraBed": "Potřebuji přistýlku",
+      "needsExtraBedHint": "K dispozici na vyžádání, podle dostupnosti.",
+      "extraBedAuto": "Přistýlka je zahrnuta v ceně (+{price} €/noc) — nutná pro 3. osobu.",
+      "needsCrib": "Potřebuji dětskou postýlku",
+      "needsCribHint": "K dispozici na vyžádání, podle dostupnosti.",
+      "childFreeOnBed": "Dítě do 2 let, které spí s rodiči v manželské posteli, se neúčtuje.",
+      "arrivalTime": "Předpokládaný čas příjezdu",
+      "arrivalTimeHint": "Příjezd mezi 14:00 – 23:00",
+      "notes": "Speciální požadavky",
+      "notesPlaceholder": "Alergie, preference lůžek, pozdní příjezd, oslava…",
+      "businessTitle": "Cestujete služebně?",
+      "businessNo": "Ne",
+      "businessYes": "Ano",
+      "companyName": "Název společnosti",
+      "companyNamePlaceholder": "XYZ s.r.o.",
+      "vatId": "DIČ",
+      "vatIdPlaceholder": "CZ12345678",
+      "rules": {
+        "checkIn": "Příjezd (check-in)",
+        "checkOut": "Odjezd (check-out)"
+      },
+      "agreeRules": "Souhlasím s <houseRules>domácím řádem</houseRules> a <bookingTerms>podmínkami rezervace</bookingTerms>.",
+      "rulesLinkLabel": "Přečtěte si domácí řád a podmínky rezervace",
+      "submitting": "Příprava platby…",
+      "continueToPayment": "Pokračovat k platbě",
+      "submit": "Pokračovat k platbě · {totalPrice} €"
+    },
+    "success": {
+      "title": "Poptávka rezervace přijata!",
+      "description": "Děkujeme, <name></name>! Potvrzení jsme odeslali na <email></email>. Ozveme se vám co nejdříve.",
+      "newBooking": "Nová rezervace",
+      "summary": {
+        "accommodation": "Ubytování",
+        "checkIn": "Příjezd",
+        "checkOut": "Odjezd",
+        "nights": "Nocí",
+        "total": "Celkem",
+        "deposit": "Platba ({percent} %)",
+        "depositNote": "platí se ihned při rezervaci.",
+        "balance": "Zbytek ({percent} %)",
+        "balanceNote": "platí se v objektu při příjezdu",
+        "cancellationTitle": "Storno",
+        "bankLabel": "Banka",
+        "internationalPayments": "platby ze zahraničí",
+        "qrTitle": "Rychlá platba QR kódem",
+        "generatingQr": "Generuji QR kódy…",
+        "hub3Title": "Chorvatské banky",
+        "hub3Alt": "HUB3 PDF417 čárový kód",
+        "hub3Hint": "m-zaba, m-keks, Erste, OTP, PBZ…",
+        "epcTitle": "EU / zahraničí",
+        "epcAlt": "EPC SEPA QR kód",
+        "epcHint": "Revolut, N26, Wise, SEPA…"
+      }
+    },
+    "errors": {
+      "maxGuests": "{apartmentName}: maximálně {capacity} hostů.",
+      "submitFailed": "Rezervaci se nepodařilo vytvořit. Zkuste to znovu."
+    },
+    "policies": {
+      "cancellation": {
+        "line1": "Bezplatné storno a vrácení zálohy do 14 dnů před příjezdem.",
+        "line2": "Při stornech do 14 dnů před příjezdem se záloha nevrací.",
+        "line3": "U zvláštních případů nás kontaktujte přímo."
+      }
+    },
+    "calendar": {
+      "loading": "Načítám kalendář…",
+      "previousMonth": "Předchozí měsíc",
+      "nextMonth": "Následující měsíc",
+      "reset": "Zrušit výběr",
+      "errors": {
+        "loadAvailability": "Chyba při načítání dostupnosti.",
+        "loadDates": "Chyba při načítání volných termínů."
+      },
+      "legend": {
+        "available": "Volno",
+        "booked": "Obsazeno",
+        "selected": "Vybráno",
+        "pickCheckIn": "Vyberte datum příjezdu",
+        "pickCheckOut": "Vyberte datum odjezdu (min. {minNights} nocí)"
+      },
+      "tooltips": {
+        "booked": "Obsazeno",
+        "minStay": "Minimální pobyt: {minNights} nocí"
+      }
+    }
+  },
+  "guidesPage": {
+    "title": "Průvodce okolím",
+    "subtitle": "Objevte krásy a atrakce v okolí.",
+    "readMore": "Číst více",
+    "bookCtaTitle": "Rezervujte si ubytování v Daruvaru",
+    "bookCtaBody": "{siteName} nabízí příjemné boutique ubytování v srdci Daruvaru.",
+    "bookCtaButton": "Zkontrolovat dostupnost",
+    "moreGuides": "Další průvodce"
+  },
+  "galleryPage": {
+    "title": "Galerie",
+    "description": "Fotografie pokojů, společných prostor a okolí Daruvaru.",
+    "heading": "Galerie",
+    "subtitle": "Fotografie ubytování a okolí Daruvaru.",
+    "openGraph": {
+      "title": "Galerie – Ginko Boutique Rooms & Wellness Daruvar",
+      "description": "Fotografie pokojů, společných prostor a okolí Daruvaru.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – galerie"
+    }
+  },
+  "privacyPage": {
+    "title": "Zásady ochrany osobních údajů",
+    "description": "Zásady ochrany osobních údajů Ginko Boutique Rooms & Wellness — jak shromažďujeme, používáme a chráníme vaše osobní údaje v souladu s GDPR.",
+    "openGraph": {
+      "title": "Zásady ochrany osobních údajů – Ginko Boutique Rooms & Wellness",
+      "description": "Jak shromažďujeme, používáme a chráníme vaše osobní údaje v souladu s GDPR.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – zásady ochrany osobních údajů"
+    },
+    "eyebrow": "Právní dokumenty",
+    "lastUpdated": "Poslední aktualizace: 19. srpna 2026.",
+    "backHome": "← Zpět na úvod",
+    "controllerTitle": "1. Správce údajů",
+    "controllerBody": "Správcem osobních údajů je {legalName}, OIB {oib}, {address}. V otázkách soukromí nás můžete kontaktovat e-mailem: <email></email>.",
+    "dataTitle": "2. Údaje, které shromažďujeme",
+    "dataIntro": "Shromažďujeme následující kategorie osobních údajů:",
+    "dataBookingLabel": "Rezervační údaje",
+    "dataBookingText": "jméno, e-mail, telefonní číslo, termín pobytu, počet hostů.",
+    "dataCommsLabel": "Komunikační údaje",
+    "dataCommsText": "zprávy, které nám pošlete přes kontaktní formulář nebo e-mailem.",
+    "dataTechLabel": "Technické údaje",
+    "dataTechText": "IP adresa, typ prohlížeče, cookies (pouze s vaším souhlasem).",
+    "purposeTitle": "3. Účel a právní základ",
+    "purposeCol": "Účel",
+    "basisCol": "Právní základ",
+    "purposeBooking": "Zpracování rezervace",
+    "basisBooking": "Plnění smlouvy (čl. 6 odst. 1 písm. b GDPR)",
+    "purposeSupport": "Komunikace a podpora",
+    "basisSupport": "Oprávněný zájem / smlouva",
+    "purposeAnalytics": "Analytika (se souhlasem)",
+    "basisAnalytics": "Souhlas (čl. 6 odst. 1 písm. a GDPR)",
+    "retentionTitle": "4. Doba uchování",
+    "retentionBody": "Rezervační údaje uchováváme 7 let v souladu s účetními povinnostmi. Komunikační údaje mažeme po 2 letech. Analytická data (se souhlasem) uchováváme do odvolání souhlasu.",
+    "rightsTitle": "5. Vaše práva",
+    "rightsIntro": "Podle GDPR máte právo na:",
+    "rightAccess": "Přístup k vašim osobním údajům",
+    "rightRectify": "Opravu nepřesných údajů",
+    "rightErase": "Výmaz údajů („právo být zapomenut“)",
+    "rightRestrict": "Omezení zpracování",
+    "rightPortability": "Přenositelnost údajů",
+    "rightObject": "Námitku proti zpracování",
+    "rightWithdraw": "Odvolání souhlasu (bez vlivu na předchozí zpracování)",
+    "rightsRequest": "Žádost můžete podat na <email></email>. Máte také právo podat stížnost u <azop>AZOP</azop> (chorvatský úřad pro ochranu osobních údajů).",
+    "cookiesTitle": "6. Cookies",
+    "cookiesBody": "Používáme nezbytné cookies pro chod webu (lokalizace). Analytické cookies používáme pouze s vaším souhlasem. Podrobnosti najdete v <cookies>zásadách používání cookies</cookies>.",
+    "changesTitle": "7. Změny zásad",
+    "changesBody": "Tyto zásady se mohou občas aktualizovat. Datum poslední změny je vždy uvedeno nahoře na stránce."
+  },
+  "cookiesPage": {
+    "title": "Zásady používání cookies",
+    "description": "Zásady používání cookies Ginko Boutique Rooms & Wellness — jaké cookies používáme a jak spravovat nastavení.",
+    "openGraph": {
+      "title": "Zásady používání cookies – Ginko Boutique Rooms & Wellness",
+      "description": "Jaké cookies používáme a jak spravovat nastavení.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – zásady cookies"
+    },
+    "eyebrow": "Právní dokumenty",
+    "lastUpdated": "Poslední aktualizace: 3. srpna 2026.",
+    "whatTitle": "Co jsou cookies?",
+    "whatBody": "Cookies jsou malé textové soubory, které weby ukládají ve vašem prohlížeči. Slouží k zapamatování nastavení a k analýze používání webu.",
+    "weUseTitle": "Cookies, které používáme",
+    "necessaryTitle": "Nezbytné (vždy aktivní)",
+    "necessaryBody": "Cookie pro výběr jazyka (<code>NEXT_LOCALE</code>) si pamatuje zvolený jazyk a je nutné pro správné zobrazení obsahu. Nevyžaduje souhlas.",
+    "analyticsTitle": "Analytické (se souhlasem)",
+    "analyticsBody": "Analytické cookies používáme jen pokud je přijmete. Sbíráme anonymní údaje o návštěvě (zobrazené stránky, doba návštěvy) pro zlepšení uživatelského zážitku. Osobní údaje se neshromažďují.",
+    "consentTitle": "Souhlas s cookies",
+    "consentBody": "Cookie <code>ginko_cookie_consent</code> ukládá vaše rozhodnutí (přijato/odmítnuto), abychom se neptali při každé návštěvě.",
+    "manageTitle": "Správa cookies",
+    "manageBody": "Analytiku můžete kdykoli odmítnout nebo odvolat přes banner, který se zobrazí při první návštěvě. Cookies můžete smazat i přímo v nastavení prohlížeče.",
+    "thirdTitle": "Třetí strany",
+    "thirdBody": "Fotografie se načítají z naší domény. Typografie se načítá přes <code>next/font</code> (po sestavení self-hosted). Pokud přijmete analytiku a je nastaven Google Analytics (GA4), Google může nastavit analytické cookies — viz jejich zásady ochrany osobních údajů.",
+    "privacyLink": "Zásady ochrany osobních údajů",
+    "homeLink": "← Úvod"
+  },
+  "cookieBanner": {
+    "ariaLabel": "Oznámení o cookies",
+    "body": "Používáme analytické cookies ke zlepšení zážitku. Volitelné cookies můžete přijmout nebo odmítnout.",
+    "learnMore": "Zjistit více",
+    "accept": "Přijmout",
+    "decline": "Odmítnout"
+  },
+  "notFoundPage": {
+    "title": "Stránka nenalezena",
+    "description": "Požadovaná stránka neexistuje nebo byla přesunuta.",
+    "cta": "Zpět na úvod"
+  }
+}

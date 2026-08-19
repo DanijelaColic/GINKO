@@ -84,6 +84,7 @@ export default async function HomePage() {
     reserve: t('availabilityReserve'),
     perNight: t('availabilityPerNight'),
     nightOne: t('availabilityNightOne'),
+    nightFew: t('availabilityNightFew'),
     nightMany: t('availabilityNightMany'),
     planAccommodationOnly: t('availabilityPlanAccommodationOnly'),
     planWithBreakfast: t('availabilityPlanWithBreakfast'),

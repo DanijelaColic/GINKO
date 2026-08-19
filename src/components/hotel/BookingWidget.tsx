@@ -89,6 +89,7 @@ export default function BookingWidget({
   const getNightsLabel = useCallback(
     (n: number) => {
       if (n === 1) return t('labels.night.one');
+      if (n >= 2 && n <= 4) return t('labels.night.few', { count: n });
       return t('labels.night.other', { count: n });
     },
     [t],

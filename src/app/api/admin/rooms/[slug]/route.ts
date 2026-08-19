@@ -22,7 +22,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     sort_order,
     capacity,
     amenities,
-    translations, // { hr: { name, tagline, description }, en: {...}, de: {...} }
+    translations, // { hr: { name, tagline, description }, en: {...}, cs: {...} }
   } = body;
 
   const supabase = createServerSupabaseClient();
@@ -60,7 +60,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   // Upsert translations if provided
   if (translations && typeof translations === 'object') {
     for (const [locale, fields] of Object.entries(translations)) {
-      if (!['hr', 'en', 'de'].includes(locale)) continue;
+      if (!['hr', 'en', 'cs'].includes(locale)) continue;
       const { error: trError } = await supabase.from('room_translations').upsert(
         {
           room_id: room.id,

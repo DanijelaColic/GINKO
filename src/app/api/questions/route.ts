@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { sendGuestQuestionNotification } from '@/lib/email';
+import { getValidLocale } from '@/i18n/messages';
 
 const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const MAX_QUESTION_LENGTH = 300;
@@ -43,8 +44,7 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const validLocale =
-    locale === 'en' || locale === 'de' || locale === 'hr' ? locale : 'hr';
+  const validLocale = getValidLocale(typeof locale === 'string' ? locale : 'hr');
 
   try {
     await sendGuestQuestionNotification({

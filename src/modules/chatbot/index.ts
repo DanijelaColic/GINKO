@@ -1,7 +1,10 @@
 export {
   CHAT_ASSISTANT_MODE,
   CHAT_LAUNCHER_ENABLED,
+  CHAT_WHATSAPP_PREFILL,
   CHAT_WHATSAPP_PREFILL_HR,
+  getWhatsAppPrefill,
+  buildWhatsAppHref,
   type ChatAssistantMode,
 } from './chatbot.config';
 

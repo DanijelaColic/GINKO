@@ -1,13 +1,13 @@
 import { hasLocale } from 'next-intl';
 import hrMessages from '../../messages/hr.json';
 import enMessages from '../../messages/en.json';
-import deMessages from '../../messages/de.json';
+import csMessages from '../../messages/cs.json';
 import { routing, type AppLocale } from './routing';
 
 const messagesByLocale = {
   hr: hrMessages,
   en: enMessages,
-  de: deMessages,
+  cs: csMessages,
 } as const;
 
 export function getValidLocale(locale: string | null | undefined): AppLocale {

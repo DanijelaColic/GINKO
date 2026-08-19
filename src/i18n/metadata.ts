@@ -11,7 +11,7 @@ const HERO_OG_IMAGE_PATH = '/images/hero/exterior-01.webp';
 const OPEN_GRAPH_LOCALES: Record<string, string> = {
   hr: 'hr_HR',
   en: 'en_US',
-  de: 'de_DE',
+  cs: 'cs_CZ',
 };
 
 const KEYWORDS_BY_LOCALE: Record<string, string[]> = {
@@ -33,14 +33,14 @@ const KEYWORDS_BY_LOCALE: Record<string, string[]> = {
     'hotel Daruvar',
     'Croatia boutique accommodation',
   ],
-  de: [
-    'Zimmer Daruvar',
-    'Boutique-Zimmer Daruvar Kroatien',
-    'Ginko Zimmer',
-    'Unterkunft Daruvar',
-    'Wellness Daruvar',
-    'Hotel Daruvar',
-    'Kroatien Boutique-Unterkunft',
+  cs: [
+    'pokoje Daruvar',
+    'boutique pokoje Daruvar Chorvatsko',
+    'ginko pokoje',
+    'ubytování Daruvar',
+    'wellness Daruvar',
+    'hotel Daruvar',
+    'Chorvatsko boutique ubytování',
   ],
 };
 
@@ -54,7 +54,7 @@ function getLocalizedPath(locale: Locale, pathname: string) {
   return `/${locale}${normalizedPath}`;
 }
 
-function getLanguageAlternates(pathname: string) {
+export function getLanguageAlternates(pathname: string) {
   return {
     ...Object.fromEntries(
       routing.locales.map((locale) => [locale, getLocalizedPath(locale, pathname)]),

@@ -121,6 +121,7 @@
     "availabilityReserve": "Rezerviraj",
     "availabilityPerNight": "po noći",
     "availabilityNightOne": "noć",
+    "availabilityNightFew": "noći",
     "availabilityNightMany": "noći",
     "availabilityPlanAccommodationOnly": "Samo smještaj",
     "availabilityPlanWithBreakfast": "S doručkom",
@@ -349,6 +350,7 @@
     "labels": {
       "night": {
         "one": "1 noć",
+        "few": "{count} noći",
         "other": "{count} noći"
       }
     },
@@ -512,7 +514,102 @@
   "guidesPage": {
     "title": "Vodič po okolici",
     "subtitle": "Otkrijte ljepote i atrakcije u blizini.",
-    "readMore": "Pročitajte više"
+    "readMore": "Pročitajte više",
+    "bookCtaTitle": "Rezervirajte smještaj u Daruvaru",
+    "bookCtaBody": "{siteName} nudi udoban boutique smještaj u srcu Daruvara.",
+    "bookCtaButton": "Provjeri dostupnost",
+    "moreGuides": "Više vodiča"
+  },
+  "galleryPage": {
+    "title": "Galerija",
+    "description": "Fotografije soba, zajedničkih prostora i okolice Daruvara.",
+    "heading": "Galerija",
+    "subtitle": "Fotografije smještaja i okolice Daruvara.",
+    "openGraph": {
+      "title": "Galerija – Ginko Boutique Rooms & Wellness Daruvar",
+      "description": "Fotografije soba, zajedničkih prostora i okolice Daruvara.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – galerija"
+    }
+  },
+  "privacyPage": {
+    "title": "Politika privatnosti",
+    "description": "Politika privatnosti Ginko Boutique Rooms & Wellness — kako prikupljamo, koristimo i štitimo vaše osobne podatke sukladno GDPR-u.",
+    "openGraph": {
+      "title": "Politika privatnosti – Ginko Boutique Rooms & Wellness",
+      "description": "Kako prikupljamo, koristimo i štitimo vaše osobne podatke sukladno GDPR-u.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – politika privatnosti"
+    },
+    "eyebrow": "Pravni dokumenti",
+    "lastUpdated": "Zadnja izmjena: 19. kolovoza 2026.",
+    "backHome": "← Povratak na početnu",
+    "controllerTitle": "1. Voditelj obrade",
+    "controllerBody": "Voditelj obrade osobnih podataka je {legalName}, OIB {oib}, {address}. Za pitanja vezana uz privatnost možete nas kontaktirati putem e-pošte: <email></email>.",
+    "dataTitle": "2. Podaci koje prikupljamo",
+    "dataIntro": "Prikupljamo sljedeće kategorije osobnih podataka:",
+    "dataBookingLabel": "Rezervacijski podaci",
+    "dataBookingText": "ime, e-pošta, broj telefona, datumi boravka, broj gostiju.",
+    "dataCommsLabel": "Komunikacijski podaci",
+    "dataCommsText": "poruke koje nam šaljete putem obrasca za kontakt ili e-pošte.",
+    "dataTechLabel": "Tehnički podaci",
+    "dataTechText": "IP adresa, vrsta preglednika, kolačići (samo uz vašu suglasnost).",
+    "purposeTitle": "3. Svrha i pravna osnova",
+    "purposeCol": "Svrha",
+    "basisCol": "Pravna osnova",
+    "purposeBooking": "Obrada rezervacije",
+    "basisBooking": "Izvršenje ugovora (čl. 6(1)(b) GDPR)",
+    "purposeSupport": "Komunikacija i podrška",
+    "basisSupport": "Legitimni interes / ugovor",
+    "purposeAnalytics": "Analitika (uz pristanak)",
+    "basisAnalytics": "Suglasnost (čl. 6(1)(a) GDPR)",
+    "retentionTitle": "4. Rokovi čuvanja",
+    "retentionBody": "Rezervacijski podaci čuvaju se 7 godina sukladno računovodstvenim obvezama. Podaci za komunikaciju brišu se nakon 2 godine. Analitički podaci (uz pristanak) čuvaju se do opoziva pristanka.",
+    "rightsTitle": "5. Vaša prava",
+    "rightsIntro": "Sukladno GDPR-u imate pravo na:",
+    "rightAccess": "Pristup vašim osobnim podacima",
+    "rightRectify": "Ispravak netočnih podataka",
+    "rightErase": "Brisanje podataka (\"pravo na zaborav\")",
+    "rightRestrict": "Ograničenje obrade",
+    "rightPortability": "Prenosivost podataka",
+    "rightObject": "Prigovor na obradu",
+    "rightWithdraw": "Opoziv pristanka (bez utjecaja na prethodnu obradu)",
+    "rightsRequest": "Zahtjev možete podnijeti na <email></email>. Imate i pravo podnijeti pritužbu <azop>AZOP-u</azop>.",
+    "cookiesTitle": "6. Kolačići",
+    "cookiesBody": "Koristimo neophodne kolačiće za rad stranice (lokalizacija). Analitičke kolačiće koristimo samo uz vašu suglasnost. Detalje možete pronaći u <cookies>Politici kolačića</cookies>.",
+    "changesTitle": "7. Izmjene politike",
+    "changesBody": "Ova politika može se povremeno ažurirati. Datum zadnje izmjene uvijek je naveden na vrhu stranice."
+  },
+  "cookiesPage": {
+    "title": "Politika kolačića",
+    "description": "Politika kolačića Ginko Boutique Rooms & Wellness — koje kolačiće koristimo i kako upravljati vašim postavkama.",
+    "openGraph": {
+      "title": "Politika kolačića – Ginko Boutique Rooms & Wellness",
+      "description": "Koje kolačiće koristimo i kako upravljati vašim postavkama.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – politika kolačića"
+    },
+    "eyebrow": "Pravni dokumenti",
+    "lastUpdated": "Zadnja izmjena: 3. kolovoza 2026.",
+    "whatTitle": "Što su kolačići?",
+    "whatBody": "Kolačići (cookies) su male tekstualne datoteke koje web stranice pohranjuju u vašem pregledniku. Koriste se za pamćenje vaših postavki i analizu korištenja stranice.",
+    "weUseTitle": "Kolačići koje koristimo",
+    "necessaryTitle": "Neophodne (uvijek aktivne)",
+    "necessaryBody": "Kolačić za odabir jezika (<code>NEXT_LOCALE</code>) — pamti vaš odabrani jezik i neophodan je za ispravan prikaz sadržaja. Ne zahtijeva pristanak.",
+    "analyticsTitle": "Analitički (uz pristanak)",
+    "analyticsBody": "Kolačiće za analitiku koristimo samo ako ste prihvatili. Prikupljamo anonimne podatke o posjetu (pregledane stranice, trajanje posjeta) radi poboljšanja korisničkog iskustva. Nema osobnih podataka.",
+    "consentTitle": "Suglasnost za kolačiće",
+    "consentBody": "Kolačić <code>ginko_cookie_consent</code> pohranjuje vašu odluku (prihvaćeno/odbijeno) kako ne bismo ponavljali upit pri svakom posjetu.",
+    "manageTitle": "Upravljanje kolačićima",
+    "manageBody": "Analitiku možete odbiti ili opozvati u svakom trenutku putem bannera koji se pojavljuje pri prvom posjetu. Kolačiće možete i izbrisati izravno u postavkama svog preglednika.",
+    "thirdTitle": "Treće strane",
+    "thirdBody": "Fotografije se poslužuju s naše domene. Tipografija se učitava putem <code>next/font</code> (samo-hostirano nakon builda). Ako prihvatite analitiku i konfiguriran je Google Analytics (GA4), Google može postaviti analitičke kolačiće — pogledajte njihovu politiku privatnosti.",
+    "privacyLink": "Politika privatnosti",
+    "homeLink": "← Početna"
+  },
+  "cookieBanner": {
+    "ariaLabel": "Obavijest o kolačićima",
+    "body": "Koristimo kolačiće za analitiku kako bismo poboljšali iskustvo. Možete prihvatiti ili odbiti neobavezne kolačiće.",
+    "learnMore": "Saznaj više",
+    "accept": "Prihvati",
+    "decline": "Odbij"
   },
   "notFoundPage": {
     "title": "Stranica nije pronađena",

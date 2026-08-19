@@ -1,7 +1,7 @@
 'use client';
 
 // New — no equivalent in source projects
-// Practical room editor: base fields + localized translations (hr/en/de)
+// Practical room editor: base fields + localized translations (hr/en/cs)
 import { useState, useEffect, useCallback } from 'react';
 import { Loader2, ChevronDown, ChevronUp, Save } from 'lucide-react';
 import clsx from 'clsx';
@@ -26,9 +26,9 @@ type DbRoom = {
   }>;
 };
 
-type LocaleKey = 'hr' | 'en' | 'de';
-const LOCALES: LocaleKey[] = ['hr', 'en', 'de'];
-const LOCALE_LABELS: Record<LocaleKey, string> = { hr: 'Hrvatski', en: 'English', de: 'Deutsch' };
+type LocaleKey = 'hr' | 'en' | 'cs';
+const LOCALES: LocaleKey[] = ['hr', 'en', 'cs'];
+const LOCALE_LABELS: Record<LocaleKey, string> = { hr: 'Hrvatski', en: 'English', cs: 'Čeština' };
 
 function RoomEditor({
   room,

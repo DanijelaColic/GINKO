@@ -15,10 +15,10 @@ export const GUIDE_HUB_BY_LOCALE: Record<
     description:
       'Practical tips for planning your stay in Daruvar: thermal baths, attractions, season and direct room booking.',
   },
-  de: {
-    title: 'Reiseführer – Daruvar & Umgebung',
+  cs: {
+    title: 'Průvodce – Daruvar a okolí',
     description:
-      'Praktische Tipps für Ihren Aufenthalt in Daruvar: Thermen, Sehenswürdigkeiten, Saison und direkte Zimmerbuchung.',
+      'Praktické tipy pro plánování pobytu v Daruvaru: lázně, atrakce, sezóna a přímá rezervace pokojů.',
   },
 } as const;
 
@@ -105,6 +105,92 @@ export const GUIDES: GuideArticle[] = [
         paragraphs: [
           'Za kraći boravak dovoljna je soba (Ginko 1–6). Za više prostora ili kuhanje birajte apartman; za privatnu saunu i jacuzzi – Wellness apartman.',
           'Direktna rezervacija na ginko-sobe.com znači bez provizije platforme, jasan depozit od 50 % i ostatak na dolasku. Doručak i pomoćni ležaj mogu se dogovoriti pri rezervaciji.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'sto-posjetiti-u-daruvaru',
+    locale: 'en',
+    title: 'What to visit in Daruvar',
+    description:
+      'A practical guide to Daruvar Spa, Janković Castle, the ginkgo tree and nearby attractions — ideal alongside a stay at Ginko Boutique Rooms.',
+    publishedAt: '2026-08-01',
+    readingTime: '6 min read',
+    keywords: [
+      'what to visit in Daruvar',
+      'Daruvar attractions',
+      'Daruvar Spa',
+      'Janković Castle',
+      'accommodation Daruvar',
+    ],
+    coverImage: {
+      src: '/images/property/20240504_154454.jpg',
+      alt: 'Ginko Boutique Rooms & Wellness – property in Daruvar',
+    },
+    sections: [
+      {
+        heading: 'Daruvar Spa and wellness',
+        paragraphs: [
+          'Daruvar is known for its thermal springs. Daruvar Spa and the Aquae Ballisae aqua park are a few minutes’ walk from the centre — ideal for recovery, a family day, or combining with the private wellness at your accommodation.',
+          'If you stay at Ginko Boutique Rooms & Wellness, the spa is literally next door: you can plan a morning session or an evening swim without a long drive.',
+        ],
+      },
+      {
+        heading: 'Janković Castle and the ginkgo tree',
+        paragraphs: [
+          'The park of Count Janković’s castle and the legendary ginkgo biloba sit in the heart of town. A walk through the grounds and a photo of the tree that inspired our name is a pleasant start to your stay.',
+          'The Church of the Holy Trinity and the historic town centre are only a few minutes on foot from Ulica Tomaša Garika Masaryka 1.',
+        ],
+      },
+      {
+        heading: 'Food and the daily rhythm',
+        paragraphs: [
+          'Daruvar has a quiet pace: cafés and restaurants in the centre, a local brewery, and short trips towards Papuk or nearby villages. For a longer outing, Zagreb is about an hour and a half by car.',
+          'Evenings are calm — which suits guests here for wellness, business or recovery. House rules support quiet hours after 23:00.',
+        ],
+      },
+    ],
+  },
+  {
+    slug: 'kako-planirati-odmor-u-daruvaru',
+    locale: 'en',
+    title: 'How to plan a stay in Daruvar',
+    description:
+      'Tips on when to come, how to arrive and where to stay in Daruvar — rooms, apartment or wellness apartment with direct booking.',
+    publishedAt: '2026-08-01',
+    readingTime: '5 min read',
+    keywords: [
+      'planning a trip to Daruvar',
+      'when to visit Daruvar',
+      'accommodation Daruvar',
+      'boutique rooms Daruvar',
+      'wellness Daruvar',
+    ],
+    coverImage: {
+      src: '/images/hero/exterior-01.webp',
+      alt: 'Ginko Boutique Rooms & Wellness – façade in Daruvar',
+    },
+    sections: [
+      {
+        heading: 'When to come',
+        paragraphs: [
+          'Spring and autumn are good for walks, the spa and fewer crowds. Summer brings the aqua park and longer days outdoors. Winter can be appealing for a thermal break and a quieter town.',
+          'Weekends in spa season fill up quickly — we recommend booking a room in advance, especially the wellness apartment.',
+        ],
+      },
+      {
+        heading: 'How to get here',
+        paragraphs: [
+          'The nearest major airport is Zagreb (about 120 km). You can reach Daruvar by car, or by bus / train to the town’s railway and bus station (about 500 m from the property).',
+          'Free private parking is available at the property, with no need to reserve a space.',
+        ],
+      },
+      {
+        heading: 'Room, apartment or wellness',
+        paragraphs: [
+          'For a shorter stay a room is enough (Ginko 1–6). For more space or cooking, choose the apartment; for a private sauna and jacuzzi — the Wellness Apartment.',
+          'Booking direct at ginko-sobe.com means no platform commission, a clear 50% deposit and the balance on arrival. Breakfast and an extra bed can be arranged when you book.',
         ],
       },
     ],

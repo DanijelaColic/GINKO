@@ -18,7 +18,7 @@ export type I18nNamespaceInfo = {
  * UI = gumbi, labele, greške (stabilnije; može se prevoditi ranije).
  * marketing = hero, opisi, FAQ odgovori (čekaj odobrenje sadržaja).
  * seo = meta / OG / structured data.
- * legal_adjacent = pravni ton (privacy je inline u page.tsx, ne u messages).
+ * legal_adjacent = pravni ton (privacy/cookies u messages).
  */
 export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
   {
@@ -43,7 +43,7 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
     namespace: 'bookingWidget',
     bucket: 'ui',
     approxKeys: 125,
-    notes: 'Forma, validacije, koraci — prioritet za EN/DE UX',
+    notes: 'Forma, validacije, koraci — prioritet za EN/CS UX',
   },
   {
     namespace: 'bookingPage',
@@ -72,14 +72,38 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
   {
     namespace: 'guidesPage',
     bucket: 'ui',
-    approxKeys: 3,
-    notes: 'Hub chrome; članci su u modules/seo/guides',
+    approxKeys: 7,
+    notes: 'Hub chrome + CTA na članku; članci u modules/seo/guides (EN Faza 3)',
+  },
+  {
+    namespace: 'galleryPage',
+    bucket: 'ui',
+    approxKeys: 7,
+    notes: 'Galerija naslov/meta',
+  },
+  {
+    namespace: 'privacyPage',
+    bucket: 'legal_adjacent',
+    approxKeys: 40,
+    notes: 'GDPR politika privatnosti',
+  },
+  {
+    namespace: 'cookiesPage',
+    bucket: 'legal_adjacent',
+    approxKeys: 20,
+    notes: 'Politika kolačića',
+  },
+  {
+    namespace: 'cookieBanner',
+    bucket: 'legal_adjacent',
+    approxKeys: 5,
+    notes: 'Consent banner',
   },
   {
     namespace: 'homePage',
     bucket: 'marketing',
     approxKeys: 75,
-    notes: 'Hero, features, availability labels — zamrzni HR prije EN/DE',
+    notes: 'Hero, features, availability labels — zamrzni HR prije EN/CS',
   },
   {
     namespace: 'travelerQuestions',
@@ -106,22 +130,17 @@ export const I18N_OUTSIDE_MESSAGES = [
   {
     path: 'src/modules/rooms/rooms.config.ts → roomTranslations',
     bucket: 'marketing' as const,
-    notes: 'EN/DE trenutačno mirror HR (TODO u configu)',
+    notes: 'EN opisi gotovi (Faza 1); CS u Fazi 6',
   },
   {
     path: 'src/modules/seo/guides/guides-content.ts',
     bucket: 'marketing' as const,
-    notes: 'SEO guide članci',
+    notes: 'SEO guide članci — HR + EN (CS u Fazi 7)',
   },
   {
     path: 'src/lib/email.ts',
     bucket: 'ui' as const,
-    notes: 'Email predmeti/tijela već imaju hr/en/de grane',
-  },
-  {
-    path: 'src/app/(public)/privacy/page.tsx + cookies/page.tsx',
-    bucket: 'legal_adjacent' as const,
-    notes: 'Inline HR; EN/DE page-ovi su locale re-exporti — treba prijevod',
+    notes: 'Email predmeti/tijela hr/en; CS pada na EN do Faze 6',
   },
 ] as const;
 

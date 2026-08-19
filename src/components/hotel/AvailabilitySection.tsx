@@ -66,6 +66,7 @@ export type AvailabilityLabels = {
   reserve: string;
   perNight: string;
   nightOne: string;
+  nightFew: string;
   nightMany: string;
   planAccommodationOnly: string;
   planWithBreakfast: string;
@@ -75,6 +76,15 @@ export type AvailabilityLabels = {
   childAgeError: string;
   capacityLabel: string;
 };
+
+export function nightCountLabel(
+  nights: number,
+  labels: Pick<AvailabilityLabels, 'nightOne' | 'nightFew' | 'nightMany'>,
+) {
+  if (nights === 1) return labels.nightOne;
+  if (nights >= 2 && nights <= 4) return labels.nightFew;
+  return labels.nightMany;
+}
 
 type Props = {
   rooms: Room[];
@@ -642,7 +652,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                               </p>
                               <p className="text-xs text-muted mt-0.5">
                                 {nights}{' '}
-                                {nights === 1 ? labels.nightOne : labels.nightMany}
+                                {nightCountLabel(nights, labels)}
                               </p>
                             </>
                           );

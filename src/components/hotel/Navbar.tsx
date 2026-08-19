@@ -17,14 +17,14 @@ import {
   propertySectionIdFromHash,
   CONTACT_PHONE_TEL,
   CONTACT_PHONE_DISPLAY,
-  CONTACT_WHATSAPP_URL,
 } from '@/modules/booking/booking.config';
 import { scrollToSectionId } from '@/lib/scroll-to-section';
+import { buildWhatsAppHref } from '@/modules/chatbot';
 
 const LOCALES: { code: AppLocale; label: string }[] = [
   { code: 'hr', label: 'HR' },
   { code: 'en', label: 'EN' },
-  { code: 'de', label: 'DE' },
+  { code: 'cs', label: 'CS' },
 ];
 
 function sectionLinkClass(isActive: boolean) {
@@ -182,7 +182,7 @@ export default function Navbar() {
             <span className="hidden lg:inline">{CONTACT_PHONE_DISPLAY}</span>
           </a>
           <a
-            href={CONTACT_WHATSAPP_URL}
+            href={buildWhatsAppHref(locale)}
             target="_blank"
             rel="noopener noreferrer"
             className={contactLinkClass()}
@@ -253,7 +253,7 @@ export default function Navbar() {
               {CONTACT_PHONE_DISPLAY}
             </a>
             <a
-              href={CONTACT_WHATSAPP_URL}
+              href={buildWhatsAppHref(locale)}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center gap-2.5 rounded-md px-3 py-2.5 text-base font-medium text-[--color-text] hover:bg-[--color-stone] hover:text-[--color-primary] transition-colors"

@@ -15,7 +15,7 @@ import {
 } from '@/modules/reviews/review-labels';
 import type { Room } from '@/modules/rooms/room.types';
 import type { RoomReserveState } from '@/components/hotel/room-reserve-state';
-import type { AvailabilityLabels } from '@/components/hotel/AvailabilitySection';
+import { nightCountLabel, type AvailabilityLabels } from '@/components/hotel/AvailabilitySection';
 import { roomNeedsExtraBed } from '@/modules/booking/guest-occupancy';
 
 type RoomStatus = {
@@ -286,7 +286,7 @@ export default function RoomDetailModal({
               </p>
               <p className="text-xs text-muted mt-0.5">
                 {showStayTotal
-                  ? t('forNights', { nights, label: nights === 1 ? labels.nightOne : labels.nightMany })
+                  ? t('forNights', { nights, label: nightCountLabel(nights, labels) })
                   : labels.perNight}
               </p>
             </div>

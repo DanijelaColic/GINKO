@@ -23,6 +23,7 @@ import {
   getBookingConfirmationUrlFromRequest,
 } from '@/lib/bookingConfirmation';
 import { sendOwnerNewBookingNotification } from '@/lib/email';
+import { getValidLocale } from '@/i18n/messages';
 import type { BookedRange } from '@/modules/booking/booking.types';
 
 // GET /api/bookings?room=slug
@@ -115,8 +116,7 @@ export async function POST(request: NextRequest) {
       locale: bodyLocale,
     } = body;
 
-    const locale: 'hr' | 'en' | 'de' =
-      bodyLocale === 'en' || bodyLocale === 'de' ? bodyLocale : 'hr';
+    const locale = getValidLocale(typeof bodyLocale === 'string' ? bodyLocale : 'hr');
 
     if (!room_slug || !check_in || !check_out || !guest_name || !guest_email) {
       return NextResponse.json({ error: 'Nedostaju obavezna polja' }, { status: 400 });

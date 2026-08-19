@@ -1,19 +1,12 @@
 'use client';
 
 import { MessageCircle } from 'lucide-react';
+import { useLocale, useTranslations } from 'next-intl';
 import {
   CHAT_ASSISTANT_MODE,
   CHAT_LAUNCHER_ENABLED,
-  CHAT_WHATSAPP_PREFILL_HR,
+  buildWhatsAppHref,
 } from '@/modules/chatbot';
-import { CONTACT_WHATSAPP_URL } from '@/modules/booking/booking.config';
-
-function buildWhatsAppHref(): string {
-  const base = CONTACT_WHATSAPP_URL.replace(/\?.*$/, '');
-  const text = encodeURIComponent(CHAT_WHATSAPP_PREFILL_HR);
-  const sep = base.includes('?') ? '&' : '?';
-  return `${base}${sep}text=${text}`;
-}
 
 /**
  * Opcionalni floating CTA. Uključen samo ako je
@@ -21,6 +14,9 @@ function buildWhatsAppHref(): string {
  * widget mode: placeholder (još nije implementiran).
  */
 export default function ChatLauncher() {
+  const locale = useLocale();
+  const t = useTranslations('navbar');
+
   if (!CHAT_LAUNCHER_ENABLED || CHAT_ASSISTANT_MODE === 'disabled') {
     return null;
   }
@@ -32,10 +28,10 @@ export default function ChatLauncher() {
 
   return (
     <a
-      href={buildWhatsAppHref()}
+      href={buildWhatsAppHref(locale)}
       target="_blank"
       rel="noopener noreferrer"
-      aria-label="Chat na WhatsAppu"
+      aria-label={t('whatsapp')}
       className="fixed bottom-5 right-5 z-30 flex h-14 w-14 items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg transition-transform hover:scale-105 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-primary"
     >
       <MessageCircle size={26} aria-hidden />

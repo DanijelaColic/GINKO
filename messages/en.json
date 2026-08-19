@@ -80,7 +80,7 @@
     "availabilityCapacityLabel": "Capacity",
     "roomsEyebrow": "Accommodation",
     "roomsTitle": "Our Rooms",
-    "roomsSubtitle": "Three carefully designed rooms for a retreat away from everyday life.",
+    "roomsSubtitle": "Carefully designed rooms for a getaway from everyday life.",
     "roomsViewAll": "View all rooms",
     "featuresEyebrow": "Why Ginko?",
     "featuresTitle": "Everything you need for the perfect stay",
@@ -121,6 +121,7 @@
     "availabilityReserve": "Book",
     "availabilityPerNight": "per night",
     "availabilityNightOne": "night",
+    "availabilityNightFew": "nights",
     "availabilityNightMany": "nights",
     "availabilityPlanAccommodationOnly": "Accommodation only",
     "availabilityPlanWithBreakfast": "With breakfast",
@@ -232,10 +233,8 @@
     },
     "price": {
       "title": "Price per night",
-      "offSeason": "Off-season",
-      "highSeason": "July / August",
-      "unavailable": "This room is currently unavailable for booking.",
-      "perNight": "per night"
+      "perNight": "per night",
+      "unavailable": "This room is currently unavailable for booking."
     },
     "actions": {
       "details": "More details",
@@ -302,8 +301,7 @@
     },
     "price": {
       "title": "Price per night",
-      "offSeason": "Off-season",
-      "highSeason": "July / August"
+      "perNight": "per night"
     },
     "rules": {
       "checkInLabel": "Check-in:",
@@ -316,7 +314,7 @@
       "minStayValue": "1 night",
       "minStay": "Minimum stay: 1 night",
       "depositLabel": "Deposit:",
-      "depositValue": "of total amount"
+      "depositValue": "at booking, remainder at the property"
     },
     "actions": {
       "bookThis": "Book this room"
@@ -344,7 +342,7 @@
       "minStayLabel": "Min. stay",
       "minStayValue": "1 night",
       "depositLabel": "Deposit",
-      "depositValue": "30% at booking"
+      "depositValue": "50% at booking, remainder at the property"
     }
   },
   "bookingWidget": {
@@ -352,6 +350,7 @@
     "labels": {
       "night": {
         "one": "1 night",
+        "few": "{count} nights",
         "other": "{count} nights"
       }
     },
@@ -379,7 +378,7 @@
       "deposit": "Deposit ({percent}%)",
       "depositNote": "at booking",
       "balance": "Remaining ({percent}%)",
-      "balanceNote": "due {days} days before arrival",
+      "balanceNote": "paid at the property on arrival",
       "freeCancellation": "Free cancellation up to 14 days before arrival",
       "changeDates": "Change dates",
       "directBooking": "Direct booking • No commission fees"
@@ -395,7 +394,7 @@
       "depositLabel": "Payment ({percent}%)",
       "depositNote": "paid immediately at booking.",
       "balanceLabel": "Remaining balance ({percent}%)",
-      "balanceNote": "must be paid no later than {days} days before arrival",
+      "balanceNote": "paid at the property on arrival",
       "cancellationTitle": "Cancellation"
     },
     "summary": {
@@ -465,7 +464,7 @@
         "deposit": "Payment ({percent}%)",
         "depositNote": "paid immediately at booking.",
         "balance": "Remaining balance ({percent}%)",
-        "balanceNote": "must be paid no later than {days} days before arrival",
+        "balanceNote": "paid at the property on arrival",
         "cancellationTitle": "Cancellation",
         "bankLabel": "Bank",
         "internationalPayments": "international payments",
@@ -515,7 +514,102 @@
   "guidesPage": {
     "title": "Local Guides",
     "subtitle": "Discover the beauty and attractions nearby.",
-    "readMore": "Read More"
+    "readMore": "Read More",
+    "bookCtaTitle": "Book accommodation in Daruvar",
+    "bookCtaBody": "{siteName} offers comfortable boutique accommodation in the heart of Daruvar.",
+    "bookCtaButton": "Check availability",
+    "moreGuides": "More guides"
+  },
+  "galleryPage": {
+    "title": "Gallery",
+    "description": "Photos of rooms, common areas and the surroundings of Daruvar.",
+    "heading": "Gallery",
+    "subtitle": "Photos of our accommodation and surroundings.",
+    "openGraph": {
+      "title": "Gallery – Ginko Boutique Rooms & Wellness Daruvar",
+      "description": "Photos of rooms, common areas and the surroundings of Daruvar.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – gallery"
+    }
+  },
+  "privacyPage": {
+    "title": "Privacy Policy",
+    "description": "Privacy policy of Ginko Boutique Rooms & Wellness — how we collect, use and protect your personal data in line with the GDPR.",
+    "openGraph": {
+      "title": "Privacy Policy – Ginko Boutique Rooms & Wellness",
+      "description": "How we collect, use and protect your personal data in line with the GDPR.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – privacy policy"
+    },
+    "eyebrow": "Legal documents",
+    "lastUpdated": "Last updated: 19 August 2026.",
+    "backHome": "← Back to home",
+    "controllerTitle": "1. Data controller",
+    "controllerBody": "The data controller is {legalName}, OIB {oib}, {address}. For privacy questions you can contact us by email: <email></email>.",
+    "dataTitle": "2. Data we collect",
+    "dataIntro": "We collect the following categories of personal data:",
+    "dataBookingLabel": "Booking data",
+    "dataBookingText": "name, email, phone number, stay dates, number of guests.",
+    "dataCommsLabel": "Communication data",
+    "dataCommsText": "messages you send us via the contact form or email.",
+    "dataTechLabel": "Technical data",
+    "dataTechText": "IP address, browser type, cookies (only with your consent).",
+    "purposeTitle": "3. Purpose and legal basis",
+    "purposeCol": "Purpose",
+    "basisCol": "Legal basis",
+    "purposeBooking": "Processing the booking",
+    "basisBooking": "Performance of a contract (Art. 6(1)(b) GDPR)",
+    "purposeSupport": "Communication and support",
+    "basisSupport": "Legitimate interest / contract",
+    "purposeAnalytics": "Analytics (with consent)",
+    "basisAnalytics": "Consent (Art. 6(1)(a) GDPR)",
+    "retentionTitle": "4. Retention periods",
+    "retentionBody": "Booking data is kept for 7 years in line with accounting obligations. Communication data is deleted after 2 years. Analytics data (with consent) is kept until consent is withdrawn.",
+    "rightsTitle": "5. Your rights",
+    "rightsIntro": "Under the GDPR you have the right to:",
+    "rightAccess": "Access your personal data",
+    "rightRectify": "Rectify inaccurate data",
+    "rightErase": "Erase data (the “right to be forgotten”)",
+    "rightRestrict": "Restrict processing",
+    "rightPortability": "Data portability",
+    "rightObject": "Object to processing",
+    "rightWithdraw": "Withdraw consent (without affecting prior processing)",
+    "rightsRequest": "You can submit a request at <email></email>. You also have the right to lodge a complaint with <azop>AZOP</azop> (the Croatian data protection authority).",
+    "cookiesTitle": "6. Cookies",
+    "cookiesBody": "We use essential cookies for the site to work (localisation). We use analytics cookies only with your consent. Details are in our <cookies>Cookie Policy</cookies>.",
+    "changesTitle": "7. Policy changes",
+    "changesBody": "This policy may be updated from time to time. The last-updated date is always shown at the top of the page."
+  },
+  "cookiesPage": {
+    "title": "Cookie Policy",
+    "description": "Cookie policy of Ginko Boutique Rooms & Wellness — which cookies we use and how to manage your settings.",
+    "openGraph": {
+      "title": "Cookie Policy – Ginko Boutique Rooms & Wellness",
+      "description": "Which cookies we use and how to manage your settings.",
+      "imageAlt": "Ginko Boutique Rooms & Wellness – cookie policy"
+    },
+    "eyebrow": "Legal documents",
+    "lastUpdated": "Last updated: 3 August 2026.",
+    "whatTitle": "What are cookies?",
+    "whatBody": "Cookies are small text files that websites store in your browser. They are used to remember your settings and to analyse how the site is used.",
+    "weUseTitle": "Cookies we use",
+    "necessaryTitle": "Essential (always active)",
+    "necessaryBody": "The language cookie (<code>NEXT_LOCALE</code>) remembers your selected language and is required for the site to display correctly. It does not require consent.",
+    "analyticsTitle": "Analytics (with consent)",
+    "analyticsBody": "We use analytics cookies only if you accept them. We collect anonymous visit data (pages viewed, visit duration) to improve the experience. No personal data is included.",
+    "consentTitle": "Cookie consent",
+    "consentBody": "The <code>ginko_cookie_consent</code> cookie stores your choice (accepted/declined) so we do not ask again on every visit.",
+    "manageTitle": "Managing cookies",
+    "manageBody": "You can decline or withdraw analytics at any time via the banner shown on your first visit. You can also delete cookies directly in your browser settings.",
+    "thirdTitle": "Third parties",
+    "thirdBody": "Photos are served from our domain. Typography is loaded via <code>next/font</code> (self-hosted after the build). If you accept analytics and Google Analytics (GA4) is configured, Google may set analytics cookies — see their privacy policy.",
+    "privacyLink": "Privacy Policy",
+    "homeLink": "← Home"
+  },
+  "cookieBanner": {
+    "ariaLabel": "Cookie notice",
+    "body": "We use analytics cookies to improve your experience. You can accept or decline optional cookies.",
+    "learnMore": "Learn more",
+    "accept": "Accept",
+    "decline": "Decline"
   },
   "notFoundPage": {
     "title": "Page Not Found",

@@ -40,7 +40,7 @@ export type BookingEmailData = {
   deposit: number;
   bookingId?: string;
   confirmationUrl?: string;
-  locale?: 'hr' | 'en' | 'de';
+  locale?: 'hr' | 'en' | 'cs';
   adults?: number;
   children?: number;
   status?: 'pending' | 'confirmed' | 'cancelled';
@@ -91,7 +91,7 @@ export function bookingRowToEmailData(
 ): BookingEmailData {
   const localeRaw = booking.locale;
   const locale =
-    localeRaw === 'en' || localeRaw === 'de' ? localeRaw : 'hr';
+    localeRaw === 'en' || localeRaw === 'cs' ? localeRaw : 'hr';
   const slug = String(booking.room_slug ?? '');
   const room = getRoomBySlug(slug);
 
@@ -156,7 +156,7 @@ export async function sendNewBookingEmails(data: BookingEmailData): Promise<void
 export type GuestQuestionEmailData = {
   guestEmail: string;
   question: string;
-  locale?: 'hr' | 'en' | 'de';
+  locale?: 'hr' | 'en' | 'cs';
 };
 
 /** Obavijest vlasniku o pitanju s FAQ sekcije. */
@@ -172,8 +172,8 @@ export async function sendGuestQuestionNotification(
   const subject =
     locale === 'en'
       ? `Guest question – ${SITE_NAME}`
-      : locale === 'de'
-        ? `Gästefrage – ${SITE_NAME}`
+      : locale === 'cs'
+        ? `Dotaz hosta – ${SITE_NAME}`
         : `Pitanje gosta – ${SITE_NAME}`;
 
   const result = await resend.emails.send({
@@ -224,8 +224,8 @@ export async function sendConfirmationEmail(data: BookingEmailData): Promise<voi
     subject:
       locale === 'en'
         ? `Booking confirmed${refBit} – ${d.roomName} | ${SITE_NAME}`
-        : locale === 'de'
-          ? `Buchung bestätigt${refBit} – ${d.roomName} | ${SITE_NAME}`
+        : locale === 'cs'
+          ? `Rezervace potvrzena${refBit} – ${d.roomName} | ${SITE_NAME}`
           : `Rezervacija potvrđena${refBit} – ${d.roomName} | ${SITE_NAME}`,
     html: guestConfirmedHtml(d, locale),
   });
@@ -235,13 +235,15 @@ export async function sendConfirmationEmail(data: BookingEmailData): Promise<voi
 
 // ── Shared HTML bits ──────────────────────────────────────────────
 
-type Locale = 'hr' | 'en' | 'de';
+type Locale = 'hr' | 'en' | 'cs';
 
 function t(
   locale: Locale,
-  strings: { hr: string; en: string; de: string },
+  strings: { hr: string; en: string; cs?: string },
 ): string {
-  return strings[locale];
+  if (locale === 'hr') return strings.hr;
+  if (locale === 'cs') return strings.cs ?? strings.en;
+  return strings.en;
 }
 
 function row(label: string, value: string, opts?: { strong?: boolean; accent?: boolean }) {
@@ -261,7 +263,7 @@ function extrasRows(d: FullData, locale: Locale): string {
   if (d.bookingFor === 'other' && d.guestStayingName) {
     parts.push(
       row(
-        t(locale, { hr: 'Boravi gost', en: 'Staying guest', de: 'Gast vor Ort' }),
+        t(locale, { hr: 'Boravi gost', en: 'Staying guest' }),
         escapeHtml(d.guestStayingName),
         { strong: true },
       ),
@@ -270,8 +272,8 @@ function extrasRows(d: FullData, locale: Locale): string {
   if (d.needsExtraBed) {
     parts.push(
       row(
-        t(locale, { hr: 'Pomoćni ležaj', en: 'Extra bed', de: 'Zustellbett' }),
-        t(locale, { hr: 'Da (20 €/noć)', en: 'Yes (€20/night)', de: 'Ja (20 €/Nacht)' }),
+        t(locale, { hr: 'Pomoćni ležaj', en: 'Extra bed' }),
+        t(locale, { hr: 'Da (20 €/noć)', en: 'Yes (€20/night)' }),
         { strong: true },
       ),
     );
@@ -279,8 +281,8 @@ function extrasRows(d: FullData, locale: Locale): string {
   if (d.needsCrib) {
     parts.push(
       row(
-        t(locale, { hr: 'Dječji krevetić', en: 'Baby crib', de: 'Babybett' }),
-        t(locale, { hr: 'Da (20 €/noć)', en: 'Yes (€20/night)', de: 'Ja (20 €/Nacht)' }),
+        t(locale, { hr: 'Dječji krevetić', en: 'Baby crib' }),
+        t(locale, { hr: 'Da (20 €/noć)', en: 'Yes (€20/night)' }),
         { strong: true },
       ),
     );
@@ -288,7 +290,7 @@ function extrasRows(d: FullData, locale: Locale): string {
   if (d.breakfastGuests && d.breakfastGuests > 0) {
     parts.push(
       row(
-        t(locale, { hr: 'Doručak', en: 'Breakfast', de: 'Frühstück' }),
+        t(locale, { hr: 'Doručak', en: 'Breakfast' }),
         `${d.breakfastGuests}×`,
         { strong: true },
       ),
@@ -297,11 +299,10 @@ function extrasRows(d: FullData, locale: Locale): string {
   if (d.includeWellness) {
     parts.push(
       row(
-        t(locale, { hr: 'Wellness', en: 'Wellness', de: 'Wellness' }),
+        t(locale, { hr: 'Wellness', en: 'Wellness' }),
         t(locale, {
           hr: 'Sauna + jacuzzi uključeni',
           en: 'Sauna + jacuzzi included',
-          de: 'Sauna + Jacuzzi inklusive',
         }),
         { strong: true },
       ),
@@ -316,7 +317,7 @@ function extrasRows(d: FullData, locale: Locale): string {
       .join(' · ');
     parts.push(
       row(
-        t(locale, { hr: 'Poslovno', en: 'Business', de: 'Geschäftlich' }),
+        t(locale, { hr: 'Poslovno', en: 'Business' }),
         biz || 'Da',
       ),
     );
@@ -327,11 +328,8 @@ function extrasRows(d: FullData, locale: Locale): string {
 function guestsLabel(d: FullData, locale: Locale): string {
   const adults = d.adults ?? 1;
   const children = d.children ?? 0;
-  if (locale === 'en') {
+  if (locale !== 'hr') {
     return `${adults} adult${adults === 1 ? '' : 's'}${children ? `, ${children} child${children === 1 ? '' : 'ren'}` : ''}`;
-  }
-  if (locale === 'de') {
-    return `${adults} Erwachsene${children ? `, ${children} Kind${children === 1 ? '' : 'er'}` : ''}`;
   }
   const a =
     adults === 1 ? '1 odrasla' : adults < 5 ? `${adults} odrasle` : `${adults} odraslih`;
@@ -346,31 +344,27 @@ function paymentBlock(d: FullData, locale: Locale, forGuest: boolean): string {
       ? t(locale, {
           hr: 'Depozit plaćen ✓',
           en: 'Deposit paid ✓',
-          de: 'Anzahlung bezahlt ✓',
         })
       : t(locale, {
           hr: 'Depozit (uplata)',
           en: 'Deposit',
-          de: 'Anzahlung',
         })
     : d.depositPaid
-      ? t(locale, { hr: 'Depozit plaćen', en: 'Deposit paid', de: 'Anzahlung bezahlt' })
+      ? t(locale, { hr: 'Depozit plaćen', en: 'Deposit paid' })
       : t(locale, {
           hr: 'Depozit (čeka uplatu)',
           en: 'Deposit (awaiting payment)',
-          de: 'Anzahlung (ausstehend)',
         });
 
   return `
     <div style="background:#f2ede6;border-radius:8px;padding:16px;margin:20px 0;">
       <table style="width:100%;font-size:14px;border-collapse:collapse;">
-        ${row(t(locale, { hr: 'Ukupno', en: 'Total', de: 'Gesamt' }), `${d.totalPrice} €`, { accent: true })}
+        ${row(t(locale, { hr: 'Ukupno', en: 'Total' }), `${d.totalPrice} €`, { accent: true })}
         ${row(depositNote, `${d.deposit} €`, { strong: true })}
         ${row(
           t(locale, {
             hr: 'Ostatak na dolasku',
             en: 'Balance on arrival',
-            de: 'Restbetrag bei Ankunft',
           }),
           `${d.balance} €`,
           { strong: true },
@@ -397,7 +391,6 @@ function contactFooter(locale: Locale): string {
         ${t(locale, {
           hr: 'Check-in 14:00–22:00 · Check-out do 10:00',
           en: 'Check-in 14:00–22:00 · Check-out by 10:00',
-          de: 'Check-in 14:00–22:00 · Check-out bis 10:00',
         })}
       </p>
     </div>`;
@@ -405,7 +398,7 @@ function contactFooter(locale: Locale): string {
 
 function houseRulesBlock(locale: Locale): string {
   const items =
-    locale === 'en'
+    locale !== 'hr'
       ? [
           'Free private parking on site',
           'Check-in 14:00–22:00 · check-out by 10:00',
@@ -413,15 +406,7 @@ function houseRulesBlock(locale: Locale): string {
           'Quiet hours 23:00–07:00',
           'Pets on request (cleaning fee €15 / day)',
         ]
-      : locale === 'de'
-        ? [
-            'Kostenloser Privatparkplatz vor Ort',
-            'Check-in 14:00–22:00 · Check-out bis 10:00',
-            'Rauchen nur auf Terrasse/Hof',
-            'Ruhezeiten 23:00–07:00',
-            'Haustiere auf Anfrage (Reinigungsgebühr 15 € / Tag)',
-          ]
-        : [
+      : [
             'Besplatan privatni parking uz objekt',
             'Prijava 14:00–22:00 · odjava do 10:00',
             'Pušenje samo na terasi / u dvorištu',
@@ -432,7 +417,7 @@ function houseRulesBlock(locale: Locale): string {
   return `
     <div style="margin-top:20px;">
       <p style="margin:0 0 8px;font-size:13px;font-weight:600;color:#1e2d22;text-transform:uppercase;letter-spacing:0.04em;">
-        ${t(locale, { hr: 'Korisne informacije', en: 'Useful information', de: 'Nützliche Infos' })}
+        ${t(locale, { hr: 'Korisne informacije', en: 'Useful information' })}
       </p>
       <ul style="margin:0;padding-left:18px;color:#6b7a6e;font-size:13px;line-height:1.7;">
         ${items.map((i) => `<li>${i}</li>`).join('')}
@@ -465,17 +450,14 @@ function guestConfirmedHtml(d: FullData, locale: Locale): string {
   const msg = t(locale, {
     hr: 'Vaša rezervacija je potvrđena. Veselimo se vašem dolasku.',
     en: 'Your booking is confirmed. We look forward to your stay.',
-    de: 'Ihre Buchung ist bestätigt. Wir freuen uns auf Ihren Aufenthalt.',
   });
 
   const nightsLabel =
-    locale === 'en'
+    locale !== 'hr'
       ? `${d.nights} night${d.nights === 1 ? '' : 's'}`
-      : locale === 'de'
-        ? `${d.nights} Nacht${d.nights === 1 ? '' : 'e'}`
-        : d.nights === 1
-          ? '1 noć'
-          : `${d.nights} noći`;
+      : d.nights === 1
+        ? '1 noć'
+        : `${d.nights} noći`;
 
   return emailShell(
     `
@@ -491,19 +473,19 @@ function guestConfirmedHtml(d: FullData, locale: Locale): string {
       <p style="color:#166534;font-weight:600;margin:0 0 20px;font-size:16px;">✓ ${msg}</p>
 
       <table style="width:100%;font-size:14px;border-collapse:collapse;">
-        ${row(t(locale, { hr: 'Soba', en: 'Room', de: 'Zimmer' }), escapeHtml(d.roomName), { strong: true })}
+        ${row(t(locale, { hr: 'Soba', en: 'Room' }), escapeHtml(d.roomName), { strong: true })}
         ${row(
-          t(locale, { hr: 'Prijava', en: 'Check-in', de: 'Check-in' }),
+          t(locale, { hr: 'Prijava', en: 'Check-in' }),
           `${d.checkInStr} · 14:00–22:00`,
           { strong: true },
         )}
         ${row(
-          t(locale, { hr: 'Odjava', en: 'Check-out', de: 'Check-out' }),
-          `${d.checkOutStr} · ${t(locale, { hr: 'do 10:00', en: 'by 10:00', de: 'bis 10:00' })}`,
+          t(locale, { hr: 'Odjava', en: 'Check-out' }),
+          `${d.checkOutStr} · ${t(locale, { hr: 'do 10:00', en: 'by 10:00' })}`,
           { strong: true },
         )}
-        ${row(t(locale, { hr: 'Trajanje', en: 'Duration', de: 'Dauer' }), nightsLabel)}
-        ${row(t(locale, { hr: 'Gosti', en: 'Guests', de: 'Gäste' }), guestsLabel(d, locale))}
+        ${row(t(locale, { hr: 'Trajanje', en: 'Duration' }), nightsLabel)}
+        ${row(t(locale, { hr: 'Gosti', en: 'Guests' }), guestsLabel(d, locale))}
         ${extrasRows(d, locale)}
       </table>
 
@@ -516,7 +498,6 @@ function guestConfirmedHtml(d: FullData, locale: Locale): string {
               t(locale, {
                 hr: 'Otvori potvrdu rezervacije',
                 en: 'Open booking confirmation',
-                de: 'Buchungsbestätigung öffnen',
               }),
             )
           : ''

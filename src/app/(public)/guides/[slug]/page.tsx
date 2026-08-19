@@ -1,10 +1,10 @@
 import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
-import { getLocale } from 'next-intl/server';
+import { getLocale, getTranslations } from 'next-intl/server';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { getValidLocale } from '@/i18n/messages';
-import { getBreadcrumbStructuredData } from '@/i18n/metadata';
+import { getBreadcrumbStructuredData, getLanguageAlternates } from '@/i18n/metadata';
 import { SITE_NAME, AVAILABILITY_SECTION_HREF } from '@/modules/booking/booking.config';
 import { getGuideBySlug } from '@/modules/seo/guides/get-guide-by-slug';
 import { getGuides } from '@/modules/seo/guides/get-guides';
@@ -30,12 +30,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
     keywords: guide.keywords,
     alternates: {
       canonical: localizedPath,
-      languages: {
-        hr: `/guides/${slug}`,
-        en: `/en/guides/${slug}`,
-        de: `/de/guides/${slug}`,
-        'x-default': `/guides/${slug}`,
-      },
+      languages: getLanguageAlternates(`/guides/${slug}`),
     },
     openGraph: {
       url: localizedPath,
@@ -51,6 +46,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function GuideArticlePage({ params }: Props) {
   const locale = getValidLocale(await getLocale());
+  const t = await getTranslations('guidesPage');
   const { slug } = await params;
   const guide = getGuideBySlug(locale, slug);
 
@@ -134,21 +130,21 @@ export default async function GuideArticlePage({ params }: Props) {
       </div>
 
       <div className="mt-12 rounded-xl border border-accent/25 bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-text mb-3">Rezervirajte smještaj u Daruvaru</h2>
+        <h2 className="text-xl font-semibold text-text mb-3">{t('bookCtaTitle')}</h2>
         <p className="text-text/70 leading-relaxed mb-5">
-          {SITE_NAME} nudi udoban boutique smještaj u srcu Daruvara.
+          {t('bookCtaBody', { siteName: SITE_NAME })}
         </p>
         <Link
           href={AVAILABILITY_SECTION_HREF}
           className="inline-flex rounded-full bg-accent px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:opacity-90"
         >
-          Provjeri dostupnost
+          {t('bookCtaButton')}
         </Link>
       </div>
 
       {relatedGuides.length > 0 && (
         <div className="mt-10 rounded-xl border border-stone/20 bg-white p-5 shadow-sm">
-          <h2 className="text-xl font-semibold text-text mb-2">Više vodiča</h2>
+          <h2 className="text-xl font-semibold text-text mb-2">{t('moreGuides')}</h2>
           <ul className="flex flex-wrap gap-2.5 mt-3">
             {relatedGuides.map((item) => (
               <li key={item.slug}>

@@ -3,7 +3,7 @@ import { getLocale } from 'next-intl/server';
 import Image from 'next/image';
 import { Link } from '@/i18n/navigation';
 import { getValidLocale } from '@/i18n/messages';
-import { getBreadcrumbStructuredData } from '@/i18n/metadata';
+import { getBreadcrumbStructuredData, getLanguageAlternates } from '@/i18n/metadata';
 import { SITE_NAME } from '@/modules/booking/booking.config';
 import { GUIDE_HUB_BY_LOCALE } from '@/modules/seo/guides/guides-content';
 import { getGuides } from '@/modules/seo/guides/get-guides';
@@ -19,6 +19,7 @@ export async function generateMetadata(): Promise<Metadata> {
     description: content.description,
     alternates: {
       canonical: localizedPath,
+      languages: getLanguageAlternates('/guides'),
     },
     openGraph: {
       title: `${content.title} | ${SITE_NAME}`,
