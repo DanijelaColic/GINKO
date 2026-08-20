@@ -1,5 +1,6 @@
 'use client';
 
+import { usePathname } from 'next/navigation';
 import { MessageCircle } from 'lucide-react';
 import { useLocale, useTranslations } from 'next-intl';
 import {
@@ -7,22 +8,30 @@ import {
   CHAT_LAUNCHER_ENABLED,
   buildWhatsAppHref,
 } from '@/modules/chatbot';
+import ChatWidget from '@/components/hotel/ChatWidget';
 
 /**
- * Opcionalni floating CTA. Uključen samo ako je
- * NEXT_PUBLIC_CHAT_LAUNCHER=1 i mode !== disabled.
- * widget mode: placeholder (još nije implementiran).
+ * Javni chat: FAQ widget (default) ili opcionalni WhatsApp FAB.
+ * Skriven na /admin.
  */
 export default function ChatLauncher() {
+  const pathname = usePathname();
   const locale = useLocale();
   const t = useTranslations('navbar');
 
-  if (!CHAT_LAUNCHER_ENABLED || CHAT_ASSISTANT_MODE === 'disabled') {
+  if (pathname?.startsWith('/admin')) {
+    return null;
+  }
+
+  if (CHAT_ASSISTANT_MODE === 'disabled') {
     return null;
   }
 
   if (CHAT_ASSISTANT_MODE === 'widget') {
-    // Slot za budući embedded widget — bez UI dok nije spreman
+    return <ChatWidget />;
+  }
+
+  if (!CHAT_LAUNCHER_ENABLED) {
     return null;
   }
 

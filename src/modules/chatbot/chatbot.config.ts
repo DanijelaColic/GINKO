@@ -1,25 +1,24 @@
 /**
- * Chatbot / asistent — konfiguracija (bez embedded LLM widgeta za sada).
+ * Chatbot / asistent — konfiguracija.
  *
- * Odluka (Faza 4):
- * - MVP: WhatsApp deep link (već u Navbar) + opcionalni floating launcher
- * - Kasnije: embedded widget može zamijeniti mode bez mijenjanja knowledge baze
+ * Faza 2: in-page FAQ widget (default).
+ * WhatsApp FAB ostaje opcionalan (Navbar već ima WhatsApp).
  */
 
 import { CONTACT_WHATSAPP_URL } from '@/modules/booking/booking.config';
 
 export type ChatAssistantMode = 'whatsapp' | 'disabled' | 'widget';
 
-const MODE_RAW = (process.env.NEXT_PUBLIC_CHAT_MODE ?? 'whatsapp').toLowerCase();
+const MODE_RAW = (process.env.NEXT_PUBLIC_CHAT_MODE ?? 'widget').toLowerCase();
 
 export const CHAT_ASSISTANT_MODE: ChatAssistantMode =
   MODE_RAW === 'disabled' || MODE_RAW === 'widget' || MODE_RAW === 'whatsapp'
     ? MODE_RAW
-    : 'whatsapp';
+    : 'widget';
 
 /**
- * Floating launcher (donji desni kut). Default OFF — Navbar već ima WhatsApp.
- * Uključi: NEXT_PUBLIC_CHAT_LAUNCHER=1
+ * Floating WhatsApp launcher (donji desni kut). Default OFF — Navbar već ima WhatsApp.
+ * Uključi: NEXT_PUBLIC_CHAT_LAUNCHER=1 i NEXT_PUBLIC_CHAT_MODE=whatsapp
  */
 export const CHAT_LAUNCHER_ENABLED =
   process.env.NEXT_PUBLIC_CHAT_LAUNCHER === '1' ||
@@ -45,3 +44,16 @@ export function buildWhatsAppHref(locale: string): string {
 
 /** @deprecated Koristi getWhatsAppPrefill(locale) */
 export const CHAT_WHATSAPP_PREFILL_HR = CHAT_WHATSAPP_PREFILL.hr;
+
+/** Čipovi u widgetu — FAQ id-evi, isti tekst kao na naslovnici */
+export const CHATBOT_SUGGESTION_IDS = [
+  'parking',
+  'breakfast',
+  'wifi',
+  'checkinTimes',
+  'pets',
+  'wellness',
+  'cancellation',
+] as const;
+
+export type ChatbotSuggestionId = (typeof CHATBOT_SUGGESTION_IDS)[number];

@@ -2,6 +2,7 @@
 
 import Image from 'next/image';
 import { useCallback, useState } from 'react';
+import { useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 
 type Props = {
@@ -10,6 +11,7 @@ type Props = {
 };
 
 export default function RoomModalGallery({ images, alt }: Props) {
+  const t = useTranslations('galleryPage');
   const [active, setActive] = useState(0);
 
   const prev = useCallback(() => {
@@ -23,7 +25,7 @@ export default function RoomModalGallery({ images, alt }: Props) {
   if (!images.length) {
     return (
       <div className="flex h-full min-h-[200px] items-center justify-center bg-stone text-muted text-sm italic">
-        — foto dolazi —
+        {t('comingSoon')}
       </div>
     );
   }
@@ -49,7 +51,7 @@ export default function RoomModalGallery({ images, alt }: Props) {
               type="button"
               onClick={prev}
               className="absolute left-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-1.5 text-text shadow hover:bg-white transition-colors"
-              aria-label="Prethodna fotografija"
+              aria-label={t('previous')}
             >
               <ChevronLeft size={20} />
             </button>
@@ -57,7 +59,7 @@ export default function RoomModalGallery({ images, alt }: Props) {
               type="button"
               onClick={next}
               className="absolute right-2 top-1/2 -translate-y-1/2 rounded-full bg-white/90 p-1.5 text-text shadow hover:bg-white transition-colors"
-              aria-label="Sljedeća fotografija"
+              aria-label={t('next')}
             >
               <ChevronRight size={20} />
             </button>
@@ -76,7 +78,7 @@ export default function RoomModalGallery({ images, alt }: Props) {
               className={`relative aspect-[4/3] overflow-hidden ${
                 i === active ? 'ring-2 ring-primary ring-inset' : 'opacity-80 hover:opacity-100'
               }`}
-              aria-label={`Fotografija ${i + 1}`}
+              aria-label={t('photo', { n: i + 1 })}
               aria-current={i === active}
             >
               <Image

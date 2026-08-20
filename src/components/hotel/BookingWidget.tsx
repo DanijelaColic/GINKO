@@ -34,7 +34,11 @@ import {
 } from '@/modules/booking/booking.config';
 import { rooms as staticRooms } from '@/modules/rooms/rooms.config';
 import type { BookingFormData } from '@/modules/booking/booking-form.schema';
-import { BOOKING_FORM_DEFAULTS, validateBookingForm } from '@/modules/booking/booking-form.schema';
+import {
+  BOOKING_COUNTRY_OPTIONS,
+  BOOKING_FORM_DEFAULTS,
+  validateBookingForm,
+} from '@/modules/booking/booking-form.schema';
 import type { GoogleReviewSummary } from '@/modules/reviews/google-reviews.types';
 import {
   calculateBreakfastPerNight,
@@ -291,7 +295,26 @@ export default function BookingWidget({
     });
 
     const data = await res.json();
-    if (!res.ok) throw new Error(data.error ?? t('errors.submitFailed'));
+    if (!res.ok) {
+      const code = typeof data.error === 'string' ? data.error : undefined;
+      if (code === 'minNights') {
+        throw new Error(t('errors.minNights', { min: MIN_NIGHTS }));
+      }
+      if (code === 'capacityExceeded' && selectedRoom) {
+        throw new Error(
+          t('errors.capacityExceeded', {
+            name: selectedRoom.name,
+            capacity: selectedRoom.capacity,
+          }),
+        );
+      }
+      if (code === 'extraBedUnavailable' && selectedRoom) {
+        throw new Error(t('errors.extraBedUnavailable', { name: selectedRoom.name }));
+      }
+      throw new Error(
+        code && t.has(`errors.${code}`) ? t(`errors.${code}`) : t('errors.submitFailed'),
+      );
+    }
 
     const bookingId = data.bookingId as string | undefined;
     if (!bookingId) {
@@ -599,7 +622,7 @@ export default function BookingWidget({
           >
             {availableRooms.map((r) => (
               <option key={r.slug} value={r.slug}>
-                {r.name} — {r.capacityNote} · {r.price}€/noć
+                {r.name} — {r.capacityNote} · {r.price}€/{t('form.perNight')}
               </option>
             ))}
           </select>
@@ -773,24 +796,11 @@ export default function BookingWidget({
                   required
                   className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
                 >
-                  <option value="Hrvatska">Hrvatska</option>
-                  <option value="Bosna i Hercegovina">Bosna i Hercegovina</option>
-                  <option value="Srbija">Srbija</option>
-                  <option value="Slovenija">Slovenija</option>
-                  <option value="Austrija">Austrija</option>
-                  <option value="Mađarska">Mađarska</option>
-                  <option value="Njemačka">Njemačka</option>
-                  <option value="Italija">Italija</option>
-                  <option value="Češka">Češka</option>
-                  <option value="Slovačka">Slovačka</option>
-                  <option value="Poljska">Poljska</option>
-                  <option value="Nizozemska">Nizozemska</option>
-                  <option value="Belgija">Belgija</option>
-                  <option value="Francuska">Francuska</option>
-                  <option value="Švicarska">Švicarska</option>
-                  <option value="Velika Britanija">Velika Britanija</option>
-                  <option value="SAD">SAD</option>
-                  <option value="Ostalo">Ostalo</option>
+                  {BOOKING_COUNTRY_OPTIONS.map(({ value, key }) => (
+                    <option key={value} value={value}>
+                      {t(`form.countries.${key}`)}
+                    </option>
+                  ))}
                 </select>
               </div>
 
@@ -910,7 +920,7 @@ export default function BookingWidget({
                   onChange={handleFormChange}
                   className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
                 >
-                  <option value="">— Odaberite —</option>
+                  <option value="">{t('form.selectPlaceholder')}</option>
                   {ARRIVAL_TIME_OPTIONS.map((time) => (
                     <option key={time} value={time}>
                       {time}
@@ -1102,7 +1112,7 @@ export default function BookingWidget({
           <h2 className="font-serif text-2xl font-semibold text-text mb-2">
             {t('stepper.step3')}
           </h2>
-          <p className="text-sm text-muted">Kreiranje rezervacije i preusmjeravanje na plaćanje…</p>
+          <p className="text-sm text-muted">{t('form.step3Redirecting')}</p>
 
           {submitError && (
             <div className="mt-6 flex items-start gap-2 text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm text-left max-w-md">

@@ -272,7 +272,7 @@ export default async function HomePage() {
       <section className="relative py-24 px-4 overflow-hidden">
         <Image
           src="/images/hero/hero-01.webp"
-          alt="Rezerviraj odmor u Ginko Boutique Rooms & Wellness"
+          alt={t('ctaImageAlt')}
           fill
           className="object-cover object-center"
           sizes="100vw"

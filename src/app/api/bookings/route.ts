@@ -12,6 +12,7 @@ import {
   calculatePrice,
 } from '@/modules/booking/dates';
 import { MIN_NIGHTS } from '@/modules/booking/booking.config';
+import { guestApiError } from '@/lib/guest-api-error';
 import {
   calculateBreakfastPerNight,
   roomFitsGuests,
@@ -33,12 +34,12 @@ export async function GET(request: NextRequest) {
   const slug = searchParams.get('room');
 
   if (!slug) {
-    return NextResponse.json({ error: 'Nedostaje parametar room' }, { status: 400 });
+    return guestApiError('missingRoomParam', 400);
   }
 
   const room = getRoomBySlug(slug);
   if (!room) {
-    return NextResponse.json({ error: 'Soba nije pronađena' }, { status: 404 });
+    return guestApiError('roomNotFound', 404);
   }
 
   try {
@@ -82,7 +83,7 @@ export async function GET(request: NextRequest) {
         ? String((err as { message: unknown }).message)
         : String(err);
     console.error('GET /api/bookings:', detail);
-    return NextResponse.json({ error: 'Greška pri dohvatu rezervacija' }, { status: 500 });
+    return guestApiError('fetchFailed', 500);
   }
 }
 
@@ -119,31 +120,25 @@ export async function POST(request: NextRequest) {
     const locale = getValidLocale(typeof bodyLocale === 'string' ? bodyLocale : 'hr');
 
     if (!room_slug || !check_in || !check_out || !guest_name || !guest_email) {
-      return NextResponse.json({ error: 'Nedostaju obavezna polja' }, { status: 400 });
+      return guestApiError('missingFields', 400);
     }
 
     const room = getRoomBySlug(room_slug);
     if (!room) {
-      return NextResponse.json({ error: 'Soba nije pronađena' }, { status: 404 });
+      return guestApiError('roomNotFound', 404);
     }
 
     const checkInDate = parseLocalDate(check_in);
     const checkOutDate = parseLocalDate(check_out);
 
     if (checkOutDate <= checkInDate) {
-      return NextResponse.json(
-        { error: 'Datum odjave mora biti nakon datuma dolaska' },
-        { status: 400 },
-      );
+      return guestApiError('checkoutAfterCheckin', 400);
     }
 
     const nights = diffDays(checkOutDate, checkInDate);
 
     if (nights < MIN_NIGHTS) {
-      return NextResponse.json(
-        { error: `Minimalni boravak su ${MIN_NIGHTS} noći` },
-        { status: 400 },
-      );
+      return guestApiError('minNights', 400);
     }
 
     const adultsCount = typeof adults === 'number' ? adults : 1;
@@ -158,28 +153,19 @@ export async function POST(request: NextRequest) {
     while (childAges.length < childrenCount) childAges.push(0);
 
     if (!roomFitsGuests(room, adultsCount, childAges)) {
-      return NextResponse.json(
-        { error: `Soba ${room.name} prima maksimalno ${room.capacity} osoba (ležaja).` },
-        { status: 400 },
-      );
+      return guestApiError('capacityExceeded', 400);
     }
 
     // Pomoćni ležaj — server je source of truth (ignorira client ako se ne slaže)
     const autoExtraBed = roomNeedsExtraBed(room, adultsCount, childAges);
     if (needs_extra_bed === true && !room.extraBedAvailable) {
-      return NextResponse.json(
-        { error: `Soba ${room.name} ne podržava pomoćni ležaj.` },
-        { status: 400 },
-      );
+      return guestApiError('extraBedUnavailable', 400);
     }
 
     // Doručak ne može biti za više osoba nego što boravi
     const bfGuests = typeof breakfast_guests === 'number' ? breakfast_guests : 0;
     if (bfGuests > adultsCount + childrenCount) {
-      return NextResponse.json(
-        { error: 'Broj osoba uz doručak ne može biti veći od ukupnog broja gostiju.' },
-        { status: 400 },
-      );
+      return guestApiError('breakfastGuestsInvalid', 400);
     }
 
     const breakfastPerNight =
@@ -219,10 +205,7 @@ export async function POST(request: NextRequest) {
     ];
 
     if (!isRangeAvailable(checkInDate, checkOutDate, existingRanges)) {
-      return NextResponse.json(
-        { error: 'Odabrani termini su već zauzeti. Molimo odaberite druge datume.' },
-        { status: 409 },
-      );
+      return guestApiError('datesUnavailable', 409);
     }
 
     // Server-side pricing (source of truth) — uključuje sve extras
@@ -317,9 +300,6 @@ export async function POST(request: NextRequest) {
     );
   } catch (err) {
     console.error('POST /api/bookings:', err);
-    return NextResponse.json(
-      { error: 'Greška pri kreiranju rezervacije. Pokušajte ponovo ili nas kontaktirajte.' },
-      { status: 500 },
-    );
+    return guestApiError('createFailed', 500);
   }
 }

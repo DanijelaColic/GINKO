@@ -124,6 +124,12 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
     notes: 'FAQ Q/A — ista baza za chatbot knowledge',
   },
   {
+    namespace: 'chatbot',
+    bucket: 'ui',
+    approxKeys: 36,
+    notes: 'In-page FAQ widget chrome + Faza 3 deep link labele',
+  },
+  {
     namespace: 'siteMetadata',
     bucket: 'seo',
     approxKeys: 3,

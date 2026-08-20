@@ -45,6 +45,43 @@
     "phone": "Call us",
     "whatsapp": "Contact via WhatsApp"
   },
+  "chatbot": {
+    "title": "Ginko assistant",
+    "subtitle": "Frequently asked questions",
+    "greeting": "Hello! I can answer common questions about the stay. Pick a question or type your own.",
+    "placeholder": "Type a question…",
+    "send": "Send",
+    "open": "Open frequently asked questions",
+    "close": "Close chat",
+    "suggestionsLabel": "Common questions",
+    "escalate": "I don’t have a ready answer for that. Message us on WhatsApp or send a question by email.",
+    "availabilityAnswer": "Availability and prices for specific dates are in the search on the site. The bot does not quote them.",
+    "legalAnswer": "Legal information is on the Privacy Policy and Cookies pages.",
+    "galleryAnswer": "Photos of the property are in the gallery and on the room pages.",
+    "roomsAnswer": "All rooms and apartments are on the Rooms page. Check availability in the search.",
+    "minNights": "The minimum stay is {count} night.",
+    "links": {
+      "availability": "Show availability",
+      "booking": "Book now",
+      "rooms": "Rooms",
+      "wellnessRoom": "Wellness apartment",
+      "gallery": "Gallery",
+      "surroundings": "Area",
+      "facilities": "House rules and facilities",
+      "privacy": "Privacy policy",
+      "cookies": "Cookies",
+      "whatsapp": "Talk to us"
+    },
+    "chips": {
+      "parking": "Parking",
+      "breakfast": "Breakfast",
+      "wifi": "Wi-Fi",
+      "checkinTimes": "Check-in / check-out",
+      "pets": "Pets",
+      "wellness": "Wellness",
+      "cancellation": "Cancellation"
+    }
+  },
   "footer": {
     "brand": "Ginko Boutique Rooms & Wellness",
     "tagline": "Ulica Tomaša Garika Masaryka 1, 43500 Daruvar",
@@ -133,6 +170,7 @@
     "ctaTitle": "Ready for your getaway?",
     "ctaSubtitle": "Book your room today and secure your spot in our peaceful corner of Slavonia.",
     "ctaButton": "Book Now",
+    "ctaImageAlt": "Book a stay at Ginko Boutique Rooms & Wellness",
     "availabilitySelectDates": "Please select check-in and check-out dates before continuing.",
     "availabilitySelectGuests": "Please select the number of adult guests before continuing.",
     "availabilityUnavailableDates": "This room is not available for the selected dates. Please try different dates.",
@@ -358,6 +396,7 @@
     "actions": {
       "bookThis": "Book this room"
     },
+    "photosComingSoon": "— photos coming soon —",
     "unavailable": {
       "title": "Room is currently unavailable.",
       "description": "Browse other available rooms.",
@@ -469,6 +508,27 @@
       "email": "Email",
       "emailPlaceholder": "anna@example.com",
       "country": "Country / Region",
+      "countries": {
+        "hr": "Croatia",
+        "ba": "Bosnia and Herzegovina",
+        "rs": "Serbia",
+        "si": "Slovenia",
+        "at": "Austria",
+        "hu": "Hungary",
+        "de": "Germany",
+        "it": "Italy",
+        "cz": "Czechia",
+        "sk": "Slovakia",
+        "pl": "Poland",
+        "nl": "Netherlands",
+        "be": "Belgium",
+        "fr": "France",
+        "ch": "Switzerland",
+        "gb": "United Kingdom",
+        "us": "USA",
+        "other": "Other"
+      },
+      "selectPlaceholder": "— Select —",
       "phone": "Phone number",
       "phonePlaceholder": "+385 91 234 5678",
       "bookingForTitle": "Who is this reservation for?",
@@ -506,6 +566,7 @@
       "rulesLinkLabel": "Read house rules and booking terms",
       "submitting": "Preparing payment…",
       "continueToPayment": "Continue to payment",
+      "step3Redirecting": "Creating your booking and redirecting to payment…",
       "submit": "Continue to payment · {totalPrice} €"
     },
     "success": {
@@ -537,7 +598,16 @@
     },
     "errors": {
       "maxGuests": "{apartmentName}: maximum {capacity} guests.",
-      "submitFailed": "Could not create the booking. Please try again."
+      "submitFailed": "Could not create the booking. Please try again.",
+      "missingFields": "Required fields are missing.",
+      "roomNotFound": "Room not found.",
+      "checkoutAfterCheckin": "Check-out must be after check-in.",
+      "minNights": "Minimum stay is {min} nights.",
+      "capacityExceeded": "{name} sleeps a maximum of {capacity} guests.",
+      "extraBedUnavailable": "{name} does not support an extra bed.",
+      "breakfastGuestsInvalid": "Breakfast cannot be for more people than the number of guests.",
+      "datesUnavailable": "The selected dates are already booked. Please choose different dates.",
+      "createFailed": "Could not create the booking. Please try again or contact us."
     },
     "policies": {
       "cancellation": {
@@ -590,6 +660,7 @@
     "showAllPhotos": "Show all photos ({count})",
     "showPhoto": "Show photo",
     "comingSoon": "Photos coming soon.",
+    "photo": "Photo {n}",
     "openPhoto": "Open: {alt}",
     "close": "Close gallery",
     "previous": "Previous photo",

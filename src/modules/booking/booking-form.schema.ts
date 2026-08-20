@@ -25,6 +25,28 @@ export type BookingFormData = {
   agreeRules: boolean;
 };
 
+/** Stored values stay Croatian (owner/admin). Labels are translated in the form. */
+export const BOOKING_COUNTRY_OPTIONS = [
+  { value: 'Hrvatska', key: 'hr' },
+  { value: 'Bosna i Hercegovina', key: 'ba' },
+  { value: 'Srbija', key: 'rs' },
+  { value: 'Slovenija', key: 'si' },
+  { value: 'Austrija', key: 'at' },
+  { value: 'Mađarska', key: 'hu' },
+  { value: 'Njemačka', key: 'de' },
+  { value: 'Italija', key: 'it' },
+  { value: 'Češka', key: 'cz' },
+  { value: 'Slovačka', key: 'sk' },
+  { value: 'Poljska', key: 'pl' },
+  { value: 'Nizozemska', key: 'nl' },
+  { value: 'Belgija', key: 'be' },
+  { value: 'Francuska', key: 'fr' },
+  { value: 'Švicarska', key: 'ch' },
+  { value: 'Velika Britanija', key: 'gb' },
+  { value: 'SAD', key: 'us' },
+  { value: 'Ostalo', key: 'other' },
+] as const;
+
 export const BOOKING_FORM_DEFAULTS: BookingFormData = {
   firstName: '',
   lastName: '',

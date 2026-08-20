@@ -78,7 +78,7 @@ export default async function RoomDetailPage({ params }: Props) {
         <ImageGallery images={room.images} alt={`${t('eyebrow')} ${room.name}`} />
       ) : (
         <div className="h-[260px] sm:h-[380px] lg:h-[460px] bg-stone flex items-center justify-center text-muted italic text-sm">
-          — fotografije dolaze uskoro —
+          {t('photosComingSoon')}
         </div>
       )}
 

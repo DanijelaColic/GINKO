@@ -45,6 +45,43 @@
     "phone": "Zavolejte nám",
     "whatsapp": "Kontaktovat přes WhatsApp"
   },
+  "chatbot": {
+    "title": "Ginko asistent",
+    "subtitle": "Časté dotazy",
+    "greeting": "Ahoj! Mohu odpovědět na časté dotazy k ubytování. Vyberte otázku nebo napište vlastní.",
+    "placeholder": "Napište otázku…",
+    "send": "Odeslat",
+    "open": "Otevřít časté dotazy",
+    "close": "Zavřít chat",
+    "suggestionsLabel": "Časté dotazy",
+    "escalate": "Na to nemám připravenou odpověď. Napište nám na WhatsApp nebo pošlete otázku e-mailem.",
+    "availabilityAnswer": "Dostupnost a ceny pro konkrétní termíny najdete ve vyhledávání na webu. Bot je neuvádí.",
+    "legalAnswer": "Právní informace jsou na stránkách Zásady ochrany osobních údajů a Cookies.",
+    "galleryAnswer": "Fotografie ubytování jsou v galerii a na stránkách pokojů.",
+    "roomsAnswer": "Přehled všech pokojů a apartmánů je na stránce Pokoje. Dostupnost ověřte ve vyhledávání.",
+    "minNights": "Minimální pobyt je {count} noc.",
+    "links": {
+      "availability": "Zobrazit dostupnost",
+      "booking": "Rezervovat",
+      "rooms": "Pokoje",
+      "wellnessRoom": "Wellness apartmán",
+      "gallery": "Galerie",
+      "surroundings": "Okolí",
+      "facilities": "Domácí řád a vybavení",
+      "privacy": "Zásady ochrany osobních údajů",
+      "cookies": "Cookies",
+      "whatsapp": "Napište nám"
+    },
+    "chips": {
+      "parking": "Parkování",
+      "breakfast": "Snídaně",
+      "wifi": "Wi-Fi",
+      "checkinTimes": "Příjezd / odjezd",
+      "pets": "Domácí zvířata",
+      "wellness": "Wellness",
+      "cancellation": "Storno"
+    }
+  },
   "footer": {
     "brand": "Ginko Boutique Rooms & Wellness",
     "tagline": "Ulica Tomaša Garika Masaryka 1, 43500 Daruvar",
@@ -133,6 +170,7 @@
     "ctaTitle": "Chystáte se na dovolenou?",
     "ctaSubtitle": "Rezervujte si pokoj ještě dnes a zajistěte si místo v našem klidném koutku Slavonie.",
     "ctaButton": "Rezervovat nyní",
+    "ctaImageAlt": "Rezervujte si pobyt v Ginko Boutique Rooms & Wellness",
     "availabilitySelectDates": "Před pokračováním vyberte datum příjezdu a odjezdu.",
     "availabilitySelectGuests": "Před pokračováním vyberte počet dospělých hostů.",
     "availabilityUnavailableDates": "Pokoj není v vybraných datech dostupný. Zkuste jiná data.",
@@ -358,6 +396,7 @@
     "actions": {
       "bookThis": "Rezervovat tento pokoj"
     },
+    "photosComingSoon": "— fotografie již brzy —",
     "unavailable": {
       "title": "Pokoj momentálně není k dispozici.",
       "description": "Prohlédněte si ostatní dostupné pokoje.",
@@ -469,6 +508,27 @@
       "email": "E-mail",
       "emailPlaceholder": "anna@example.com",
       "country": "Země / region",
+      "countries": {
+        "hr": "Chorvatsko",
+        "ba": "Bosna a Hercegovina",
+        "rs": "Srbsko",
+        "si": "Slovinsko",
+        "at": "Rakousko",
+        "hu": "Maďarsko",
+        "de": "Německo",
+        "it": "Itálie",
+        "cz": "Česko",
+        "sk": "Slovensko",
+        "pl": "Polsko",
+        "nl": "Nizozemsko",
+        "be": "Belgie",
+        "fr": "Francie",
+        "ch": "Švýcarsko",
+        "gb": "Spojené království",
+        "us": "USA",
+        "other": "Jiné"
+      },
+      "selectPlaceholder": "— Vyberte —",
       "phone": "Telefonní číslo",
       "phonePlaceholder": "+420 777 123 456",
       "bookingForTitle": "Pro koho je tato rezervace?",
@@ -506,6 +566,7 @@
       "rulesLinkLabel": "Přečtěte si domácí řád a podmínky rezervace",
       "submitting": "Příprava platby…",
       "continueToPayment": "Pokračovat k platbě",
+      "step3Redirecting": "Vytvářím rezervaci a přesměrovávám na platbu…",
       "submit": "Pokračovat k platbě · {totalPrice} €"
     },
     "success": {
@@ -537,7 +598,16 @@
     },
     "errors": {
       "maxGuests": "{apartmentName}: maximálně {capacity} hostů.",
-      "submitFailed": "Rezervaci se nepodařilo vytvořit. Zkuste to znovu."
+      "submitFailed": "Rezervaci se nepodařilo vytvořit. Zkuste to znovu.",
+      "missingFields": "Chybí povinná pole.",
+      "roomNotFound": "Pokoj nebyl nalezen.",
+      "checkoutAfterCheckin": "Datum odjezdu musí být po datu příjezdu.",
+      "minNights": "Minimální pobyt je {min} nocí.",
+      "capacityExceeded": "{name} ubytuje maximálně {capacity} osob.",
+      "extraBedUnavailable": "{name} neumožňuje přistýlku.",
+      "breakfastGuestsInvalid": "Počet osob se snídaní nemůže být vyšší než počet hostů.",
+      "datesUnavailable": "Vybrané termíny jsou už obsazené. Zvolte jiná data.",
+      "createFailed": "Rezervaci se nepodařilo vytvořit. Zkuste to znovu nebo nás kontaktujte."
     },
     "policies": {
       "cancellation": {
@@ -590,6 +660,7 @@
     "showAllPhotos": "Zobrazit všechny fotografie ({count})",
     "showPhoto": "Zobrazit fotografii",
     "comingSoon": "Fotografie již brzy.",
+    "photo": "Fotografie {n}",
     "openPhoto": "Otevřít: {alt}",
     "close": "Zavřít galerii",
     "previous": "Předchozí fotografie",

@@ -45,6 +45,43 @@
     "phone": "Nazovi nas",
     "whatsapp": "Kontakt putem WhatsAppa"
   },
+  "chatbot": {
+    "title": "Ginko asistent",
+    "subtitle": "Česta pitanja",
+    "greeting": "Pozdrav! Mogu odgovoriti na česta pitanja o smještaju. Odaberite pitanje ili napišite svoje.",
+    "placeholder": "Napišite pitanje…",
+    "send": "Pošalji",
+    "open": "Otvori česta pitanja",
+    "close": "Zatvori chat",
+    "suggestionsLabel": "Česta pitanja",
+    "escalate": "Na to nemam spreman odgovor. Pišite nam na WhatsApp ili pošaljite pitanje e-poštom.",
+    "availabilityAnswer": "Raspoloživost i cijene za konkretne datume vidite u pretrazi na stranici. Bot ih ne navodi.",
+    "legalAnswer": "Pravne informacije su na stranicama Politika privatnosti i Kolačići.",
+    "galleryAnswer": "Fotografije smještaja su u galeriji i na stranicama soba.",
+    "roomsAnswer": "Pregled svih soba i apartmana je na stranici Sobe. Raspoloživost provjerite u pretrazi.",
+    "minNights": "Minimalni boravak je {count} noć.",
+    "links": {
+      "availability": "Prikaži raspoloživost",
+      "booking": "Rezervirajte",
+      "rooms": "Sobe",
+      "wellnessRoom": "Wellness apartman",
+      "gallery": "Galerija",
+      "surroundings": "Okolica",
+      "facilities": "Kućni red i sadržaji",
+      "privacy": "Politika privatnosti",
+      "cookies": "Kolačići",
+      "whatsapp": "Razgovaraj s nama"
+    },
+    "chips": {
+      "parking": "Parking",
+      "breakfast": "Doručak",
+      "wifi": "Wi-Fi",
+      "checkinTimes": "Prijava / odjava",
+      "pets": "Ljubimci",
+      "wellness": "Wellness",
+      "cancellation": "Otkazivanje"
+    }
+  },
   "footer": {
     "brand": "Ginko Boutique Rooms & Wellness",
     "tagline": "Ulica Tomaša Garika Masaryka 1, 43500 Daruvar",
@@ -133,6 +170,7 @@
     "ctaTitle": "Spremi se za odmor?",
     "ctaSubtitle": "Rezerviraj svoju sobu danas i osiguraj mjesto u našem mirnom kutku Slavonije.",
     "ctaButton": "Rezerviraj sada",
+    "ctaImageAlt": "Rezerviraj odmor u Ginko Boutique Rooms & Wellness",
     "availabilitySelectDates": "Molimo odaberite datum dolaska i odlaska prije nastavka.",
     "availabilitySelectGuests": "Molimo odaberite broj odraslih gostiju prije nastavka.",
     "availabilityUnavailableDates": "Soba nije dostupna za odabrane datume. Pokušajte s drugim datumima.",
@@ -358,6 +396,7 @@
     "actions": {
       "bookThis": "Rezerviraj ovu sobu"
     },
+    "photosComingSoon": "— fotografije dolaze uskoro —",
     "unavailable": {
       "title": "Soba trenutno nije dostupna.",
       "description": "Pogledajte ostale dostupne sobe.",
@@ -469,6 +508,27 @@
       "email": "E-pošta",
       "emailPlaceholder": "ana@primjer.hr",
       "country": "Zemlja / Regija",
+      "countries": {
+        "hr": "Hrvatska",
+        "ba": "Bosna i Hercegovina",
+        "rs": "Srbija",
+        "si": "Slovenija",
+        "at": "Austrija",
+        "hu": "Mađarska",
+        "de": "Njemačka",
+        "it": "Italija",
+        "cz": "Češka",
+        "sk": "Slovačka",
+        "pl": "Poljska",
+        "nl": "Nizozemska",
+        "be": "Belgija",
+        "fr": "Francuska",
+        "ch": "Švicarska",
+        "gb": "Velika Britanija",
+        "us": "SAD",
+        "other": "Ostalo"
+      },
+      "selectPlaceholder": "— Odaberite —",
       "phone": "Broj telefona",
       "phonePlaceholder": "+385 91 234 5678",
       "bookingForTitle": "Za koga je ova rezervacija?",
@@ -506,6 +566,7 @@
       "rulesLinkLabel": "Pročitajte kućni red i uvjete rezervacije",
       "submitting": "Priprema plaćanja…",
       "continueToPayment": "Nastavi na plaćanje",
+      "step3Redirecting": "Kreiranje rezervacije i preusmjeravanje na plaćanje…",
       "submit": "Nastavi na plaćanje · {totalPrice} €"
     },
     "success": {
@@ -537,7 +598,16 @@
     },
     "errors": {
       "maxGuests": "{apartmentName}: maksimalno {capacity} gostiju.",
-      "submitFailed": "Kreiranje rezervacije nije uspjelo. Pokušajte ponovo."
+      "submitFailed": "Kreiranje rezervacije nije uspjelo. Pokušajte ponovo.",
+      "missingFields": "Nedostaju obavezna polja.",
+      "roomNotFound": "Soba nije pronađena.",
+      "checkoutAfterCheckin": "Datum odjave mora biti nakon datuma dolaska.",
+      "minNights": "Minimalni boravak su {min} noći.",
+      "capacityExceeded": "{name} prima maksimalno {capacity} osoba (ležaja).",
+      "extraBedUnavailable": "{name} ne podržava pomoćni ležaj.",
+      "breakfastGuestsInvalid": "Broj osoba uz doručak ne može biti veći od ukupnog broja gostiju.",
+      "datesUnavailable": "Odabrani termini su već zauzeti. Molimo odaberite druge datume.",
+      "createFailed": "Greška pri kreiranju rezervacije. Pokušajte ponovo ili nas kontaktirajte."
     },
     "policies": {
       "cancellation": {
@@ -590,6 +660,7 @@
     "showAllPhotos": "Prikaži sve fotografije ({count})",
     "showPhoto": "Prikaži fotografiju",
     "comingSoon": "Fotografije dolaze uskoro.",
+    "photo": "Fotografija {n}",
     "openPhoto": "Otvori: {alt}",
     "close": "Zatvori galeriju",
     "previous": "Prethodna fotografija",
