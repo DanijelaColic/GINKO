@@ -48,7 +48,7 @@
   "chatbot": {
     "title": "Ginko asistent",
     "subtitle": "Česta pitanja",
-    "greeting": "Pozdrav! Mogu odgovoriti na česta pitanja o smještaju. Odaberite pitanje ili napišite svoje.",
+    "greeting": "Bok, dobro došli u Ginko! Tu smo za brza pitanja o boravku — parking, doručak, check-in… Odaberite nešto ispod ili slobodno napišite svoje.",
     "placeholder": "Napišite pitanje…",
     "send": "Pošalji",
     "open": "Otvori česta pitanja",

@@ -48,7 +48,7 @@
   "chatbot": {
     "title": "Ginko asistent",
     "subtitle": "Časté dotazy",
-    "greeting": "Ahoj! Mohu odpovědět na časté dotazy k ubytování. Vyberte otázku nebo napište vlastní.",
+    "greeting": "Ahoj, vítejte v Ginku! Jsme tu pro rychlé dotazy k pobytu — parkování, snídaně, check-in… Vyberte níže nebo napište vlastní.",
     "placeholder": "Napište otázku…",
     "send": "Odeslat",
     "open": "Otevřít časté dotazy",

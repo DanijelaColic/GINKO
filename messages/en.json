@@ -48,7 +48,7 @@
   "chatbot": {
     "title": "Ginko assistant",
     "subtitle": "Frequently asked questions",
-    "greeting": "Hello! I can answer common questions about the stay. Pick a question or type your own.",
+    "greeting": "Hi, welcome to Ginko! We’re here for quick questions about your stay — parking, breakfast, check-in… Pick one below or just type your own.",
     "placeholder": "Type a question…",
     "send": "Send",
     "open": "Open frequently asked questions",

@@ -65,12 +65,12 @@ export const TOPIC_DEEP_LINKS: Record<string, readonly ChatDeepLinkId[]> = {
   checkinTimes: ['facilities'],
   wellness: ['wellnessRoom', 'availability'],
   families: ['rooms'],
-  booking: ['booking', 'availability'],
+  booking: ['booking'],
   cancellation: ['booking', 'facilities'],
   deposit_payment: ['booking'],
   children_ages: ['booking', 'facilities'],
   smoking: ['facilities'],
-  min_nights: ['booking', 'availability'],
+  min_nights: ['booking'],
 };
 
 export function deepLinksForTopic(topicId: string): readonly ChatDeepLinkId[] {

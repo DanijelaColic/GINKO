@@ -91,9 +91,9 @@ function lineFromMatch(match: ChatMatch): ChatLine {
 function linksForLine(line: Exclude<ChatLine, { role: 'user' }>): ChatDeepLinkId[] {
   switch (line.kind) {
     case 'greeting':
-      return ['availability', 'booking', 'whatsapp'];
+      return ['booking', 'whatsapp'];
     case 'availability':
-      return ['availability', 'booking', 'whatsapp'];
+      return ['availability', 'whatsapp'];
     case 'legal':
       return ['privacy', 'cookies'];
     case 'gallery':
@@ -142,19 +142,37 @@ function AssistantFaq({
 function ChatDeepLinks({
   ids,
   onSiteNavigate,
+  emphasizeWhatsapp = false,
 }: {
   ids: readonly ChatDeepLinkId[];
   onSiteNavigate: () => void;
+  emphasizeWhatsapp?: boolean;
 }) {
   const locale = useLocale();
   const pathname = usePathname();
-  const t = useTranslations('chatbot');
+  const tLink = useTranslations('chatbot.links');
   const isHome = pathname === '/';
 
   if (!ids.length) return null;
 
+  const pill =
+    'inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors';
+
+  function classFor(id: ChatDeepLinkId) {
+    if (id === 'whatsapp') {
+      return emphasizeWhatsapp
+        ? `${pill} bg-[#25D366] text-white hover:opacity-90`
+        : `${pill} border border-stone text-muted hover:border-[#25D366] hover:text-[#128C7E]`;
+    }
+    const isMainCta = id === 'booking' || id === 'availability';
+    if (isMainCta && !emphasizeWhatsapp) {
+      return `${pill} bg-primary text-white hover:bg-primary-dark`;
+    }
+    return `${pill} border border-primary text-primary hover:bg-primary/5`;
+  }
+
   return (
-    <div className="mt-2 flex flex-col gap-1.5">
+    <div className="mt-2 flex flex-wrap gap-1.5">
       {ids.map((id) => {
         if (id === 'whatsapp') {
           return (
@@ -163,10 +181,10 @@ function ChatDeepLinks({
               href={buildWhatsAppHref(locale)}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center justify-center gap-1.5 rounded-lg bg-[#25D366] px-3 py-2 text-xs font-semibold text-white hover:opacity-90"
+              className={classFor(id)}
             >
-              <WhatsAppIcon size={14} />
-              {t('links.whatsapp')}
+              <WhatsAppIcon size={12} />
+              {tLink('whatsapp')}
             </a>
           );
         }
@@ -176,7 +194,7 @@ function ChatDeepLinks({
           <Link
             key={id}
             href={def.href}
-            className="inline-flex items-center justify-center rounded-lg border border-primary px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/5"
+            className={classFor(id)}
             onClick={(e) => {
               if (def.hashId && isHome) {
                 e.preventDefault();
@@ -185,7 +203,7 @@ function ChatDeepLinks({
               onSiteNavigate();
             }}
           >
-            {t(`links.${id}`)}
+            {tLink(id)}
           </Link>
         );
       })}
@@ -196,6 +214,7 @@ function ChatDeepLinks({
 export default function ChatWidget() {
   const locale = useLocale();
   const t = useTranslations('chatbot');
+  const tChip = useTranslations('chatbot.chips');
   const tFaq = useTranslations('travelerQuestions');
 
   const [open, setOpen] = useState(false);
@@ -342,13 +361,14 @@ export default function ChatWidget() {
                     <ChatDeepLinks
                       ids={links}
                       onSiteNavigate={() => setOpen(false)}
+                      emphasizeWhatsapp={line.kind === 'escalate'}
                     />
 
                     {line.kind === 'escalate' && (
                       <button
                         type="button"
                         onClick={() => setAskOpen(true)}
-                        className="mt-1.5 inline-flex w-full items-center justify-center rounded-lg border border-primary px-3 py-2 text-xs font-semibold text-primary hover:bg-primary/5"
+                        className="mt-1.5 inline-flex items-center justify-center rounded-full border border-primary px-2.5 py-1 text-[11px] font-semibold text-primary hover:bg-primary/5"
                       >
                         {tFaq('askQuestion')}
                       </button>
@@ -371,7 +391,7 @@ export default function ChatWidget() {
                   onClick={() => onChip(id)}
                   className="rounded-full border border-stone bg-stone-light px-2.5 py-1 text-[11px] text-text transition-colors hover:border-primary hover:text-primary"
                 >
-                  {t(`chips.${id}`)}
+                  {tChip(id)}
                 </button>
               ))}
             </div>
