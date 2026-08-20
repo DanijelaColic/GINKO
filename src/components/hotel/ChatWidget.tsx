@@ -150,11 +150,12 @@ function ChatDeepLinks({
 }) {
   const locale = useLocale();
   const pathname = usePathname();
-  const tLink = useTranslations('chatbot.links');
+  const t = useTranslations('chatbot');
   const isHome = pathname === '/';
 
   if (!ids.length) return null;
 
+  const labels = t.raw('links') as Record<ChatDeepLinkId, string>;
   const pill =
     'inline-flex items-center justify-center gap-1 rounded-full px-2.5 py-1 text-[11px] font-semibold transition-colors';
 
@@ -184,7 +185,7 @@ function ChatDeepLinks({
               className={classFor(id)}
             >
               <WhatsAppIcon size={12} />
-              {tLink('whatsapp')}
+              {labels.whatsapp}
             </a>
           );
         }
@@ -203,7 +204,7 @@ function ChatDeepLinks({
               onSiteNavigate();
             }}
           >
-            {tLink(id)}
+            {labels[id]}
           </Link>
         );
       })}
@@ -214,8 +215,11 @@ function ChatDeepLinks({
 export default function ChatWidget() {
   const locale = useLocale();
   const t = useTranslations('chatbot');
-  const tChip = useTranslations('chatbot.chips');
   const tFaq = useTranslations('travelerQuestions');
+  const chipLabels = t.raw('chips') as Record<
+    (typeof CHATBOT_SUGGESTION_IDS)[number],
+    string
+  >;
 
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
@@ -391,7 +395,7 @@ export default function ChatWidget() {
                   onClick={() => onChip(id)}
                   className="rounded-full border border-stone bg-stone-light px-2.5 py-1 text-[11px] text-text transition-colors hover:border-primary hover:text-primary"
                 >
-                  {tChip(id)}
+                  {chipLabels[id]}
                 </button>
               ))}
             </div>

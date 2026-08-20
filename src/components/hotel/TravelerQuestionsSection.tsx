@@ -7,10 +7,37 @@ import { Link } from '@/i18n/navigation';
 import AskQuestionModal from '@/components/hotel/AskQuestionModal';
 import { QUESTIONS_SECTION_ID } from '@/modules/booking/booking.config';
 
-const FAQ_COL_1 = ['parking', 'breakfast', 'wifi', 'therms', 'attractions'] as const;
-const FAQ_COL_2 = ['pets', 'checkin', 'checkinTimes', 'wellness', 'families', 'booking', 'cancellation'] as const;
+type FaqId =
+  | 'parking'
+  | 'breakfast'
+  | 'wifi'
+  | 'therms'
+  | 'attractions'
+  | 'wellness'
+  | 'pets'
+  | 'checkin'
+  | 'checkinTimes'
+  | 'families'
+  | 'booking'
+  | 'cancellation';
 
-type FaqId = (typeof FAQ_COL_1)[number] | (typeof FAQ_COL_2)[number];
+const LEFT_FAQ: readonly FaqId[] = [
+  'parking',
+  'breakfast',
+  'wifi',
+  'therms',
+  'attractions',
+  'wellness',
+];
+
+const RIGHT_FAQ: readonly FaqId[] = [
+  'pets',
+  'checkin',
+  'checkinTimes',
+  'families',
+  'booking',
+  'cancellation',
+];
 
 const RICH_ANSWER_IDS = new Set<FaqId>(['booking']);
 
@@ -89,13 +116,11 @@ export default function TravelerQuestionsSection() {
   return (
     <section id={QUESTIONS_SECTION_ID} className="py-14 px-4 bg-white border-t border-stone scroll-mt-28">
       <div className="max-w-6xl mx-auto">
-        {/* Most prema FAQ-u */}
         <div className="border border-stone rounded-xl p-5 mb-8">
           <h3 className="font-semibold text-sm text-text mb-2">{t('qualityTitle')}</h3>
           <p className="text-sm text-muted leading-relaxed">{t('qualityDesc')}</p>
         </div>
 
-        {/* Header */}
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text">
             {t('title')}
@@ -108,12 +133,10 @@ export default function TravelerQuestionsSection() {
           </a>
         </div>
 
-        {/* Tri kolone */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          <FaqColumn ids={FAQ_COL_1} openId={openId} onToggle={toggle} t={t} />
-          <FaqColumn ids={FAQ_COL_2} openId={openId} onToggle={toggle} t={t} />
+          <FaqColumn ids={LEFT_FAQ} openId={openId} onToggle={toggle} t={t} />
+          <FaqColumn ids={RIGHT_FAQ} openId={openId} onToggle={toggle} t={t} />
 
-          {/* CTA kartica */}
           <div className="bg-white border border-stone rounded-xl p-8 flex flex-col items-center justify-center text-center min-h-[200px]">
             <h3 className="font-semibold text-text text-base mb-4">{t('stillLooking')}</h3>
             <button
