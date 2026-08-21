@@ -95,6 +95,16 @@ const TOPIC_KEYWORDS: Record<string, readonly string[]> = {
     'rezervacni formular',
   ],
   cancellation: ['otkaz', 'cancel', 'storno', 'refund', 'povrat depozita', 'zrusen'],
+  invoice: [
+    'r1',
+    'racun za tvrt',
+    'invoice',
+    'faktura',
+    'faktur',
+    'company invoice',
+    'pdv broj',
+    'vat number',
+  ],
   deposit_payment: [
     'depozit',
     'deposit',

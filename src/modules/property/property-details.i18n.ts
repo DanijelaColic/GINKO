@@ -173,7 +173,7 @@ const FACILITY_COPY: Record<AppLocale, Record<string, FacilityCopy>> = {
     },
     pets: {
       title: 'Pets',
-      text: 'Pets allowed on request. Cleaning fee: €15 / day.',
+      text: 'Pets allowed on request in all rooms and apartments. Cleaning fee: €15 / day.',
     },
     media: {
       title: 'Media and technology',
@@ -236,7 +236,7 @@ const FACILITY_COPY: Record<AppLocale, Record<string, FacilityCopy>> = {
     },
     pets: {
       title: 'Domácí mazlíčci',
-      text: 'Domácí mazlíčci povoleni na vyžádání. Úklid: 15 € / den.',
+      text: 'Domácí mazlíčci povoleni na vyžádání ve všech pokojích a apartmánech. Úklid: 15 € / den.',
     },
     media: {
       title: 'Média a technika',
@@ -383,7 +383,7 @@ const HOUSE_RULES_BY_LOCALE: Record<AppLocale, HouseRuleItem[]> = {
       id: 'pets',
       title: 'Pets',
       paragraphs: [
-        'Pets are allowed if announced in advance when booking.',
+        'Pets are allowed on request in all rooms and apartments.',
         'Pet cleaning fee: €15 / day.',
       ],
     },
@@ -393,6 +393,14 @@ const HOUSE_RULES_BY_LOCALE: Record<AppLocale, HouseRuleItem[]> = {
       paragraphs: [
         'The booking is confirmed by paying a 50% deposit when you send the request.',
         'The remaining balance is paid at the property on arrival.',
+      ],
+    },
+    {
+      id: 'invoice',
+      title: 'Company invoice (R1)',
+      paragraphs: [
+        'We issue an R1 invoice using the company details from your booking (company name and VAT number).',
+        'We send the invoice by email after your stay.',
       ],
     },
     {
@@ -474,7 +482,7 @@ const HOUSE_RULES_BY_LOCALE: Record<AppLocale, HouseRuleItem[]> = {
       id: 'pets',
       title: 'Domácí mazlíčci',
       paragraphs: [
-        'Pobyt domácích mazlíčků je povolen po předchozím nahlášení při rezervaci.',
+        'Domácí mazlíčci jsou povoleni na vyžádání ve všech pokojích a apartmánech.',
         'Poplatek za úklid: 15 € / den.',
       ],
     },
@@ -484,6 +492,14 @@ const HOUSE_RULES_BY_LOCALE: Record<AppLocale, HouseRuleItem[]> = {
       paragraphs: [
         'Rezervace se potvrzuje zaplacením zálohy 50 % při odeslání poptávky.',
         'Zbytek částky se platí v objektu při příjezdu.',
+      ],
+    },
+    {
+      id: 'invoice',
+      title: 'Firemní faktura (R1)',
+      paragraphs: [
+        'Fakturu R1 vystavíme podle údajů z rezervace (název společnosti a DIČ).',
+        'Fakturu pošleme e-mailem po pobytu.',
       ],
     },
     {

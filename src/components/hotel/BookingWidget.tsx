@@ -53,7 +53,7 @@ const HAS_BALANCE_PAYMENT = BALANCE_PCT_DISPLAY > 0;
 
 const ARRIVAL_TIME_OPTIONS = [
   '14:00', '15:00', '16:00', '17:00', '18:00',
-  '19:00', '20:00', '21:00', '22:00', '23:00',
+  '19:00', '20:00', '21:00', '22:00',
 ];
 
 type Props = {
@@ -1012,9 +1012,11 @@ export default function BookingWidget({
             {rulesText ?? (
               <div className="bg-stone-light rounded-xl p-4 text-xs text-muted space-y-2">
                 <p>
-                  <strong className="text-text">{t('form.rules.checkIn')}:</strong> 14:00 – 23:00
+                  <strong className="text-text">{t('form.rules.checkIn')}:</strong>{' '}
+                  {t('form.rules.checkInTime')}
                   &nbsp;|&nbsp;
-                  <strong className="text-text">{t('form.rules.checkOut')}:</strong> 09:00 – 11:00
+                  <strong className="text-text">{t('form.rules.checkOut')}:</strong>{' '}
+                  {t('form.rules.checkOutTime')}
                 </p>
                 <Link
                   href={propertySectionHref(FACILITIES_SECTION_ID)}

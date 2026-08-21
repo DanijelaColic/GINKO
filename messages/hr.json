@@ -55,6 +55,7 @@
     "close": "Zatvori chat",
     "suggestionsLabel": "Česta pitanja",
     "escalate": "Na to nemam spreman odgovor. Pišite nam na WhatsApp ili pošaljite pitanje e-poštom.",
+    "thinking": "Trenutak…",
     "availabilityAnswer": "Raspoloživost i cijene za konkretne datume vidite u pretrazi na stranici. Bot ih ne navodi.",
     "legalAnswer": "Pravne informacije su na stranicama Politika privatnosti i Kolačići.",
     "galleryAnswer": "Fotografije smještaja su u galeriji i na stranicama soba.",
@@ -262,7 +263,7 @@
       },
       "pets": {
         "q": "Mogu li doći s kućnim ljubimcima?",
-        "a": "Da, kućni ljubimci su dobrodošli uz prethodnu najavu prilikom rezervacije. Cijena čišćenja za kućne ljubimce iznosi 15 € / dan."
+        "a": "Da, kućni ljubimci su dozvoljeni na upit u svim sobama i apartmanima. Cijena čišćenja iznosi 15 € / dan."
       },
       "checkin": {
         "q": "Kako funkcionira prijava ako stignemo kasno?",
@@ -287,6 +288,10 @@
       "cancellation": {
         "q": "Kakva je politika otkazivanja rezervacije?",
         "a": "Besplatno otkazivanje i povrat depozita do 14 dana prije dolaska. Za otkazivanja unutar 14 dana prije dolaska depozit se ne vraća."
+      },
+      "invoice": {
+        "q": "Izdajete li R1 račun za tvrtku?",
+        "a": "Da. R1 izdajemo na podatke iz rezervacije (naziv tvrtke i PDV broj) i šaljemo e-poštom nakon boravka."
       }
     }
   },
@@ -382,9 +387,11 @@
     },
     "rules": {
       "checkInLabel": "Check-in:",
+      "checkInValue": "14:00 – 22:00",
       "checkOutLabel": "Check-out:",
+      "checkOutValue": "do 10:00",
       "petsLabel": "Kućni ljubimci:",
-      "petsValue": "Nisu dozvoljeni",
+      "petsValue": "Dozvoljeni na upit, 15 € / dan",
       "smokingLabel": "Pušenje:",
       "smokingValue": "Nije dozvoljeno",
       "minStayLabel": "Minimalni boravak:",
@@ -416,7 +423,7 @@
       "checkInLabel": "Dolazak",
       "checkInValue": "od 14:00",
       "checkOutLabel": "Odlazak",
-      "checkOutValue": "do 11:00",
+      "checkOutValue": "do 10:00",
       "minStayLabel": "Min. boravak",
       "minStayValue": "1 noć",
       "depositLabel": "Depozit",
@@ -458,7 +465,7 @@
       "checkIn": "Dolazak",
       "checkOut": "Odlazak",
       "checkInTime": "od 14:00",
-      "checkOutTime": "do 11:00",
+      "checkOutTime": "do 10:00",
       "guests": "Gosti",
       "reservationDetails": "Detalji vaše rezervacije",
       "priceBreakdown": "Pregled cijene",
@@ -548,7 +555,7 @@
       "needsCribHint": "Dostupan na upit, ovisno o raspoloživosti.",
       "childFreeOnBed": "Dijete do 2 godine koje spava s roditeljima u bračnom krevetu ne naplaćuje se.",
       "arrivalTime": "Procijenjeno vrijeme dolaska",
-      "arrivalTimeHint": "Dolazak između 14:00 – 23:00",
+      "arrivalTimeHint": "Dolazak između 14:00 – 22:00",
       "notes": "Posebni zahtjevi",
       "notesPlaceholder": "Alergije, preferencije kreveta, kasni dolazak, proslava…",
       "businessTitle": "Putujete poslovno?",
@@ -560,7 +567,9 @@
       "vatIdPlaceholder": "HR12345678901",
       "rules": {
         "checkIn": "Dolazak (check-in)",
-        "checkOut": "Odlazak (check-out)"
+        "checkInTime": "14:00 – 22:00",
+        "checkOut": "Odlazak (check-out)",
+        "checkOutTime": "do 10:00"
       },
       "agreeRules": "Slažem se s <houseRules>pravilima smještaja</houseRules> i <bookingTerms>uvjetima rezervacije</bookingTerms>.",
       "rulesLinkLabel": "Pročitajte kućni red i uvjete rezervacije",

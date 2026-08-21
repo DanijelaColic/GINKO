@@ -67,6 +67,7 @@ export const TOPIC_DEEP_LINKS: Record<string, readonly ChatDeepLinkId[]> = {
   families: ['rooms'],
   booking: ['booking'],
   cancellation: ['booking', 'facilities'],
+  invoice: ['booking'],
   deposit_payment: ['booking'],
   children_ages: ['booking', 'facilities'],
   smoking: ['facilities'],

@@ -19,7 +19,8 @@ type FaqId =
   | 'checkinTimes'
   | 'families'
   | 'booking'
-  | 'cancellation';
+  | 'cancellation'
+  | 'invoice';
 
 const LEFT_FAQ: readonly FaqId[] = [
   'parking',
@@ -37,6 +38,7 @@ const RIGHT_FAQ: readonly FaqId[] = [
   'families',
   'booking',
   'cancellation',
+  'invoice',
 ];
 
 const RICH_ANSWER_IDS = new Set<FaqId>(['booking']);

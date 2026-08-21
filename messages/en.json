@@ -55,6 +55,7 @@
     "close": "Close chat",
     "suggestionsLabel": "Common questions",
     "escalate": "I don’t have a ready answer for that. Message us on WhatsApp or send a question by email.",
+    "thinking": "One moment…",
     "availabilityAnswer": "Availability and prices for specific dates are in the search on the site. The bot does not quote them.",
     "legalAnswer": "Legal information is on the Privacy Policy and Cookies pages.",
     "galleryAnswer": "Photos of the property are in the gallery and on the room pages.",
@@ -262,7 +263,7 @@
       },
       "pets": {
         "q": "Can I bring pets?",
-        "a": "Yes, pets are welcome with prior notice when booking. The pet cleaning fee is €15 / day."
+        "a": "Yes, pets are allowed on request in all rooms and apartments. The cleaning fee is €15 / day."
       },
       "checkin": {
         "q": "How does check-in work if we arrive late?",
@@ -287,6 +288,10 @@
       "cancellation": {
         "q": "What is the cancellation policy?",
         "a": "Free cancellation and deposit refund up to 14 days before arrival. For cancellations within 14 days of arrival, the deposit is non-refundable."
+      },
+      "invoice": {
+        "q": "Can you issue a company invoice (R1)?",
+        "a": "Yes. We issue an R1 invoice using the company details from your booking and send it by email after your stay."
       }
     }
   },
@@ -382,9 +387,11 @@
     },
     "rules": {
       "checkInLabel": "Check-in:",
+      "checkInValue": "14:00 – 22:00",
       "checkOutLabel": "Check-out:",
+      "checkOutValue": "until 10:00",
       "petsLabel": "Pets:",
-      "petsValue": "Not allowed",
+      "petsValue": "Allowed on request, €15 / day",
       "smokingLabel": "Smoking:",
       "smokingValue": "Not allowed",
       "minStayLabel": "Minimum stay:",
@@ -416,7 +423,7 @@
       "checkInLabel": "Check-in",
       "checkInValue": "from 14:00",
       "checkOutLabel": "Check-out",
-      "checkOutValue": "until 11:00",
+      "checkOutValue": "until 10:00",
       "minStayLabel": "Min. stay",
       "minStayValue": "1 night",
       "depositLabel": "Deposit",
@@ -458,7 +465,7 @@
       "checkIn": "Check-in",
       "checkOut": "Check-out",
       "checkInTime": "from 14:00",
-      "checkOutTime": "until 11:00",
+      "checkOutTime": "until 10:00",
       "guests": "Guests",
       "reservationDetails": "Your reservation details",
       "priceBreakdown": "Price overview",
@@ -548,7 +555,7 @@
       "needsCribHint": "Available on request, subject to availability.",
       "childFreeOnBed": "Children up to 2 years sleeping with parents in the double bed are free of charge.",
       "arrivalTime": "Estimated arrival time",
-      "arrivalTimeHint": "Check-in available from 14:00 – 23:00",
+      "arrivalTimeHint": "Check-in available from 14:00 – 22:00",
       "notes": "Special requests",
       "notesPlaceholder": "Allergies, bed preferences, late arrival, celebration…",
       "businessTitle": "Travelling for work?",
@@ -560,7 +567,9 @@
       "vatIdPlaceholder": "GB123456789",
       "rules": {
         "checkIn": "Check-in",
-        "checkOut": "Check-out"
+        "checkInTime": "14:00 – 22:00",
+        "checkOut": "Check-out",
+        "checkOutTime": "until 10:00"
       },
       "agreeRules": "I agree with the <houseRules>house rules</houseRules> and <bookingTerms>booking terms</bookingTerms>.",
       "rulesLinkLabel": "Read house rules and booking terms",

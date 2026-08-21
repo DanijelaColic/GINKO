@@ -14,8 +14,8 @@ import {
   buildWhatsAppHref,
   deepLinksForTopic,
   houseRuleAnswer,
-  matchGuestQuestion,
   topicById,
+  type ChatApiResponse,
   type ChatDeepLinkId,
   type ChatMatch,
   type KnowledgeTopic,
@@ -37,7 +37,14 @@ type ChatLine =
   | { id: number; role: 'assistant'; kind: 'legal' }
   | { id: number; role: 'assistant'; kind: 'gallery' }
   | { id: number; role: 'assistant'; kind: 'rooms' }
-  | { id: number; role: 'assistant'; kind: 'escalate' };
+  | { id: number; role: 'assistant'; kind: 'escalate' }
+  | {
+      id: number;
+      role: 'assistant';
+      kind: 'llm';
+      text: string;
+      topicId?: string;
+    };
 
 let lineId = 0;
 function nextId() {
@@ -88,6 +95,25 @@ function lineFromMatch(match: ChatMatch): ChatLine {
   return { id: nextId(), role: 'assistant', kind: match.kind };
 }
 
+function lineFromApi(data: ChatApiResponse): ChatLine {
+  if (data.kind === 'llm') {
+    return {
+      id: nextId(),
+      role: 'assistant',
+      kind: 'llm',
+      text: data.text,
+      topicId: data.topicId,
+    };
+  }
+  if (data.kind === 'topic') {
+    return lineFromMatch({ kind: 'topic', topicId: data.topicId });
+  }
+  if (data.kind === 'escalate') {
+    return { id: nextId(), role: 'assistant', kind: 'escalate' };
+  }
+  return { id: nextId(), role: 'assistant', kind: data.kind };
+}
+
 function linksForLine(line: Exclude<ChatLine, { role: 'user' }>): ChatDeepLinkId[] {
   switch (line.kind) {
     case 'greeting':
@@ -102,6 +128,8 @@ function linksForLine(line: Exclude<ChatLine, { role: 'user' }>): ChatDeepLinkId
       return ['rooms', 'availability'];
     case 'escalate':
       return ['whatsapp', 'booking'];
+    case 'llm':
+      return line.topicId ? [...deepLinksForTopic(line.topicId)] : [];
     case 'faq':
     case 'house_rules':
     case 'min_nights':
@@ -224,6 +252,7 @@ export default function ChatWidget() {
   const [open, setOpen] = useState(false);
   const [input, setInput] = useState('');
   const [askOpen, setAskOpen] = useState(false);
+  const [pending, setPending] = useState(false);
   const [messages, setMessages] = useState<ChatLine[]>(() => [
     { id: nextId(), role: 'assistant', kind: 'greeting' },
   ]);
@@ -250,7 +279,7 @@ export default function ChatWidget() {
     const el = listRef.current;
     if (!el) return;
     el.scrollTop = el.scrollHeight;
-  }, [messages, open]);
+  }, [messages, open, pending]);
 
   function pushAnswer(match: ChatMatch, userText: string) {
     setMessages((prev) => [
@@ -260,12 +289,36 @@ export default function ChatWidget() {
     ]);
   }
 
-  function onSubmit(e: React.FormEvent) {
+  async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     const text = input.trim();
-    if (!text) return;
+    if (!text || pending) return;
     setInput('');
-    pushAnswer(matchGuestQuestion(text, locale), text);
+    setMessages((prev) => [...prev, { id: nextId(), role: 'user', text }]);
+    setPending(true);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ question: text, locale }),
+      });
+      const data = (await res.json().catch(() => null)) as ChatApiResponse | null;
+      if (!res.ok || !data?.kind) {
+        setMessages((prev) => [
+          ...prev,
+          { id: nextId(), role: 'assistant', kind: 'escalate' },
+        ]);
+        return;
+      }
+      setMessages((prev) => [...prev, lineFromApi(data)]);
+    } catch {
+      setMessages((prev) => [
+        ...prev,
+        { id: nextId(), role: 'assistant', kind: 'escalate' },
+      ]);
+    } finally {
+      setPending(false);
+    }
   }
 
   function onChip(id: (typeof CHATBOT_SUGGESTION_IDS)[number]) {
@@ -361,6 +414,11 @@ export default function ChatWidget() {
                         {t('escalate')}
                       </p>
                     )}
+                    {line.kind === 'llm' && (
+                      <p className="text-sm leading-relaxed text-text">
+                        {line.text}
+                      </p>
+                    )}
 
                     <ChatDeepLinks
                       ids={links}
@@ -381,6 +439,13 @@ export default function ChatWidget() {
                 </div>
               );
             })}
+            {pending && (
+              <div className="flex justify-start">
+                <p className="rounded-2xl rounded-bl-md border border-stone bg-white px-3 py-2 text-sm text-muted">
+                  {t('thinking')}
+                </p>
+              </div>
+            )}
           </div>
 
           <div className="border-t border-stone bg-white px-3 py-2">
@@ -393,7 +458,8 @@ export default function ChatWidget() {
                   key={id}
                   type="button"
                   onClick={() => onChip(id)}
-                  className="rounded-full border border-stone bg-stone-light px-2.5 py-1 text-[11px] text-text transition-colors hover:border-primary hover:text-primary"
+                  disabled={pending}
+                  className="rounded-full border border-stone bg-stone-light px-2.5 py-1 text-[11px] text-text transition-colors hover:border-primary hover:text-primary disabled:opacity-40"
                 >
                   {chipLabels[id]}
                 </button>
@@ -409,11 +475,12 @@ export default function ChatWidget() {
                 className="min-w-0 flex-1 rounded-lg border border-stone bg-stone-light/40 px-3 py-2 text-sm text-text outline-none placeholder:text-muted/70 focus:border-primary focus:ring-1 focus:ring-primary/30"
                 aria-label={t('placeholder')}
                 maxLength={300}
+                disabled={pending}
               />
               <button
                 type="submit"
                 className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-lg bg-primary text-white transition-colors hover:bg-primary-dark disabled:opacity-40"
-                disabled={!input.trim()}
+                disabled={!input.trim() || pending}
                 aria-label={t('send')}
               >
                 <Send size={16} />

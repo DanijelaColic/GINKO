@@ -2,6 +2,7 @@
  * Pravila bota (Faza 1) — izvor istine za Fazu 2+ (widget / LLM).
  * Widget (Faza 2–3) smije govoriti samo iz `topicsReadyForBot()`
  * i slati gosta na postojeće stranice (raspoloživost, booking, WhatsApp…).
+ * LLM (Faza 4) smije parafrazirati istu bazu; bez ključa pada na matcher.
  */
 
 import type { AppLocale } from '@/i18n/routing';

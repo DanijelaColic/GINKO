@@ -116,7 +116,7 @@ export const rooms: Room[] = [
     price: 60,
     fullyBooked: false,
     extraBedAvailable: false,
-    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
       '/images/rooms/ginko-5/01-cover.jpg',
     ],
@@ -150,7 +150,7 @@ export const rooms: Room[] = [
     name: 'Wellness Apartman',
     tagline: 'Privatna sauna i jacuzzi — luksuzno wellness iskustvo.',
     description:
-      'Dobrodošli u Wellness Apartman — vašu oazu luksuza i wellness iskustva u Daruvaru. Prostrani smještaj od 50 m² smješten na drugom katu nudi potpuno drugačije iskustvo od standardnih soba: privatna sauna, jacuzzi, terasa s pogledom, odvojena kuhinja i besprijekoran dizajn čine ovaj smještaj idealnim za parove ili manje grupe koje žele nešto više. Svaki detalj pažljivo je dizajniran za miran, opuštajući i nezaboravan odmor. Kućni ljubimci nisu dozvoljeni.',
+      'Dobrodošli u Wellness Apartman — vašu oazu luksuza i wellness iskustva u Daruvaru. Prostrani smještaj od 50 m² smješten na drugom katu nudi potpuno drugačije iskustvo od standardnih soba: privatna sauna, jacuzzi, terasa s pogledom, odvojena kuhinja i besprijekoran dizajn čine ovaj smještaj idealnim za parove ili manje grupe koje žele nešto više. Svaki detalj pažljivo je dizajniran za miran, opuštajući i nezaboravan odmor. Kućni ljubimci su dobrodošli na upit.',
     capacity: 4,
     capacityNote: '2+2',
     size: 50,
@@ -162,7 +162,7 @@ export const rooms: Room[] = [
     fullyBooked: false,
     extraBedAvailable: true,
     linkedSlugs: ['ginko-spa-1'],
-    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Privatna sauna', 'Jacuzzi', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Privatna sauna', 'Jacuzzi', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
       '/images/rooms/ginko-spa-2/01-cover.png',
     ],
@@ -174,7 +174,7 @@ export const rooms: Room[] = [
     name: 'Apartman',
     tagline: 'Prostrani apartman s terasom i odvojenom kuhinjom.',
     description:
-      'Dobrodošli u Apartman — prostrani smještaj od 50 m² smješten na drugom katu u srcu Daruvara. Terasa s pogledom, odvojena kuhinja i moderno uređen prostor čine ovaj apartman savršenim za opuštajući odmor. Ovaj smještaj ne uključuje pristup privatnoj wellness zoni (sauna i jacuzzi). Kućni ljubimci nisu dozvoljeni.',
+      'Dobrodošli u Apartman — prostrani smještaj od 50 m² smješten na drugom katu u srcu Daruvara. Terasa s pogledom, odvojena kuhinja i moderno uređen prostor čine ovaj apartman savršenim za opuštajući odmor. Ovaj smještaj ne uključuje pristup privatnoj wellness zoni (sauna i jacuzzi). Kućni ljubimci su dobrodošli na upit.',
     capacity: 4,
     capacityNote: '2+2',
     size: 50,
@@ -186,7 +186,7 @@ export const rooms: Room[] = [
     fullyBooked: false,
     extraBedAvailable: true,
     linkedSlugs: ['ginko-spa-2'],
-    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina'],
+    amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
       '/images/rooms/ginko-spa-2/01-cover.png',
     ],
@@ -299,7 +299,7 @@ export const roomTranslations: Record<
         'Welcome to Ginko 5, your stay in the cultural heart of continental Croatia. At Ulica Tomaša Garika Masaryka 1 in Daruvar, this elegant room offers a comfortable, authentic taste of Croatian life. The private, fully furnished space is designed for up to two guests. A terrace and complete privacy are available to all guests. Pets are welcome on request.',
       capacityNote: '2 guests',
       beds: '1 double bed',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen'],
+      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
     },
     'ginko-6': {
       tagline: 'Ideal for solo travellers — a quiet, intimate stay.',
@@ -313,19 +313,19 @@ export const roomTranslations: Record<
       name: 'Wellness Apartment',
       tagline: 'Private sauna and jacuzzi — a luxury wellness stay.',
       description:
-        'Welcome to the Wellness Apartment — your luxury wellness retreat in Daruvar. This 50 m² apartment on the second floor is a different experience from the standard rooms: a private sauna, jacuzzi, terrace with a view, a separate kitchen and a carefully finished interior make it ideal for couples or small groups who want something extra. Every detail is designed for a calm, relaxing stay. Pets are not allowed.',
+        'Welcome to the Wellness Apartment — your luxury wellness retreat in Daruvar. This 50 m² apartment on the second floor is a different experience from the standard rooms: a private sauna, jacuzzi, terrace with a view, a separate kitchen and a carefully finished interior make it ideal for couples or small groups who want something extra. Every detail is designed for a calm, relaxing stay. Pets are welcome on request.',
       capacityNote: '2+2',
       beds: 'Bedroom 1: 1 double bed\nLiving room: 1 sofa bed\nExtra: 1 single bed (extra bed)',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Private sauna', 'Jacuzzi', 'Terrace', 'Separate kitchen', 'Parking', 'Heating', 'Towels', 'Linen'],
+      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Private sauna', 'Jacuzzi', 'Terrace', 'Separate kitchen', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
     },
     'ginko-spa-1': {
       name: 'Apartment',
       tagline: 'Spacious apartment with a terrace and a separate kitchen.',
       description:
-        'Welcome to the Apartment — a spacious 50 m² stay on the second floor in the heart of Daruvar. A terrace with a view, a separate kitchen and a modern interior make it perfect for a relaxing break. This listing does not include access to the private wellness area (sauna and jacuzzi). Pets are not allowed.',
+        'Welcome to the Apartment — a spacious 50 m² stay on the second floor in the heart of Daruvar. A terrace with a view, a separate kitchen and a modern interior make it perfect for a relaxing break. This listing does not include access to the private wellness area (sauna and jacuzzi). Pets are welcome on request.',
       capacityNote: '2+2',
       beds: 'Bedroom 1: 1 double bed\nLiving room: 1 sofa bed\nExtra: 1 single bed (extra bed)',
-      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Separate kitchen', 'Parking', 'Heating', 'Towels', 'Linen'],
+      amenities: ['WiFi', 'LCD TV', 'Satellite TV', 'Air conditioning', 'Terrace', 'Separate kitchen', 'Parking', 'Heating', 'Towels', 'Linen', 'Pets on request'],
     },
   },
   cs: {
@@ -367,7 +367,7 @@ export const roomTranslations: Record<
         'Vítejte v Ginko 5, vašem pobytu v kulturním srdci kontinentálního Chorvatska. Na Ulici Tomaša Garika Masaryka 1 v Daruvaru nabízí tento elegantní pokoj pohodlnou a autentickou chuť chorvatského života. Soukromý, plně zařízený prostor je navržený až pro dva hosty. Terasa a úplné soukromí jsou k dispozici všem hostům. Domácí mazlíčci jsou vítáni na vyžádání.',
       capacityNote: '2 osoby',
       beds: '1 manželská postel',
-      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Parkování', 'Topení', 'Ručníky', 'Povlečení'],
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Parkování', 'Topení', 'Ručníky', 'Povlečení', 'Domácí mazlíčci na vyžádání'],
     },
     'ginko-6': {
       tagline: 'Ideální pro sólové cestovatele — klidný a intimní pobyt.',
@@ -381,19 +381,19 @@ export const roomTranslations: Record<
       name: 'Wellness apartmán',
       tagline: 'Soukromá sauna a vířivka — luxusní wellness pobyt.',
       description:
-        'Vítejte ve Wellness apartmánu — vaší luxusní wellness oáze v Daruvaru. Tento 50 m² apartmán v druhém patře je jiný zážitek než standardní pokoje: soukromá sauna, vířivka, terasa s výhledem, oddělená kuchyň a pečlivě dotažený interiér z něj dělají ideální volbu pro páry nebo menší skupiny, které chtějí něco navíc. Každý detail je navržený pro klidný a odpočinkový pobyt. Domácí mazlíčci nejsou povoleni.',
+        'Vítejte ve Wellness apartmánu — vaší luxusní wellness oáze v Daruvaru. Tento 50 m² apartmán v druhém patře je jiný zážitek než standardní pokoje: soukromá sauna, vířivka, terasa s výhledem, oddělená kuchyň a pečlivě dotažený interiér z něj dělají ideální volbu pro páry nebo menší skupiny, které chtějí něco navíc. Každý detail je navržený pro klidný a odpočinkový pobyt. Domácí mazlíčci jsou vítáni na vyžádání.',
       capacityNote: '2+2',
       beds: 'Ložnice 1: 1 manželská postel\nObývací pokoj: 1 rozkládací pohovka\nNavíc: 1 jednolůžko (přistýlka)',
-      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Soukromá sauna', 'Vířivka', 'Terasa', 'Oddělená kuchyň', 'Parkování', 'Topení', 'Ručníky', 'Povlečení'],
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Soukromá sauna', 'Vířivka', 'Terasa', 'Oddělená kuchyň', 'Parkování', 'Topení', 'Ručníky', 'Povlečení', 'Domácí mazlíčci na vyžádání'],
     },
     'ginko-spa-1': {
       name: 'Apartmán',
       tagline: 'Prostorný apartmán s terasou a oddělenou kuchyní.',
       description:
-        'Vítejte v Apartmánu — prostorném 50 m² ubytování v druhém patře v srdci Daruvaru. Terasa s výhledem, oddělená kuchyň a moderní interiér z něj dělají ideální místo k odpočinku. Tato varianta nezahrnuje přístup do soukromé wellness zóny (sauna a vířivka). Domácí mazlíčci nejsou povoleni.',
+        'Vítejte v Apartmánu — prostorném 50 m² ubytování v druhém patře v srdci Daruvaru. Terasa s výhledem, oddělená kuchyň a moderní interiér z něj dělají ideální místo k odpočinku. Tato varianta nezahrnuje přístup do soukromé wellness zóny (sauna a vířivka). Domácí mazlíčci jsou vítáni na vyžádání.',
       capacityNote: '2+2',
       beds: 'Ložnice 1: 1 manželská postel\nObývací pokoj: 1 rozkládací pohovka\nNavíc: 1 jednolůžko (přistýlka)',
-      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Oddělená kuchyň', 'Parkování', 'Topení', 'Ručníky', 'Povlečení'],
+      amenities: ['WiFi', 'LCD TV', 'Satelitní TV', 'Klimatizace', 'Terasa', 'Oddělená kuchyň', 'Parkování', 'Topení', 'Ručníky', 'Povlečení', 'Domácí mazlíčci na vyžádání'],
     },
   },
 };

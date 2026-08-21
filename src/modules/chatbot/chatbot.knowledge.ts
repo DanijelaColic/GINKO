@@ -85,11 +85,7 @@ const ON_SITE_FAQ: KnowledgeTopic[] = [
     status: 'approved',
     source: 'faq',
     clientPrompt:
-      'Opće pravilo: ljubimci uz najavu, 15 €/dan. U opisu Wellness Apartmana i Apartmana (ginko-spa-2 / ginko-spa-1) piše da ljubimci nisu dozvoljeni.',
-    conflicts: [
-      'FAQ + kućni red: ljubimci dopušteni uz najavu, 15 €/dan.',
-      'rooms.config ginko-spa-1 i ginko-spa-2: „Kućni ljubimci nisu dozvoljeni.”',
-    ],
+      'Ljubimci dozvoljeni na upit u svim sobama i apartmanima, 15 €/dan.',
   },
   {
     id: 'checkin',
@@ -107,12 +103,7 @@ const ON_SITE_FAQ: KnowledgeTopic[] = [
     category: 'stay',
     status: 'approved',
     source: 'faq',
-    clientPrompt:
-      'Bot koristi FAQ/kućni red: prijava 14:00–22:00, odjava do 10:00. Booking traka i widget još kažu 11:00.',
-    conflicts: [
-      'FAQ, kućni red, footer, email, i18n metadata: odjava do 10:00.',
-      'bookingPage.strip, sidebar, BookingWidget, rooms/[slug]: odjava do 11:00.',
-    ],
+    clientPrompt: 'Prijava 14:00–22:00, odjava do 10:00 (usklađeno na cijelom webu).',
   },
   {
     id: 'wellness',
@@ -147,11 +138,20 @@ const ON_SITE_FAQ: KnowledgeTopic[] = [
     source: 'faq',
     clientPrompt: 'Besplatno otkazivanje i povrat depozita do 14 dana prije dolaska.',
   },
+  {
+    id: 'invoice',
+    messageFaqId: 'invoice',
+    houseRuleId: 'invoice',
+    category: 'payment',
+    status: 'approved',
+    source: 'faq',
+    clientPrompt:
+      'R1 na podatke iz rezervacije (tvrtka + PDV); šalje se e-poštom nakon boravka.',
+  },
 ];
 
 /**
  * Teme koje nisu u FAQ-u, ali jesu javno na webu (kućni red / booking.config).
- * invoice ostaje pending — forma prima naziv tvrtke, nema objavljenog R1 postupka.
  */
 const FROM_HOUSE_RULES: KnowledgeTopic[] = [
   {
@@ -193,22 +193,9 @@ const FROM_HOUSE_RULES: KnowledgeTopic[] = [
   },
 ];
 
-const PENDING_TOPICS: KnowledgeTopic[] = [
-  {
-    id: 'invoice',
-    messageFaqId: null,
-    category: 'payment',
-    status: 'pending_client',
-    source: null,
-    clientPrompt:
-      'Račun / R1 za tvrtke — postupak nije na FAQ-u ni u kućnom redu. Forma rezervacije prima naziv tvrtke. Bot ne odgovara dok klijent ne odobri copy.',
-  },
-];
-
 export const CHATBOT_KNOWLEDGE: readonly KnowledgeTopic[] = [
   ...ON_SITE_FAQ,
   ...FROM_HOUSE_RULES,
-  ...PENDING_TOPICS,
 ];
 
 export function knowledgeByStatus(status: KnowledgeStatus): KnowledgeTopic[] {

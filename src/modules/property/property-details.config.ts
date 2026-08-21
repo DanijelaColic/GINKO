@@ -110,7 +110,7 @@ export const FACILITY_GROUPS: FacilityGroup[] = [
     title: 'Kućni ljubimci',
     column: 2,
     type: 'text',
-    text: 'Kućni ljubimci dozvoljeni na upit. Cijena čišćenja: 15 € / dan.',
+    text: 'Kućni ljubimci dozvoljeni na upit u svim sobama i apartmanima. Cijena čišćenja: 15 € / dan.',
   },
   {
     id: 'media',
@@ -271,7 +271,7 @@ export const HOUSE_RULES: HouseRuleItem[] = [
     id: 'pets',
     title: 'Kućni ljubimci',
     paragraphs: [
-      'Boravak kućnih ljubimaca dopušten je uz prethodnu najavu prilikom rezervacije.',
+      'Kućni ljubimci su dozvoljeni na upit u svim sobama i apartmanima.',
       'Cijena čišćenja za kućne ljubimce: 15 € / dan.',
     ],
   },
@@ -281,6 +281,14 @@ export const HOUSE_RULES: HouseRuleItem[] = [
     paragraphs: [
       'Rezervacija se potvrđuje uplatom depozita od 50% pri slanju upita.',
       'Ostatak iznosa plaća se u smještajnom objektu pri dolasku.',
+    ],
+  },
+  {
+    id: 'invoice',
+    title: 'R1 račun za tvrtke',
+    paragraphs: [
+      'R1 izdajemo na podatke iz rezervacije (naziv tvrtke i PDV broj).',
+      'Račun šaljemo e-poštom nakon boravka.',
     ],
   },
   {

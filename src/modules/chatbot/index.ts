@@ -12,6 +12,8 @@ export {
 
 export { flattenHouseRule, houseRuleAnswer } from './chatbot.answers';
 
+export type { ChatApiResponse } from './chatbot.api';
+
 export { matchGuestQuestion, topicById, type ChatMatch } from './chatbot.match';
 
 export {

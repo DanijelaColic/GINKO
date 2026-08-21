@@ -55,6 +55,7 @@
     "close": "Zavřít chat",
     "suggestionsLabel": "Časté dotazy",
     "escalate": "Na to nemám připravenou odpověď. Napište nám na WhatsApp nebo pošlete otázku e-mailem.",
+    "thinking": "Moment…",
     "availabilityAnswer": "Dostupnost a ceny pro konkrétní termíny najdete ve vyhledávání na webu. Bot je neuvádí.",
     "legalAnswer": "Právní informace jsou na stránkách Zásady ochrany osobních údajů a Cookies.",
     "galleryAnswer": "Fotografie ubytování jsou v galerii a na stránkách pokojů.",
@@ -262,7 +263,7 @@
       },
       "pets": {
         "q": "Mohu přijet s domácími mazlíčky?",
-        "a": "Ano, domácí mazlíčci jsou vítáni po předchozí nahlášení při rezervaci. Poplatek za úklid je 15 € / den."
+        "a": "Ano, domácí mazlíčci jsou povoleni na vyžádání ve všech pokojích a apartmánech. Poplatek za úklid je 15 € / den."
       },
       "checkin": {
         "q": "Jak probíhá check-in, když přijedeme pozdě?",
@@ -287,6 +288,10 @@
       "cancellation": {
         "q": "Jaká je storno politika?",
         "a": "Bezplatné storno a vrácení zálohy do 14 dnů před příjezdem. Při stornech do 14 dnů před příjezdem se záloha nevrací."
+      },
+      "invoice": {
+        "q": "Vystavujete firemní fakturu (R1)?",
+        "a": "Ano. Fakturu R1 vystavíme podle údajů z rezervace (název společnosti a DIČ) a pošleme e-mailem po pobytu."
       }
     }
   },
@@ -382,9 +387,11 @@
     },
     "rules": {
       "checkInLabel": "Check-in:",
+      "checkInValue": "14:00 – 22:00",
       "checkOutLabel": "Check-out:",
+      "checkOutValue": "do 10:00",
       "petsLabel": "Domácí mazlíčci:",
-      "petsValue": "Nejsou povoleni",
+      "petsValue": "Povoleno na vyžádání, 15 € / den",
       "smokingLabel": "Kouření:",
       "smokingValue": "Není povoleno",
       "minStayLabel": "Minimální pobyt:",
@@ -416,7 +423,7 @@
       "checkInLabel": "Příjezd",
       "checkInValue": "od 14:00",
       "checkOutLabel": "Odjezd",
-      "checkOutValue": "do 11:00",
+      "checkOutValue": "do 10:00",
       "minStayLabel": "Min. pobyt",
       "minStayValue": "1 noc",
       "depositLabel": "Záloha",
@@ -458,7 +465,7 @@
       "checkIn": "Příjezd",
       "checkOut": "Odjezd",
       "checkInTime": "od 14:00",
-      "checkOutTime": "do 11:00",
+      "checkOutTime": "do 10:00",
       "guests": "Hosté",
       "reservationDetails": "Detaily vaší rezervace",
       "priceBreakdown": "Přehled ceny",
@@ -548,7 +555,7 @@
       "needsCribHint": "K dispozici na vyžádání, podle dostupnosti.",
       "childFreeOnBed": "Dítě do 2 let, které spí s rodiči v manželské posteli, se neúčtuje.",
       "arrivalTime": "Předpokládaný čas příjezdu",
-      "arrivalTimeHint": "Příjezd mezi 14:00 – 23:00",
+      "arrivalTimeHint": "Příjezd mezi 14:00 – 22:00",
       "notes": "Speciální požadavky",
       "notesPlaceholder": "Alergie, preference lůžek, pozdní příjezd, oslava…",
       "businessTitle": "Cestujete služebně?",
@@ -560,7 +567,9 @@
       "vatIdPlaceholder": "CZ12345678",
       "rules": {
         "checkIn": "Příjezd (check-in)",
-        "checkOut": "Odjezd (check-out)"
+        "checkInTime": "14:00 – 22:00",
+        "checkOut": "Odjezd (check-out)",
+        "checkOutTime": "do 10:00"
       },
       "agreeRules": "Souhlasím s <houseRules>domácím řádem</houseRules> a <bookingTerms>podmínkami rezervace</bookingTerms>.",
       "rulesLinkLabel": "Přečtěte si domácí řád a podmínky rezervace",

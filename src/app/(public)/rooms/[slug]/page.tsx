@@ -166,10 +166,12 @@ export default async function RoomDetailPage({ params }: Props) {
 
             <div className="mt-8 p-4 bg-stone-light rounded-xl text-sm text-muted space-y-1">
               <p>
-                <strong className="text-text">{t('rules.checkInLabel')}</strong> 14:00 – 23:00
+                <strong className="text-text">{t('rules.checkInLabel')}</strong>{' '}
+                {t('rules.checkInValue')}
               </p>
               <p>
-                <strong className="text-text">{t('rules.checkOutLabel')}</strong> 09:00 – 11:00
+                <strong className="text-text">{t('rules.checkOutLabel')}</strong>{' '}
+                {t('rules.checkOutValue')}
               </p>
               <p>
                 <strong className="text-text">{t('rules.petsLabel')}</strong>{' '}
