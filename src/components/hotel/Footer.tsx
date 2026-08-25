@@ -3,6 +3,8 @@ import { Link } from '@/i18n/navigation';
 import { Phone, Mail, Clock, MapPin } from 'lucide-react';
 import { PROPERTY_MAP_URL, PROPERTY_STREET } from '@/modules/property/property-details.config';
 import { getPropertyCityLine } from '@/modules/property/property-details.i18n';
+import { getValidLocale } from '@/i18n/messages';
+import { getSeoNavLinks } from '@/modules/seo/seo-nav-links';
 import {
   CONTACT_EMAIL,
   CONTACT_PHONE_TEL,
@@ -24,22 +26,23 @@ const LEGAL_LINKS = [
 ] as const;
 
 export default async function Footer() {
-  const locale = await getLocale();
+  const locale = getValidLocale(await getLocale());
   const t = await getTranslations('footer');
   const tSections = await getTranslations('homePage.subnav');
   const cityLine = getPropertyCityLine(locale);
+  const seoLinks = getSeoNavLinks(locale);
 
   return (
     <footer className="relative z-10 bg-text text-white shrink-0">
       <div className="mx-auto max-w-6xl px-4 py-12">
-        <div className="grid grid-cols-1 gap-10 sm:grid-cols-3">
+        <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand column */}
           <div>
             <p className="font-serif text-lg font-semibold leading-tight">{t('brand')}</p>
             <p className="mt-2 text-sm text-white/60">{t('tagline')}</p>
           </div>
 
-          {/* Navigation */}
+          {/* Property sections */}
           <div>
             <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
               {t('navTitle')}
@@ -52,6 +55,25 @@ export default async function Footer() {
                     className="text-sm text-white/70 hover:text-white transition-colors"
                   >
                     {tSections(key)}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          {/* Guides + SEO landings */}
+          <div>
+            <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-white/40">
+              {t('seoTitle')}
+            </p>
+            <ul className="space-y-2">
+              {seoLinks.map(({ href, label }) => (
+                <li key={href}>
+                  <Link
+                    href={href}
+                    className="text-sm text-white/70 hover:text-white transition-colors"
+                  >
+                    {label}
                   </Link>
                 </li>
               ))}
@@ -72,7 +94,8 @@ export default async function Footer() {
               >
                 <MapPin size={14} className="shrink-0 mt-0.5 text-white/40" />
                 <span>
-                  {PROPERTY_STREET}<br />
+                  {PROPERTY_STREET}
+                  <br />
                   {cityLine}
                 </span>
               </a>
@@ -93,7 +116,8 @@ export default async function Footer() {
               <p className="flex items-start gap-2 text-sm text-white/60">
                 <Clock size={14} className="shrink-0 mt-0.5 text-white/40" />
                 <span>
-                  {t('checkIn')}<br />
+                  {t('checkIn')}
+                  <br />
                   {t('checkOut')}
                 </span>
               </p>
@@ -102,7 +126,9 @@ export default async function Footer() {
         </div>
 
         <div className="mt-10 border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-white/30">
-          <span>&copy; {YEAR} {t('brand')} &mdash; {t('rights')}</span>
+          <span>
+            &copy; {YEAR} {t('brand')} &mdash; {t('rights')}
+          </span>
           <nav aria-label="Legal" className="flex gap-4">
             {LEGAL_LINKS.map(({ key, href }) => (
               <Link

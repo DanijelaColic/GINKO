@@ -206,6 +206,15 @@ export default function Navbar() {
               {renderSectionLink(key, id, sectionLinkClass(isHome && activeSectionId === id))}
             </li>
           ))}
+          {/* SEO hub — visible path to guides (landings live in footer) */}
+          <li className="shrink-0">
+            <Link
+              href="/guides"
+              className={sectionLinkClass(pathname === '/guides' || pathname.startsWith('/guides/'))}
+            >
+              {t('links.guides')}
+            </Link>
+          </li>
         </ul>
 
         {/* Desktop: kontakt + locale switcher + CTA */}
@@ -269,6 +278,19 @@ export default function Navbar() {
                 )}
               </li>
             ))}
+            <li>
+              <Link
+                href="/guides"
+                onClick={() => setIsOpen(false)}
+                className={`block w-full text-left rounded-md px-3 py-2.5 text-base font-medium transition-colors ${
+                  pathname === '/guides' || pathname.startsWith('/guides/')
+                    ? 'bg-primary/10 text-primary'
+                    : 'text-[--color-text] hover:bg-[--color-stone] hover:text-[--color-primary]'
+                }`}
+              >
+                {t('links.guides')}
+              </Link>
+            </li>
           </ul>
           <div className="mt-6 flex flex-col gap-2 border-t border-[--color-stone] pt-4">
             <a
