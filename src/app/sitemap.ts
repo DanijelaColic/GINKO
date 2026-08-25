@@ -1,6 +1,7 @@
 import type { MetadataRoute } from 'next';
 import { routing } from '@/i18n/routing';
 import { GUIDES } from '@/modules/seo/guides/guides-content';
+import { LANDING_PAGE_PATHS } from '@/modules/seo/landing-pages/landing-enriched-types';
 import { rooms } from '@/modules/rooms/rooms.config';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ginko-sobe.com';
@@ -12,6 +13,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     { pathname: '/booking', changeFrequency: 'weekly' as const, priority: 0.9 },
     { pathname: '/guides', changeFrequency: 'weekly' as const, priority: 0.8 },
     { pathname: '/gallery', changeFrequency: 'monthly' as const, priority: 0.75 },
+    ...LANDING_PAGE_PATHS.map((key) => ({
+      pathname: `/${key}`,
+      changeFrequency: 'monthly' as const,
+      priority: 0.85,
+    })),
     { pathname: '/privacy', changeFrequency: 'yearly' as const, priority: 0.2 },
     { pathname: '/cookies', changeFrequency: 'yearly' as const, priority: 0.2 },
   ];

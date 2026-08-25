@@ -1,6 +1,7 @@
 // Adapted from VJ pattern: reads persisted booking record via public API endpoint.
 // Token-gated: confirmation URL is only valid for the booking's guest email.
 // Step 3 of reservation flow — two-column layout mirroring Step 2 ("Vaši podaci").
+import type { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
@@ -21,6 +22,10 @@ type Props = {
     /** @deprecated Worldline Direct return param */
     hostedCheckoutId?: string;
   }>;
+};
+
+export const metadata: Metadata = {
+  robots: { index: false, follow: false },
 };
 
 export default async function BookingConfirmationPage({ params, searchParams }: Props) {

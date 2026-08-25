@@ -2,7 +2,14 @@ import type { Metadata } from 'next';
 import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { CONTACT_EMAIL, CONTACT_PHONE_TEL, SITE_NAME } from '@/modules/booking/booking.config';
-import { PROPERTY_STREET } from '@/modules/property/property-details.config';
+import {
+  PROPERTY_LATITUDE,
+  PROPERTY_LONGITUDE,
+  PROPERTY_MAP_URL,
+  PROPERTY_STREET,
+} from '@/modules/property/property-details.config';
+import { rooms } from '@/modules/rooms/rooms.config';
+import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { routing } from './routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ginko-sobe.com';
@@ -183,6 +190,7 @@ export function getBreadcrumbStructuredData(locale: Locale, items: BreadcrumbIte
 
 export async function getStructuredData(locale: Locale) {
   const t = await getTranslations({ locale, namespace: 'metadata.structuredData' });
+  const reviews = await getGoogleReviews();
 
   return {
     '@context': 'https://schema.org',
@@ -199,9 +207,15 @@ export async function getStructuredData(locale: Locale) {
       postalCode: '43500',
       addressCountry: 'HR',
     },
+    geo: {
+      '@type': 'GeoCoordinates',
+      latitude: PROPERTY_LATITUDE,
+      longitude: PROPERTY_LONGITUDE,
+    },
     image: `${SITE_URL}${HERO_OG_IMAGE_PATH}`,
     priceRange: '€€',
     currenciesAccepted: 'EUR',
+    numberOfRooms: rooms.length,
     amenityFeature: [
       { '@type': 'LocationFeatureSpecification', name: t('amenities.wifi'), value: true },
       { '@type': 'LocationFeatureSpecification', name: t('amenities.airConditioning'), value: true },
@@ -209,5 +223,23 @@ export async function getStructuredData(locale: Locale) {
     ],
     checkinTime: '14:00',
     checkoutTime: '10:00',
+    sameAs: [PROPERTY_MAP_URL],
+    contactPoint: {
+      '@type': 'ContactPoint',
+      telephone: CONTACT_PHONE_TEL,
+      contactType: 'reservations',
+      availableLanguage: ['Croatian', 'English', 'Czech'],
+    },
+    ...(reviews
+      ? {
+          aggregateRating: {
+            '@type': 'AggregateRating',
+            ratingValue: reviews.rating,
+            reviewCount: reviews.reviewCount,
+            bestRating: 5,
+            worstRating: 1,
+          },
+        }
+      : {}),
   };
 }

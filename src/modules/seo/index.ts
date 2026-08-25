@@ -4,3 +4,7 @@ export { getGuides } from './guides/get-guides';
 export { getGuideBySlug } from './guides/get-guide-by-slug';
 export { getSeoNavLinks } from './seo-nav-links';
 export type { SeoNavLink } from './seo-nav-links';
+export type { LandingPageKey } from './landing-pages/landing-enriched-types';
+export { LANDING_PAGE_PATHS } from './landing-pages/landing-enriched-types';
+export { getLandingPageContent, getLandingPageMetadata } from './landing-pages/content';
+export { LandingPageTemplate } from './landing-pages/LandingPageTemplate';

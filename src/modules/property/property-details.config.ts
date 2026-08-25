@@ -2,6 +2,10 @@ export const PROPERTY_STREET = 'Ulica Tomaša Garika Masaryka 1';
 export const PROPERTY_CITY = '43500 Daruvar, Hrvatska';
 export const PROPERTY_ADDRESS = `${PROPERTY_STREET}, ${PROPERTY_CITY}`;
 
+/** WGS84 — Ulica Tomaša Garika Masaryka 1, Daruvar (local SEO / LodgingBusiness) */
+export const PROPERTY_LATITUDE = 45.594636;
+export const PROPERTY_LONGITUDE = 17.222586;
+
 export const PROPERTY_MAP_URL = `https://maps.google.com/?q=${encodeURIComponent(PROPERTY_ADDRESS)}`;
 
 export const PROPERTY_MAP_EMBED_URL = `https://maps.google.com/maps?q=${encodeURIComponent(PROPERTY_ADDRESS)}&z=16&output=embed`;

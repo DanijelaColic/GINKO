@@ -65,6 +65,9 @@ export default async function GuideArticlePage({ params }: Props) {
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ginko-sobe.com';
   const basePath = locale === 'hr' ? '' : `/${locale}`;
+  const coverSrc = guide.coverImage.src.startsWith('http')
+    ? guide.coverImage.src
+    : `${siteUrl}${guide.coverImage.src}`;
   const blogPostingJsonLd = {
     '@context': 'https://schema.org',
     '@type': 'BlogPosting',
@@ -76,7 +79,7 @@ export default async function GuideArticlePage({ params }: Props) {
     author: { '@type': 'Organization', name: SITE_NAME },
     publisher: { '@type': 'Organization', name: SITE_NAME },
     mainEntityOfPage: `${siteUrl}${basePath}/guides/${guide.slug}`,
-    image: guide.coverImage.src,
+    image: coverSrc,
   };
 
   return (

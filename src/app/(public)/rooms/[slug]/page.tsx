@@ -1,5 +1,4 @@
 // Adapted from Villa-Jurina/src/app/(public)/apartmani/[slug]/page.tsx
-// Removed: JsonLd (SEO phase later), Jurina-specific room refs
 // Color classes: secondary→accent, sand→stone, sand-light→stone-light
 // Routes: /apartmani→/rooms, /rezervacija→/booking
 
@@ -9,9 +8,15 @@ import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { rooms } from '@/modules/rooms/rooms.config';
 import { getRoom } from '@/modules/rooms/room.repository';
-import { getSiteUrl } from '@/lib/siteUrl';
 import { getValidLocale } from '@/i18n/messages';
-import { getBreadcrumbStructuredData } from '@/i18n/metadata';
+import { getBreadcrumbStructuredData, getLanguageAlternates } from '@/i18n/metadata';
+import { localizePath } from '@/i18n/pathnames';
+import { getSiteUrl } from '@/lib/siteUrl';
+import {
+  PROPERTY_LATITUDE,
+  PROPERTY_LONGITUDE,
+  PROPERTY_STREET,
+} from '@/modules/property/property-details.config';
 import { SITE_NAME, buildAvailabilityHref, DEPOSIT_PERCENT } from '@/modules/booking/booking.config';
 import ImageGallery from '@/components/hotel/ImageGallery';
 import { Link } from '@/i18n/navigation';
@@ -36,19 +41,23 @@ export async function generateMetadata({ params }: Props) {
   const suffix = t('metadata.descriptionSuffix');
   const title = `${prefix} ${room.name}`;
   const description = `${room.tagline} ${prefix} ${room.capacityNote}, ${room.size} m², ${suffix}`;
-  const BASE_URL = getSiteUrl();
+  const pathname = `/rooms/${slug}`;
+  const localizedPath = localizePath(pathname, locale);
   return {
     title,
     description,
+    alternates: {
+      canonical: localizedPath,
+      languages: getLanguageAlternates(pathname),
+    },
     openGraph: {
       title,
       description,
-      url: `${BASE_URL}/rooms/${slug}`,
+      url: localizedPath,
       images: room.images[0]
         ? [{ url: room.images[0], width: 1200, height: 630, alt: title }]
         : [],
     },
-    alternates: { canonical: `${BASE_URL}/rooms/${slug}` },
   };
 }
 
@@ -66,11 +75,68 @@ export default async function RoomDetailPage({ params }: Props) {
     { name: room.name, pathname: `/rooms/${room.slug}` },
   ]);
 
+  const siteUrl = getSiteUrl();
+  const roomPath = localizePath(`/rooms/${room.slug}`, locale);
+  const hotelRoomJsonLd = {
+    '@context': 'https://schema.org',
+    '@type': 'HotelRoom',
+    name: `${room.name} – ${SITE_NAME}`,
+    description: room.description,
+    url: `${siteUrl}${roomPath}`,
+    image: room.images.map((src) =>
+      src.startsWith('http') ? src : `${siteUrl}${src}`,
+    ),
+    bed: room.beds,
+    occupancy: {
+      '@type': 'QuantitativeValue',
+      maxValue: room.capacity,
+    },
+    floorSize: {
+      '@type': 'QuantitativeValue',
+      value: room.size,
+      unitCode: 'MTK',
+    },
+    amenityFeature: room.amenities.map((name) => ({
+      '@type': 'LocationFeatureSpecification',
+      name,
+      value: true,
+    })),
+    offers: {
+      '@type': 'Offer',
+      priceCurrency: 'EUR',
+      price: room.price,
+      availability: room.fullyBooked
+        ? 'https://schema.org/OutOfStock'
+        : 'https://schema.org/InStock',
+      url: `${siteUrl}${roomPath}`,
+    },
+    containedInPlace: {
+      '@type': 'LodgingBusiness',
+      name: SITE_NAME,
+      address: {
+        '@type': 'PostalAddress',
+        streetAddress: PROPERTY_STREET,
+        addressLocality: 'Daruvar',
+        postalCode: '43500',
+        addressCountry: 'HR',
+      },
+      geo: {
+        '@type': 'GeoCoordinates',
+        latitude: PROPERTY_LATITUDE,
+        longitude: PROPERTY_LONGITUDE,
+      },
+    },
+  };
+
   return (
     <div>
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(hotelRoomJsonLd) }}
       />
 
       {/* Galerija — full width, bez paddinga */}

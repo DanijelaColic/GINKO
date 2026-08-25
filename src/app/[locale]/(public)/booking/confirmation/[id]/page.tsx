@@ -1,1 +1,1 @@
-export { default } from '../../../../../(public)/booking/confirmation/[id]/page';
+export { default, metadata } from '../../../../../(public)/booking/confirmation/[id]/page';
