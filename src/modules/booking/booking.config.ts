@@ -9,6 +9,11 @@ export const SITE_NAME =
   process.env.NEXT_PUBLIC_SITE_NAME ?? 'Ginko Boutique Rooms & Wellness';
 export const SITE_LOCATION = process.env.NEXT_PUBLIC_SITE_LOCATION ?? 'Hrvatska';
 
+/** Broj rezervacije u mailu, adminu i CSV-u (prvih 8 znakova UUID-a). */
+export function bookingReference(bookingId: string): string {
+  return `REZ-${bookingId.substring(0, 8).toUpperCase()}`;
+}
+
 // ── Kontakt ───────────────────────────────────────────────────────
 // Javni kontakt na stranici — uvijek info@ginko-sobe.com (ne iz env-a)
 export const CONTACT_EMAIL = 'info@ginko-sobe.com';

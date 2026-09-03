@@ -8,6 +8,7 @@ import { ChevronLeft, ChevronRight } from 'lucide-react';
 import clsx from 'clsx';
 import { rooms } from '@/modules/rooms/rooms.config';
 import { parseLocalDate } from '@/modules/booking/dates';
+import { bookingReference } from '@/modules/booking/booking.config';
 import type { Booking } from '@/modules/booking/booking.types';
 
 const COL_W = 38;
@@ -315,7 +316,7 @@ export default function BookingTimeline({ bookings, onEditBooking }: Props) {
                           clipped && 'rounded-l-none border-l-2 border-l-white/40',
                           booking.status !== 'cancelled' && 'hover:opacity-90',
                         )}
-                        title={`${booking.guest_name} · ${booking.check_in} → ${booking.check_out} · ${booking.total_price}€`}
+                        title={`${bookingReference(booking.id)} · ${booking.guest_name} · ${booking.check_in} → ${booking.check_out} · ${booking.total_price}€`}
                       >
                         <span className="text-xs font-semibold truncate leading-tight">
                           {booking.guest_name}

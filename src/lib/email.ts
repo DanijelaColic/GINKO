@@ -10,6 +10,7 @@ import {
   CONTACT_PHONE_DISPLAY,
   CONTACT_WHATSAPP_URL,
   FREE_CANCELLATION_DAYS,
+  bookingReference,
 } from '@/modules/booking/booking.config';
 import {
   PROPERTY_ADDRESS,
@@ -79,9 +80,7 @@ function buildFullData(data: BookingEmailData): FullData {
     ...data,
     checkInStr: formatDisplayDate(data.checkIn, data.locale ?? 'hr'),
     checkOutStr: formatDisplayDate(data.checkOut, data.locale ?? 'hr'),
-    reference: data.bookingId
-      ? `REZ-${data.bookingId.substring(0, 8).toUpperCase()}`
-      : null,
+    reference: data.bookingId ? bookingReference(data.bookingId) : null,
     balance: Math.max(0, Math.round((total - deposit) * 100) / 100),
   };
 }

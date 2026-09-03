@@ -11,6 +11,7 @@ import {
 } from 'lucide-react';
 import clsx from 'clsx';
 import { centsToEur } from '@/modules/payments/payment.types';
+import { bookingReference } from '@/modules/booking/booking.config';
 import type { PaymentIntentStatus } from '@/modules/payments/payment.types';
 import { ToastContainer, type ToastItem } from './Toast';
 
@@ -341,6 +342,9 @@ export default function AdminPayments() {
                         {row.booking ? (
                           <div>
                             <div className="font-medium text-gray-800">{row.booking.guest_name}</div>
+                            <div className="text-xs font-mono text-gray-400">
+                              {bookingReference(row.booking.id)}
+                            </div>
                             <div className="text-xs text-gray-400 truncate max-w-36">{row.booking.guest_email}</div>
                           </div>
                         ) : (

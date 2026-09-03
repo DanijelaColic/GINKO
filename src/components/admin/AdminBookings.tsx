@@ -33,11 +33,14 @@ import {
   Mail,
   ChevronRight,
   AlertTriangle,
+  Phone,
+  MessageCircle,
+  Clock,
 } from 'lucide-react';
 import clsx from 'clsx';
 import { rooms } from '@/modules/rooms/rooms.config';
 import { formatDisplayDate, parseLocalDate, calculatePrice } from '@/modules/booking/dates';
-import { DEPOSIT_PERCENT } from '@/modules/booking/booking.config';
+import { DEPOSIT_PERCENT, bookingReference } from '@/modules/booking/booking.config';
 import type { Booking } from '@/modules/booking/booking.types';
 import BookingTimeline from './BookingTimeline';
 import { ToastContainer, type ToastItem } from './Toast';
@@ -61,6 +64,65 @@ const STATUS_COLORS: Record<string, string> = {
 
 const ROOM_NAMES = Object.fromEntries(rooms.map((r) => [r.slug, r.name]));
 
+function BookingRef({
+  id,
+  className,
+}: {
+  id: string;
+  className?: string;
+}) {
+  const [copied, setCopied] = useState(false);
+  const ref = bookingReference(id);
+
+  return (
+    <button
+      type="button"
+      title="Kopiraj broj rezervacije"
+      onClick={(e) => {
+        e.stopPropagation();
+        void navigator.clipboard.writeText(ref).then(() => {
+          setCopied(true);
+          window.setTimeout(() => setCopied(false), 1200);
+        });
+      }}
+      className={clsx(
+        'font-mono text-xs tracking-wide text-gray-500 hover:text-primary transition-colors',
+        className,
+      )}
+    >
+      {copied ? 'Kopirano' : ref}
+    </button>
+  );
+}
+
+function guestPhoneDigits(phone: string): string {
+  return phone.replace(/\D/g, '');
+}
+
+function guestWhatsAppUrl(booking: Booking): string | null {
+  if (!booking.guest_phone) return null;
+  const digits = guestPhoneDigits(booking.guest_phone);
+  if (digits.length < 8) return null;
+  const text = encodeURIComponent(
+    `Pozdrav ${booking.guest_name}, vezano uz rezervaciju ${bookingReference(booking.id)}…`,
+  );
+  return `https://wa.me/${digits}?text=${text}`;
+}
+
+function hoursSinceCreated(iso: string): number {
+  return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 3_600_000));
+}
+
+function formatStaleAge(hours: number): string {
+  if (hours < 48) return `${hours} h`;
+  const days = Math.floor(hours / 24);
+  if (days === 1) return '1 dan';
+  if (days >= 2 && days <= 4) return `${days} dana`;
+  return `${days} dana`;
+}
+
+const STALE_PREVIEW = 3;
+
 type SortKey = 'check_in' | 'created_at' | 'total_price';
 
 function SortIcon({ k, sortKey, sortAsc }: { k: SortKey; sortKey: SortKey; sortAsc: boolean }) {
@@ -76,6 +138,9 @@ export default function AdminBookings() {
   const [filterStatus, setFilterStatus] = useState('');
   const [filterDateFrom, setFilterDateFrom] = useState('');
   const [filterDateTo, setFilterDateTo] = useState('');
+  const [filterUnpaidDeposit, setFilterUnpaidDeposit] = useState(false);
+  const [showCancelled, setShowCancelled] = useState(false);
+  const [expandStalePending, setExpandStalePending] = useState(false);
   const [sortKey, setSortKey] = useState<SortKey>('check_in');
   const [sortAsc, setSortAsc] = useState(false);
   const [view, setView] = useState<'table' | 'timeline'>('table');
@@ -227,16 +292,32 @@ export default function AdminBookings() {
     });
   }, [bookings, currentYear, daysInYear]);
 
+  const stalePending = useMemo(() => {
+    const cutoff = Date.now() - 24 * 60 * 60 * 1000;
+    return bookings
+      .filter((b) => b.status === 'pending' && new Date(b.created_at).getTime() < cutoff)
+      .sort((a, b) => a.created_at.localeCompare(b.created_at));
+  }, [bookings]);
+
   const filtered = bookings
+    .filter((b) => {
+      if (b.status !== 'cancelled') return true;
+      return showCancelled || filterStatus === 'cancelled';
+    })
     .filter((b) => !filterRoom || b.room_slug === filterRoom)
     .filter((b) => !filterStatus || b.status === filterStatus)
+    .filter((b) => {
+      if (!filterUnpaidDeposit) return true;
+      return !b.deposit_paid && b.status !== 'cancelled';
+    })
     .filter((b) => {
       if (!searchQuery) return true;
       const q = searchQuery.toLowerCase();
       return (
         b.guest_name.toLowerCase().includes(q) ||
         b.guest_email.toLowerCase().includes(q) ||
-        (b.guest_phone ?? '').toLowerCase().includes(q)
+        (b.guest_phone ?? '').toLowerCase().includes(q) ||
+        bookingReference(b.id).toLowerCase().includes(q)
       );
     })
     .filter((b) => {
@@ -279,11 +360,12 @@ export default function AdminBookings() {
 
   const exportCSV = () => {
     const headers = [
-      'Soba', 'Gost', 'Email', 'Telefon', 'Check-in', 'Check-out',
+      'Broj', 'Soba', 'Gost', 'Email', 'Telefon', 'Check-in', 'Check-out',
       'Noći', 'Odrasli', 'Djeca', 'Ukupno (€)', 'Depozit (€)', 'Depozit plaćen',
       'Status', 'Napomena', 'Kreirano',
     ];
     const rows = filtered.map((b) => [
+      bookingReference(b.id),
       ROOM_NAMES[b.room_slug] ?? b.room_slug,
       b.guest_name, b.guest_email, b.guest_phone ?? '',
       b.check_in, b.check_out, b.nights, b.adults, b.children,
@@ -427,12 +509,100 @@ export default function AdminBookings() {
                     <li key={i} className="text-xs text-red-600">
                       <span className="font-semibold">{ROOM_NAMES[a.room_slug]}</span>
                       {' — '}
-                      {a.guest_name} ({a.check_in} → {a.check_out})
+                      {a.guest_name} {bookingReference(a.id)} ({a.check_in} → {a.check_out})
                       {' ⟺ '}
-                      {b.guest_name} ({b.check_in} → {b.check_out})
+                      {b.guest_name} {bookingReference(b.id)} ({b.check_in} → {b.check_out})
                     </li>
                   ))}
                 </ul>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Pending > 24h — čeka uplatu depozita */}
+        {stalePending.length > 0 && (
+          <div className="mb-6 bg-amber-50 border border-amber-200 rounded-xl px-5 py-4">
+            <div className="flex items-start gap-3">
+              <Clock size={18} className="text-amber-600 shrink-0 mt-0.5" />
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-semibold text-amber-800">
+                  {stalePending.length === 1
+                    ? '1 rezervacija na čekanju dulje od 24 h'
+                    : stalePending.length >= 2 && stalePending.length <= 4
+                      ? `${stalePending.length} rezervacije na čekanju dulje od 24 h`
+                      : `${stalePending.length} rezervacija na čekanju dulje od 24 h`}
+                </p>
+                <p className="text-xs text-amber-700/80 mt-1">
+                  Datum je blokiran, a depozit još nije uplaćen. Ovo je podsjetnik — lista je u tablici ispod.
+                </p>
+
+                <ul className="mt-3 space-y-2">
+                  {(expandStalePending
+                    ? stalePending
+                    : stalePending.slice(0, STALE_PREVIEW)
+                  ).map((b) => {
+                    const hours = hoursSinceCreated(b.created_at);
+                    const wa = guestWhatsAppUrl(b);
+                    return (
+                      <li
+                        key={b.id}
+                        className="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-amber-950"
+                      >
+                        <span className="font-mono text-xs font-medium">
+                          {bookingReference(b.id)}
+                        </span>
+                        <span className="font-medium">{b.guest_name}</span>
+                        <span className="text-amber-800/70 text-xs">
+                          {ROOM_NAMES[b.room_slug] ?? b.room_slug} · {formatStaleAge(hours)}
+                        </span>
+                        {b.guest_phone && (
+                          <a
+                            href={`tel:${guestPhoneDigits(b.guest_phone)}`}
+                            className="inline-flex items-center gap-1 text-xs text-amber-800 hover:underline"
+                          >
+                            <Phone size={12} /> Nazovi
+                          </a>
+                        )}
+                        {wa && (
+                          <a
+                            href={wa}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="inline-flex items-center gap-1 text-xs text-amber-800 hover:underline"
+                          >
+                            <MessageCircle size={12} /> WhatsApp
+                          </a>
+                        )}
+                      </li>
+                    );
+                  })}
+                </ul>
+
+                <div className="flex flex-wrap items-center gap-2 mt-3">
+                  {stalePending.length > STALE_PREVIEW && (
+                    <button
+                      type="button"
+                      onClick={() => setExpandStalePending((v) => !v)}
+                      className="text-xs font-medium text-amber-800 hover:underline underline-offset-2"
+                    >
+                      {expandStalePending
+                        ? 'Prikaži manje'
+                        : `Prikaži sve (${stalePending.length})`}
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setFilterStatus('pending');
+                      setFilterUnpaidDeposit(true);
+                      setShowCancelled(false);
+                    }}
+                    className="text-xs font-medium bg-amber-100 hover:bg-amber-200 text-amber-900 rounded-lg px-3 py-1.5 transition-colors"
+                  >
+                    Otvori u tablici
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -562,6 +732,7 @@ export default function AdminBookings() {
                         <div className="w-2 h-2 rounded-full bg-primary mt-1.5 shrink-0" />
                         <div className="min-w-0">
                           <p className="font-medium text-gray-900 text-sm truncate">{b.guest_name}</p>
+                          <BookingRef id={b.id} className="mt-0.5" />
                           <p className="text-xs text-primary font-medium">
                             {ROOM_NAMES[b.room_slug] ?? b.room_slug}
                           </p>
@@ -604,7 +775,7 @@ export default function AdminBookings() {
                   type="text"
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Pretraži po imenu, emailu ili telefonu..."
+                  placeholder="Pretraži po broju, imenu, emailu ili telefonu..."
                   className="w-full pl-9 pr-4 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:border-primary"
                 />
                 {searchQuery && (
@@ -641,6 +812,26 @@ export default function AdminBookings() {
                   <option value="confirmed">Potvrđeno</option>
                   <option value="cancelled">Otkazano</option>
                 </select>
+
+                <label className="inline-flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={filterUnpaidDeposit}
+                    onChange={(e) => setFilterUnpaidDeposit(e.target.checked)}
+                    className="h-3.5 w-3.5 accent-primary cursor-pointer"
+                  />
+                  Depozit nije plaćen
+                </label>
+
+                <label className="inline-flex items-center gap-1.5 text-sm text-gray-600 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={showCancelled}
+                    onChange={(e) => setShowCancelled(e.target.checked)}
+                    className="h-3.5 w-3.5 accent-primary cursor-pointer"
+                  />
+                  Prikaži otkazane
+                </label>
 
                 <span className="hidden sm:block text-gray-200 text-lg">|</span>
 
@@ -725,6 +916,7 @@ export default function AdminBookings() {
                       </span>
                     </div>
                     <p className="font-semibold text-gray-900 text-sm">{booking.guest_name}</p>
+                    <BookingRef id={booking.id} className="block mt-0.5 mb-1" />
                     {booking.guest_email && (
                       <p className="text-xs text-gray-400 mb-2">{booking.guest_email}</p>
                     )}
@@ -753,6 +945,24 @@ export default function AdminBookings() {
                       {booking.deposit_paid ? 'Depozit plaćen' : 'Depozit nije plaćen'}
                     </button>
                     <div className="flex items-center gap-2 flex-wrap border-t border-gray-50 pt-3">
+                      {booking.guest_phone && (
+                        <a
+                          href={`tel:${guestPhoneDigits(booking.guest_phone)}`}
+                          className="flex items-center gap-1 text-xs bg-gray-50 text-gray-700 border border-gray-200 px-3 py-1.5 rounded-lg"
+                        >
+                          <Phone size={13} /> Nazovi
+                        </a>
+                      )}
+                      {guestWhatsAppUrl(booking) && (
+                        <a
+                          href={guestWhatsAppUrl(booking)!}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 border border-emerald-200 px-3 py-1.5 rounded-lg"
+                        >
+                          <MessageCircle size={13} /> WhatsApp
+                        </a>
+                      )}
                       {booking.status === 'pending' && (
                         <button
                           onClick={() => updateBooking(booking.id, { status: 'confirmed' })}
@@ -817,6 +1027,9 @@ export default function AdminBookings() {
                           />
                         </th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium uppercase tracking-wide">
+                          Broj
+                        </th>
+                        <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium uppercase tracking-wide">
                           Soba
                         </th>
                         <th className="text-left px-4 py-3 text-xs text-gray-500 font-medium uppercase tracking-wide">
@@ -863,6 +1076,9 @@ export default function AdminBookings() {
                             className={clsx(
                               'hover:bg-gray-50 transition-colors',
                               booking.status === 'cancelled' && 'opacity-50',
+                              booking.status === 'pending' &&
+                                hoursSinceCreated(booking.created_at) >= 24 &&
+                                'bg-amber-50/40',
                             )}
                           >
                             <td className="px-3 py-3 text-center">
@@ -873,6 +1089,9 @@ export default function AdminBookings() {
                                 aria-label={`Odaberi rezervaciju ${booking.guest_name}`}
                                 className="h-4 w-4 accent-primary cursor-pointer"
                               />
+                            </td>
+                            <td className="px-4 py-3">
+                              <BookingRef id={booking.id} />
                             </td>
                             <td className="px-4 py-3 font-medium text-primary">
                               {ROOM_NAMES[booking.room_slug] ?? booking.room_slug}
@@ -982,11 +1201,38 @@ export default function AdminBookings() {
 
                           {expandedId === booking.id && (
                             <tr key={`${booking.id}-expanded`} className="bg-blue-50/30">
-                              <td colSpan={10} className="px-4 py-3">
+                              <td colSpan={11} className="px-4 py-3">
                                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-sm">
                                   <div>
+                                    <p className="text-xs text-gray-400 mb-0.5">Broj rezervacije</p>
+                                    <BookingRef id={booking.id} className="text-gray-700" />
+                                  </div>
+                                  <div>
                                     <p className="text-xs text-gray-400 mb-0.5">Telefon</p>
-                                    <p className="text-gray-700">{booking.guest_phone ?? '—'}</p>
+                                    {booking.guest_phone ? (
+                                      <div className="flex flex-wrap items-center gap-2">
+                                        <a
+                                          href={`tel:${guestPhoneDigits(booking.guest_phone)}`}
+                                          className="inline-flex items-center gap-1 text-primary hover:underline"
+                                        >
+                                          <Phone size={12} />
+                                          {booking.guest_phone}
+                                        </a>
+                                        {guestWhatsAppUrl(booking) && (
+                                          <a
+                                            href={guestWhatsAppUrl(booking)!}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="inline-flex items-center gap-1 text-xs text-emerald-700 hover:underline"
+                                          >
+                                            <MessageCircle size={12} />
+                                            WhatsApp
+                                          </a>
+                                        )}
+                                      </div>
+                                    ) : (
+                                      <p className="text-gray-700">—</p>
+                                    )}
                                   </div>
                                   <div>
                                     <p className="text-xs text-gray-400 mb-0.5">Gosti</p>
@@ -1429,7 +1675,9 @@ function EditBookingModal({ booking, onClose, onSuccess }: EditModalProps) {
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
           <div>
             <h2 className="font-serif text-lg font-semibold text-gray-900">Uredi rezervaciju</h2>
-            <p className="text-xs text-gray-400 mt-0.5">{booking.guest_name}</p>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {bookingReference(booking.id)} · {booking.guest_name}
+            </p>
           </div>
           <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
             <X size={20} />

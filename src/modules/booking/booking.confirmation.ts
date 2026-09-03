@@ -11,6 +11,7 @@ import {
   RECIPIENT_BIC,
   RECIPIENT_BANK_NAME,
   SITE_NAME,
+  bookingReference,
 } from '@/modules/booking/booking.config';
 import type { BookingConfirmationData } from './booking.types';
 
@@ -55,7 +56,7 @@ export async function getBookingConfirmationData(
 
     return {
       id: booking.id,
-      reference: `REZ-${booking.id.substring(0, 8).toUpperCase()}`,
+      reference: bookingReference(booking.id),
       status: booking.status as BookingConfirmationData['status'],
       guestName: booking.guest_name,
       guestFirstName: (booking.guest_first_name as string | null) ?? null,
