@@ -36,7 +36,7 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
   {
     namespace: 'bookingConfirmation',
     bucket: 'ui',
-    approxKeys: 22,
+    approxKeys: 30,
     notes: 'Potvrda rezervacije + kartično plaćanje + checkout greške',
   },
   {

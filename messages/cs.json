@@ -763,6 +763,8 @@
   },
   "bookingConfirmation": {
     "title": "Dokončit rezervaci",
+    "titleConfirmed": "Rezervace potvrzena",
+    "pageGreeting": "Vážená/ý {name},",
     "reference": "Reference",
     "statusConfirmed": "Potvrzeno",
     "statusCancelled": "Zrušeno",
@@ -776,6 +778,9 @@
     "bookingCancelledHint": "Pro novou rezervaci navštivte stránku dostupnosti.",
     "cardPayTitle": "Platba zálohy kartou",
     "cardPayNote": "Platí se pouze záloha {amount} € — zbytek se platí při příjezdu",
+    "confirmedTitle": "Záloha je zaplacena",
+    "confirmedBody": "Vaše rezervace je potvrzena. Zbytek {remaining} € se platí při příjezdu.",
+    "confirmedCheckIn": "Check-in 14:00–22:00 · check-out do 10:00",
     "balanceOnArrival": "Zbytek částky se platí při příjezdu. Potvrzení rezervace posíláme e-mailem.",
     "terms": "Rezervací přijímáte storno podmínky. Bezplatné storno a vrácení zálohy do 14 dnů před příjezdem.",
     "payButton": "Zaplatit zálohu {amount} € kartou",
@@ -788,6 +793,7 @@
       "bookingNotFound": "Rezervace nebyla nalezena.",
       "invalidToken": "Odkaz na platbu není platný. Otevřete potvrzení z e-mailu.",
       "bookingCancelled": "Rezervace byla stornována — platba není možná.",
+      "alreadyPaid": "Záloha už byla zaplacena. Tato rezervace je potvrzena.",
       "invalidDeposit": "Částka zálohy není platná. Kontaktujte nás.",
       "paymentUnavailable": "Platba je dočasně nedostupná. Zkuste to znovu nebo nás kontaktujte.",
       "createFailed": "Platbu se nepodařilo vytvořit. Zkuste to znovu."

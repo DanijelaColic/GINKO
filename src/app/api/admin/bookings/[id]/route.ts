@@ -6,7 +6,7 @@ import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
 import { getRoomBySlug } from '@/modules/rooms/room.repository';
 import { parseLocalDate, diffDays, calculatePrice } from '@/modules/booking/dates';
 import { sendConfirmationEmail, notifyGuestBookingConfirmed, bookingRowToEmailData } from '@/lib/email';
-import { createBookingViewToken, getBookingConfirmationUrl } from '@/lib/bookingConfirmation';
+import { createBookingViewToken, getBookingConfirmationUrlFromRequest } from '@/lib/bookingConfirmation';
 import type { Booking } from '@/modules/booking/booking.types';
 
 type Params = { params: Promise<{ id: string }> };
@@ -28,7 +28,12 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 
     if (booking.guest_email) {
       const token = createBookingViewToken(booking.id, booking.guest_email);
-      const confirmationUrl = getBookingConfirmationUrl(booking.id, token);
+      const origin = request.headers.get('origin') ?? request.headers.get('referer');
+      const confirmationUrl = getBookingConfirmationUrlFromRequest(
+        booking.id,
+        token,
+        origin,
+      );
 
       await sendConfirmationEmail(
         bookingRowToEmailData(booking as Record<string, unknown>, { confirmationUrl }),

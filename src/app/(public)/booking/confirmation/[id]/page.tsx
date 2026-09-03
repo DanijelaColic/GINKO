@@ -28,6 +28,8 @@ export const metadata: Metadata = {
   robots: { index: false, follow: false },
 };
 
+export const dynamic = 'force-dynamic';
+
 export default async function BookingConfirmationPage({ params, searchParams }: Props) {
   const { id } = await params;
   const { token = '', payment, oid, hostedCheckoutId } = await searchParams;
@@ -88,13 +90,21 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
 
   const checkInDate = parseLocalDate(data.checkInIso);
   const checkOutDate = parseLocalDate(data.checkOutIso);
+  const isPaid =
+    data.status === 'confirmed' ||
+    data.depositPaid === true ||
+    showSuccessBanner;
+  const remainingEur = Math.max(0, Math.round((data.totalPrice - data.deposit) * 100) / 100);
+  const guestFirstName =
+    data.guestFirstName?.trim() ||
+    data.guestName.trim().split(/\s+/)[0] ||
+    data.guestName;
 
   return (
     <main className="min-h-screen bg-stone/5 py-10 px-4">
       <div className="max-w-5xl mx-auto">
 
-        {/* Stepper — korak 3 aktivan */}
-        <BookingStepsBar currentStep={3} />
+        {!isPaid && <BookingStepsBar currentStep={3} />}
 
         {/* Two-column layout — isti pattern kao korak 2 */}
         <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 items-start">
@@ -118,20 +128,20 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
           <div>
             <div className="mb-6">
               <h2 className="font-serif text-2xl font-semibold text-text">
-                {t('title')}
+                {isPaid ? t('titleConfirmed') : t('title')}
               </h2>
               <p className="text-sm text-text/50 mt-1">
                 {t('reference')}:{' '}
                 <span className="font-mono font-medium text-text/70">{data.reference}</span>
                 {' · '}
                 <span className={
-                  data.status === 'confirmed'
+                  isPaid
                     ? 'text-green-600'
                     : data.status === 'cancelled'
                       ? 'text-red-500'
                       : 'text-amber-600'
                 }>
-                  {data.status === 'confirmed'
+                  {isPaid
                     ? t('statusConfirmed')
                     : data.status === 'cancelled'
                       ? t('statusCancelled')
@@ -144,7 +154,10 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
               bookingId={id}
               token={token}
               status={data.status}
+              paid={isPaid}
               depositEur={data.deposit}
+              remainingEur={remainingEur}
+              guestFirstName={guestFirstName}
               paymentBanner={paymentBanner}
             />
 

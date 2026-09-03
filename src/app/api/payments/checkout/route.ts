@@ -27,7 +27,7 @@ export async function POST(request: NextRequest) {
     const supabase = createServerSupabaseClient();
     const { data: booking, error: bookingErr } = await supabase
       .from('bookings')
-      .select('id, guest_email, deposit, status, room_slug')
+      .select('id, guest_email, deposit, status, deposit_paid, room_slug')
       .eq('id', bookingId)
       .single();
 
@@ -41,6 +41,10 @@ export async function POST(request: NextRequest) {
 
     if (booking.status === 'cancelled') {
       return guestApiError('bookingCancelled', 409);
+    }
+
+    if (booking.status === 'confirmed' || booking.deposit_paid === true) {
+      return guestApiError('alreadyPaid', 409);
     }
 
     const depositEur: number = booking.deposit as number;

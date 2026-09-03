@@ -29,7 +29,7 @@ export async function getBookingConfirmationData(
     const { data: booking, error } = await supabase
       .from('bookings')
       .select(
-        'id, room_slug, check_in, check_out, nights, guest_name, guest_email, total_price, deposit, status, created_at, adults, children',
+        'id, room_slug, check_in, check_out, nights, guest_name, guest_first_name, guest_email, total_price, deposit, deposit_paid, status, created_at, adults, children',
       )
       .eq('id', bookingId)
       .single();
@@ -58,6 +58,7 @@ export async function getBookingConfirmationData(
       reference: `REZ-${booking.id.substring(0, 8).toUpperCase()}`,
       status: booking.status as BookingConfirmationData['status'],
       guestName: booking.guest_name,
+      guestFirstName: (booking.guest_first_name as string | null) ?? null,
       guestEmail: booking.guest_email,
       roomName: room.name,
       room,
@@ -71,6 +72,7 @@ export async function getBookingConfirmationData(
       pricePerNight,
       totalPrice: booking.total_price,
       deposit: booking.deposit,
+      depositPaid: booking.deposit_paid === true,
       priceBreakdown,
       createdAt: booking.created_at,
       payment: {

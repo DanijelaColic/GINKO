@@ -763,6 +763,8 @@
   },
   "bookingConfirmation": {
     "title": "Complete your booking",
+    "titleConfirmed": "Booking confirmed",
+    "pageGreeting": "Dear {name},",
     "reference": "Reference",
     "statusConfirmed": "Confirmed",
     "statusCancelled": "Cancelled",
@@ -776,6 +778,9 @@
     "bookingCancelledHint": "To make a new booking, visit the availability page.",
     "cardPayTitle": "Pay the deposit by card",
     "cardPayNote": "Only the {amount} € deposit is charged now — the balance is paid on arrival",
+    "confirmedTitle": "Deposit paid",
+    "confirmedBody": "Your booking is confirmed. The remaining {remaining} € is paid on arrival.",
+    "confirmedCheckIn": "Check-in 14:00–22:00 · check-out by 10:00",
     "balanceOnArrival": "The remaining balance is paid on arrival. We send the booking confirmation by email.",
     "terms": "By booking you accept the cancellation terms. Free cancellation and deposit refund up to 14 days before arrival.",
     "payButton": "Pay {amount} € deposit by card",
@@ -788,6 +793,7 @@
       "bookingNotFound": "Booking not found.",
       "invalidToken": "This payment link is not valid. Open the confirmation from your email.",
       "bookingCancelled": "This booking has been cancelled — payment is not possible.",
+      "alreadyPaid": "The deposit has already been paid. This booking is confirmed.",
       "invalidDeposit": "The deposit amount is not valid. Please contact us.",
       "paymentUnavailable": "Payment is temporarily unavailable. Please try again or contact us.",
       "createFailed": "Could not create the payment. Please try again."

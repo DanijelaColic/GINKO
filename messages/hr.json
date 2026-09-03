@@ -763,6 +763,8 @@
   },
   "bookingConfirmation": {
     "title": "Dovrši rezervaciju",
+    "titleConfirmed": "Rezervacija potvrđena",
+    "pageGreeting": "Poštovani/a {name},",
     "reference": "Referenca",
     "statusConfirmed": "Potvrđena",
     "statusCancelled": "Otkazana",
@@ -776,6 +778,9 @@
     "bookingCancelledHint": "Za novo rezerviranje posjetite stranicu dostupnosti.",
     "cardPayTitle": "Plaćanje depozita karticom",
     "cardPayNote": "Plaća se samo depozit od {amount} € — ostatak se plaća pri dolasku",
+    "confirmedTitle": "Depozit je plaćen",
+    "confirmedBody": "Vaša rezervacija je potvrđena. Ostatak od {remaining} € plaća se pri dolasku.",
+    "confirmedCheckIn": "Prijava 14:00–22:00 · odjava do 10:00",
     "balanceOnArrival": "Ostatak iznosa plaća se pri dolasku. Potvrdu rezervacije šaljemo na e-mail.",
     "terms": "Rezervacijom prihvaćate uvjete otkazivanja. Besplatno otkazivanje i povrat depozita do 14 dana prije dolaska.",
     "payButton": "Plati depozit {amount} € karticom",
@@ -788,6 +793,7 @@
       "bookingNotFound": "Rezervacija nije pronađena.",
       "invalidToken": "Veza za plaćanje nije važeća. Otvorite potvrdu iz e-pošte.",
       "bookingCancelled": "Rezervacija je otkazana — plaćanje nije moguće.",
+      "alreadyPaid": "Depozit je već plaćen. Ova rezervacija je potvrđena.",
       "invalidDeposit": "Iznos depozita nije važeći. Kontaktirajte nas.",
       "paymentUnavailable": "Plaćanje trenutno nije dostupno. Pokušajte ponovo ili nas kontaktirajte.",
       "createFailed": "Greška pri kreiranju plaćanja. Pokušajte ponovo."

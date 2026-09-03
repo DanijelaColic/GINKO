@@ -9,6 +9,7 @@ import {
   CONTACT_PHONE_TEL,
   CONTACT_PHONE_DISPLAY,
   CONTACT_WHATSAPP_URL,
+  FREE_CANCELLATION_DAYS,
 } from '@/modules/booking/booking.config';
 import {
   PROPERTY_ADDRESS,
@@ -20,6 +21,7 @@ import { getRoomDisplayName } from '@/modules/rooms/room.repository';
 
 export type BookingEmailData = {
   guestName: string;
+  guestFirstName?: string | null;
   guestEmail: string;
   guestPhone?: string | null;
   guestCountry?: string | null;
@@ -96,6 +98,7 @@ export function bookingRowToEmailData(
 
   return {
     guestName: String(booking.guest_name ?? ''),
+    guestFirstName: (booking.guest_first_name as string | null) ?? null,
     guestEmail: String(booking.guest_email ?? ''),
     guestPhone: (booking.guest_phone as string | null) ?? null,
     guestCountry: (booking.guest_country as string | null) ?? null,
@@ -389,6 +392,12 @@ function paymentBlock(d: FullData, locale: Locale, forGuest: boolean): string {
     </div>`;
 }
 
+function guestFirstName(d: { guestFirstName?: string | null; guestName: string }): string {
+  const fromField = d.guestFirstName?.trim();
+  if (fromField) return fromField;
+  return d.guestName.trim().split(/\s+/)[0] || d.guestName;
+}
+
 function contactFooter(locale: Locale): string {
   return `
     <div style="margin-top:24px;padding-top:16px;border-top:1px solid #e8e4dc;font-size:13px;color:#6b7a6e;line-height:1.7;">
@@ -403,13 +412,6 @@ function contactFooter(locale: Locale): string {
         ·
         <a href="${CONTACT_WHATSAPP_URL}" style="color:#3a6b4a;">WhatsApp</a>
       </p>
-      <p style="margin:8px 0 0;font-size:12px;">
-        ${t(locale, {
-          hr: 'Check-in 14:00–22:00 · Check-out do 10:00',
-          en: 'Check-in 14:00–22:00 · Check-out by 10:00',
-          cs: 'Check-in 14:00–22:00 · check-out do 10:00',
-        })}
-      </p>
     </div>`;
 }
 
@@ -418,7 +420,6 @@ function houseRulesBlock(locale: Locale): string {
     locale === 'en'
       ? [
           'Free private parking on site',
-          'Check-in 14:00–22:00 · check-out by 10:00',
           'No smoking indoors (terrace/yard OK)',
           'Quiet hours 23:00–07:00',
           'Pets on request (cleaning fee €15 / day)',
@@ -426,14 +427,12 @@ function houseRulesBlock(locale: Locale): string {
       : locale === 'cs'
         ? [
             'Soukromé parkování u objektu zdarma',
-            'Check-in 14:00–22:00 · check-out do 10:00',
             'Kouření pouze na terase / na dvoře',
             'Noční klid 23:00–07:00',
             'Domácí mazlíčci na vyžádání (úklid 15 € / den)',
           ]
         : [
             'Besplatan privatni parking uz objekt',
-            'Prijava 14:00–22:00 · odjava do 10:00',
             'Pušenje samo na terasi / u dvorištu',
             'Mir od 23:00 do 07:00',
             'Kućni ljubimci na upit (čišćenje 15 € / dan)',
@@ -472,10 +471,21 @@ function escapeHtml(s: string): string {
 // ── Templates ─────────────────────────────────────────────────────
 
 function guestConfirmedHtml(d: FullData, locale: Locale): string {
+  const name = escapeHtml(guestFirstName(d));
+  const greeting = t(locale, {
+    hr: `Poštovani/a ${name},`,
+    en: `Dear ${name},`,
+    cs: `Vážená/ý ${name},`,
+  });
   const msg = t(locale, {
     hr: 'Vaša rezervacija je potvrđena. Veselimo se vašem dolasku.',
     en: 'Your booking is confirmed. We look forward to your stay.',
     cs: 'Vaše rezervace byla potvrzena. Těšíme se na váš pobyt.',
+  });
+  const cancellation = t(locale, {
+    hr: `Besplatno otkazivanje i povrat depozita do ${FREE_CANCELLATION_DAYS} dana prije dolaska.`,
+    en: `Free cancellation and deposit refund up to ${FREE_CANCELLATION_DAYS} days before arrival.`,
+    cs: `Bezplatné storno a vrácení zálohy do ${FREE_CANCELLATION_DAYS} dnů před příjezdem.`,
   });
 
   const nightsLabel =
@@ -496,6 +506,7 @@ function guestConfirmedHtml(d: FullData, locale: Locale): string {
           ? `<p style="color:#e8f0ea;margin:10px 0 0;font-size:13px;font-family:monospace;">${d.reference}</p>`
           : ''
       }
+      <p style="color:#fff;margin:16px 0 0;font-size:17px;font-weight:600;">${greeting}</p>
     </div>
     <div style="padding:28px 24px;">
       <p style="color:#166534;font-weight:600;margin:0 0 20px;font-size:16px;">✓ ${msg}</p>
@@ -519,14 +530,16 @@ function guestConfirmedHtml(d: FullData, locale: Locale): string {
 
       ${paymentBlock(d, locale, true)}
 
+      <p style="margin:0 0 8px;font-size:13px;color:#6b7a6e;line-height:1.6;">${cancellation}</p>
+
       ${
         d.confirmationUrl
           ? ctaButton(
               d.confirmationUrl,
               t(locale, {
-                hr: 'Otvori potvrdu rezervacije',
-                en: 'Open booking confirmation',
-                cs: 'Otevřít potvrzení rezervace',
+                hr: 'Otvori rezervaciju',
+                en: 'Open your booking',
+                cs: 'Otevřít rezervaci',
               }),
             )
           : ''

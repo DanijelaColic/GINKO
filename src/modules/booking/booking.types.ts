@@ -68,6 +68,7 @@ export type BookingConfirmationData = {
   reference: string;
   status: 'pending' | 'confirmed' | 'cancelled';
   guestName: string;
+  guestFirstName?: string | null;
   guestEmail: string;
   roomName: string;
   room: Room;
@@ -81,6 +82,7 @@ export type BookingConfirmationData = {
   pricePerNight: number;
   totalPrice: number;
   deposit: number;
+  depositPaid?: boolean;
   priceBreakdown: PriceBreakdown;
   createdAt: string;
   payment: {

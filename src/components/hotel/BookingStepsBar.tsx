@@ -5,10 +5,13 @@ import { useTranslations } from 'next-intl';
 
 type Props = {
   currentStep: 1 | 2 | 3;
+  /** All steps checked — used after deposit is paid */
+  complete?: boolean;
 };
 
-export default function BookingStepsBar({ currentStep }: Props) {
+export default function BookingStepsBar({ currentStep, complete = false }: Props) {
   const t = useTranslations('bookingWidget.stepper');
+  const visualStep = complete ? 4 : currentStep;
 
   const steps: { n: 1 | 2 | 3; label: string }[] = [
     { n: 1, label: t('step1') },
@@ -23,20 +26,20 @@ export default function BookingStepsBar({ currentStep }: Props) {
           <div className="flex flex-col items-center gap-2">
             <div
               className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold transition-all ${
-                currentStep > step.n
+                visualStep > step.n
                   ? 'bg-primary text-white'
-                  : currentStep === step.n
+                  : visualStep === step.n
                     ? 'bg-primary text-white ring-4 ring-primary/15'
                     : 'bg-stone border border-stone text-muted'
               }`}
             >
-              {currentStep > step.n ? <Check size={14} /> : step.n}
+              {visualStep > step.n ? <Check size={14} /> : step.n}
             </div>
             <span
               className={`text-xs font-medium whitespace-nowrap transition-colors ${
-                currentStep === step.n
+                visualStep === step.n
                   ? 'text-text'
-                  : currentStep > step.n
+                  : visualStep > step.n
                     ? 'text-primary'
                     : 'text-muted'
               }`}
@@ -48,7 +51,7 @@ export default function BookingStepsBar({ currentStep }: Props) {
           {i < steps.length - 1 && (
             <div
               className={`h-px w-10 sm:w-16 mx-2 mt-4 shrink-0 transition-colors ${
-                currentStep > step.n ? 'bg-primary' : 'bg-stone'
+                visualStep > step.n ? 'bg-primary' : 'bg-stone'
               }`}
             />
           )}
