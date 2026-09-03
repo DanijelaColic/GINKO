@@ -6,7 +6,7 @@ import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
 
 // GET /api/admin/rooms — all rooms with translations + media count
 export async function GET(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

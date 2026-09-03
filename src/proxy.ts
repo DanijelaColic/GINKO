@@ -2,18 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import createMiddleware from 'next-intl/middleware';
 import { routing } from '@/i18n/routing';
 import { ADMIN_COOKIE_NAME } from '@/modules/booking/booking.config';
+import { verifyAdminSessionToken } from '@/lib/admin-session';
 
 const handleI18nRouting = createMiddleware(routing);
 
-export function proxy(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // ── Admin route guard ───────────────────────────────────────────
+  // ── Admin route guard (potpisana sesija) ────────────────────────
   if (pathname.startsWith('/admin') && pathname !== '/admin/login') {
     const cookie = request.cookies.get(ADMIN_COOKIE_NAME);
-    const expected = process.env.ADMIN_TOKEN;
+    const ok = await verifyAdminSessionToken(cookie?.value);
 
-    if (!expected || !cookie || cookie.value !== expected) {
+    if (!ok) {
       const loginUrl = new URL('/admin/login', request.url);
       loginUrl.searchParams.set('redirect', pathname);
       return NextResponse.redirect(loginUrl);
@@ -22,8 +23,8 @@ export function proxy(request: NextRequest) {
 
   if (pathname === '/admin/login') {
     const cookie = request.cookies.get(ADMIN_COOKIE_NAME);
-    const expected = process.env.ADMIN_TOKEN;
-    if (expected && cookie?.value === expected) {
+    const ok = await verifyAdminSessionToken(cookie?.value);
+    if (ok) {
       return NextResponse.redirect(new URL('/admin', request.url));
     }
   }

@@ -6,11 +6,15 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
-import { verifyBookingViewToken } from '@/lib/bookingConfirmation';
+import {
+  getBookingConfirmationPath,
+  verifyBookingViewToken,
+} from '@/lib/bookingConfirmation';
 import { guestApiError } from '@/lib/guest-api-error';
 import { createCheckoutSession } from '@/modules/payments/payment.service';
 import { eurToCents } from '@/modules/payments/payment.types';
 import { getSiteUrl } from '@/lib/siteUrl';
+import { getValidLocale } from '@/i18n/messages';
 
 export async function POST(request: NextRequest) {
   try {
@@ -27,7 +31,7 @@ export async function POST(request: NextRequest) {
     const supabase = createServerSupabaseClient();
     const { data: booking, error: bookingErr } = await supabase
       .from('bookings')
-      .select('id, guest_email, deposit, status, deposit_paid, room_slug')
+      .select('id, guest_email, deposit, status, deposit_paid, room_slug, locale')
       .eq('id', bookingId)
       .single();
 
@@ -53,18 +57,24 @@ export async function POST(request: NextRequest) {
     }
     const amountCents = eurToCents(depositEur);
 
+    const locale = getValidLocale(
+      typeof booking.locale === 'string' ? booking.locale : 'hr',
+    );
     const siteUrl = getSiteUrl();
-    const returnBasePath = `/booking/confirmation/${bookingId}?token=${encodeURIComponent(token)}`;
+    // Localized path so Saferpay return lands on the same language as booking
+    const returnBasePath = getBookingConfirmationPath(bookingId, token, locale);
 
     const result = await createCheckoutSession({
       booking_id: bookingId,
       amount_cents: amountCents,
       currency: 'eur',
+      languageCode: locale,
       returnBasePath,
       metadata: {
         payment_type: paymentType,
         room_slug: booking.room_slug as string,
         site_url: siteUrl,
+        locale,
       },
     });
 

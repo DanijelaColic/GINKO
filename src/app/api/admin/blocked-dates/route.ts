@@ -6,7 +6,7 @@ import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
 
 // GET /api/admin/blocked-dates?room=slug  (or all if no param)
 export async function GET(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/admin/blocked-dates — create a block
 export async function POST(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -55,7 +55,7 @@ export async function POST(request: NextRequest) {
 
 // DELETE /api/admin/blocked-dates — delete by id (body: { id })
 export async function DELETE(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

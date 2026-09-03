@@ -7,7 +7,7 @@ type Params = { params: Promise<{ slug: string }> };
 
 // PATCH /api/admin/rooms/[slug] — update room base fields + translations
 export async function PATCH(request: NextRequest, { params }: Params) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

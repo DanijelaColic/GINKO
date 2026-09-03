@@ -59,6 +59,8 @@ export type CreatePaymentIntentInput = {
   /** Amount in EUR cents (e.g. 5000 = €50.00) */
   amount_cents: number;
   currency?: string;
+  /** Guest UI locale — drives Saferpay Payment Page LanguageCode */
+  languageCode?: string;
   metadata?: Record<string, string>;
 };
 

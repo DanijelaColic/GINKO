@@ -3,12 +3,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
-import { createBookingViewToken } from '@/lib/bookingConfirmation';
+import {
+  createBookingViewToken,
+  getBookingConfirmationPath,
+} from '@/lib/bookingConfirmation';
 import { createCheckoutSession } from '@/modules/payments/payment.service';
 import { eurToCents } from '@/modules/payments/payment.types';
+import { getValidLocale } from '@/i18n/messages';
 
 export async function POST(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -21,7 +25,7 @@ export async function POST(request: NextRequest) {
   const supabase = createServerSupabaseClient();
   const { data: booking, error: bookingErr } = await supabase
     .from('bookings')
-    .select('id, guest_email, deposit, status, room_slug')
+    .select('id, guest_email, deposit, status, room_slug, locale')
     .eq('id', bookingId)
     .single();
 
@@ -43,20 +47,25 @@ export async function POST(request: NextRequest) {
 
   // ── Generate booking-view token server-side ───────────────────────
   const token = createBookingViewToken(bookingId, booking.guest_email as string);
+  const locale = getValidLocale(
+    typeof booking.locale === 'string' ? booking.locale : 'hr',
+  );
 
   // ── Build return path (same shape as public checkout) ─────────────
-  const returnBasePath = `/booking/confirmation/${bookingId}?token=${encodeURIComponent(token)}`;
+  const returnBasePath = getBookingConfirmationPath(bookingId, token, locale);
 
   try {
     const result = await createCheckoutSession({
       booking_id: bookingId,
       amount_cents: eurToCents(depositEur),
       currency: 'eur',
+      languageCode: locale,
       returnBasePath,
       metadata: {
         payment_type: 'deposit',
         room_slug: booking.room_slug as string,
         created_by: 'admin',
+        locale,
       },
     });
 

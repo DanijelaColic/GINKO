@@ -1,6 +1,9 @@
 // Adapted 1:1 from VJ/src/lib/bookingConfirmation.ts
 // Changes: getBookingConfirmationPath updated to use Ginko's /booking/confirmation route.
 import { createHmac, timingSafeEqual } from 'crypto';
+import { getValidLocale } from '@/i18n/messages';
+import { localizePath } from '@/i18n/pathnames';
+import type { AppLocale } from '@/i18n/routing';
 import { getSiteUrl, getSiteUrlFromRequest } from './siteUrl';
 
 function getBookingViewSecret(): string {
@@ -30,18 +33,24 @@ export function verifyBookingViewToken(
   return timingSafeEqual(Buffer.from(provided), Buffer.from(expected));
 }
 
-export function getBookingConfirmationPath(bookingId: string, token: string): string {
+export function getBookingConfirmationPath(
+  bookingId: string,
+  token: string,
+  locale?: string | null,
+): string {
+  const loc = getValidLocale(locale);
   const params = new URLSearchParams({ token });
-  return `/booking/confirmation/${bookingId}?${params.toString()}`;
+  return `${localizePath(`/booking/confirmation/${bookingId}`, loc)}?${params.toString()}`;
 }
 
 export function getBookingConfirmationUrl(
   bookingId: string,
   token: string,
   baseUrl?: string,
+  locale?: string | null,
 ): string {
   const site = baseUrl ?? getSiteUrl();
-  return `${site}${getBookingConfirmationPath(bookingId, token)}`;
+  return `${site}${getBookingConfirmationPath(bookingId, token, locale)}`;
 }
 
 /** Build absolute confirmation URL using the incoming request origin when available. */
@@ -49,10 +58,17 @@ export function getBookingConfirmationUrlFromRequest(
   bookingId: string,
   token: string,
   originOrReferer?: string | null,
+  locale?: string | null,
 ): string {
   return getBookingConfirmationUrl(
     bookingId,
     token,
     getSiteUrlFromRequest(originOrReferer),
+    locale,
   );
+}
+
+/** Saferpay Payment Page LanguageCode (ISO 639-1). */
+export function toSaferpayLanguageCode(locale?: string | null): AppLocale {
+  return getValidLocale(locale);
 }

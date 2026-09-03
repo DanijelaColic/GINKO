@@ -2,7 +2,7 @@
 // Token-gated: confirmation URL is only valid for the booking's guest email.
 // Step 3 of reservation flow — two-column layout mirroring Step 2 ("Vaši podaci").
 import type { Metadata } from 'next';
-import { notFound } from 'next/navigation';
+import { notFound, redirect } from 'next/navigation';
 import Link from 'next/link';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { getBookingConfirmationData } from '@/modules/booking/booking.confirmation';
@@ -12,6 +12,8 @@ import BookingSummaryCard from '@/components/hotel/BookingSummaryCard';
 import ConfirmationPaymentPanel from '@/components/hotel/ConfirmationPaymentPanel';
 import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { syncSaferpayPayment } from '@/modules/payments/payment.service';
+import { getValidLocale } from '@/i18n/messages';
+import { localizePath } from '@/i18n/pathnames';
 
 type Props = {
   params: Promise<{ id: string }>;
@@ -47,14 +49,27 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
 
   if (!id || !token) notFound();
 
-  const locale = await getLocale();
-  const t = await getTranslations('bookingConfirmation');
+  const urlLocale = getValidLocale(await getLocale());
   const [data, googleReviews] = await Promise.all([
-    getBookingConfirmationData(id, token, locale),
+    getBookingConfirmationData(id, token),
     getGoogleReviews(),
   ]);
 
   if (!data) notFound();
+
+  // Saferpay / email may return without /en|/cs — bounce to booking locale URL
+  if (data.locale !== urlLocale) {
+    const qs = new URLSearchParams({ token });
+    if (payment) qs.set('payment', payment);
+    if (oid) qs.set('oid', oid);
+    if (hostedCheckoutId) qs.set('hostedCheckoutId', hostedCheckoutId);
+    redirect(
+      `${localizePath(`/booking/confirmation/${id}`, getValidLocale(data.locale))}?${qs.toString()}`,
+    );
+  }
+
+  const locale = data.locale;
+  const t = await getTranslations({ locale, namespace: 'bookingConfirmation' });
 
   const showSuccessBanner =
     payment === 'success' ||
@@ -164,7 +179,7 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
             {/* Back link */}
             <div className="mt-8 text-center">
               <Link
-                href="/"
+                href={localizePath('/', getValidLocale(locale))}
                 className="inline-block rounded-full border border-primary px-6 py-3 text-sm font-medium text-primary transition-colors hover:bg-primary hover:text-white"
               >
                 {t('backHome')}

@@ -6,7 +6,7 @@ import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
 
 // GET /api/admin/pricing?room=slug
 export async function GET(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -28,7 +28,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/admin/pricing — add seasonal rate
 export async function POST(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
 
 // DELETE /api/admin/pricing — delete by id
 export async function DELETE(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

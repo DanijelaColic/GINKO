@@ -255,11 +255,16 @@ export async function POST(request: NextRequest) {
 
     const confirmationToken = createBookingViewToken(booking.id, guest_email);
     const origin = request.headers.get('origin') ?? request.headers.get('referer');
-    const confirmationPath = getBookingConfirmationPath(booking.id, confirmationToken);
+    const confirmationPath = getBookingConfirmationPath(
+      booking.id,
+      confirmationToken,
+      locale,
+    );
     const confirmationUrl = getBookingConfirmationUrlFromRequest(
       booking.id,
       confirmationToken,
       origin,
+      locale,
     );
 
     // Email vlasniku odmah; gost prima potvrdu tek nakon plaćanja depozita

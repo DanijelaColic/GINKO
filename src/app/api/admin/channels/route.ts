@@ -8,7 +8,7 @@ import { rooms as staticRooms } from '@/modules/rooms/rooms.config';
 
 // GET — list all mappings, auto-creating records for any room without one
 export async function GET(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -40,7 +40,7 @@ export async function GET(request: NextRequest) {
 
 // PATCH — update import URL or sync_enabled for a room
 export async function PATCH(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

@@ -113,6 +113,16 @@ function hoursSinceCreated(iso: string): number {
   return Math.max(0, Math.floor((Date.now() - new Date(iso).getTime()) / 3_600_000));
 }
 
+function formatCreatedAt(iso: string): string {
+  return new Date(iso).toLocaleString('hr-HR', {
+    day: 'numeric',
+    month: 'numeric',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+  });
+}
+
 function formatStaleAge(hours: number): string {
   if (hours < 48) return `${hours} h`;
   const days = Math.floor(hours / 24);
@@ -371,7 +381,7 @@ export default function AdminBookings() {
       b.check_in, b.check_out, b.nights, b.adults, b.children,
       b.total_price, b.deposit, b.deposit_paid ? 'Da' : 'Ne',
       STATUS_LABELS[b.status] ?? b.status, b.notes ?? '',
-      new Date(b.created_at).toLocaleDateString('hr-HR'),
+      formatCreatedAt(b.created_at),
     ]);
     const csv = [headers, ...rows]
       .map((row) => row.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(','))
@@ -1247,7 +1257,7 @@ export default function AdminBookings() {
                                   <div>
                                     <p className="text-xs text-gray-400 mb-0.5">Kreirano</p>
                                     <p className="text-gray-700">
-                                      {new Date(booking.created_at).toLocaleDateString('hr-HR')}
+                                      {formatCreatedAt(booking.created_at)}
                                     </p>
                                   </div>
                                   {booking.notes && (

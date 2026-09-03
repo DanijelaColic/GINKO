@@ -5,7 +5,7 @@ import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
 import { syncICalForRoom } from '@/modules/channels/ical.sync';
 
 export async function POST(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

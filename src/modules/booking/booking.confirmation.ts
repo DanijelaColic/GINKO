@@ -23,14 +23,12 @@ export async function getBookingConfirmationData(
   const trimmedToken = token.trim();
   if (!bookingId || !trimmedToken) return null;
 
-  const locale = getValidLocale(localeRaw);
-
   try {
     const supabase = createServerSupabaseClient();
     const { data: booking, error } = await supabase
       .from('bookings')
       .select(
-        'id, room_slug, check_in, check_out, nights, guest_name, guest_first_name, guest_email, total_price, deposit, deposit_paid, status, created_at, adults, children',
+        'id, room_slug, check_in, check_out, nights, guest_name, guest_first_name, guest_email, total_price, deposit, deposit_paid, status, created_at, adults, children, locale',
       )
       .eq('id', bookingId)
       .single();
@@ -40,6 +38,11 @@ export async function getBookingConfirmationData(
     if (!verifyBookingViewToken(trimmedToken, booking.id, booking.guest_email)) {
       return null;
     }
+
+    // Content always follows booking.locale (set at create time)
+    const locale = getValidLocale(
+      typeof booking.locale === 'string' ? booking.locale : localeRaw,
+    );
 
     const room =
       (await getRoom(booking.room_slug, locale)) ?? getRoomBySlug(booking.room_slug);
@@ -58,6 +61,7 @@ export async function getBookingConfirmationData(
       id: booking.id,
       reference: bookingReference(booking.id),
       status: booking.status as BookingConfirmationData['status'],
+      locale,
       guestName: booking.guest_name,
       guestFirstName: (booking.guest_first_name as string | null) ?? null,
       guestEmail: booking.guest_email,

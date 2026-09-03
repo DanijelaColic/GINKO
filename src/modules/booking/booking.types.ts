@@ -67,6 +67,8 @@ export type BookingConfirmationData = {
   id: string;
   reference: string;
   status: 'pending' | 'confirmed' | 'cancelled';
+  /** Locale snimljen pri rezervaciji — za Saferpay return / email linkove */
+  locale: string;
   guestName: string;
   guestFirstName?: string | null;
   guestEmail: string;

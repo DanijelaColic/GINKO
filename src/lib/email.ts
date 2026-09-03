@@ -203,7 +203,12 @@ export async function notifyGuestBookingConfirmed(bookingId: string): Promise<vo
   if (error || !booking?.guest_email) return;
 
   const token = createBookingViewToken(booking.id, booking.guest_email);
-  const confirmationUrl = getBookingConfirmationUrl(booking.id, token);
+  const confirmationUrl = getBookingConfirmationUrl(
+    booking.id,
+    token,
+    undefined,
+    typeof booking.locale === 'string' ? booking.locale : 'hr',
+  );
 
   await sendConfirmationEmail(
     bookingRowToEmailData(booking as Record<string, unknown>, { confirmationUrl }),

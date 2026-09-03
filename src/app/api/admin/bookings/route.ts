@@ -9,7 +9,7 @@ import { parseLocalDate, diffDays, calculatePrice } from '@/modules/booking/date
 
 // GET /api/admin/bookings — sve rezervacije
 export async function GET(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -25,7 +25,7 @@ export async function GET(request: NextRequest) {
 
 // POST /api/admin/bookings — nova ručna rezervacija
 export async function POST(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
@@ -88,7 +88,7 @@ export async function POST(request: NextRequest) {
 
 // DELETE /api/admin/bookings — grupno brisanje
 export async function DELETE(request: NextRequest) {
-  if (!isAdminAuthenticatedFromRequest(request)) {
+  if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 

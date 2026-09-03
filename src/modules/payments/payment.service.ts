@@ -31,6 +31,7 @@ import type {
   PaymentIntent,
 } from './payment.types';
 import { getSiteUrl } from '@/lib/siteUrl';
+import { toSaferpayLanguageCode } from '@/lib/bookingConfirmation';
 import { notifyGuestBookingConfirmed } from '@/lib/email';
 
 // ── Status mapping ────────────────────────────────────────────────
@@ -91,6 +92,8 @@ export async function createCheckoutSession(
   const returnUrl = `${siteUrl}${input.returnBasePath}&payment=return&oid=${orderId}`;
   const notifyBase = `${siteUrl}/api/webhooks/saferpay?oid=${orderId}`;
 
+  const languageCode = toSaferpayLanguageCode(input.languageCode);
+
   const init = await saferpayRequest<PaymentPageInitializeResponse>(
     '/Payment/v1/PaymentPage/Initialize',
     {
@@ -104,7 +107,7 @@ export async function createCheckoutSession(
         Description: `Depozit rezervacije ${input.booking_id}`,
       },
       Payer: {
-        LanguageCode: 'hr',
+        LanguageCode: languageCode,
       },
       ReturnUrl: {
         Url: returnUrl,
@@ -322,11 +325,18 @@ export async function getPaymentStatus(bookingId: string): Promise<PaymentStatus
 export async function createPaymentIntent(
   input: CreatePaymentIntentInput,
 ): Promise<PaymentIntentResult> {
+  const languageCode = toSaferpayLanguageCode(input.languageCode);
   const result = await createCheckoutSession({
     ...input,
-    returnBasePath: `/booking/confirmation/${input.booking_id}?token=`,
+    languageCode,
+    returnBasePath: getBookingConfirmationPathPlaceholder(input.booking_id),
   });
   return result;
+}
+
+function getBookingConfirmationPathPlaceholder(bookingId: string): string {
+  // Token is empty here — callers that need a real return URL must use createCheckoutSession
+  return `/booking/confirmation/${bookingId}?token=`;
 }
 
 // ── Notify handler (GET from Saferpay servers) ────────────────────
