@@ -1,1 +1,3 @@
-export { default, metadata, dynamic } from '../../../../../(public)/booking/confirmation/[id]/page';
+export { default, metadata } from '../../../../../(public)/booking/confirmation/[id]/page';
+
+export const dynamic = 'force-dynamic';
