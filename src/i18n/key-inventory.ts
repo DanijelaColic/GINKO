@@ -106,6 +106,12 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
     notes: 'Politika kolačića',
   },
   {
+    namespace: 'termsPage',
+    bucket: 'legal_adjacent',
+    approxKeys: 35,
+    notes: 'Opći poslovni uvjeti (Worldline Risk)',
+  },
+  {
     namespace: 'cookieBanner',
     bucket: 'legal_adjacent',
     approxKeys: 5,

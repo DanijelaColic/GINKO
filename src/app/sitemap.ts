@@ -3,6 +3,7 @@ import { routing } from '@/i18n/routing';
 import { GUIDES } from '@/modules/seo/guides/guides-content';
 import { LANDING_PAGE_PATHS } from '@/modules/seo/landing-pages/landing-enriched-types';
 import { rooms } from '@/modules/rooms/rooms.config';
+import { TERMS_PATH } from '@/modules/booking/booking.config';
 
 const BASE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ginko-sobe.com';
 
@@ -18,6 +19,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'monthly' as const,
       priority: 0.85,
     })),
+    { pathname: TERMS_PATH, changeFrequency: 'yearly' as const, priority: 0.35 },
     { pathname: '/privacy', changeFrequency: 'yearly' as const, priority: 0.2 },
     { pathname: '/cookies', changeFrequency: 'yearly' as const, priority: 0.2 },
   ];

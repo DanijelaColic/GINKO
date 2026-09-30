@@ -14,6 +14,7 @@ import {
 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import { getLocale } from 'next-intl/server';
+import { HOUSE_RULES_SECTION_ID } from '@/modules/booking/booking.config';
 import {
   getHouseRules,
   getHouseRulesUi,
@@ -118,7 +119,10 @@ export default async function PropertyHouseRulesSection({ embedded = false }: Pr
   const rules = getHouseRules(locale);
 
   const content = (
-    <div className="border border-stone rounded-xl overflow-hidden bg-white">
+    <div
+      id={HOUSE_RULES_SECTION_ID}
+      className="border border-stone rounded-xl overflow-hidden bg-white scroll-mt-28"
+    >
       <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4 px-5 py-5 border-b border-stone bg-stone-light/30">
         <div>
           <h3 className="font-serif text-2xl sm:text-3xl font-semibold text-text">

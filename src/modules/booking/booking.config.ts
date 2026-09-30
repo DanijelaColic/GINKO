@@ -49,6 +49,16 @@ export const RECIPIENT_BIC = process.env.RECIPIENT_BIC ?? '';
 export const RECIPIENT_BANK_NAME = process.env.RECIPIENT_BANK_NAME ?? '';
 
 // ── Poslovni uvjeti ───────────────────────────────────────────────
+/** Javna stranica Općih poslovnih uvjeta (Worldline Risk / checkout) */
+export const TERMS_PATH = '/opci-poslovni-uvjeti' as const;
+
+/** Kućni red — anchor na početnoj (u sekciji sadržaji) */
+export const HOUSE_RULES_SECTION_ID = 'kucni-red';
+
+export function houseRulesSectionHref() {
+  return `/#${HOUSE_RULES_SECTION_ID}`;
+}
+
 /** 50% depozit pri rezervaciji; ostatak u smještajnom objektu */
 export const DEPOSIT_PERCENT = 0.5;
 

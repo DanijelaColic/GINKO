@@ -1,6 +1,8 @@
 'use client';
 
 import { useTranslations } from 'next-intl';
+import { Link } from '@/i18n/navigation';
+import { TERMS_PATH } from '@/modules/booking/booking.config';
 import PayDepositButton from './PayDepositButton';
 import {
   PROPERTY_ADDRESS,
@@ -110,7 +112,13 @@ export default function ConfirmationPaymentPanel({
 
       {!bookingCancelled && (
         <p className="text-xs text-text/40 text-center leading-relaxed px-2">
-          {t('terms')}
+          {t.rich('terms', {
+            terms: (chunks) => (
+              <Link href={TERMS_PATH} className="text-primary/70 hover:underline underline-offset-2">
+                {chunks}
+              </Link>
+            ),
+          })}
         </p>
       )}
     </div>

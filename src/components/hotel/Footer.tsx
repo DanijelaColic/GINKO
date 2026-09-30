@@ -11,6 +11,7 @@ import {
   CONTACT_PHONE_DISPLAY,
   PROPERTY_NAV_ITEMS,
   propertySectionHref,
+  TERMS_PATH,
 } from '@/modules/booking/booking.config';
 
 const YEAR = new Date().getFullYear();
@@ -21,6 +22,7 @@ const NAV_LINKS = PROPERTY_NAV_ITEMS.map(({ key, id }) => ({
 }));
 
 const LEGAL_LINKS = [
+  { key: 'terms', href: TERMS_PATH },
   { key: 'privacy', href: '/privacy' },
   { key: 'cookies', href: '/cookies' },
 ] as const;

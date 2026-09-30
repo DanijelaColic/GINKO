@@ -27,8 +27,8 @@ import {
   RECIPIENT_BANK_NAME,
   DEPOSIT_PERCENT,
   MIN_NIGHTS,
-  FACILITIES_SECTION_ID,
-  propertySectionHref,
+  TERMS_PATH,
+  houseRulesSectionHref,
   EXTRA_BED_PRICE_PER_NIGHT,
   CRIB_PRICE_PER_NIGHT,
 } from '@/modules/booking/booking.config';
@@ -1019,7 +1019,7 @@ export default function BookingWidget({
                   {t('form.rules.checkOutTime')}
                 </p>
                 <Link
-                  href={propertySectionHref(FACILITIES_SECTION_ID)}
+                  href={TERMS_PATH}
                   className="text-primary hover:underline underline-offset-2 font-medium"
                 >
                   {t('form.rulesLinkLabel')}
@@ -1041,7 +1041,7 @@ export default function BookingWidget({
                 {t.rich('form.agreeRules', {
                   houseRules: (chunks) => (
                     <Link
-                      href={propertySectionHref(FACILITIES_SECTION_ID)}
+                      href={houseRulesSectionHref()}
                       className="text-primary hover:underline underline-offset-2"
                     >
                       {chunks}
@@ -1049,7 +1049,7 @@ export default function BookingWidget({
                   ),
                   bookingTerms: (chunks) => (
                     <Link
-                      href={propertySectionHref(FACILITIES_SECTION_ID)}
+                      href={TERMS_PATH}
                       className="text-primary hover:underline underline-offset-2"
                     >
                       {chunks}
