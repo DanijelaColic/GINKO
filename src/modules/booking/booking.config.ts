@@ -48,8 +48,8 @@ export const RECIPIENT_NAME = process.env.RECIPIENT_NAME ?? '';
 export const RECIPIENT_BIC = process.env.RECIPIENT_BIC ?? '';
 export const RECIPIENT_BANK_NAME = process.env.RECIPIENT_BANK_NAME ?? '';
 
-// ── Opći uvjeti poslovanja (OPU) ──────────────────────────────────
-/** Javna stranica OPU-a (Worldline Risk / checkout); URL ostaje radi bookmarka */
+// ── Opći uvjeti poslovanja (OUP) ──────────────────────────────────
+/** Javna stranica OUP-a (Worldline Risk / checkout); URL ostaje radi bookmarka */
 export const TERMS_PATH = '/opci-poslovni-uvjeti' as const;
 
 /** Kućni red — anchor na početnoj (u sekciji sadržaji) */

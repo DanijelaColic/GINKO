@@ -752,7 +752,7 @@
   },
   "termsPage": {
     "title": "Opći uvjeti poslovanja",
-    "description": "Opći uvjeti poslovanja (OPU) za online rezervaciju smještaja — Ginko Boutique Rooms & Wellness, Daruvar.",
+    "description": "Opći uvjeti poslovanja (OUP) za online rezervaciju smještaja — Ginko Boutique Rooms & Wellness, Daruvar.",
     "openGraph": {
       "title": "Opći uvjeti poslovanja – Ginko Boutique Rooms & Wellness",
       "description": "Uvjeti online rezervacije, plaćanja depozita i otkazivanja boravka.",
@@ -760,7 +760,7 @@
     },
     "eyebrow": "Pravni dokumenti",
     "lastUpdated": "Zadnja izmjena: 18. rujna 2026.",
-    "intro": "Ovi Opći uvjeti poslovanja (OPU) reguliraju online rezervaciju smještaja putem web stranice ginko-sobe.com. Rezervacijom prihvaćate ove uvjete.",
+    "intro": "Ovi Opći uvjeti poslovanja (OUP) reguliraju online rezervaciju smještaja putem web stranice ginko-sobe.com. Rezervacijom prihvaćate ove uvjete.",
     "providerTitle": "1. Pružatelj usluge",
     "providerBody": "Pružatelj usluge smještaja je {legalName}, OIB {oib}, {address}. Za pitanja vezana uz rezervacije i plaćanja kontaktirajte nas na <email></email>.",
     "subjectTitle": "2. Predmet ugovora",
