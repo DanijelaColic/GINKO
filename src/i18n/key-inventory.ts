@@ -109,7 +109,7 @@ export const I18N_NAMESPACES: readonly I18nNamespaceInfo[] = [
     namespace: 'termsPage',
     bucket: 'legal_adjacent',
     approxKeys: 35,
-    notes: 'Opći poslovni uvjeti (Worldline Risk)',
+    notes: 'Opći uvjeti poslovanja — OPU (Worldline Risk)',
   },
   {
     namespace: 'cookieBanner',

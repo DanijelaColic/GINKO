@@ -93,7 +93,7 @@
     "legal": {
       "privacy": "Zásady ochrany osobních údajů",
       "cookies": "Cookies",
-      "terms": "Obchodní podmínky"
+      "terms": "Obecné obchodní podmínky"
     },
     "checkIn": "Check-in od 14:00",
     "checkOut": "Check-out do 10:00",
@@ -573,8 +573,8 @@
         "checkOut": "Odjezd (check-out)",
         "checkOutTime": "do 10:00"
       },
-      "agreeRules": "Souhlasím s <houseRules>domácím řádem</houseRules> a <bookingTerms>podmínkami rezervace</bookingTerms>.",
-      "rulesLinkLabel": "Přečtěte si domácí řád a podmínky rezervace",
+      "agreeRules": "Souhlasím s <houseRules>domácím řádem</houseRules> a <bookingTerms>obecnými obchodními podmínkami</bookingTerms>.",
+      "rulesLinkLabel": "Přečtěte si domácí řád a obecné obchodní podmínky",
       "submitting": "Příprava platby…",
       "continueToPayment": "Pokračovat k platbě",
       "step3Redirecting": "Vytvářím rezervaci a přesměrovávám na platbu…",
@@ -751,16 +751,16 @@
     "homeLink": "← Úvod"
   },
   "termsPage": {
-    "title": "Obchodní podmínky",
-    "description": "Obecné obchodní podmínky online rezervace ubytování — Ginko Boutique Rooms & Wellness, Daruvar.",
+    "title": "Obecné obchodní podmínky",
+    "description": "Obecné obchodní podmínky (OPU) pro online rezervaci ubytování — Ginko Boutique Rooms & Wellness, Daruvar.",
     "openGraph": {
-      "title": "Obchodní podmínky – Ginko Boutique Rooms & Wellness",
+      "title": "Obecné obchodní podmínky – Ginko Boutique Rooms & Wellness",
       "description": "Podmínky online rezervace, platby zálohy a storna.",
-      "imageAlt": "Ginko Boutique Rooms & Wellness – obchodní podmínky"
+      "imageAlt": "Ginko Boutique Rooms & Wellness – obecné obchodní podmínky"
     },
     "eyebrow": "Právní dokumenty",
     "lastUpdated": "Poslední aktualizace: 18. září 2026.",
-    "intro": "Tyto obchodní podmínky upravují online rezervace ubytování přes ginko-sobe.com. Rezervací podmínky přijímáte.",
+    "intro": "Tyto obecné obchodní podmínky (OPU) upravují online rezervace ubytování přes ginko-sobe.com. Rezervací podmínky přijímáte.",
     "providerTitle": "1. Poskytovatel služby",
     "providerBody": "Poskytovatelem ubytování je {legalName}, OIB {oib}, {address}. Dotazy k rezervacím a platbám směřujte na <email></email>.",
     "subjectTitle": "2. Předmět smlouvy",
@@ -822,7 +822,7 @@
     "confirmedBody": "Vaše rezervace je potvrzena. Zbytek {remaining} € se platí při příjezdu.",
     "confirmedCheckIn": "Check-in 14:00–22:00 · check-out do 10:00",
     "balanceOnArrival": "Zbytek částky se platí při příjezdu. Potvrzení rezervace posíláme e-mailem.",
-    "terms": "Rezervací přijímáte <terms>Obchodní podmínky</terms>. Bezplatné storno a vrácení zálohy do 14 dnů před příjezdem.",
+    "terms": "Rezervací přijímáte <terms>Obecné obchodní podmínky</terms>. Bezplatné storno a vrácení zálohy do 14 dnů před příjezdem.",
     "payButton": "Zaplatit zálohu {amount} € kartou",
     "redirecting": "Přesměrování na platbu...",
     "alreadyStarted": "Platba už byla zahájena — stav potvrzení najdete v e-mailu.",

@@ -57,7 +57,7 @@
     "escalate": "Na to nemam spreman odgovor. Pišite nam na WhatsApp ili pošaljite pitanje e-poštom.",
     "thinking": "Trenutak…",
     "availabilityAnswer": "Raspoloživost i cijene za konkretne datume vidite u pretrazi na stranici. Bot ih ne navodi.",
-    "legalAnswer": "Pravne informacije: Opći poslovni uvjeti, Politika privatnosti i Kolačići (linkovi u podnožju stranice).",
+    "legalAnswer": "Pravne informacije: Opći uvjeti poslovanja, Politika privatnosti i Kolačići (linkovi u podnožju stranice).",
     "galleryAnswer": "Fotografije smještaja su u galeriji i na stranicama soba.",
     "roomsAnswer": "Pregled svih soba i apartmana je na stranici Sobe. Raspoloživost provjerite u pretrazi.",
     "minNights": "Minimalni boravak je {count} noć.",
@@ -93,7 +93,7 @@
     "legal": {
       "privacy": "Politika privatnosti",
       "cookies": "Kolačići",
-      "terms": "Opći poslovni uvjeti"
+      "terms": "Opći uvjeti poslovanja"
     },
     "checkIn": "Check-in od 14:00",
     "checkOut": "Check-out do 10:00",
@@ -573,8 +573,8 @@
         "checkOut": "Odlazak (check-out)",
         "checkOutTime": "do 10:00"
       },
-      "agreeRules": "Slažem se s <houseRules>pravilima smještaja</houseRules> i <bookingTerms>uvjetima rezervacije</bookingTerms>.",
-      "rulesLinkLabel": "Pročitajte kućni red i uvjete rezervacije",
+      "agreeRules": "Slažem se s <houseRules>pravilima smještaja</houseRules> i <bookingTerms>općim uvjetima poslovanja</bookingTerms>.",
+      "rulesLinkLabel": "Pročitajte kućni red i opće uvjete poslovanja",
       "submitting": "Priprema plaćanja…",
       "continueToPayment": "Nastavi na plaćanje",
       "step3Redirecting": "Kreiranje rezervacije i preusmjeravanje na plaćanje…",
@@ -751,16 +751,16 @@
     "homeLink": "← Početna"
   },
   "termsPage": {
-    "title": "Opći poslovni uvjeti",
-    "description": "Opći poslovni uvjeti online rezervacije smještaja — Ginko Boutique Rooms & Wellness, Daruvar.",
+    "title": "Opći uvjeti poslovanja",
+    "description": "Opći uvjeti poslovanja (OPU) za online rezervaciju smještaja — Ginko Boutique Rooms & Wellness, Daruvar.",
     "openGraph": {
-      "title": "Opći poslovni uvjeti – Ginko Boutique Rooms & Wellness",
+      "title": "Opći uvjeti poslovanja – Ginko Boutique Rooms & Wellness",
       "description": "Uvjeti online rezervacije, plaćanja depozita i otkazivanja boravka.",
-      "imageAlt": "Ginko Boutique Rooms & Wellness – opći poslovni uvjeti"
+      "imageAlt": "Ginko Boutique Rooms & Wellness – opći uvjeti poslovanja"
     },
     "eyebrow": "Pravni dokumenti",
     "lastUpdated": "Zadnja izmjena: 18. rujna 2026.",
-    "intro": "Ovi Opći poslovni uvjeti (OPG) reguliraju online rezervaciju smještaja putem web stranice ginko-sobe.com. Rezervacijom prihvaćate ove uvjete.",
+    "intro": "Ovi Opći uvjeti poslovanja (OPU) reguliraju online rezervaciju smještaja putem web stranice ginko-sobe.com. Rezervacijom prihvaćate ove uvjete.",
     "providerTitle": "1. Pružatelj usluge",
     "providerBody": "Pružatelj usluge smještaja je {legalName}, OIB {oib}, {address}. Za pitanja vezana uz rezervacije i plaćanja kontaktirajte nas na <email></email>.",
     "subjectTitle": "2. Predmet ugovora",
@@ -822,7 +822,7 @@
     "confirmedBody": "Vaša rezervacija je potvrđena. Ostatak od {remaining} € plaća se pri dolasku.",
     "confirmedCheckIn": "Prijava 14:00–22:00 · odjava do 10:00",
     "balanceOnArrival": "Ostatak iznosa plaća se pri dolasku. Potvrdu rezervacije šaljemo na e-mail.",
-    "terms": "Rezervacijom prihvaćate <terms>Opće poslovne uvjete</terms>. Besplatno otkazivanje i povrat depozita do 14 dana prije dolaska.",
+    "terms": "Rezervacijom prihvaćate <terms>Opće uvjete poslovanja</terms>. Besplatno otkazivanje i povrat depozita do 14 dana prije dolaska.",
     "payButton": "Plati depozit {amount} € karticom",
     "redirecting": "Preusmjeravanje na plaćanje...",
     "alreadyStarted": "Plaćanje je već pokrenuto — provjerite e-mail za status potvrde.",

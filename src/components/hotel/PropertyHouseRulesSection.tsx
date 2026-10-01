@@ -15,6 +15,7 @@ import {
 import { Link } from '@/i18n/navigation';
 import { getLocale } from 'next-intl/server';
 import { HOUSE_RULES_SECTION_ID } from '@/modules/booking/booking.config';
+import AvailabilityCtaLink from '@/components/hotel/AvailabilityCtaLink';
 import {
   getHouseRules,
   getHouseRulesUi,
@@ -129,12 +130,9 @@ export default async function PropertyHouseRulesSection({ embedded = false }: Pr
             {copy.title}
           </h3>
         </div>
-        <a
-          href="#raspolozivost"
-          className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0"
-        >
+        <AvailabilityCtaLink className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0">
           {copy.showAvailability}
-        </a>
+        </AvailabilityCtaLink>
       </div>
 
       {rules.map((rule) => (

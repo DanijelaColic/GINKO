@@ -11,6 +11,7 @@ import { getRootMetadata } from '@/i18n/metadata';
 import { getRooms } from '@/modules/rooms/room.repository';
 import type { RoomLocale } from '@/modules/rooms/room.types';
 import HeroSearchBar from '@/components/hotel/HeroSearchBar';
+import AvailabilityCtaLink from '@/components/hotel/AvailabilityCtaLink';
 import PropertyGallery from '@/components/hotel/PropertyGallery';
 import type { GalleryImage } from '@/components/hotel/PropertyGallery';
 import AvailabilitySection from '@/components/hotel/AvailabilitySection';
@@ -142,13 +143,10 @@ export default async function HomePage() {
           </p>
           <HeroSearchBar />
           <div className="mt-12 flex items-center gap-2 text-white/60 text-sm">
-            <a
-              href="#raspolozivost"
-              className="hover:text-white transition-colors flex items-center gap-1"
-            >
+            <AvailabilityCtaLink className="hover:text-white transition-colors flex items-center gap-1">
               {t('heroCta')}
               <ChevronRight size={15} />
-            </a>
+            </AvailabilityCtaLink>
           </div>
         </div>
       </section>

@@ -4,6 +4,7 @@ import { PropertyLocationMapPreview } from '@/components/hotel/PropertyLocationM
 import { getSurroundingsCopy } from '@/modules/property/property-details.i18n';
 import type { SurroundingItem } from '@/modules/property/property-details.config';
 import { SURROUNDINGS_SECTION_ID } from '@/modules/booking/booking.config';
+import AvailabilityCtaLink from '@/components/hotel/AvailabilityCtaLink';
 
 function SurroundingList({ items }: { items: readonly SurroundingItem[] }) {
   return (
@@ -51,12 +52,9 @@ export default async function PropertySurroundingsSection() {
               {ui.title}
             </h2>
           </div>
-          <a
-            href="#raspolozivost"
-            className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0"
-          >
+          <AvailabilityCtaLink className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0">
             {ui.showAvailability}
-          </a>
+          </AvailabilityCtaLink>
         </div>
 
         <PropertyLocationMapPreview />

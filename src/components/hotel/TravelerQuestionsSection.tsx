@@ -6,6 +6,7 @@ import { MessageCircle, ChevronRight } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import AskQuestionModal from '@/components/hotel/AskQuestionModal';
 import { QUESTIONS_SECTION_ID } from '@/modules/booking/booking.config';
+import AvailabilityCtaLink from '@/components/hotel/AvailabilityCtaLink';
 
 type FaqId =
   | 'parking'
@@ -127,12 +128,9 @@ export default function TravelerQuestionsSection() {
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text">
             {t('title')}
           </h2>
-          <a
-            href="#raspolozivost"
-            className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0"
-          >
+          <AvailabilityCtaLink className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0">
             {t('showAvailability')}
-          </a>
+          </AvailabilityCtaLink>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">

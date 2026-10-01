@@ -23,6 +23,7 @@ import {
   getPopularFacilities,
 } from '@/modules/property/property-details.i18n';
 import { FACILITIES_SECTION_ID } from '@/modules/booking/booking.config';
+import AvailabilityCtaLink from '@/components/hotel/AvailabilityCtaLink';
 import PropertyHouseRulesSection from '@/components/hotel/PropertyHouseRulesSection';
 
 const POPULAR_ICONS: Record<string, ElementType> = {
@@ -87,12 +88,9 @@ export default async function PropertyFacilitiesSection() {
           <h2 className="font-serif text-3xl sm:text-4xl font-semibold text-text">
             {copy.title}
           </h2>
-          <a
-            href="#raspolozivost"
-            className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0"
-          >
+          <AvailabilityCtaLink className="inline-flex items-center justify-center bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap shrink-0">
             {copy.showAvailability}
-          </a>
+          </AvailabilityCtaLink>
         </div>
 
         <h3 className="font-semibold text-sm text-text mb-4">

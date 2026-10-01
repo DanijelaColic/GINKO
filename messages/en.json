@@ -93,7 +93,7 @@
     "legal": {
       "privacy": "Privacy Policy",
       "cookies": "Cookies",
-      "terms": "Terms & Conditions"
+      "terms": "Terms of Business"
     },
     "checkIn": "Check-in from 14:00",
     "checkOut": "Check-out until 10:00",
@@ -573,8 +573,8 @@
         "checkOut": "Check-out",
         "checkOutTime": "until 10:00"
       },
-      "agreeRules": "I agree with the <houseRules>house rules</houseRules> and <bookingTerms>booking terms</bookingTerms>.",
-      "rulesLinkLabel": "Read house rules and booking terms",
+      "agreeRules": "I agree with the <houseRules>house rules</houseRules> and <bookingTerms>general terms of business</bookingTerms>.",
+      "rulesLinkLabel": "Read house rules and terms of business",
       "submitting": "Preparing payment…",
       "continueToPayment": "Continue to payment",
       "step3Redirecting": "Creating your booking and redirecting to payment…",
@@ -751,16 +751,16 @@
     "homeLink": "← Home"
   },
   "termsPage": {
-    "title": "Terms & Conditions",
-    "description": "General terms for online accommodation booking — Ginko Boutique Rooms & Wellness, Daruvar.",
+    "title": "Terms of Business",
+    "description": "General terms of business (GTB) for online accommodation booking — Ginko Boutique Rooms & Wellness, Daruvar.",
     "openGraph": {
-      "title": "Terms & Conditions – Ginko Boutique Rooms & Wellness",
+      "title": "Terms of Business – Ginko Boutique Rooms & Wellness",
       "description": "Online booking, deposit payment and cancellation terms.",
-      "imageAlt": "Ginko Boutique Rooms & Wellness – terms and conditions"
+      "imageAlt": "Ginko Boutique Rooms & Wellness – terms of business"
     },
     "eyebrow": "Legal documents",
     "lastUpdated": "Last updated: 18 September 2026.",
-    "intro": "These Terms & Conditions govern online accommodation bookings via ginko-sobe.com. By booking you accept these terms.",
+    "intro": "These General Terms of Business (GTB) govern online accommodation bookings via ginko-sobe.com. By booking you accept these terms.",
     "providerTitle": "1. Service provider",
     "providerBody": "The accommodation provider is {legalName}, OIB {oib}, {address}. For booking and payment enquiries contact us at <email></email>.",
     "subjectTitle": "2. Subject of contract",
@@ -822,7 +822,7 @@
     "confirmedBody": "Your booking is confirmed. The remaining {remaining} € is paid on arrival.",
     "confirmedCheckIn": "Check-in 14:00–22:00 · check-out by 10:00",
     "balanceOnArrival": "The remaining balance is paid on arrival. We send the booking confirmation by email.",
-    "terms": "By booking you accept the <terms>Terms & Conditions</terms>. Free cancellation and deposit refund up to 14 days before arrival.",
+    "terms": "By booking you accept the <terms>Terms of Business</terms>. Free cancellation and deposit refund up to 14 days before arrival.",
     "payButton": "Pay {amount} € deposit by card",
     "redirecting": "Redirecting to payment...",
     "alreadyStarted": "Payment has already been started — check your email for confirmation status.",
