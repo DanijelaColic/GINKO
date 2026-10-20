@@ -41,8 +41,17 @@ function applyStaticCapacityOverlay(room: Room, locale: RoomLocale): Room {
   };
 }
 
+/** Gallery paths — prefer rooms.config until room_media in DB is fully updated. */
+function applyStaticImagesOverlay(room: Room): Room {
+  const staticRoom = staticRooms.find((r) => r.slug === room.slug);
+  if (!staticRoom?.images?.length) return room;
+  return { ...room, images: staticRoom.images };
+}
+
 function finalizeRoom(room: Room, locale: RoomLocale): Room {
-  return applyStaticCapacityOverlay(applyLocaleOverlay(room, locale), locale);
+  return applyStaticImagesOverlay(
+    applyStaticCapacityOverlay(applyLocaleOverlay(room, locale), locale),
+  );
 }
 
 /** Quick lookup without locale — used for validation in API routes */

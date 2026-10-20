@@ -20,7 +20,7 @@ export type Room = {
   price: number; // €/noć
   fullyBooked: boolean;
   amenities: string[];
-  images: string[]; // paths under /public/images/rooms/[slug]/
+  images: string[]; // public paths, e.g. /images/rooms/... or /images/shared/...
   /** Soba/apartman podržava pomoćni ležaj (+20 €/noć) — Ginko 2–4 (2+1) i apartmani (2+2) */
   extraBedAvailable: boolean;
   /**

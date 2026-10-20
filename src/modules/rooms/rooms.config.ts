@@ -30,7 +30,8 @@ export const rooms: Room[] = [
     extraBedAvailable: false,
     amenities: ['WiFi', 'LCD TV', 'Klima', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      '/images/rooms/ginko-1/01-cover.jpg',
+      '/images/rooms/ginko-1/01-cover.webp',
+      '/images/shared/bathroom-wood-shower-01.webp',
     ],
   },
   {
@@ -52,7 +53,12 @@ export const rooms: Room[] = [
     extraBedAvailable: true,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      '/images/rooms/ginko-2/01-cover.jpg',
+      '/images/rooms/ginko-2/01-cover.webp',
+      '/images/rooms/ginko-2/02-bedroom-angle.webp',
+      '/images/rooms/ginko-2/03-bedroom-leds.webp',
+      '/images/rooms/ginko-2/04-entry.webp',
+      '/images/shared/bathroom-sink-detail-01.webp',
+      '/images/shared/bathroom-wood-shower-01.webp',
     ],
   },
   {
@@ -74,7 +80,14 @@ export const rooms: Room[] = [
     extraBedAvailable: true,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      '/images/rooms/ginko-3/01-cover.jpg',
+      '/images/rooms/ginko-3/01-cover.webp',
+      '/images/rooms/ginko-3/02-bedroom-sofa.webp',
+      '/images/rooms/ginko-3/03-bedroom-closet.webp',
+      '/images/rooms/ginko-3/04-desk-tv.webp',
+      // Same asset as Ginko 1 cover (Untitled-4) — one file, two galleries
+      '/images/rooms/ginko-1/01-cover.webp',
+      '/images/shared/bathroom-sink-detail-01.webp',
+      '/images/shared/amenity-kettle-01.webp',
     ],
   },
   {
@@ -96,7 +109,12 @@ export const rooms: Room[] = [
     extraBedAvailable: true,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      '/images/rooms/ginko-4/01-cover.jpg',
+      '/images/rooms/ginko-4/01-cover.webp',
+      '/images/rooms/ginko-4/02-bedroom-desk.webp',
+      '/images/rooms/ginko-4/03-bedroom-angle.webp',
+      '/images/rooms/ginko-4/04-bedroom-wardrobe.webp',
+      '/images/shared/bathroom-marble-01.webp',
+      '/images/shared/amenity-kettle-01.webp',
     ],
   },
   {
@@ -118,7 +136,13 @@ export const rooms: Room[] = [
     extraBedAvailable: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      '/images/rooms/ginko-5/01-cover.jpg',
+      '/images/rooms/ginko-5/01-cover.webp',
+      '/images/rooms/ginko-5/02-bedroom.webp',
+      '/images/rooms/ginko-5/03-desk-amenities.webp',
+      '/images/rooms/ginko-5/04-entry-fridge.webp',
+      '/images/rooms/ginko-5/05-closet-hall.webp',
+      '/images/shared/bathroom-marble-01.webp',
+      '/images/shared/amenity-kettle-01.webp',
     ],
   },
   {
@@ -140,7 +164,12 @@ export const rooms: Room[] = [
     extraBedAvailable: false,
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      '/images/rooms/ginko-6/01-cover.jpg',
+      '/images/rooms/ginko-6/01-cover.webp',
+      '/images/rooms/ginko-6/02-desk-storage.webp',
+      '/images/rooms/ginko-6/03-layout-bathroom.webp',
+      '/images/rooms/ginko-6/04-bathroom.webp',
+      '/images/rooms/ginko-6/05-detail.webp',
+      '/images/rooms/ginko-6/06-terrace.webp',
     ],
   },
   {
@@ -164,7 +193,17 @@ export const rooms: Room[] = [
     linkedSlugs: ['ginko-spa-1'],
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Privatna sauna', 'Jacuzzi', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      '/images/rooms/ginko-spa-2/01-cover.png',
+      // COVER: SPA Untitled-8 (jacuzzi) — wellness only
+      '/images/rooms/apartment/wellness-01-jacuzzi-cover.webp',
+      '/images/rooms/apartment/wellness-02-sauna-jacuzzi.webp',
+      '/images/rooms/apartment/wellness-03-jacuzzi-night.webp',
+      '/images/rooms/apartment/01-living.webp',
+      '/images/rooms/apartment/02-bedroom.webp',
+      '/images/rooms/apartment/03-bedroom-detail.webp',
+      '/images/rooms/apartment/04-kitchen.webp',
+      '/images/rooms/apartment/05-detail-shelf.webp',
+      '/images/rooms/apartment/06-terrace-romance.webp',
+      '/images/rooms/apartment/07-welcome-cart.webp',
     ],
   },
   {
@@ -188,7 +227,14 @@ export const rooms: Room[] = [
     linkedSlugs: ['ginko-spa-2'],
     amenities: ['WiFi', 'LCD TV', 'Satelitski TV', 'Klima', 'Terasa', 'Posebna kuhinja', 'Parking', 'Grijanje', 'Ručnici', 'Posteljina', 'Kućni ljubimci na upit'],
     images: [
-      '/images/rooms/ginko-spa-2/01-cover.png',
+      // No wellness/jacuzzi images on the standard apartment listing
+      '/images/rooms/apartment/01-living.webp',
+      '/images/rooms/apartment/02-bedroom.webp',
+      '/images/rooms/apartment/03-bedroom-detail.webp',
+      '/images/rooms/apartment/04-kitchen.webp',
+      '/images/rooms/apartment/05-detail-shelf.webp',
+      '/images/rooms/apartment/06-terrace-romance.webp',
+      '/images/rooms/apartment/07-welcome-cart.webp',
     ],
   },
 ];

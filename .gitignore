@@ -20,6 +20,9 @@ npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
 
+# Client original photos (do not deploy)
+temp-ginko-photos/
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts

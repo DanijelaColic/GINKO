@@ -40,7 +40,7 @@ export default function RoomModalGallery({ images, alt }: Props) {
           src={images[active]}
           alt={`${alt} ${active + 1}`}
           fill
-          priority
+          priority={active === 0}
           className="object-cover"
           sizes="(max-width: 768px) 100vw, 45vw"
         />

@@ -28,21 +28,19 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const PROPERTY_IMAGE_SRCS = [
+  '/images/property/exterior-entrance-01.webp',
+  '/images/property/breakfast-coffee-buffet-01.webp',
+  '/images/property/breakfast-cold-buffet-01.webp',
   '/images/property/20240504_154454.jpg',
   '/images/property/20240906_085556.jpg',
   '/images/property/20240906_091154.jpg',
   '/images/property/20240906_091257.jpg',
-  '/images/property/20240906_091321.jpg',
-  '/images/property/20240906_091344.jpg',
-  '/images/property/20240929_072608.jpg',
-  '/images/property/20241101_080530.jpg',
-  '/images/property/20241101_080707.jpg',
-  '/images/property/20250405_085232.jpg',
-  '/images/property/20250420_083046.jpg',
+  '/images/rooms/apartment/01-living.webp',
+  '/images/rooms/ginko-3/01-cover.webp',
+  '/images/property/breakfast-pastries-01.webp',
   '/images/property/20250501_174531.jpg',
   '/images/property/20251202_144635.jpg',
   '/images/property/20251202_144813.jpg',
-  '/images/property/20251202_150520.jpg',
   '/images/property/20251228_151836.jpg',
 ] as const;
 
