@@ -28,15 +28,18 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 const PROPERTY_IMAGE_SRCS = [
+  // Cover (large left): building + two palms on terrace
+  '/images/property/20240504_154454.jpg',
+  // First small (right): bedroom already in this gallery
+  '/images/rooms/ginko-3/01-cover.webp',
+  // Remaining images keep prior relative order (entrance no longer cover)
   '/images/property/exterior-entrance-01.webp',
   '/images/property/breakfast-coffee-buffet-01.webp',
   '/images/property/breakfast-cold-buffet-01.webp',
-  '/images/property/20240504_154454.jpg',
   '/images/property/20240906_085556.jpg',
   '/images/property/20240906_091154.jpg',
   '/images/property/20240906_091257.jpg',
   '/images/rooms/apartment/01-living.webp',
-  '/images/rooms/ginko-3/01-cover.webp',
   '/images/property/breakfast-pastries-01.webp',
   '/images/property/20250501_174531.jpg',
   '/images/property/20251202_144635.jpg',

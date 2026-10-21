@@ -167,8 +167,9 @@ export default function GuestPicker({
   if (childrenCount > 0) {
     summaryParts.push(`${childrenCount} ${l.children.toLowerCase()}`);
   }
+  // Bez odabira: samo labela „Gosti”, ne „0 odraslih”
   const summary =
-    summaryParts.length > 0 ? summaryParts.join(' · ') : `0 ${l.adults.toLowerCase()}`;
+    summaryParts.length > 0 ? summaryParts.join(' · ') : l.guests;
 
   return (
     <div ref={rootRef} className={`relative ${className}`}>

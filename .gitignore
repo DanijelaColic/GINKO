@@ -23,6 +23,9 @@ yarn-error.log*
 # Client original photos (do not deploy)
 temp-ginko-photos/
 
+# Local DB backup exports (not for git/deploy)
+supabase/scripts/backups/
+
 # TypeScript
 *.tsbuildinfo
 next-env.d.ts

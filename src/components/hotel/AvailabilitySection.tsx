@@ -119,7 +119,8 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
 
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [adults, setAdults] = useState(2);
+  // 0 = bez filtera kapaciteta → prikazuje i solo sobe (npr. Ginko 6)
+  const [adults, setAdults] = useState(0);
   const [children, setChildren] = useState(0);
   const [childAges, setChildAges] = useState<Array<number | null>>([]);
   const [highlightedRoom, setHighlightedRoom] = useState<string | null>(null);
@@ -520,19 +521,19 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                   isHighlighted ? 'border-primary ring-2 ring-primary/20' : 'border-stone'
                 }`}
               >
-                {/* Slika — otvara Booking-stil modal */}
+                {/* Slika — otvara Booking-stil modal; ~38% širine kartice, 4:3 (coveri su 1184×864) */}
                 <button
                   type="button"
                   onClick={() => setDetailRoomSlug(room.slug)}
-                  className="relative shrink-0 w-full sm:w-56 h-44 sm:h-auto overflow-hidden block cursor-pointer text-left"
+                  className="relative shrink-0 w-full aspect-[4/3] sm:aspect-auto sm:w-[38%] sm:min-w-[260px] sm:max-w-[400px] sm:self-stretch overflow-hidden block cursor-pointer text-left"
                 >
                   {room.images[0] ? (
                     <Image
                       src={room.images[0]}
                       alt={room.name}
                       fill
-                      className="object-cover hover:scale-105 transition-transform duration-500"
-                      sizes="(max-width: 640px) 100vw, 224px"
+                      className="object-cover object-center hover:scale-105 transition-transform duration-500"
+                      sizes="(max-width: 640px) 100vw, 38vw"
                     />
                   ) : (
                     <div className="absolute inset-0 bg-stone flex items-center justify-center text-muted text-xs italic">

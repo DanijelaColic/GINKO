@@ -8,6 +8,7 @@ import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import { getLocale, getTranslations } from 'next-intl/server';
 import { rooms } from '@/modules/rooms/rooms.config';
 import { getRoom } from '@/modules/rooms/room.repository';
+import { appendSharedPropertyImages } from '@/modules/rooms/shared-property-gallery';
 import { getValidLocale } from '@/i18n/messages';
 import { getBreadcrumbStructuredData, getLanguageAlternates } from '@/i18n/metadata';
 import { localizePath } from '@/i18n/pathnames';
@@ -68,6 +69,9 @@ export default async function RoomDetailPage({ params }: Props) {
   const room = await getRoom(slug, locale as RoomLocale);
 
   if (!room) notFound();
+
+  // Soba prvo, zatim zajednički prostori (bez dupliciranja datoteka)
+  const galleryImages = appendSharedPropertyImages(room.images);
 
   const breadcrumbJsonLd = getBreadcrumbStructuredData(locale, [
     { name: SITE_NAME, pathname: '/' },
@@ -140,8 +144,8 @@ export default async function RoomDetailPage({ params }: Props) {
       />
 
       {/* Galerija — full width, bez paddinga */}
-      {room.images.length > 0 ? (
-        <ImageGallery images={room.images} alt={`${t('eyebrow')} ${room.name}`} />
+      {galleryImages.length > 0 ? (
+        <ImageGallery images={galleryImages} alt={`${t('eyebrow')} ${room.name}`} />
       ) : (
         <div className="h-[260px] sm:h-[380px] lg:h-[460px] bg-stone flex items-center justify-center text-muted italic text-sm">
           {t('photosComingSoon')}

@@ -14,6 +14,7 @@ import {
   getRatingLabel,
 } from '@/modules/reviews/review-labels';
 import type { Room } from '@/modules/rooms/room.types';
+import { appendSharedPropertyImages } from '@/modules/rooms/shared-property-gallery';
 import type { RoomReserveState } from '@/components/hotel/room-reserve-state';
 import { nightCountLabel, type AvailabilityLabels } from '@/components/hotel/AvailabilitySection';
 import { roomNeedsExtraBed } from '@/modules/booking/guest-occupancy';
@@ -65,7 +66,8 @@ export default function RoomDetailModal({
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose();
+      // PhotoLightbox hvata Escape u capture fazi — ne zatvaraj modal dok je lightbox otvoren
+      if (e.key === 'Escape' && !e.defaultPrevented) onClose();
     };
     window.addEventListener('keydown', onKey);
     return () => window.removeEventListener('keydown', onKey);
@@ -185,7 +187,10 @@ export default function RoomDetailModal({
             {/* Lijevo: galerija — sticky na desktopu dok se skrola desno */}
             <div className="h-[220px] shrink-0 md:h-auto md:w-[45%] md:sticky md:top-0 md:self-start border-b md:border-b-0 md:border-r border-stone">
               <div className="h-full md:min-h-[min(70vh,560px)]">
-                <RoomModalGallery images={room.images} alt={room.name} />
+                <RoomModalGallery
+                  images={appendSharedPropertyImages(room.images)}
+                  alt={room.name}
+                />
               </div>
             </div>
 

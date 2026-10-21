@@ -26,7 +26,8 @@ export default function HeroSearchBar() {
   const router = useRouter();
   const [checkIn, setCheckIn] = useState('');
   const [checkOut, setCheckOut] = useState('');
-  const [adults, setAdults] = useState(2);
+  // 0 = bez pretpostavljenog broja gostiju (lista pokazuje i solo sobe)
+  const [adults, setAdults] = useState(0);
   const [children, setChildren] = useState(0);
   const [childAges, setChildAges] = useState<Array<number | null>>([]);
   const [dateError, setDateError] = useState<string | null>(null);
