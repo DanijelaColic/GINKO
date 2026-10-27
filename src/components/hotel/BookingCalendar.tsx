@@ -75,14 +75,27 @@ export default function BookingCalendar({
     let isCancelled = false;
 
     fetch(`${bookingsApiPath}?room=${roomSlug}`)
-      .then((r) => r.json())
-      .then((data) => {
+      .then(async (r) => {
         if (isCancelled) return;
+        // Fail-closed: 503/5xx (npr. MyRent down) → greška, ne prazan kalendar
+        if (!r.ok) {
+          setAvailability({
+            requestKey,
+            bookedRanges: [],
+            error: t('errors.loadAvailability'),
+          });
+          return;
+        }
+        const data: unknown = await r.json();
         if (Array.isArray(data)) {
           setAvailability({ requestKey, bookedRanges: data, error: null });
           return;
         }
-        setAvailability({ requestKey, bookedRanges: [], error: t('errors.loadAvailability') });
+        setAvailability({
+          requestKey,
+          bookedRanges: [],
+          error: t('errors.loadAvailability'),
+        });
       })
       .catch(() => {
         if (isCancelled) return;

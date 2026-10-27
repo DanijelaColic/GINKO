@@ -39,7 +39,7 @@ export const GUIDES: GuideArticle[] = [
       'smještaj Daruvar',
     ],
     coverImage: {
-      src: '/images/property/20240504_154454.jpg',
+      src: '/images/property/20240504_154454.webp',
       alt: 'Ginko Boutique Rooms & Wellness – objekt u Daruvaru',
     },
     sections: [
@@ -125,7 +125,7 @@ export const GUIDES: GuideArticle[] = [
       'accommodation Daruvar',
     ],
     coverImage: {
-      src: '/images/property/20240504_154454.jpg',
+      src: '/images/property/20240504_154454.webp',
       alt: 'Ginko Boutique Rooms & Wellness – property in Daruvar',
     },
     sections: [
@@ -211,7 +211,7 @@ export const GUIDES: GuideArticle[] = [
       'ubytování Daruvar',
     ],
     coverImage: {
-      src: '/images/property/20240504_154454.jpg',
+      src: '/images/property/20240504_154454.webp',
       alt: 'Ginko Boutique Rooms & Wellness – objekt v Daruvaru',
     },
     sections: [
@@ -299,7 +299,7 @@ export const GUIDES: GuideArticle[] = [
       'aqua park Daruvar',
     ],
     coverImage: {
-      src: '/images/property/20241101_080530.jpg',
+      src: '/images/property/20241101_080530.webp',
       alt: 'Okolica Daruvara blizu Daruvarskih toplica',
     },
     sections: [
@@ -342,7 +342,7 @@ export const GUIDES: GuideArticle[] = [
       'wellness apartman',
     ],
     coverImage: {
-      src: '/images/property/20240906_091154.jpg',
+      src: '/images/property/20240906_091154.webp',
       alt: 'Wellness i opuštanje u Ginko smještaju Daruvar',
     },
     sections: [
@@ -430,7 +430,7 @@ export const GUIDES: GuideArticle[] = [
       'aqua park Daruvar',
     ],
     coverImage: {
-      src: '/images/property/20241101_080530.jpg',
+      src: '/images/property/20241101_080530.webp',
       alt: 'Daruvar surroundings near Daruvar Spa',
     },
     sections: [
@@ -473,7 +473,7 @@ export const GUIDES: GuideArticle[] = [
       'wellness apartment',
     ],
     coverImage: {
-      src: '/images/property/20240906_091154.jpg',
+      src: '/images/property/20240906_091154.webp',
       alt: 'Wellness and relaxation at Ginko Daruvar',
     },
     sections: [
@@ -561,7 +561,7 @@ export const GUIDES: GuideArticle[] = [
       'aquapark Daruvar',
     ],
     coverImage: {
-      src: '/images/property/20241101_080530.jpg',
+      src: '/images/property/20241101_080530.webp',
       alt: 'Okolí Daruvaru blízko lázní',
     },
     sections: [
@@ -604,7 +604,7 @@ export const GUIDES: GuideArticle[] = [
       'wellness apartmán',
     ],
     coverImage: {
-      src: '/images/property/20240906_091154.jpg',
+      src: '/images/property/20240906_091154.webp',
       alt: 'Wellness a odpočinek v ubytování Ginko Daruvar',
     },
     sections: [

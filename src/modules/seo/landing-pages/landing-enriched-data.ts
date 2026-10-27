@@ -1,10 +1,10 @@
 import type { LandingEnrichedMap } from './landing-enriched-types';
 
 const HERO = '/images/hero/exterior-01.webp';
-const IMG_PROPERTY = '/images/property/20240504_154454.jpg';
-const IMG_WELLNESS = '/images/property/20240906_091154.jpg';
-const IMG_TOWN = '/images/property/20241101_080530.jpg';
-const IMG_ROOM = '/images/property/20250405_085232.jpg';
+const IMG_PROPERTY = '/images/property/20240504_154454.webp';
+const IMG_WELLNESS = '/images/property/20240906_091154.webp';
+const IMG_TOWN = '/images/property/20241101_080530.webp';
+const IMG_ROOM = '/images/property/20250405_085232.webp';
 
 export const LANDING_ENRICHED: LandingEnrichedMap = {
   'sobe-daruvar': {

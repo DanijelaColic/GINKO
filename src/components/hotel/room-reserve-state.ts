@@ -10,6 +10,8 @@ export function getRoomReserveState(
   if (!hasDates) return 'dates';
   if (adults < 1) return 'guests';
   if (!searched) return 'search';
-  if (statuses[slug]?.available === false) return 'unavailable';
+  // Fail-closed: nema statusa / API greška → ne tretiraj kao slobodno
+  const status = statuses[slug];
+  if (status == null || status.available !== true) return 'unavailable';
   return 'ready';
 }

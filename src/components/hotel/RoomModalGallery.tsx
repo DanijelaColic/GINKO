@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useTranslations } from 'next-intl';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import PhotoLightbox from '@/components/hotel/PhotoLightbox';
@@ -10,6 +10,75 @@ type Props = {
   images: string[];
   alt: string;
 };
+
+/** Učitaj thumbnail tek kad uđe u vidljivi dio scroll kontejnera (+ buffer). */
+function GalleryThumb({
+  src,
+  alt,
+  active,
+  onSelect,
+  forceLoad,
+  label,
+}: {
+  src: string;
+  alt: string;
+  active: boolean;
+  onSelect: () => void;
+  forceLoad: boolean;
+  label: string;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [load, setLoad] = useState(forceLoad || active);
+
+  useEffect(() => {
+    if (forceLoad || active) setLoad(true);
+  }, [forceLoad, active]);
+
+  useEffect(() => {
+    if (load) return;
+    const el = ref.current;
+    if (!el) return;
+    const root = el.closest('[data-thumb-scroll]');
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry?.isIntersecting) {
+          setLoad(true);
+          io.disconnect();
+        }
+      },
+      { root: root instanceof Element ? root : null, rootMargin: '120px 0px', threshold: 0 },
+    );
+    io.observe(el);
+    return () => io.disconnect();
+  }, [load]);
+
+  return (
+    <button
+      ref={ref}
+      type="button"
+      onClick={onSelect}
+      className={`relative aspect-[4/3] overflow-hidden rounded-sm ${
+        active ? 'ring-2 ring-primary ring-offset-1' : 'opacity-80 hover:opacity-100'
+      }`}
+      aria-label={label}
+      aria-current={active}
+    >
+      {load ? (
+        <Image
+          src={src}
+          alt={alt}
+          fill
+          className="object-cover"
+          sizes="96px"
+          quality={60}
+          loading="lazy"
+        />
+      ) : (
+        <span className="absolute inset-0 bg-stone/40" aria-hidden />
+      )}
+    </button>
+  );
+}
 
 export default function RoomModalGallery({ images, alt }: Props) {
   const t = useTranslations('galleryPage');
@@ -76,28 +145,22 @@ export default function RoomModalGallery({ images, alt }: Props) {
         )}
       </div>
 
-      {/* Thumbnaili — malo veći; klik samo mijenja glavnu */}
+      {/* Thumbnaili — svi ostaju; učitavanje tek kad su blizu viewporta scrolla */}
       {showNav && (
-        <div className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-1 p-1.5 bg-white border-t border-stone shrink-0 max-h-[148px] overflow-y-auto">
+        <div
+          data-thumb-scroll
+          className="grid grid-cols-4 sm:grid-cols-5 lg:grid-cols-6 gap-1 p-1.5 bg-white border-t border-stone shrink-0 max-h-[148px] overflow-y-auto"
+        >
           {images.map((src, i) => (
-            <button
+            <GalleryThumb
               key={`${src}-${i}`}
-              type="button"
-              onClick={() => setActive(i)}
-              className={`relative aspect-[4/3] overflow-hidden rounded-sm ${
-                i === active ? 'ring-2 ring-primary ring-offset-1' : 'opacity-80 hover:opacity-100'
-              }`}
-              aria-label={t('photo', { n: i + 1 })}
-              aria-current={i === active}
-            >
-              <Image
-                src={src}
-                alt={`${alt} thumbnail ${i + 1}`}
-                fill
-                className="object-cover"
-                sizes="96px"
-              />
-            </button>
+              src={src}
+              alt={`${alt} thumbnail ${i + 1}`}
+              active={i === active}
+              onSelect={() => setActive(i)}
+              forceLoad={i < 8}
+              label={t('photo', { n: i + 1 })}
+            />
           ))}
         </div>
       )}

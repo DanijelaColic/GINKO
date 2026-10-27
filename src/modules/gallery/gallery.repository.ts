@@ -20,7 +20,7 @@ const MOCK_ITEMS: GalleryItem[] = [
   },
   {
     id: 'ext-2',
-    src: '/images/property/20240504_154454.jpg',
+    src: '/images/property/20240504_154454.webp',
     category_key: 'exterior',
     alt_text: 'Ginko Sobe — objekt, Daruvar',
     title: 'Objekt',
@@ -29,7 +29,7 @@ const MOCK_ITEMS: GalleryItem[] = [
   },
   {
     id: 'ext-3',
-    src: '/images/property/20240906_085556.jpg',
+    src: '/images/property/20240906_085556.webp',
     category_key: 'exterior',
     alt_text: 'Ginko Sobe — pogled na objekt',
     title: 'Pogled na objekt',
@@ -38,7 +38,7 @@ const MOCK_ITEMS: GalleryItem[] = [
   },
   {
     id: 'ext-4',
-    src: '/images/property/20251202_144635.jpg',
+    src: '/images/property/20251202_144635.webp',
     category_key: 'exterior',
     alt_text: 'Ginko Sobe — eksterijer',
     title: 'Eksterijer',
@@ -121,7 +121,7 @@ const MOCK_ITEMS: GalleryItem[] = [
   // ── Common areas ──────────────────────────────────────────────
   {
     id: 'common-1',
-    src: '/images/property/20240906_091154.jpg',
+    src: '/images/property/20240906_091154.webp',
     category_key: 'common-areas',
     alt_text: 'Ginko Sobe — zajednički prostori',
     title: 'Zajednički prostori',
@@ -130,7 +130,7 @@ const MOCK_ITEMS: GalleryItem[] = [
   },
   {
     id: 'common-2',
-    src: '/images/property/20240906_091257.jpg',
+    src: '/images/property/20240906_091257.webp',
     category_key: 'common-areas',
     alt_text: 'Ginko Sobe — terasa',
     title: 'Terasa',
@@ -213,7 +213,7 @@ const MOCK_ITEMS: GalleryItem[] = [
   // ── Surroundings ─────────────────────────────────────────────
   {
     id: 'surr-1',
-    src: '/images/property/20250501_174531.jpg',
+    src: '/images/property/20250501_174531.webp',
     category_key: 'surroundings',
     alt_text: 'Okolica Daruvara',
     title: 'Okolica Daruvara',
@@ -222,7 +222,7 @@ const MOCK_ITEMS: GalleryItem[] = [
   },
   {
     id: 'surr-2',
-    src: '/images/property/20240929_072608.jpg',
+    src: '/images/property/20240929_072608.webp',
     category_key: 'surroundings',
     alt_text: 'Daruvar — priroda i okolica',
     title: 'Daruvar okolica',
@@ -231,7 +231,7 @@ const MOCK_ITEMS: GalleryItem[] = [
   },
   {
     id: 'surr-3',
-    src: '/images/property/20251228_151836.jpg',
+    src: '/images/property/20251228_151836.webp',
     category_key: 'surroundings',
     alt_text: 'Daruvar — grad',
     title: 'Daruvar',

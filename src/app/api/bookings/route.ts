@@ -2,6 +2,8 @@
 // Changes: apartment_slug → room_slug, getApartment → getRoomBySlug (static config),
 //          removed VJ email integration (Phase 8+), added confirmation token response,
 //          added blocked_dates overlap check alongside booking overlap check.
+// GET: MyRent (SoT) ∪ lokalni izvori; fail-closed ako MyRent nije dostupan.
+// POST: još uvijek samo lokalni overlap (MyRent re-check dolazi u sljedećoj fazi).
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { getRoomBySlug } from '@/modules/rooms/room.repository';
@@ -11,6 +13,10 @@ import {
   diffDays,
   calculatePrice,
 } from '@/modules/booking/dates';
+import {
+  AvailabilityUnavailableError,
+  getGuestBookedRanges,
+} from '@/modules/booking/availability.service';
 import { MIN_NIGHTS } from '@/modules/booking/booking.config';
 import { guestApiError } from '@/lib/guest-api-error';
 import {
@@ -28,7 +34,7 @@ import { getValidLocale } from '@/i18n/messages';
 import type { BookedRange } from '@/modules/booking/booking.types';
 
 // GET /api/bookings?room=slug
-// Returns booked date ranges for the calendar component
+// Returns booked date ranges for the calendar component (MyRent + local).
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
   const slug = searchParams.get('room');
@@ -43,41 +49,13 @@ export async function GET(request: NextRequest) {
   }
 
   try {
-    const supabase = createServerSupabaseClient();
-
-    // Uključi linked slugove (isti fizički prostor) — npr. ginko-spa-1 ↔ ginko-spa-2
-    const slugsToCheck = [slug, ...(room.linkedSlugs ?? [])];
-
-    const [bookingsRes, blockedRes, externalRes] = await Promise.all([
-      supabase
-        .from('bookings')
-        .select('check_in, check_out')
-        .in('room_slug', slugsToCheck)
-        .neq('status', 'cancelled'),
-      supabase
-        .from('blocked_dates')
-        .select('check_in, check_out')
-        .in('room_slug', slugsToCheck),
-      // Phase 9: include external iCal-imported events
-      supabase
-        .from('external_calendar_events')
-        .select('starts_on, ends_on')
-        .in('room_slug', slugsToCheck),
-    ]);
-
-    if (bookingsRes.error) throw bookingsRes.error;
-
-    const ranges: BookedRange[] = [
-      ...(bookingsRes.data ?? []),
-      ...(blockedRes.data ?? []),
-      ...(externalRes.data ?? []).map((e) => ({
-        check_in: e.starts_on as string,
-        check_out: e.ends_on as string,
-      })),
-    ];
-
+    const ranges = await getGuestBookedRanges(slug);
     return NextResponse.json(ranges);
   } catch (err) {
+    if (err instanceof AvailabilityUnavailableError) {
+      console.error('GET /api/bookings: availability unavailable');
+      return guestApiError('availabilityUnavailable', 503);
+    }
     const detail =
       err && typeof err === 'object' && 'message' in err
         ? String((err as { message: unknown }).message)

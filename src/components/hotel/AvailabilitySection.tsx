@@ -198,7 +198,15 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
         rooms.map(async (room) => {
           try {
             const res = await fetch(`/api/bookings?room=${room.slug}`);
-            const bookedRanges: BookedRange[] = res.ok ? await res.json() : [];
+            // Fail-closed: MyRent/API greška → null (ne prazan [] kao "sve slobodno")
+            if (!res.ok) {
+              return { slug: room.slug, status: null as RoomStatus | null };
+            }
+            const payload: unknown = await res.json();
+            if (!Array.isArray(payload)) {
+              return { slug: room.slug, status: null as RoomStatus | null };
+            }
+            const bookedRanges = payload as BookedRange[];
             const available = isRangeAvailable(ciDate, coDate, bookedRanges);
             const extraBeds = roomNeedsExtraBed(room, adultsCount, ages) ? 1 : 0;
             const priceData = available
@@ -211,7 +219,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                 : { available: false, totalPrice: 0, nights: 0 },
             };
           } catch {
-            return { slug: room.slug, status: null };
+            return { slug: room.slug, status: null as RoomStatus | null };
           }
         }),
       );
@@ -219,6 +227,13 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
       const map: Record<string, RoomStatus | null> = {};
       results.forEach(({ slug, status }) => { map[slug] = status; });
       setStatuses(map);
+
+      // Ako nijedna soba nije uspješno provjerena — ne prikazuj "sve slobodno"
+      const anyChecked = results.some((r) => r.status != null);
+      if (!anyChecked) {
+        setDateError(labels.unavailableDates);
+      }
+
       setLoading(false);
 
       if (scrollToResults) {
@@ -233,7 +248,16 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
 
       return true;
     },
-    [checkIn, checkOut, rooms, labels.selectDates, adults, children, childAges],
+    [
+      checkIn,
+      checkOut,
+      rooms,
+      labels.selectDates,
+      labels.unavailableDates,
+      adults,
+      children,
+      childAges,
+    ],
   );
 
   // Latest check fn — keep in ref via effect (avoid updating ref during render)
@@ -359,7 +383,8 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
     ) {
       return false;
     }
-    if (searched && statuses[r.slug]?.available === false) return false;
+    // Fail-closed: prikaži samo sobe s potvrđenom dostupnošću
+    if (searched && statuses[r.slug]?.available !== true) return false;
     return true;
   });
 
