@@ -70,3 +70,36 @@ export function myRentDaysToBookedRanges(
     .filter((d) => DATE_RE.test(d));
   return occupiedDatesToBookedRanges(occupied);
 }
+
+/** Proširi BookedRange[] u skup zauzetih noći (YYYY-MM-DD). */
+export function bookedRangesToOccupiedNights(
+  ranges: readonly BookedRange[],
+): Set<string> {
+  const nights = new Set<string>();
+  for (const r of ranges) {
+    if (!r?.check_in || !r?.check_out || r.check_out <= r.check_in) continue;
+    let d = r.check_in;
+    while (d < r.check_out) {
+      nights.add(d);
+      d = addIsoDays(d, 1);
+    }
+  }
+  return nights;
+}
+
+/**
+ * Makni noći pokrivene lokalnim Ginko rezervacijama iz MyRent rangeova
+ * (izbjegava dvostruki prikaz istog termina u Timelineu).
+ */
+export function subtractOccupiedRanges(
+  source: readonly BookedRange[],
+  subtract: readonly BookedRange[],
+): BookedRange[] {
+  const sourceNights = bookedRangesToOccupiedNights(source);
+  if (sourceNights.size === 0) return [];
+  const covered = bookedRangesToOccupiedNights(subtract);
+  for (const night of covered) {
+    sourceNights.delete(night);
+  }
+  return occupiedDatesToBookedRanges([...sourceNights]);
+}

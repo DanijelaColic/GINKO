@@ -29,7 +29,15 @@ export {
   addIsoDays,
   occupiedDatesToBookedRanges,
   myRentDaysToBookedRanges,
+  bookedRangesToOccupiedNights,
+  subtractOccupiedRanges,
 } from './myrent.ranges';
+
+export {
+  MYRENT_TIMELINE_UNITS,
+  getTimelineUnitForRoomSlug,
+} from './myrent.units';
+export type { MyRentTimelineUnit } from './myrent.units';
 
 export type {
   MyRentCalendarDay,

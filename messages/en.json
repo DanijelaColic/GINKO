@@ -624,6 +624,7 @@
       "extraBedUnavailable": "{name} does not support an extra bed.",
       "breakfastGuestsInvalid": "Breakfast cannot be for more people than the number of guests.",
       "datesUnavailable": "The selected dates are already booked. Please choose different dates.",
+      "availabilityUnavailable": "We can’t confirm availability right now. Please try again shortly or contact us.",
       "createFailed": "Could not create the booking. Please try again or contact us."
     },
     "policies": {

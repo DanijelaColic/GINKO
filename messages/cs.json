@@ -624,6 +624,7 @@
       "extraBedUnavailable": "{name} neumožňuje přistýlku.",
       "breakfastGuestsInvalid": "Počet osob se snídaní nemůže být vyšší než počet hostů.",
       "datesUnavailable": "Vybrané termíny jsou už obsazené. Zvolte jiná data.",
+      "availabilityUnavailable": "Dostupnost teď nemůžeme potvrdit. Zkuste to za chvíli znovu nebo nás kontaktujte.",
       "createFailed": "Rezervaci se nepodařilo vytvořit. Zkuste to znovu nebo nás kontaktujte."
     },
     "policies": {

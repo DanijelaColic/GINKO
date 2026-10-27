@@ -14,7 +14,13 @@ import {
   MyRentAuthError,
   occupiedDatesToBookedRanges,
 } from '@/modules/myrent';
-import { formatDate, startOfToday, addDays } from './dates';
+import {
+  formatDate,
+  startOfToday,
+  addDays,
+  isRangeAvailable,
+  parseLocalDate,
+} from './dates';
 import type { BookedRange } from './booking.types';
 
 /** Koliko unaprijed vučemo MyRent kalendar za guest UI. */
@@ -26,6 +32,23 @@ export class AvailabilityUnavailableError extends Error {
     this.name = 'AvailabilityUnavailableError';
   }
 }
+
+/** Termin zauzet (MyRent ili lokalno) — gost treba odabrati druge datume. */
+export class DatesUnavailableError extends Error {
+  constructor(message = 'Odabrani termini nisu dostupni.') {
+    super(message);
+    this.name = 'DatesUnavailableError';
+  }
+}
+
+export type StayAvailabilityDeps = {
+  fetchMyRentRangesForWindow: (
+    roomSlug: string,
+    dateFrom: string,
+    dateUntil: string,
+  ) => Promise<BookedRange[]>;
+  fetchLocalRanges: (roomSlug: string) => Promise<BookedRange[]>;
+};
 
 function mergeBookedRanges(ranges: BookedRange[]): BookedRange[] {
   // Dedup identičnih rangeova; overlap merge nije nužan za isDateBooked
@@ -89,8 +112,10 @@ async function fetchLocalBookedRanges(
   ];
 }
 
-async function fetchMyRentBookedRanges(
+async function fetchMyRentBookedRangesForWindow(
   roomSlug: string,
+  dateFrom: string,
+  dateUntil: string,
 ): Promise<BookedRange[]> {
   if (!isMyRentConfigured()) {
     throw new AvailabilityUnavailableError(
@@ -105,34 +130,37 @@ async function fetchMyRentBookedRanges(
     );
   }
 
-  const from = formatDate(startOfToday());
-  const until = formatDate(
-    addDays(startOfToday(), MYRENT_AVAILABILITY_HORIZON_DAYS),
-  );
-
   try {
     const calendar = await fetchMyRentCalendar({
       objectId,
       roomSlug,
-      dateFrom: from,
-      dateUntil: until,
+      dateFrom,
+      dateUntil,
     });
     return occupiedDatesToBookedRanges(calendar.occupied.map((d) => d.day));
   } catch (err) {
-    if (
-      err instanceof MyRentAuthError ||
-      err instanceof MyRentApiError ||
-      err instanceof AvailabilityUnavailableError
-    ) {
-      throw new AvailabilityUnavailableError(
-        'MyRent kalendar nije dostupan.',
-      );
+    if (err instanceof AvailabilityUnavailableError) throw err;
+    if (err instanceof MyRentAuthError || err instanceof MyRentApiError) {
+      throw new AvailabilityUnavailableError('MyRent kalendar nije dostupan.');
     }
-    throw new AvailabilityUnavailableError(
-      'MyRent kalendar nije dostupan.',
-    );
+    throw new AvailabilityUnavailableError('MyRent kalendar nije dostupan.');
   }
 }
+
+async function fetchMyRentBookedRanges(
+  roomSlug: string,
+): Promise<BookedRange[]> {
+  const from = formatDate(startOfToday());
+  const until = formatDate(
+    addDays(startOfToday(), MYRENT_AVAILABILITY_HORIZON_DAYS),
+  );
+  return fetchMyRentBookedRangesForWindow(roomSlug, from, until);
+}
+
+const defaultStayDeps: StayAvailabilityDeps = {
+  fetchMyRentRangesForWindow: fetchMyRentBookedRangesForWindow,
+  fetchLocalRanges: fetchLocalBookedRanges,
+};
 
 /**
  * Zauzeti rangeovi za guest kalendar / availability search.
@@ -151,6 +179,43 @@ export async function getGuestBookedRanges(
   const localRanges = await fetchLocalBookedRanges(roomSlug);
 
   return mergeBookedRanges([...myrentRanges, ...localRanges]);
+}
+
+/**
+ * Svježa provjera prije POST rezervacije.
+ * - MyRent fail → AvailabilityUnavailableError (ne potvrđuj)
+ * - overlap MyRent ∪ lokalno → DatesUnavailableError
+ * SPA 1/2 dijele object_id 7460 + linkedSlugs u lokalnom fetchu.
+ */
+export async function assertBookingStayAvailable(
+  roomSlug: string,
+  checkInIso: string,
+  checkOutIso: string,
+  deps: StayAvailabilityDeps = defaultStayDeps,
+): Promise<void> {
+  const room = getRoomBySlug(roomSlug);
+  if (!room) {
+    throw new AvailabilityUnavailableError(`Nepoznata soba: ${roomSlug}`);
+  }
+
+  const checkInDate = parseLocalDate(checkInIso);
+  const checkOutDate = parseLocalDate(checkOutIso);
+  if (!(checkOutDate > checkInDate)) {
+    throw new DatesUnavailableError('Neispravan raspon datuma.');
+  }
+
+  // Uski prozor oko boravka — svježi MyRent read (ne keširani GET horizon)
+  const myrentRanges = await deps.fetchMyRentRangesForWindow(
+    roomSlug,
+    checkInIso,
+    checkOutIso,
+  );
+  const localRanges = await deps.fetchLocalRanges(roomSlug);
+  const ranges = mergeBookedRanges([...myrentRanges, ...localRanges]);
+
+  if (!isRangeAvailable(checkInDate, checkOutDate, ranges)) {
+    throw new DatesUnavailableError();
+  }
 }
 
 // Re-export date helpers used by older imports of this module

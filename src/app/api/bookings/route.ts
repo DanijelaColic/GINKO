@@ -3,18 +3,19 @@
 //          removed VJ email integration (Phase 8+), added confirmation token response,
 //          added blocked_dates overlap check alongside booking overlap check.
 // GET: MyRent (SoT) ∪ lokalni izvori; fail-closed ako MyRent nije dostupan.
-// POST: još uvijek samo lokalni overlap (MyRent re-check dolazi u sljedećoj fazi).
+// POST: svježi MyRent re-check ∪ lokalni overlap prije inserta; Saferpay nepromijenjen.
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { getRoomBySlug } from '@/modules/rooms/room.repository';
 import {
   parseLocalDate,
-  isRangeAvailable,
   diffDays,
   calculatePrice,
 } from '@/modules/booking/dates';
 import {
+  assertBookingStayAvailable,
   AvailabilityUnavailableError,
+  DatesUnavailableError,
   getGuestBookedRanges,
 } from '@/modules/booking/availability.service';
 import { MIN_NIGHTS } from '@/modules/booking/booking.config';
@@ -31,7 +32,6 @@ import {
 } from '@/lib/bookingConfirmation';
 import { sendOwnerNewBookingNotification } from '@/lib/email';
 import { getValidLocale } from '@/i18n/messages';
-import type { BookedRange } from '@/modules/booking/booking.types';
 
 // GET /api/bookings?room=slug
 // Returns booked date ranges for the calendar component (MyRent + local).
@@ -151,40 +151,20 @@ export async function POST(request: NextRequest) {
 
     const isWellnessApartment = room_slug === 'ginko-spa-2';
 
-    const supabase = createServerSupabaseClient();
-
-    // Overlap check uključuje linked slugove (isti fizički prostor)
-    const overlapSlugs = [room_slug, ...(room.linkedSlugs ?? [])];
-
-    // Overlap check: confirmed/pending bookings + blocked dates + external iCal events
-    const [bookingsRes, blockedRes, externalRes] = await Promise.all([
-      supabase
-        .from('bookings')
-        .select('check_in, check_out')
-        .in('room_slug', overlapSlugs)
-        .neq('status', 'cancelled'),
-      supabase
-        .from('blocked_dates')
-        .select('check_in, check_out')
-        .in('room_slug', overlapSlugs),
-      supabase
-        .from('external_calendar_events')
-        .select('starts_on, ends_on')
-        .in('room_slug', overlapSlugs),
-    ]);
-
-    const existingRanges: BookedRange[] = [
-      ...(bookingsRes.data ?? []),
-      ...(blockedRes.data ?? []),
-      ...(externalRes.data ?? []).map((e) => ({
-        check_in: e.starts_on as string,
-        check_out: e.ends_on as string,
-      })),
-    ];
-
-    if (!isRangeAvailable(checkInDate, checkOutDate, existingRanges)) {
-      return guestApiError('datesUnavailable', 409);
+    // Svježi MyRent + lokalni overlap (SPA 1/2 → object_id 7460 / linkedSlugs)
+    try {
+      await assertBookingStayAvailable(room_slug, check_in, check_out);
+    } catch (err) {
+      if (err instanceof AvailabilityUnavailableError) {
+        return guestApiError('availabilityUnavailable', 503);
+      }
+      if (err instanceof DatesUnavailableError) {
+        return guestApiError('datesUnavailable', 409);
+      }
+      throw err;
     }
+
+    const supabase = createServerSupabaseClient();
 
     // Server-side pricing (source of truth) — uključuje sve extras
     const priceData = calculatePrice(checkInDate, checkOutDate, room, {

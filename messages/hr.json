@@ -624,6 +624,7 @@
       "extraBedUnavailable": "{name} ne podržava pomoćni ležaj.",
       "breakfastGuestsInvalid": "Broj osoba uz doručak ne može biti veći od ukupnog broja gostiju.",
       "datesUnavailable": "Odabrani termini su već zauzeti. Molimo odaberite druge datume.",
+      "availabilityUnavailable": "Trenutno ne možemo potvrditi dostupnost. Pokušajte ponovo za trenutak ili nas kontaktirajte.",
       "createFailed": "Greška pri kreiranju rezervacije. Pokušajte ponovo ili nas kontaktirajte."
     },
     "policies": {
