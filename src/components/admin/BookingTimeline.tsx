@@ -16,14 +16,32 @@ import {
 
 const COL_W = 38;
 const ROW_H = 52;
-const LABEL_W = 130;
+/** Lijevi stupac — sticky pri horizontalnom scrollu */
+const LABEL_W = 128;
 const MYRENT_BAR_COLOR = '#94a3b8'; // slate-400 — zauzeto u MyRentu (bez PII)
+
+const STICKY_LABEL =
+  'sticky left-0 z-30 shrink-0 border-r border-gray-200 shadow-[2px_0_6px_-2px_rgba(0,0,0,0.08)]';
 
 const MONTHS_HR = [
   'Siječanj', 'Veljača', 'Ožujak', 'Travanj', 'Svibanj', 'Lipanj',
   'Srpanj', 'Kolovoz', 'Rujan', 'Listopad', 'Studeni', 'Prosinac',
 ];
 const DAYS_SHORT = ['Po', 'Ut', 'Sr', 'Če', 'Pe', 'Su', 'Ne'];
+
+function formatMonthRangeTitle(
+  a: { month: number; year: number },
+  b: { month: number; year: number },
+): string {
+  // Isti mjesec se ne ponavlja; godina jednom ako je ista
+  if (a.year === b.year && a.month === b.month) {
+    return `${MONTHS_HR[a.month]} ${a.year}`;
+  }
+  if (a.year === b.year) {
+    return `${MONTHS_HR[a.month]} – ${MONTHS_HR[b.month]} ${a.year}`;
+  }
+  return `${MONTHS_HR[a.month]} ${a.year} – ${MONTHS_HR[b.month]} ${b.year}`;
+}
 
 const BAR_COLORS: Record<string, string> = {
   pending: 'text-amber-950',
@@ -219,10 +237,8 @@ export default function BookingTimeline({ bookings, onEditBooking }: Props) {
         >
           <ChevronLeft size={18} />
         </button>
-        <span className="text-sm font-semibold text-gray-700 min-w-[220px] text-center">
-          {MONTHS_HR[months[0].month]} {months[0].year}
-          <span className="text-gray-300 mx-2">·</span>
-          {MONTHS_HR[months[1].month]} {months[1].year}
+        <span className="text-sm font-semibold text-gray-700 min-w-0 sm:min-w-[200px] text-center px-1">
+          {formatMonthRangeTitle(months[0], months[1])}
         </span>
         <button
           onClick={() => setOffset((o) => o + 1)}
@@ -272,11 +288,14 @@ export default function BookingTimeline({ bookings, onEditBooking }: Props) {
         </div>
       )}
 
-      <div className="overflow-x-auto rounded-xl border border-gray-100 shadow-sm bg-white">
+      <div className="overflow-x-auto overscroll-x-contain rounded-xl border border-gray-100 shadow-sm bg-white -mx-1 px-0 sm:mx-0">
         <div style={{ minWidth: LABEL_W + allDays.length * COL_W }}>
           {/* Month headers */}
           <div className="flex border-b border-gray-100 bg-gray-50">
-            <div style={{ width: LABEL_W }} className="shrink-0" />
+            <div
+              style={{ width: LABEL_W, minWidth: LABEL_W }}
+              className={clsx(STICKY_LABEL, 'bg-gray-50')}
+            />
             {months.map((m) => (
               <div
                 key={`${m.year}-${m.month}`}
@@ -284,7 +303,10 @@ export default function BookingTimeline({ bookings, onEditBooking }: Props) {
                 className="text-center py-2 text-xs font-bold uppercase tracking-widest shrink-0 border-r border-gray-200 last:border-r-0"
               >
                 <span className="text-gray-500">{MONTHS_HR[m.month]}</span>
-                <span className="text-primary ml-1.5">{m.year}</span>
+                {/* Godina samo u prvom mjesečnom bloku ako su iste — manje ponavljanja */}
+                {(m.year !== months[0].year || m.month === months[0].month) && (
+                  <span className="text-primary ml-1.5">{m.year}</span>
+                )}
               </div>
             ))}
           </div>
@@ -292,8 +314,11 @@ export default function BookingTimeline({ bookings, onEditBooking }: Props) {
           {/* Day headers */}
           <div className="flex border-b border-gray-200">
             <div
-              style={{ width: LABEL_W }}
-              className="shrink-0 px-3 py-2 text-xs text-gray-400 font-medium border-r border-gray-100"
+              style={{ width: LABEL_W, minWidth: LABEL_W }}
+              className={clsx(
+                STICKY_LABEL,
+                'bg-white px-2 sm:px-3 py-2 text-xs text-gray-400 font-medium',
+              )}
             >
               Jedinica
             </div>
@@ -358,18 +383,22 @@ export default function BookingTimeline({ bookings, onEditBooking }: Props) {
                 style={{ height: ROW_H }}
               >
                 <div
-                  style={{ width: LABEL_W }}
-                  className="shrink-0 flex items-center px-3 border-r border-gray-100"
+                  style={{ width: LABEL_W, minWidth: LABEL_W }}
+                  className={clsx(
+                    STICKY_LABEL,
+                    'flex items-center px-2 sm:px-3',
+                    unitIdx % 2 === 1 ? 'bg-gray-50' : 'bg-white',
+                  )}
                 >
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800 leading-tight flex items-center gap-1.5">
+                  <div className="min-w-0">
+                    <p className="text-xs sm:text-sm font-semibold text-gray-800 leading-tight flex items-center gap-1.5">
                       <span
-                        className="inline-block w-2.5 h-2.5 rounded-full"
+                        className="inline-block w-2.5 h-2.5 rounded-full shrink-0"
                         style={{ backgroundColor: color }}
                       />
-                      {unit.label}
+                      <span className="truncate">{unit.label}</span>
                     </p>
-                    <p className="text-[11px] text-gray-400 leading-tight">
+                    <p className="text-[10px] sm:text-[11px] text-gray-400 leading-tight truncate">
                       {unit.unitId === 'spa-2'
                         ? 'Wellness / bez wellnessa'
                         : `MyRent #${unit.objectId}`}
