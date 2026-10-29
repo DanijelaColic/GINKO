@@ -5,42 +5,44 @@
 // does not append Token or payment data.
 //
 // Register in Initialize Notification container (automatic), not Merchant Portal.
+//
+// Idempotencija: isti provider_event_id → postojeći webhook red; syncSaferpayPayment
+// short-circuit ako je intent već succeeded; confirm samo dok je booking pending.
 
 import { NextRequest, NextResponse } from 'next/server';
 import { insertWebhookEvent, markWebhookEventProcessed } from '@/modules/payments/payment.repository';
 import { handleSaferpayNotify } from '@/modules/payments/payment.service';
+import { formatSafeErrorMessage } from '@/modules/payments/safe-error';
 
 async function processNotify(orderId: string, result: string | null) {
   const eventId = `saferpay_${orderId}_${result ?? 'unknown'}`;
 
-  let webhookRow: { id: string } | null;
+  let webhookRow: { id: string };
   try {
     webhookRow = await insertWebhookEvent({
       provider_event_id: eventId,
       type: result === 'fail' ? 'saferpay.notify.fail' : 'saferpay.notify.success',
+      // Samo oid + result — bez PII / kartica / tajni
       payload: { orderId, result },
     });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (msg.includes('unique') || msg.includes('duplicate')) {
+    const msg = formatSafeErrorMessage(err);
+    if (/unique|duplicate|23505/i.test(msg)) {
       return NextResponse.json({ received: true, note: 'duplicate' });
     }
     console.error('[webhook/saferpay] Failed to insert webhook_event:', msg);
     return NextResponse.json({ error: 'DB error' }, { status: 500 });
   }
 
-  // insertWebhookEvent returns null on duplicate provider_event_id — rare with timestamp.
-  // Still process notify (idempotent Assert/Capture).
   try {
     await handleSaferpayNotify({ orderId, result });
-    if (webhookRow) await markWebhookEventProcessed(webhookRow.id);
+    await markWebhookEventProcessed(webhookRow.id);
     return NextResponse.json({ received: true });
   } catch (err) {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = formatSafeErrorMessage(err);
     console.error('[webhook/saferpay] Handler error:', msg);
-    if (webhookRow) await markWebhookEventProcessed(webhookRow.id, msg);
-    // Saferpay retries on non-200 — return 200 only if we want to stop retries.
-    // Transient errors → 500 so Saferpay retries.
+    await markWebhookEventProcessed(webhookRow.id, msg);
+    // Transient → 500 da Saferpay retrya; handler je idempotentan
     return NextResponse.json({ error: 'Handler failed' }, { status: 500 });
   }
 }

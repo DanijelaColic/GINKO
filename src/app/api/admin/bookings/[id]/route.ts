@@ -7,6 +7,7 @@ import { getRoomBySlug } from '@/modules/rooms/room.repository';
 import { parseLocalDate, diffDays, calculatePrice } from '@/modules/booking/dates';
 import { sendConfirmationEmail, notifyGuestBookingConfirmed, bookingRowToEmailData } from '@/lib/email';
 import { createBookingViewToken, getBookingConfirmationUrlFromRequest } from '@/lib/bookingConfirmation';
+import { checkBookingHardDeleteAllowed } from '@/modules/booking/booking-delete-policy';
 import type { Booking } from '@/modules/booking/booking.types';
 
 type Params = { params: Promise<{ id: string }> };
@@ -25,6 +26,16 @@ export async function PATCH(request: NextRequest, { params }: Params) {
   if (updates._resend_email === true) {
     const { data: booking } = await supabase.from('bookings').select('*').eq('id', id).single();
     if (!booking) return NextResponse.json({ error: 'Nije pronađeno' }, { status: 404 });
+
+    if (booking.status !== 'confirmed') {
+      return NextResponse.json(
+        {
+          error:
+            'Email potvrde šalje se samo za potvrđene rezervacije (status confirmed).',
+        },
+        { status: 409 },
+      );
+    }
 
     if (booking.guest_email) {
       const token = createBookingViewToken(booking.id, booking.guest_email);
@@ -94,6 +105,7 @@ export async function PATCH(request: NextRequest, { params }: Params) {
 }
 
 // DELETE /api/admin/bookings/[id]
+// Plaćene rezervacije: nemoj hard-delete — otkaži da ostane povijest plaćanja.
 export async function DELETE(request: NextRequest, { params }: Params) {
   if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -101,6 +113,19 @@ export async function DELETE(request: NextRequest, { params }: Params) {
 
   const { id } = await params;
   const supabase = createServerSupabaseClient();
+
+  const check = await checkBookingHardDeleteAllowed(supabase, id);
+  if (!check.allowed) {
+    return NextResponse.json(
+      {
+        error: check.message,
+        code: check.reason,
+        hint: 'cancel_instead',
+      },
+      { status: check.reason === 'not_found' ? 404 : 409 },
+    );
+  }
+
   const { error } = await supabase.from('bookings').delete().eq('id', id);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

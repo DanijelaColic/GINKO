@@ -41,13 +41,25 @@ export class DatesUnavailableError extends Error {
   }
 }
 
+export type FetchLocalRangesOptions = {
+  /** Isključi vlastiti booking red (npr. re-check prije potvrde nakon plaćanja). */
+  excludeBookingId?: string | null;
+};
+
 export type StayAvailabilityDeps = {
   fetchMyRentRangesForWindow: (
     roomSlug: string,
     dateFrom: string,
     dateUntil: string,
   ) => Promise<BookedRange[]>;
-  fetchLocalRanges: (roomSlug: string) => Promise<BookedRange[]>;
+  fetchLocalRanges: (
+    roomSlug: string,
+    options?: FetchLocalRangesOptions,
+  ) => Promise<BookedRange[]>;
+};
+
+export type AssertStayAvailableOptions = {
+  excludeBookingId?: string | null;
 };
 
 function mergeBookedRanges(ranges: BookedRange[]): BookedRange[] {
@@ -78,16 +90,24 @@ export function getAvailabilitySlugsForRoom(roomSlug: string): string[] {
 
 async function fetchLocalBookedRanges(
   roomSlug: string,
+  options?: FetchLocalRangesOptions,
 ): Promise<BookedRange[]> {
   const slugsToCheck = getAvailabilitySlugsForRoom(roomSlug);
   const supabase = createServerSupabaseClient();
+  const excludeId = options?.excludeBookingId?.trim() || null;
+
+  let bookingsQuery = supabase
+    .from('bookings')
+    .select('id, check_in, check_out')
+    .in('room_slug', slugsToCheck)
+    .neq('status', 'cancelled');
+
+  if (excludeId) {
+    bookingsQuery = bookingsQuery.neq('id', excludeId);
+  }
 
   const [bookingsRes, blockedRes, externalRes] = await Promise.all([
-    supabase
-      .from('bookings')
-      .select('check_in, check_out')
-      .in('room_slug', slugsToCheck)
-      .neq('status', 'cancelled'),
+    bookingsQuery,
     supabase
       .from('blocked_dates')
       .select('check_in, check_out')
@@ -103,7 +123,10 @@ async function fetchLocalBookedRanges(
   if (externalRes.error) throw externalRes.error;
 
   return [
-    ...(bookingsRes.data ?? []),
+    ...(bookingsRes.data ?? []).map((b) => ({
+      check_in: b.check_in as string,
+      check_out: b.check_out as string,
+    })),
     ...(blockedRes.data ?? []),
     ...(externalRes.data ?? []).map((e) => ({
       check_in: e.starts_on as string,
@@ -182,9 +205,10 @@ export async function getGuestBookedRanges(
 }
 
 /**
- * Svježa provjera prije POST rezervacije.
+ * Svježa provjera prije POST rezervacije ili prije potvrde nakon plaćanja.
  * - MyRent fail → AvailabilityUnavailableError (ne potvrđuj)
  * - overlap MyRent ∪ lokalno → DatesUnavailableError
+ * - options.excludeBookingId: lokalni red ne blokira sam sebe
  * SPA 1/2 dijele object_id 7460 + linkedSlugs u lokalnom fetchu.
  */
 export async function assertBookingStayAvailable(
@@ -192,6 +216,7 @@ export async function assertBookingStayAvailable(
   checkInIso: string,
   checkOutIso: string,
   deps: StayAvailabilityDeps = defaultStayDeps,
+  options?: AssertStayAvailableOptions,
 ): Promise<void> {
   const room = getRoomBySlug(roomSlug);
   if (!room) {
@@ -210,11 +235,96 @@ export async function assertBookingStayAvailable(
     checkInIso,
     checkOutIso,
   );
-  const localRanges = await deps.fetchLocalRanges(roomSlug);
+  const localRanges = await deps.fetchLocalRanges(roomSlug, {
+    excludeBookingId: options?.excludeBookingId,
+  });
   const ranges = mergeBookedRanges([...myrentRanges, ...localRanges]);
 
   if (!isRangeAvailable(checkInDate, checkOutDate, ranges)) {
     throw new DatesUnavailableError();
+  }
+}
+
+export type ConfirmAvailabilityResult =
+  | { ok: true }
+  | {
+      ok: false;
+      reason: 'unavailable' | 'myrent_down' | 'missing_booking' | 'error';
+      message: string;
+    };
+
+/**
+ * Re-check prije konačne potvrde (npr. nakon budućeg Saferpay uspjeha).
+ * Isključuje vlastiti booking_id iz lokalnih rangeova.
+ * Ne šalje email, ne piše u MyRent, ne mijenja naplatu — samo provjera.
+ */
+export async function recheckAvailabilityBeforeBookingConfirm(
+  bookingId: string,
+  deps: StayAvailabilityDeps = defaultStayDeps,
+): Promise<ConfirmAvailabilityResult> {
+  const id = bookingId?.trim();
+  if (!id) {
+    return { ok: false, reason: 'missing_booking', message: 'Nedostaje booking id.' };
+  }
+
+  try {
+    const supabase = createServerSupabaseClient();
+    const { data, error } = await supabase
+      .from('bookings')
+      .select('id, room_slug, check_in, check_out, status')
+      .eq('id', id)
+      .maybeSingle();
+
+    if (error) {
+      return {
+        ok: false,
+        reason: 'error',
+        message: error.message || 'Greška učitavanja rezervacije.',
+      };
+    }
+    if (!data) {
+      return {
+        ok: false,
+        reason: 'missing_booking',
+        message: 'Rezervacija nije pronađena.',
+      };
+    }
+    if (data.status === 'cancelled') {
+      return {
+        ok: false,
+        reason: 'unavailable',
+        message: 'Rezervacija je otkazana.',
+      };
+    }
+
+    await assertBookingStayAvailable(
+      data.room_slug as string,
+      data.check_in as string,
+      data.check_out as string,
+      deps,
+      { excludeBookingId: id },
+    );
+    return { ok: true };
+  } catch (err) {
+    if (err instanceof DatesUnavailableError) {
+      return {
+        ok: false,
+        reason: 'unavailable',
+        message: err.message || 'Termin više nije dostupan.',
+      };
+    }
+    if (err instanceof AvailabilityUnavailableError) {
+      return {
+        ok: false,
+        reason: 'myrent_down',
+        message: err.message || 'MyRent kalendar nije dostupan.',
+      };
+    }
+    return {
+      ok: false,
+      reason: 'error',
+      message: err instanceof Error ? err.message : 'Greška provjere dostupnosti.',
+    };
   }
 }
 

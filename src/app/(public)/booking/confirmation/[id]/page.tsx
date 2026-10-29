@@ -12,6 +12,7 @@ import BookingSummaryCard from '@/components/hotel/BookingSummaryCard';
 import ConfirmationPaymentPanel from '@/components/hotel/ConfirmationPaymentPanel';
 import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { syncSaferpayPayment } from '@/modules/payments/payment.service';
+import { getGuestConfirmationViewState } from '@/modules/booking/confirmation-display-state';
 import { getValidLocale } from '@/i18n/messages';
 import { localizePath } from '@/i18n/pathnames';
 
@@ -105,21 +106,43 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
 
   const checkInDate = parseLocalDate(data.checkInIso);
   const checkOutDate = parseLocalDate(data.checkOutIso);
-  const isPaid =
-    data.status === 'confirmed' ||
-    data.depositPaid === true ||
-    showSuccessBanner;
+  // Samo DB status — Saferpay banner ne smije lažno prikazati „potvrđeno”
+  const viewState = getGuestConfirmationViewState({
+    status: data.status,
+    depositPaid: data.depositPaid === true,
+  });
   const remainingEur = Math.max(0, Math.round((data.totalPrice - data.deposit) * 100) / 100);
   const guestFirstName =
     data.guestFirstName?.trim() ||
     data.guestName.trim().split(/\s+/)[0] ||
     data.guestName;
 
+  const titleKey =
+    viewState === 'confirmed'
+      ? 'titleConfirmed'
+      : viewState === 'paid_pending_confirm'
+        ? 'titlePaymentReceivedPending'
+        : 'title';
+  const statusLabel =
+    viewState === 'confirmed'
+      ? t('statusConfirmed')
+      : viewState === 'paid_pending_confirm'
+        ? t('statusPaymentReceivedPending')
+        : viewState === 'cancelled'
+          ? t('statusCancelled')
+          : t('statusPending');
+  const statusClass =
+    viewState === 'confirmed'
+      ? 'text-green-600'
+      : viewState === 'cancelled'
+        ? 'text-red-500'
+        : 'text-amber-600';
+
   return (
     <main className="min-h-screen bg-stone/5 py-10 px-4">
       <div className="max-w-5xl mx-auto">
 
-        {!isPaid && <BookingStepsBar currentStep={3} />}
+        {viewState === 'unpaid' && <BookingStepsBar currentStep={3} />}
 
         {/* Two-column layout — isti pattern kao korak 2 */}
         <div className="grid grid-cols-1 lg:grid-cols-[340px_1fr] gap-8 items-start">
@@ -143,33 +166,20 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
           <div>
             <div className="mb-6">
               <h2 className="font-serif text-2xl font-semibold text-text">
-                {isPaid ? t('titleConfirmed') : t('title')}
+                {t(titleKey)}
               </h2>
               <p className="text-sm text-text/50 mt-1">
                 {t('reference')}:{' '}
                 <span className="font-mono font-medium text-text/70">{data.reference}</span>
                 {' · '}
-                <span className={
-                  isPaid
-                    ? 'text-green-600'
-                    : data.status === 'cancelled'
-                      ? 'text-red-500'
-                      : 'text-amber-600'
-                }>
-                  {isPaid
-                    ? t('statusConfirmed')
-                    : data.status === 'cancelled'
-                      ? t('statusCancelled')
-                      : t('statusPending')}
-                </span>
+                <span className={statusClass}>{statusLabel}</span>
               </p>
             </div>
 
             <ConfirmationPaymentPanel
               bookingId={id}
               token={token}
-              status={data.status}
-              paid={isPaid}
+              viewState={viewState}
               depositEur={data.deposit}
               remainingEur={remainingEur}
               guestFirstName={guestFirstName}

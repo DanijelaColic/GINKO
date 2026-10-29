@@ -191,7 +191,7 @@ export async function sendGuestQuestionNotification(
   }
 }
 
-/** Potvrda gostu nakon uspješnog plaćanja depozita. */
+/** Potvrda gostu nakon uspješnog plaćanja depozita — samo ako je status confirmed. */
 export async function notifyGuestBookingConfirmed(bookingId: string): Promise<void> {
   const supabase = createServerSupabaseClient();
   const { data: booking, error } = await supabase
@@ -201,6 +201,15 @@ export async function notifyGuestBookingConfirmed(bookingId: string): Promise<vo
     .single();
 
   if (error || !booking?.guest_email) return;
+
+  if (booking.status !== 'confirmed') {
+    console.warn(
+      '[email] skip guest confirmation — booking not confirmed:',
+      bookingId,
+      booking.status,
+    );
+    return;
+  }
 
   const token = createBookingViewToken(booking.id, booking.guest_email);
   const confirmationUrl = getBookingConfirmationUrl(
@@ -217,6 +226,14 @@ export async function notifyGuestBookingConfirmed(bookingId: string): Promise<vo
 
 /** Ponovno slanje gostu (admin) — potvrda rezervacije. */
 export async function sendConfirmationEmail(data: BookingEmailData): Promise<void> {
+  if (data.status && data.status !== 'confirmed') {
+    console.warn(
+      '[email] skip confirmation email — status is not confirmed:',
+      data.status,
+    );
+    return;
+  }
+
   const resend = getResend();
   if (!resend) return;
 

@@ -124,6 +124,45 @@ describe('assertBookingStayAvailable (bez MyRent/Supabase write)', () => {
       '2026-12-01',
       '2026-12-04',
     );
-    expect(fetchLocal).toHaveBeenCalledWith('ginko-3');
+    expect(fetchLocal).toHaveBeenCalledWith('ginko-3', {
+      excludeBookingId: undefined,
+    });
+  });
+
+  it('excludeBookingId prosljeđuje se lokalnom fetchu (self ne blokira)', async () => {
+    const selfId = '11111111-2222-3333-4444-555555555555';
+    const fetchMyRent = vi.fn().mockResolvedValue([]);
+    const fetchLocal = vi.fn().mockResolvedValue([]);
+    await assertBookingStayAvailable(
+      'ginko-1',
+      '2026-11-08',
+      '2026-11-10',
+      {
+        fetchMyRentRangesForWindow: fetchMyRent,
+        fetchLocalRanges: fetchLocal,
+      },
+      { excludeBookingId: selfId },
+    );
+    expect(fetchLocal).toHaveBeenCalledWith('ginko-1', {
+      excludeBookingId: selfId,
+    });
+  });
+
+  it('bez excludea: lokalni overlap i dalje blokira', async () => {
+    const local: BookedRange[] = [
+      { check_in: '2026-11-08', check_out: '2026-11-10' },
+    ];
+    await expect(
+      assertBookingStayAvailable(
+        'ginko-1',
+        '2026-11-08',
+        '2026-11-10',
+        {
+          fetchMyRentRangesForWindow: vi.fn().mockResolvedValue([]),
+          fetchLocalRanges: vi.fn().mockResolvedValue(local),
+        },
+        { excludeBookingId: 'other-id' },
+      ),
+    ).rejects.toBeInstanceOf(DatesUnavailableError);
   });
 });

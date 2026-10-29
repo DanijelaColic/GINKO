@@ -13,6 +13,11 @@ import clsx from 'clsx';
 import { centsToEur } from '@/modules/payments/payment.types';
 import { bookingReference } from '@/modules/booking/booking.config';
 import type { PaymentIntentStatus } from '@/modules/payments/payment.types';
+import {
+  bookingPaymentAdminLabel,
+  getBookingPaymentAdminState,
+  isPaidUnconfirmedBooking,
+} from '@/modules/payments/booking-payment-state';
 import { ToastContainer, type ToastItem } from './Toast';
 
 // ── Types ─────────────────────────────────────────────────────────
@@ -371,9 +376,37 @@ export default function AdminPayments() {
                         {centsToEur(row.amount).toFixed(2)} {row.currency.toUpperCase()}
                       </td>
 
-                      {/* Status */}
+                      {/* Status: Saferpay intent + booking confirm state */}
                       <td className="px-4 py-3">
-                        <StatusBadge status={row.status} />
+                        <div className="flex flex-col gap-1 items-start">
+                          <StatusBadge status={row.status} />
+                          {row.booking && isPaidUnconfirmedBooking(row.booking) && (
+                            <span
+                              className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-orange-100 text-orange-800 leading-tight"
+                              title={
+                                typeof row.metadata?.confirm_blocked_message === 'string'
+                                  ? row.metadata.confirm_blocked_message
+                                  : bookingPaymentAdminLabel(
+                                      getBookingPaymentAdminState(row.booking),
+                                    )
+                              }
+                            >
+                              Plaćeno · nije potvrđeno
+                            </span>
+                          )}
+                          {row.status === 'succeeded' && !row.booking_id && (
+                            <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-red-100 text-red-700">
+                              Nema povezane rezervacije
+                            </span>
+                          )}
+                          {row.metadata?.confirm_blocked === true &&
+                            row.booking &&
+                            !isPaidUnconfirmedBooking(row.booking) && (
+                            <span className="text-[10px] text-orange-700">
+                              confirm_blocked
+                            </span>
+                          )}
+                        </div>
                       </td>
 
                       {/* Saferpay ID */}

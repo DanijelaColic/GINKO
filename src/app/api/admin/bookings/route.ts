@@ -4,6 +4,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
+import { checkBookingHardDeleteAllowed } from '@/modules/booking/booking-delete-policy';
 import { getRoomBySlug } from '@/modules/rooms/room.repository';
 import { parseLocalDate, diffDays, calculatePrice } from '@/modules/booking/dates';
 
@@ -86,7 +87,7 @@ export async function POST(request: NextRequest) {
   return NextResponse.json(data, { status: 201 });
 }
 
-// DELETE /api/admin/bookings — grupno brisanje
+// DELETE /api/admin/bookings — grupno brisanje (preskače plaćene)
 export async function DELETE(request: NextRequest) {
   if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -103,8 +104,33 @@ export async function DELETE(request: NextRequest) {
   }
 
   const supabase = createServerSupabaseClient();
-  const { error } = await supabase.from('bookings').delete().in('id', ids);
+  const deletable: string[] = [];
+  const skipped: { id: string; reason: string }[] = [];
+
+  for (const id of ids as string[]) {
+    const check = await checkBookingHardDeleteAllowed(supabase, id);
+    if (check.allowed) deletable.push(id);
+    else skipped.push({ id, reason: check.reason });
+  }
+
+  if (deletable.length === 0) {
+    return NextResponse.json(
+      {
+        error:
+          'Nijedna odabrana rezervacija se ne smije brisati (imaju uspješnu naplatu). Otkažite ih umjesto brisanja.',
+        skipped,
+        deletedCount: 0,
+      },
+      { status: 409 },
+    );
+  }
+
+  const { error } = await supabase.from('bookings').delete().in('id', deletable);
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-  return NextResponse.json({ success: true, deletedCount: ids.length });
+  return NextResponse.json({
+    success: true,
+    deletedCount: deletable.length,
+    skipped,
+  });
 }

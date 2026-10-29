@@ -259,20 +259,25 @@ export async function getAmbiguousPaymentIntents(
 
 // ── WebhookEvent ──────────────────────────────────────────────────
 
+/**
+ * Idempotent upsert-by-provider_event_id.
+ * Vrati postojeći red pri ponovljenom notifyju (da se može markirati processed).
+ * Ranije je vraćao null → retry nije mogao ažurirati processed/error.
+ */
 export async function insertWebhookEvent(data: {
   provider_event_id: string;
   type: string;
   payload: Record<string, unknown>;
-}): Promise<WebhookEvent | null> {
+}): Promise<WebhookEvent> {
   const supabase = createServerSupabaseClient();
 
   const { data: existing } = await supabase
     .from('webhook_events')
-    .select('id')
+    .select('*')
     .eq('provider_event_id', data.provider_event_id)
-    .single();
+    .maybeSingle();
 
-  if (existing) return null;
+  if (existing) return existing as WebhookEvent;
 
   const { data: row, error } = await supabase
     .from('webhook_events')
@@ -284,7 +289,25 @@ export async function insertWebhookEvent(data: {
     .select()
     .single();
 
-  if (error) throw error;
+  if (error) {
+    // Race: drugi request insertao — učitaj postojeći
+    if (
+      typeof error === 'object' &&
+      error &&
+      ('code' in error || 'message' in error) &&
+      /unique|duplicate|23505/i.test(
+        `${(error as { code?: string }).code ?? ''} ${(error as { message?: string }).message ?? ''}`,
+      )
+    ) {
+      const { data: again } = await supabase
+        .from('webhook_events')
+        .select('*')
+        .eq('provider_event_id', data.provider_event_id)
+        .maybeSingle();
+      if (again) return again as WebhookEvent;
+    }
+    throw error;
+  }
   return row as WebhookEvent;
 }
 

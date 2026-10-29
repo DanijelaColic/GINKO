@@ -3,6 +3,7 @@
 import { useTranslations } from 'next-intl';
 import { Link } from '@/i18n/navigation';
 import { TERMS_PATH } from '@/modules/booking/booking.config';
+import type { GuestConfirmationViewState } from '@/modules/booking/confirmation-display-state';
 import PayDepositButton from './PayDepositButton';
 import {
   PROPERTY_ADDRESS,
@@ -12,8 +13,7 @@ import {
 type Props = {
   bookingId: string;
   token: string;
-  status: 'pending' | 'confirmed' | 'cancelled';
-  paid: boolean;
+  viewState: GuestConfirmationViewState;
   depositEur: number;
   remainingEur: number;
   guestFirstName?: string;
@@ -30,17 +30,17 @@ type Props = {
 export default function ConfirmationPaymentPanel({
   bookingId,
   token,
-  status,
-  paid,
+  viewState,
   depositEur,
   remainingEur,
   guestFirstName,
   paymentBanner,
 }: Props) {
   const t = useTranslations('bookingConfirmation');
-  const bookingCancelled = status === 'cancelled';
-  const showPayButton = !paid && !bookingCancelled;
-  const showPaidState = paid && !bookingCancelled;
+  const bookingCancelled = viewState === 'cancelled';
+  const showPayButton = viewState === 'unpaid';
+  const showConfirmed = viewState === 'confirmed';
+  const showPaidPending = viewState === 'paid_pending_confirm';
 
   return (
     <div className="space-y-5">
@@ -50,7 +50,8 @@ export default function ConfirmationPaymentPanel({
         </p>
       )}
 
-      {paymentBanner && !paid && (
+      {/* Banner samo dok još čekamo uplatu / obradu — ne prepisuje confirmed UI */}
+      {paymentBanner && viewState === 'unpaid' && (
         <div className={`rounded-2xl border px-5 py-4 ${paymentBanner.bg}`}>
           <div className="flex items-start gap-3">
             <span className={`text-xl font-bold leading-none mt-0.5 ${paymentBanner.text}`}>
@@ -91,7 +92,14 @@ export default function ConfirmationPaymentPanel({
         </div>
       )}
 
-      {showPaidState && (
+      {showPaidPending && (
+        <div className="rounded-2xl border border-amber-200 bg-amber-50/70 px-6 py-5 space-y-3">
+          <p className="font-semibold text-amber-900">{t('paidPendingConfirmTitle')}</p>
+          <p className="text-sm text-amber-900/85">{t('paidPendingConfirmBody')}</p>
+        </div>
+      )}
+
+      {showConfirmed && (
         <div className="rounded-2xl border border-green-200 bg-green-50/60 px-6 py-5 space-y-3">
           <p className="font-semibold text-green-800">{t('confirmedTitle')}</p>
           <p className="text-sm text-green-800/80">

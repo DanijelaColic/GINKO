@@ -33,6 +33,9 @@ import type {
 import { getSiteUrl } from '@/lib/siteUrl';
 import { toSaferpayLanguageCode } from '@/lib/bookingConfirmation';
 import { notifyGuestBookingConfirmed } from '@/lib/email';
+import { recheckAvailabilityBeforeBookingConfirm } from '@/modules/booking/availability.service';
+import { queueMyRentSyncAfterPayment } from '@/modules/myrent/myrent.booking-sync-hook';
+import { formatSafeErrorMessage } from './safe-error';
 
 // ── Status mapping ────────────────────────────────────────────────
 
@@ -58,17 +61,98 @@ function isPaymentSuccessful(status: PaymentIntentStatus): boolean {
   return status === 'succeeded';
 }
 
+/**
+ * Nakon uspješne naplate: svježi re-check dostupnosti (isključujući vlastiti red),
+ * zatim potvrda + email + MyRent sync queue.
+ * Ako je termin zauzet / MyRent down: označi depozit plaćen, NE potvrđuj automatski,
+ * NE šalji mail gostu, NE syncaj u MyRent (admin mora riješiti).
+ * Ne mijenja Saferpay Capture — samo lokalnu potvrdu nakon plaćanja.
+ */
+/**
+ * Zabilježi na payment_intent da je naplata OK, ali potvrda bookinga blokirana.
+ * Admin vidi: booking.deposit_paid + status=pending + metadata.confirm_blocked.
+ */
+async function markBookingConfirmBlocked(
+  bookingId: string,
+  reason: string,
+  message: string,
+): Promise<void> {
+  try {
+    const intent = await getPaymentIntentByBookingId(bookingId);
+    if (!intent) return;
+    await updatePaymentIntentStatus(intent.provider_payment_id, intent.status, {
+      confirm_blocked: true,
+      confirm_blocked_reason: reason,
+      confirm_blocked_message: message.slice(0, 200),
+      confirm_blocked_at: new Date().toISOString(),
+    });
+  } catch (err) {
+    console.error(
+      '[payments] markBookingConfirmBlocked failed:',
+      bookingId,
+      formatSafeErrorMessage(err),
+    );
+  }
+}
+
 async function confirmBookingAfterPayment(bookingId: string): Promise<void> {
+  const availability = await recheckAvailabilityBeforeBookingConfirm(bookingId);
+
+  if (!availability.ok) {
+    // Plaćeno, ali nije potvrđeno — jasan admin signal (pending + deposit_paid)
+    await updateBookingPaymentState(bookingId, { depositPaid: true });
+    await markBookingConfirmBlocked(
+      bookingId,
+      availability.reason,
+      availability.message,
+    );
+    console.error(
+      '[availability] re-check prije potvrde nije prošao — depozit bilježen, bez auto-confirm/email/MyRent:',
+      bookingId,
+      availability.reason,
+      availability.message,
+    );
+    return;
+  }
+
   const { confirmed } = await updateBookingPaymentState(bookingId, {
     confirmIfPending: true,
     depositPaid: true,
   });
 
+  // Uspješna potvrda — očisti eventualni stari confirm_blocked flag
   if (confirmed) {
+    try {
+      const intent = await getPaymentIntentByBookingId(bookingId);
+      if (intent?.metadata?.confirm_blocked) {
+        await updatePaymentIntentStatus(intent.provider_payment_id, intent.status, {
+          confirm_blocked: false,
+          confirm_blocked_cleared_at: new Date().toISOString(),
+        });
+      }
+    } catch (err) {
+      console.error(
+        '[payments] clear confirm_blocked failed:',
+        bookingId,
+        formatSafeErrorMessage(err),
+      );
+    }
+
     void notifyGuestBookingConfirmed(bookingId).catch((err) =>
-      console.error('[email] notifyGuestBookingConfirmed:', err),
+      console.error(
+        '[email] notifyGuestBookingConfirmed:',
+        formatSafeErrorMessage(err),
+      ),
     );
   }
+
+  // MyRent sync (mock/disabled by default) — ne utječe na naplatu ni mail gostu
+  void queueMyRentSyncAfterPayment(bookingId).catch((err) =>
+    console.error(
+      '[myrent-sync] queueMyRentSyncAfterPayment:',
+      formatSafeErrorMessage(err),
+    ),
+  );
 }
 
 function centsToSaferpayValue(cents: number): string {
@@ -228,7 +312,7 @@ export async function syncSaferpayPayment(
       finalStatus = (capture.Status ?? 'CAPTURED').toUpperCase();
     } catch (err) {
       // Already captured (retry / notify race) — treat as success.
-      const msg = err instanceof Error ? err.message : String(err);
+      const msg = formatSafeErrorMessage(err);
       if (/already|captured|TRANSACTION_ALREADY/i.test(msg)) {
         captureId = captureId ?? transactionId;
         finalStatus = 'CAPTURED';
@@ -298,12 +382,19 @@ async function applyPaymentOutcome(
     status: 'succeeded',
     metadata,
   }).catch((err: unknown) => {
-    const msg = err instanceof Error ? err.message : String(err);
-    if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
+    const msg = formatSafeErrorMessage(err);
+    if (!/unique|duplicate|23505/i.test(msg)) throw err;
   });
 
   if (record.booking_id) {
     await confirmBookingAfterPayment(record.booking_id);
+  } else {
+    // Booking obrisan (CASCADE) ili nikad povezan — naplata postoji u Saferpayu,
+    // lokalni intent može nestati s bookingom. Webhook i dalje ima orderId.
+    console.error(
+      '[payments] applyPaymentOutcome: succeeded payment without booking_id — ručni pregled potreban',
+      record.id,
+    );
   }
 }
 
@@ -459,7 +550,7 @@ export async function issueRefund(input: RefundInput): Promise<RefundResult> {
       saferpay_refund_status: refundStatus,
     },
   }).catch((err: unknown) => {
-    const msg = err instanceof Error ? err.message : String(err);
+    const msg = formatSafeErrorMessage(err);
     if (!msg.includes('unique') && !msg.includes('duplicate')) throw err;
   });
 
@@ -538,7 +629,7 @@ export async function reconcilePayments(
         action: 'repaired',
       });
     } catch (err) {
-      const msg = err instanceof Error ? err.message : String(err);
+      const msg = formatSafeErrorMessage(err);
       result.skipped++;
       result.details.push({
         paymentIntentId: record.id,

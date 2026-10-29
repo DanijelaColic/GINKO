@@ -43,7 +43,13 @@ import { formatDisplayDate, parseLocalDate, calculatePrice } from '@/modules/boo
 import { DEPOSIT_PERCENT, bookingReference } from '@/modules/booking/booking.config';
 import type { Booking } from '@/modules/booking/booking.types';
 import BookingTimeline from './BookingTimeline';
+import MyRentSyncIssuesBanner from './MyRentSyncIssuesBanner';
 import { ToastContainer, type ToastItem } from './Toast';
+import {
+  bookingPaymentAdminLabel,
+  getBookingPaymentAdminState,
+  isPaidUnconfirmedBooking,
+} from '@/modules/payments/booking-payment-state';
 
 const MONTHS_HR_SHORT = [
   'Sij', 'Velj', 'Ožu', 'Tra', 'Svi', 'Lip',
@@ -214,12 +220,22 @@ export default function AdminBookings() {
     setActionLoading(null);
   };
 
-  const deleteBooking = async (id: string, name: string) => {
+  const deleteBooking = async (id: string, name: string, depositPaid: boolean) => {
+    if (depositPaid) {
+      showToast(
+        'Plaćena rezervacija se ne briše — otkažite je da sačuvate povijest plaćanja.',
+        'error',
+      );
+      return;
+    }
     if (!confirm(`Obriši rezervaciju gosta ${name}?`)) return;
     setActionLoading(id);
     const res = await fetch(`/api/admin/bookings/${id}`, { method: 'DELETE' });
     if (res.ok) showToast(`Rezervacija za ${name} obrisana`);
-    else showToast('Greška pri brisanju', 'error');
+    else {
+      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+      showToast(data?.error ?? 'Greška pri brisanju', 'error');
+    }
     await fetchBookings();
     setActionLoading(null);
   };
@@ -355,6 +371,7 @@ export default function AdminBookings() {
     total: bookings.filter((b) => b.status !== 'cancelled').length,
     pending: bookings.filter((b) => b.status === 'pending').length,
     confirmed: bookings.filter((b) => b.status === 'confirmed').length,
+    paidUnconfirmed: bookings.filter((b) => isPaidUnconfirmedBooking(b)).length,
     revenue: bookings
       .filter((b) => b.status !== 'cancelled')
       .reduce((s, b) => s + b.total_price, 0),
@@ -409,16 +426,44 @@ export default function AdminBookings() {
 
   const deleteSelectedBookings = async () => {
     if (selectedFilteredCount === 0) return;
-    if (!confirm(`Obriši ${selectedFilteredCount} odabranih rezervacija?`)) return;
-    setBulkDeleteLoading(true);
     const idsToDelete = filteredIds.filter((id) => selectedBookingIds.has(id));
+    const protectedCount = bookings.filter(
+      (b) => idsToDelete.includes(b.id) && b.deposit_paid,
+    ).length;
+    if (protectedCount === idsToDelete.length) {
+      showToast(
+        'Odabrane rezervacije imaju naplatu — otkažite ih umjesto brisanja.',
+        'error',
+      );
+      return;
+    }
+    if (
+      !confirm(
+        protectedCount > 0
+          ? `Obriši ${idsToDelete.length - protectedCount} rezervacija? (${protectedCount} plaćenih bit će preskočeno)`
+          : `Obriši ${selectedFilteredCount} odabranih rezervacija?`,
+      )
+    ) {
+      return;
+    }
+    setBulkDeleteLoading(true);
     const res = await fetch('/api/admin/bookings', {
       method: 'DELETE',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ ids: idsToDelete }),
     });
+    const data = (await res.json().catch(() => null)) as {
+      deletedCount?: number;
+      skipped?: unknown[];
+      error?: string;
+    } | null;
     if (res.ok) {
-      showToast(`Obrisano ${idsToDelete.length} rezervacija`);
+      const skipped = Array.isArray(data?.skipped) ? data.skipped.length : 0;
+      showToast(
+        skipped > 0
+          ? `Obrisano ${data?.deletedCount ?? 0}; ${skipped} plaćenih preskočeno`
+          : `Obrisano ${data?.deletedCount ?? idsToDelete.length} rezervacija`,
+      );
       setSelectedBookingIds((prev) => {
         const next = new Set(prev);
         idsToDelete.forEach((id) => next.delete(id));
@@ -426,7 +471,7 @@ export default function AdminBookings() {
       });
       await fetchBookings();
     } else {
-      showToast('Greška pri grupnom brisanju', 'error');
+      showToast(data?.error ?? 'Greška pri grupnom brisanju', 'error');
     }
     setBulkDeleteLoading(false);
   };
@@ -502,6 +547,29 @@ export default function AdminBookings() {
             </div>
           ))}
         </div>
+
+        {/* Plaćeno ali nije potvrđeno (npr. availability re-check nakon Saferpaya) */}
+        {stats.paidUnconfirmed > 0 && (
+          <div className="mb-6 bg-orange-50 border border-orange-200 rounded-xl px-5 py-4">
+            <div className="flex items-start gap-3">
+              <AlertTriangle size={18} className="text-orange-600 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-semibold text-orange-900">
+                  {stats.paidUnconfirmed === 1
+                    ? '1 rezervacija je plaćena, ali nije potvrđena'
+                    : `${stats.paidUnconfirmed} rezervacije su plaćene, ali nisu potvrđene`}
+                </p>
+                <p className="text-xs text-orange-800 mt-1">
+                  Depozit je evidentiran (`deposit_paid`), status je još „Na čekanju“.
+                  Provjeri dostupnost pa ručno potvrdi ili vrati uplatu.
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* MyRent: rezervacije koje nisu live-sinkronizirane (mock ≠ uspjeh) */}
+        <MyRentSyncIssuesBanner />
 
         {/* Overlap warning */}
         {overlaps.length > 0 && (
@@ -939,21 +1007,31 @@ export default function AdminBookings() {
                       </div>
                       <span className="font-bold text-gray-900 text-sm">{booking.total_price}€</span>
                     </div>
-                    <button
-                      onClick={() =>
-                        updateBooking(booking.id, { deposit_paid: !booking.deposit_paid })
-                      }
-                      disabled={actionLoading === booking.id}
-                      className={clsx(
-                        'inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium mb-3 transition-colors',
-                        booking.deposit_paid
-                          ? 'bg-green-100 text-green-700'
-                          : 'bg-gray-100 text-gray-500',
+                    <div className="flex flex-wrap gap-1.5 mb-3">
+                      <button
+                        onClick={() =>
+                          updateBooking(booking.id, { deposit_paid: !booking.deposit_paid })
+                        }
+                        disabled={actionLoading === booking.id}
+                        className={clsx(
+                          'inline-flex items-center gap-1 text-xs px-2.5 py-1 rounded-full font-medium transition-colors',
+                          booking.deposit_paid
+                            ? 'bg-green-100 text-green-700'
+                            : 'bg-gray-100 text-gray-500',
+                        )}
+                      >
+                        <Banknote size={12} />
+                        {booking.deposit_paid ? 'Depozit plaćen' : 'Depozit nije plaćen'}
+                      </button>
+                      {isPaidUnconfirmedBooking(booking) && (
+                        <span
+                          className="inline-flex items-center text-xs px-2.5 py-1 rounded-full font-medium bg-orange-100 text-orange-800"
+                          title="Depozit je plaćen, ali rezervacija nije automatski potvrđena — provjeri dostupnost"
+                        >
+                          {bookingPaymentAdminLabel('paid_unconfirmed')}
+                        </span>
                       )}
-                    >
-                      <Banknote size={12} />
-                      {booking.deposit_paid ? 'Depozit plaćen' : 'Depozit nije plaćen'}
-                    </button>
+                    </div>
                     <div className="flex items-center gap-2 flex-wrap border-t border-gray-50 pt-3">
                       {booking.guest_phone && (
                         <a
@@ -997,13 +1075,24 @@ export default function AdminBookings() {
                       >
                         <Pencil size={13} /> Uredi
                       </button>
-                      <button
-                        onClick={() => deleteBooking(booking.id, booking.guest_name)}
-                        disabled={actionLoading === booking.id}
-                        className="flex items-center gap-1 text-xs bg-red-50 text-red-500 border border-red-200 px-3 py-1.5 rounded-lg ml-auto"
-                      >
-                        <Trash2 size={13} /> Briši
-                      </button>
+                      {booking.deposit_paid ? (
+                        <span
+                          className="text-[10px] text-stone-400 ml-auto max-w-[7rem] text-right leading-tight"
+                          title="Plaćene rezervacije otkažite umjesto brisanja"
+                        >
+                          Briši onemogućeno (naplata)
+                        </span>
+                      ) : (
+                        <button
+                          onClick={() =>
+                            deleteBooking(booking.id, booking.guest_name, booking.deposit_paid)
+                          }
+                          disabled={actionLoading === booking.id}
+                          className="flex items-center gap-1 text-xs bg-red-50 text-red-500 border border-red-200 px-3 py-1.5 rounded-lg ml-auto"
+                        >
+                          <Trash2 size={13} /> Briši
+                        </button>
+                      )}
                     </div>
                   </div>
                 ))}
@@ -1140,14 +1229,26 @@ export default function AdminBookings() {
                               </button>
                             </td>
                             <td className="px-4 py-3 text-center">
-                              <span
-                                className={clsx(
-                                  'text-xs px-2.5 py-1 rounded-full font-medium',
-                                  STATUS_COLORS[booking.status],
+                              <div className="inline-flex flex-col items-center gap-1">
+                                <span
+                                  className={clsx(
+                                    'text-xs px-2.5 py-1 rounded-full font-medium',
+                                    STATUS_COLORS[booking.status],
+                                  )}
+                                >
+                                  {STATUS_LABELS[booking.status]}
+                                </span>
+                                {isPaidUnconfirmedBooking(booking) && (
+                                  <span
+                                    className="text-[10px] px-2 py-0.5 rounded-full font-semibold bg-orange-100 text-orange-800 max-w-[9rem] leading-tight"
+                                    title={bookingPaymentAdminLabel(
+                                      getBookingPaymentAdminState(booking),
+                                    )}
+                                  >
+                                    Plaćeno · nije potvrđeno
+                                  </span>
                                 )}
-                              >
-                                {STATUS_LABELS[booking.status]}
-                              </span>
+                              </div>
                             </td>
                             <td className="px-4 py-3">
                               <div className="flex items-center gap-1 justify-end">
@@ -1198,10 +1299,27 @@ export default function AdminBookings() {
                                   />
                                 </button>
                                 <button
-                                  onClick={() => deleteBooking(booking.id, booking.guest_name)}
-                                  disabled={actionLoading === booking.id}
-                                  title="Obriši"
-                                  className="p-1.5 rounded-lg text-red-400 hover:bg-red-50 transition-colors"
+                                  onClick={() =>
+                                    deleteBooking(
+                                      booking.id,
+                                      booking.guest_name,
+                                      booking.deposit_paid,
+                                    )
+                                  }
+                                  disabled={
+                                    actionLoading === booking.id || booking.deposit_paid
+                                  }
+                                  title={
+                                    booking.deposit_paid
+                                      ? 'Plaćena rezervacija — otkaži umjesto brisanja'
+                                      : 'Obriši'
+                                  }
+                                  className={clsx(
+                                    'p-1.5 rounded-lg transition-colors',
+                                    booking.deposit_paid
+                                      ? 'text-gray-300 cursor-not-allowed'
+                                      : 'text-red-400 hover:bg-red-50',
+                                  )}
                                 >
                                   <Trash2 size={15} />
                                 </button>

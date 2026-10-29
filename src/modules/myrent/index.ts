@@ -44,3 +44,53 @@ export type {
   MyRentCalendarResult,
   MyRentOccupiedDay,
 } from './myrent.types';
+
+export {
+  getMyRentWriteConfig,
+  isMyRentLiveWriteAllowed,
+} from './myrent.write-config';
+export type { MyRentWriteMode, MyRentWriteConfig } from './myrent.write-config';
+
+export {
+  buildMyRentRentAddPayload,
+  MyRentPayloadError,
+} from './myrent.booking-payload';
+export type { BookingForMyRentSync } from './myrent.booking-payload';
+
+export {
+  syncBookingToMyRent,
+  syncBookingToMyRentAfterPayment,
+} from './myrent.booking-sync';
+export { queueMyRentSyncAfterPayment } from './myrent.booking-sync-hook';
+export {
+  transportMyRentRentAdd,
+  executeLiveMyRentRentAdd,
+  buildMyRentRentAddRequestBody,
+  parseMyRentRentAddResponse,
+} from './myrent.write-transport';
+
+export {
+  resetMyRentSyncLedgerForTests,
+  getMyRentSyncRecord,
+  listMyRentSyncRecordsNeedingAttention,
+  listMyRentAdminAlerts,
+  hasSuccessfulMyRentSync,
+  hasConfirmedLiveMyRentSync,
+  hasConfirmedLiveMyRentSyncFromRow,
+} from './myrent.sync-ledger';
+
+export {
+  getMyRentSyncStore,
+  setMyRentSyncStoreForTests,
+  createMemoryMyRentSyncStore,
+  createSupabaseMyRentSyncStore,
+} from './myrent.sync-store';
+export type { MyRentSyncStore, SyncStoreRow } from './myrent.sync-store';
+
+export type {
+  MyRentRentAddPayload,
+  MyRentSyncStatus,
+  MyRentSyncRecord,
+  MyRentSyncResult,
+  MyRentAdminAlert,
+} from './myrent.booking-sync.types';
