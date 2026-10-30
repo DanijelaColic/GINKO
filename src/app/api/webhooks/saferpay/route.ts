@@ -8,11 +8,14 @@
 //
 // Idempotencija: isti provider_event_id → postojeći webhook red; syncSaferpayPayment
 // short-circuit ako je intent već succeeded; confirm samo dok je booking pending.
-
+//
 import { NextRequest, NextResponse } from 'next/server';
 import { insertWebhookEvent, markWebhookEventProcessed } from '@/modules/payments/payment.repository';
 import { handleSaferpayNotify } from '@/modules/payments/payment.service';
 import { formatSafeErrorMessage } from '@/modules/payments/safe-error';
+
+// Assert/Capture + await MyRent sync može trajati dulje od default serverless limita.
+export const maxDuration = 60;
 
 async function processNotify(orderId: string, result: string | null) {
   const eventId = `saferpay_${orderId}_${result ?? 'unknown'}`;

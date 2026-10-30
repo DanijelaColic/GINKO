@@ -31,9 +31,13 @@ function statusLabel(status: string): string {
     case 'mocked_ok':
       return 'Samo mock (nije u MyRentu)';
     case 'skipped_disabled':
-      return 'Write isključen';
+      return 'Write isključen / live gate';
+    case 'skipped_duplicate':
+      return 'Preskočeno (već u tijeku ili sinkronizirano)';
     case 'pending':
       return 'Na čekanju';
+    case 'live_ok':
+      return 'Live OK';
     default:
       return status;
   }

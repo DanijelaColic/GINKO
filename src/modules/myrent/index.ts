@@ -49,9 +49,26 @@ export type {
 
 export {
   getMyRentWriteConfig,
+  getMyRentLiveWriteAllowlist,
+  getMyRentTestLiveSiteHosts,
   isMyRentLiveWriteAllowed,
+  isMyRentLiveWriteAllowedForBooking,
+  isMyRentGlobalLiveWriteOpen,
+  isMyRentTestLiveOpen,
+  isMyRentProductionLiveOpen,
+  isMyRentAllowlistLiveForBooking,
+  isMyRentInstallIdMatched,
+  isMyRentTestLiveSiteHostAllowed,
+  isSaferpayTestEnvironment,
+  MYRENT_LIVE_WRITE_CONFIRM_TOKEN,
+  MYRENT_TEST_LIVE_CONFIRM_TOKEN,
+  MYRENT_PRODUCTION_LIVE_CONFIRM_TOKEN,
 } from './myrent.write-config';
-export type { MyRentWriteMode, MyRentWriteConfig } from './myrent.write-config';
+export type {
+  MyRentWriteMode,
+  MyRentWriteConfig,
+  MyRentLiveScope,
+} from './myrent.write-config';
 
 export {
   buildMyRentRentAddPayload,
@@ -72,6 +89,7 @@ export {
 export {
   transportMyRentRentAdd,
   executeLiveMyRentRentAdd,
+  prepareMyRentAuthForLiveWrite,
   buildMyRentRentAddRequestBody,
   parseMyRentRentAddResponse,
 } from './myrent.write-transport';
@@ -107,7 +125,11 @@ export {
   createMemoryMyRentSyncStore,
   createSupabaseMyRentSyncStore,
 } from './myrent.sync-store';
-export type { MyRentSyncStore, SyncStoreRow } from './myrent.sync-store';
+export type {
+  MyRentSyncStore,
+  SyncStoreRow,
+  OneShotClaimResult,
+} from './myrent.sync-store';
 
 export type {
   MyRentRentAddPayload,
@@ -116,3 +138,22 @@ export type {
   MyRentSyncResult,
   MyRentAdminAlert,
 } from './myrent.booking-sync.types';
+
+export {
+  MYRENT_ONE_SHOT_CLAIM_PREFIX,
+  MYRENT_ONE_SHOT_LIVE_CONFIRM,
+  assertOneShotBookingEligible,
+  isMyRentOneShotLiveAuthorized,
+  isOneShotAlreadyAttempted,
+  isConfirmedOneShotClaim,
+  buildOneShotClaimError,
+  runMyRentOneShotLive,
+  runMyRentOneShotCli,
+  checkMyRentStayAvailableReadOnly,
+} from './myrent.one-shot-live';
+export type {
+  OneShotBookingRow,
+  OneShotDeps,
+  OneShotResult,
+  OneShotSafeSummary,
+} from './myrent.one-shot-live';

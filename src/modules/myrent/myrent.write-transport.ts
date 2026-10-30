@@ -1,18 +1,15 @@
 /**
  * MyRent write transport.
  * Mock: lokalni odgovor, BEZ HTTP-a.
- * Live: pripremljen POST /user/rent_add, ali hard-gated dok
- * isMyRentLiveWriteAllowed() !== true (trenutno uvijek false).
- *
- * NEPOZNATO do kontroliranog testa:
- * - točan oblik 200 odgovora rent_add (nije isti kao rent_get)
- * - ponašanje pri duplom erp_id
+ * Live: POST /user/rent_add samo ako gate dozvoli (TEST/PRODUCTION LIVE ili allowlist).
+ * Live POST: allowAuthRetry=false (nikad 401/403 retry).
  */
 
+import { getMyRentToken } from './myrent.auth';
 import { myrentRequest } from './myrent.client';
 import {
   getMyRentWriteConfig,
-  isMyRentLiveWriteAllowed,
+  isMyRentLiveWriteAllowedForBooking,
 } from './myrent.write-config';
 import type { MyRentRentAddPayload } from './myrent.booking-sync.types';
 
@@ -26,17 +23,15 @@ export type MyRentWriteTransportResult = {
   /** true SAMO nakon uspješnog live HTTP odgovora s nedvosmislenim ID-om */
   confirmedLiveSync: boolean;
   /**
-   * true ako MyRent možda zaprimio (timeout / nejasan odgovor).
-   * Sync sloj mora postaviti status uncertain — bez auto-resenda.
+   * true ako MyRent možda zaprimio (timeout / nejasan odgovor / {}).
+   * Sync sloj: reconcile pa uncertain — bez auto-resenda.
    */
   uncertain: boolean;
 };
 
 export type ParsedMyRentRentAddResponse = {
-  /** Preferirani ID za ledger (brojčani id ako postoji, inače guid) */
   rentId: string | null;
   rentGuid: string | null;
-  /** true ako odgovor jasno sadrži barem jedan identifikator */
   unambiguous: boolean;
 };
 
@@ -69,8 +64,7 @@ function parseObjectIds(o: Record<string, unknown>): ParsedMyRentRentAddResponse
 
 /**
  * Ekstrakcija identifikatora iz rent_add odgovora.
- * Podržava number | string | objekt | niz objekata.
- * Ne pretpostavlja da je oblik jednak rent_get odgovoru.
+ * Prazan objekt {} → unambiguous:false (poznati MyRent oblik).
  */
 export function parseMyRentRentAddResponse(
   raw: unknown,
@@ -80,7 +74,6 @@ export function parseMyRentRentAddResponse(
   }
   if (typeof raw === 'string' && raw.trim()) {
     const s = raw.trim();
-    // Čisti JSON string u odgovoru
     if (
       (s.startsWith('{') && s.endsWith('}')) ||
       (s.startsWith('[') && s.endsWith(']'))
@@ -98,11 +91,9 @@ export function parseMyRentRentAddResponse(
     if (raw.length === 0) {
       return { rentId: null, rentGuid: null, unambiguous: false };
     }
-    // Jedan element — tipičan rent_get oblik; za rent_add prihvatimo ako je nedvosmislen
     if (raw.length === 1) {
       return parseMyRentRentAddResponse(raw[0]);
     }
-    // Više elemenata bez konteksta — nije pouzdano
     return { rentId: null, rentGuid: null, unambiguous: false };
   }
 
@@ -152,20 +143,20 @@ export function buildMyRentRentAddRequestBody(
 }
 
 /**
- * Live HTTP — smije se zvati SAMO kad isMyRentLiveWriteAllowed() === true.
- * U ovoj fazi nikad se ne poziva iz transportMyRentRentAdd (gate=false).
+ * Live HTTP — samo ako isMyRentLiveWriteAllowedForBooking.
+ * Auth se osvježava PRIJE poziva; POST bez 401/403 retryja.
  */
 export async function executeLiveMyRentRentAdd(
   payload: MyRentRentAddPayload,
 ): Promise<MyRentWriteTransportResult> {
-  if (!isMyRentLiveWriteAllowed()) {
+  if (!isMyRentLiveWriteAllowedForBooking(payload.erp_id)) {
     return {
       ok: false,
       mode: 'live',
       rentId: null,
       rentGuid: null,
       error:
-        'MyRent live write hard-gate: isMyRentLiveWriteAllowed()=false (nema HTTP).',
+        'MyRent live write nije dozvoljen za ovaj booking (live gate).',
       confirmedLiveSync: false,
       uncertain: false,
     };
@@ -187,14 +178,15 @@ export async function executeLiveMyRentRentAdd(
   const body = buildMyRentRentAddRequestBody(payload);
 
   try {
+    // Token već treba biti osvježen u sync sloju prije claima; ovdje bez retryja.
     const raw = await myrentRequest<unknown>({
       method: 'POST',
       path: '/user/rent_add',
       body,
+      allowAuthRetry: false,
     });
     const parsed = parseMyRentRentAddResponse(raw);
     if (!parsed.unambiguous || !parsed.rentId) {
-      // HTTP možda uspio, ali ID nije jasan → uncertain (reconcile kasnije)
       return {
         ok: false,
         mode: 'live',
@@ -229,6 +221,7 @@ export async function executeLiveMyRentRentAdd(
         uncertain: true,
       };
     }
+    // Nakon claima: i jasan HTTP fail tretira sync sloj kao uncertain (bez drugog POST-a).
     return {
       ok: false,
       mode: 'live',
@@ -236,21 +229,26 @@ export async function executeLiveMyRentRentAdd(
       rentGuid: null,
       error: message,
       confirmedLiveSync: false,
-      uncertain: false,
+      uncertain: true,
     };
   }
 }
 
+/** Osvježi token prije claima / live POST-a (bez write retryja). */
+export async function prepareMyRentAuthForLiveWrite(): Promise<void> {
+  await getMyRentToken({ forceRefresh: true });
+}
+
 /**
- * Jedina javna točka za write. Live HTTP ostaje potpuno isključen.
+ * Jedina javna točka za write.
+ * Live HTTP samo ako gate dozvoli (TEST/PRODUCTION LIVE ili allowlist).
  */
 export async function transportMyRentRentAdd(
   payload: MyRentRentAddPayload,
 ): Promise<MyRentWriteTransportResult> {
   const cfg = getMyRentWriteConfig();
 
-  // Hard stop: nikakav live HTTP dok gate nije otvoren
-  if (!isMyRentLiveWriteAllowed()) {
+  if (!isMyRentLiveWriteAllowedForBooking(payload.erp_id)) {
     if (!cfg.enabled) {
       return {
         ok: false,
@@ -275,14 +273,14 @@ export async function transportMyRentRentAdd(
       };
     }
 
-    // mode=live u env, ali hard-gate još zatvoren — BEZ HTTP-a
+    // mode=live u env, ali gate nije otvoren — BEZ HTTP-a
     return {
       ok: false,
       mode: 'live',
       rentId: null,
       rentGuid: null,
       error:
-        'MyRent live write nije aktiviran u ovoj verziji (nema HTTP poziva).',
+        'MyRent live write nije dozvoljen (scope/confirm/install) — nema HTTP poziva.',
       confirmedLiveSync: false,
       uncertain: false,
     };

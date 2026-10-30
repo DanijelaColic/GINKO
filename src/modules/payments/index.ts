@@ -30,6 +30,7 @@ export {
   issueRefund,
   reconcilePayments,
   mapWorldlinePaymentStatus,
+  ensureMyRentSyncAfterSuccessfulPayment,
 } from './payment.service';
 export type { RefundInput, RefundResult, ReconcileResult } from './payment.service';
 export type {

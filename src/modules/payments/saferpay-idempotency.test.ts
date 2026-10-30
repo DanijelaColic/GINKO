@@ -4,9 +4,10 @@ import { formatSafeErrorMessage } from './safe-error';
 /**
  * Dokumentira očekivano ponašanje idempotencije (bez stvarnog Saferpay/DB).
  * Pravi syncSaferpayPayment short-circuit je u payment.service.ts:
- * - intent.status === 'succeeded' → return bez Capture
+ * - intent.status === 'succeeded' → ensureMyRentSync (oporavak) pa return bez Capture
  * - confirmIfPending samo WHERE status=pending
  * - charge unique constraint guta duplicate
+ * - MyRent greška nikad ne poništava succeeded / confirmed
  */
 
 describe('Saferpay notify idempotency contracts', () => {

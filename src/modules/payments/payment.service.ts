@@ -146,13 +146,28 @@ async function confirmBookingAfterPayment(bookingId: string): Promise<void> {
     );
   }
 
-  // MyRent sync (mock/disabled by default) — ne utječe na naplatu ni mail gostu
-  void queueMyRentSyncAfterPayment(bookingId).catch((err) =>
+  // Await — Vercel inače može zamrznuti funkciju prije MyRent POST/reconcile.
+  // Greške se gutaju: naplata / confirmed status već su zapisani.
+  await ensureMyRentSyncAfterSuccessfulPayment(bookingId);
+}
+
+/**
+ * Pouzdan pokušaj MyRent synca nakon uspješnog plaćanja.
+ * Nikad ne baca — ne smije utjecati na Saferpay ishod ni booking confirm.
+ * Idempotentno: claim / live_ok / uncertain blokiraju drugi POST.
+ */
+export async function ensureMyRentSyncAfterSuccessfulPayment(
+  bookingId: string,
+): Promise<void> {
+  try {
+    await queueMyRentSyncAfterPayment(bookingId);
+  } catch (err) {
     console.error(
-      '[myrent-sync] queueMyRentSyncAfterPayment:',
+      '[myrent-sync] ensureMyRentSyncAfterSuccessfulPayment:',
+      bookingId,
       formatSafeErrorMessage(err),
-    ),
-  );
+    );
+  }
 }
 
 function centsToSaferpayValue(cents: number): string {
@@ -253,6 +268,11 @@ export async function syncSaferpayPayment(
   }
 
   if (record.status === 'succeeded') {
+    // Oporavak: prethodni poziv možda pao nakon succeeded, a prije MyRent claima.
+    // Idempotentno — ne radi drugi POST ako je live_ok / uncertain / claim.
+    if (record.booking_id) {
+      await ensureMyRentSyncAfterSuccessfulPayment(record.booking_id);
+    }
     return 'succeeded';
   }
 

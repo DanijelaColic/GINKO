@@ -22,6 +22,11 @@ type MyRentRequestOptions = {
   path: string;
   query?: Record<string, string | number | undefined | null>;
   body?: Record<string, unknown>;
+  /**
+   * Read putanje: true (default) — jedan retry nakon 401/403 uz refresh tokena.
+   * One-shot / write: false — NIKAD ne ponavlja HTTP (auth se osvježava PRIJE poziva).
+   */
+  allowAuthRetry?: boolean;
   /** Interno: već jednom retry nakon 401 */
   _retried?: boolean;
 };
@@ -72,7 +77,12 @@ export async function myrentRequest<T = unknown>(
     cache: 'no-store',
   });
 
-  if ((res.status === 401 || res.status === 403) && !options._retried) {
+  const allowAuthRetry = options.allowAuthRetry !== false;
+  if (
+    allowAuthRetry &&
+    (res.status === 401 || res.status === 403) &&
+    !options._retried
+  ) {
     clearMyRentTokenCache();
     return myrentRequest<T>({ ...options, _retried: true });
   }

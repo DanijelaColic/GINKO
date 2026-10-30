@@ -14,10 +14,26 @@ export type SyncStoreRow = MyRentSyncRecord & {
   syncLockUntil: string | null;
 };
 
+export type OneShotClaimResult = {
+  claimed: boolean;
+  reason: 'already_claimed' | 'already_synced' | 'error' | null;
+  row: SyncStoreRow | null;
+};
+
 export type MyRentSyncStore = {
   get(bookingId: string): Promise<SyncStoreRow | null>;
   /** Insert ili update; ne pregazi confirmed_live_sync / mocked_ok uspjeh bez namjere */
   save(record: MyRentSyncRecord & { attemptCount?: number }): Promise<void>;
+  /**
+   * Atomski one-shot claim: status=uncertain trajno.
+   * Samo jedan pozivatelj smije dobiti claimed=true.
+   */
+  claimOneShotAttempt(input: {
+    bookingId: string;
+    payloadErpId: string;
+    objectId: number;
+    claimError: string;
+  }): Promise<OneShotClaimResult>;
   /**
    * Pokušaj zaključati red za sync.
    * false = već uspješno (mock/live) ili zaključano od drugog procesa.
@@ -85,6 +101,30 @@ export function createMemoryMyRentSyncStore(): MyRentSyncStore {
           record.attemptCount ?? (prev?.attemptCount ?? 0) + 1,
         syncLockUntil: prev?.syncLockUntil ?? null,
       });
+    },
+    async claimOneShotAttempt(input) {
+      // Sinhrono check-and-set (bez await između) — atomarno u single-thread JS.
+      const existing = byBooking.get(input.bookingId) ?? null;
+      if (existing?.confirmedLiveSync === true || existing?.status === 'live_ok') {
+        return { claimed: false, reason: 'already_synced', row: existing };
+      }
+      if (existing?.status === 'uncertain') {
+        return { claimed: false, reason: 'already_claimed', row: existing };
+      }
+      const row: SyncStoreRow = {
+        bookingId: input.bookingId,
+        status: 'uncertain',
+        myrentRentId: null,
+        error: input.claimError,
+        payloadErpId: input.payloadErpId,
+        objectId: input.objectId,
+        attemptedAt: new Date().toISOString(),
+        confirmedLiveSync: false,
+        attemptCount: (existing?.attemptCount ?? 0) + 1,
+        syncLockUntil: null,
+      };
+      byBooking.set(input.bookingId, row);
+      return { claimed: true, reason: null, row };
     },
     async tryAcquireLock(bookingId, erpId, objectId) {
       const existing = byBooking.get(bookingId) ?? null;
@@ -190,6 +230,41 @@ export function createSupabaseMyRentSyncStore(): MyRentSyncStore {
         { onConflict: 'booking_id' },
       );
       if (error) throw error;
+    },
+
+    async claimOneShotAttempt(input) {
+      const supabase = createServerSupabaseClient();
+      const { data, error } = await supabase.rpc(
+        'claim_myrent_one_shot_attempt',
+        {
+          p_booking_id: input.bookingId,
+          p_payload_erp_id: input.payloadErpId,
+          p_object_id: input.objectId || null,
+          p_claim_error: input.claimError,
+        },
+      );
+      if (error) throw error;
+
+      const payload = data as {
+        claimed?: boolean;
+        reason?: 'already_claimed' | 'already_synced' | 'error' | null;
+        row?: Record<string, unknown> | null;
+      } | null;
+
+      const row = payload?.row ? rowFromDb(payload.row) : null;
+      if (payload?.claimed === true) {
+        return { claimed: true, reason: null, row };
+      }
+
+      const reasonRaw = payload?.reason;
+      const reason =
+        reasonRaw === 'already_claimed' ||
+        reasonRaw === 'already_synced' ||
+        reasonRaw === 'error'
+          ? reasonRaw
+          : 'error';
+
+      return { claimed: false, reason, row };
     },
 
     async tryAcquireLock(bookingId, erpId, objectId) {

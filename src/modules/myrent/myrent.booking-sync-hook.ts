@@ -1,6 +1,7 @@
 /**
  * Povezivanje s uspješnim Saferpay plaćanjem.
  * Ne mijenja naplatu ni email gostu — samo fire-and-forget sync pokušaj.
+ * Sync samo ako je booking u DB: status=confirmed AND deposit_paid=true.
  */
 
 import { createServerSupabaseClient } from '@/lib/supabase';
@@ -34,10 +35,19 @@ export async function queueMyRentSyncAfterPayment(
     }
 
     const booking = data as BookingForMyRentSync;
-    const result = await syncBookingToMyRentAfterPayment({
-      ...booking,
-      deposit_paid: true,
-    });
+
+    // Ne forsiraj deposit_paid — samo stvarno stanje iz Supabasea
+    if (booking.status !== 'confirmed' || booking.deposit_paid !== true) {
+      console.info(
+        '[myrent-sync] skip — booking nije confirmed+deposit_paid:',
+        bookingId,
+        `status=${booking.status}`,
+        `deposit_paid=${booking.deposit_paid}`,
+      );
+      return;
+    }
+
+    const result = await syncBookingToMyRentAfterPayment(booking);
 
     if (result?.adminAlert) {
       console.error(
@@ -54,8 +64,15 @@ export async function queueMyRentSyncAfterPayment(
       );
     } else if (result?.record.status === 'skipped_disabled') {
       console.info(
-        '[myrent-sync] write disabled — nema MyRent upisa:',
+        '[myrent-sync] write disabled / live gate — nema MyRent upisa:',
         bookingId,
+      );
+    } else if (result?.record.status === 'live_ok') {
+      console.info(
+        '[myrent-sync] live_ok:',
+        bookingId,
+        'rent',
+        result.record.myrentRentId,
       );
     } else if (result?.record.status === 'uncertain') {
       console.error(
