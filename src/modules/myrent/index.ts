@@ -20,6 +20,16 @@ export {
 
 export { myrentRequest, MyRentApiError } from './myrent.client';
 export { MYRENT_USER_AGENT, myrentCommonHeaders } from './myrent.http';
+export {
+  classifyMyRentResponseText,
+  failureStepForApiPath,
+  logMyRentFailure,
+} from './myrent.diagnostics';
+export type {
+  MyRentFailureDiag,
+  MyRentFailureStep,
+  MyRentResponseBodyKind,
+} from './myrent.diagnostics';
 
 export {
   fetchMyRentCalendar,

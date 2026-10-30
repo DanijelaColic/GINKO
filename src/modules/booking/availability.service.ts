@@ -14,6 +14,7 @@ import {
   MyRentAuthError,
   occupiedDatesToBookedRanges,
 } from '@/modules/myrent';
+import { logMyRentFailure } from '@/modules/myrent/myrent.diagnostics';
 import {
   formatDate,
   startOfToday,
@@ -141,6 +142,13 @@ async function fetchMyRentBookedRangesForWindow(
   dateUntil: string,
 ): Promise<BookedRange[]> {
   if (!isMyRentConfigured()) {
+    logMyRentFailure({
+      configured: false,
+      step: 'config',
+      httpStatus: null,
+      bodyKind: 'empty',
+      cloudflareChallenge: false,
+    });
     throw new AvailabilityUnavailableError(
       'MyRent nije konfiguriran (nedostaju MYRENT_* env varijable).',
     );

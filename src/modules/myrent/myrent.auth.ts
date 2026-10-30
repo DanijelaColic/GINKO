@@ -6,9 +6,14 @@
 
 import {
   getMyRentConfig,
+  isMyRentConfigured,
   MYRENT_TOKEN_TTL_MS,
   type MyRentEnvConfig,
 } from './myrent.config';
+import {
+  classifyMyRentResponseText,
+  logMyRentFailure,
+} from './myrent.diagnostics';
 import { myrentCommonHeaders } from './myrent.http';
 
 type TokenCache = {
@@ -45,20 +50,32 @@ function readTokenFromResponse(data: unknown): string {
 }
 
 async function requestNewToken(config: MyRentEnvConfig): Promise<string> {
-  const res = await fetch(config.authUrl, {
-    method: 'POST',
-    headers: myrentCommonHeaders({
-      'Content-Type': 'application/json',
-      user_guid: config.userGuid,
-      Authorization: config.apiAuth,
-    }),
-    body: JSON.stringify({
-      user_id: config.userId,
-      public_key: config.publicKey,
-      auth_key: config.authKey,
-    }),
-    cache: 'no-store',
-  });
+  let res: Response;
+  try {
+    res = await fetch(config.authUrl, {
+      method: 'POST',
+      headers: myrentCommonHeaders({
+        'Content-Type': 'application/json',
+        user_guid: config.userGuid,
+        Authorization: config.apiAuth,
+      }),
+      body: JSON.stringify({
+        user_id: config.userId,
+        public_key: config.publicKey,
+        auth_key: config.authKey,
+      }),
+      cache: 'no-store',
+    });
+  } catch {
+    logMyRentFailure({
+      configured: true,
+      step: 'auth_generate',
+      httpStatus: null,
+      bodyKind: 'other',
+      cloudflareChallenge: false,
+    });
+    throw new MyRentAuthError(0, 'MyRent auth generate failed (network error).');
+  }
 
   const text = await res.text();
   let json: unknown = null;
@@ -71,6 +88,14 @@ async function requestNewToken(config: MyRentEnvConfig): Promise<string> {
   }
 
   if (!res.ok) {
+    const { bodyKind, cloudflareChallenge } = classifyMyRentResponseText(text);
+    logMyRentFailure({
+      configured: true,
+      step: 'auth_generate',
+      httpStatus: res.status,
+      bodyKind,
+      cloudflareChallenge,
+    });
     // Nikad ne logiraj body (može sadržavati dijelove credentials odgovora)
     throw new MyRentAuthError(
       res.status,
@@ -78,7 +103,19 @@ async function requestNewToken(config: MyRentEnvConfig): Promise<string> {
     );
   }
 
-  return readTokenFromResponse(json);
+  try {
+    return readTokenFromResponse(json);
+  } catch (err) {
+    const { bodyKind, cloudflareChallenge } = classifyMyRentResponseText(text);
+    logMyRentFailure({
+      configured: true,
+      step: 'auth_generate',
+      httpStatus: res.status,
+      bodyKind,
+      cloudflareChallenge,
+    });
+    throw err;
+  }
 }
 
 /**
@@ -102,6 +139,16 @@ export async function getMyRentToken(options?: {
 
   if (!forceRefresh && inflight) {
     return inflight;
+  }
+
+  if (!isMyRentConfigured()) {
+    logMyRentFailure({
+      configured: false,
+      step: 'config',
+      httpStatus: null,
+      bodyKind: 'empty',
+      cloudflareChallenge: false,
+    });
   }
 
   const config = getMyRentConfig();

@@ -5,7 +5,12 @@
  */
 
 import { clearMyRentTokenCache, getMyRentToken, MyRentAuthError } from './myrent.auth';
-import { getMyRentConfig } from './myrent.config';
+import { getMyRentConfig, isMyRentConfigured } from './myrent.config';
+import {
+  classifyMyRentResponseText,
+  failureStepForApiPath,
+  logMyRentFailure,
+} from './myrent.diagnostics';
 import { myrentCommonHeaders } from './myrent.http';
 
 export class MyRentApiError extends Error {
@@ -69,14 +74,29 @@ export async function myrentRequest<T = unknown>(
     headers['Content-Type'] = 'application/json';
   }
 
-  const res = await fetch(url, {
-    method,
-    headers,
-    body: method === 'POST' && options.body
-      ? JSON.stringify(options.body)
-      : undefined,
-    cache: 'no-store',
-  });
+  let res: Response;
+  try {
+    res = await fetch(url, {
+      method,
+      headers,
+      body: method === 'POST' && options.body
+        ? JSON.stringify(options.body)
+        : undefined,
+      cache: 'no-store',
+    });
+  } catch {
+    logMyRentFailure({
+      configured: isMyRentConfigured(),
+      step: failureStepForApiPath(options.path),
+      httpStatus: null,
+      bodyKind: 'other',
+      cloudflareChallenge: false,
+    });
+    throw new MyRentApiError(
+      0,
+      `MyRent API ${method} ${options.path} failed (network error).`,
+    );
+  }
 
   const allowAuthRetry = options.allowAuthRetry !== false;
   if (
@@ -99,6 +119,14 @@ export async function myrentRequest<T = unknown>(
   }
 
   if (!res.ok) {
+    const { bodyKind, cloudflareChallenge } = classifyMyRentResponseText(text);
+    logMyRentFailure({
+      configured: isMyRentConfigured(),
+      step: failureStepForApiPath(options.path),
+      httpStatus: res.status,
+      bodyKind,
+      cloudflareChallenge,
+    });
     throw new MyRentApiError(
       res.status,
       `MyRent API ${method} ${options.path} failed (HTTP ${res.status}).`,
