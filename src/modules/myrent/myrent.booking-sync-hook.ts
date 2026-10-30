@@ -57,6 +57,12 @@ export async function queueMyRentSyncAfterPayment(
         '[myrent-sync] write disabled — nema MyRent upisa:',
         bookingId,
       );
+    } else if (result?.record.status === 'uncertain') {
+      console.error(
+        '[myrent-sync] UNCERTAIN — bez auto-resenda, ručna provjera:',
+        bookingId,
+        result.record.error,
+      );
     }
   } catch (err) {
     console.error(
@@ -66,3 +72,6 @@ export async function queueMyRentSyncAfterPayment(
     );
   }
 }
+
+/** @deprecated Koristi queueMyRentSyncAfterPayment */
+export const voidMyRentSyncAfterPayment = queueMyRentSyncAfterPayment;

@@ -1,5 +1,7 @@
 export {
   MYRENT_OBJECT_IDS,
+  MYRENT_RENT_SOURCE_WEB_PAGE,
+  MYRENT_CURRENCY_EUR,
   MYRENT_DEFAULT_API_BASE_URL,
   MYRENT_DEFAULT_AUTH_URL,
   getMyRentConfig,
@@ -60,14 +62,34 @@ export type { BookingForMyRentSync } from './myrent.booking-payload';
 export {
   syncBookingToMyRent,
   syncBookingToMyRentAfterPayment,
+  isMyRentAutoSyncBlocked,
 } from './myrent.booking-sync';
-export { queueMyRentSyncAfterPayment } from './myrent.booking-sync-hook';
+export {
+  queueMyRentSyncAfterPayment,
+  /** @deprecated Koristi queueMyRentSyncAfterPayment */
+  queueMyRentSyncAfterPayment as voidMyRentSyncAfterPayment,
+} from './myrent.booking-sync-hook';
 export {
   transportMyRentRentAdd,
   executeLiveMyRentRentAdd,
   buildMyRentRentAddRequestBody,
   parseMyRentRentAddResponse,
 } from './myrent.write-transport';
+export type {
+  MyRentWriteTransportResult,
+  ParsedMyRentRentAddResponse,
+} from './myrent.write-transport';
+
+export {
+  ginkoBookingNoteMarker,
+  noteContainsGinkoBookingMarker,
+  findUniqueRentByGinkoNoteMarker,
+  reconcileMyRentRentByBookingNote,
+} from './myrent.reconcile';
+export type {
+  MyRentRentNoteCandidate,
+  MyRentReconcileResult,
+} from './myrent.reconcile';
 
 export {
   resetMyRentSyncLedgerForTests,

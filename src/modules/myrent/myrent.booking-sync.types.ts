@@ -10,6 +10,11 @@ export type MyRentSyncStatus =
   | 'live_ok'
   | 'skipped_duplicate'
   | 'skipped_disabled'
+  /**
+   * MyRent je možda zaprimio rezervaciju (timeout / nejasan odgovor).
+   * Nema automatskog ponovnog slanja — treba reconcile ili ručna provjera.
+   */
+  | 'uncertain'
   | 'failed';
 
 /** Payload spreman za kasniji POST /user/rent_add (ili ekvivalent). */
@@ -28,6 +33,8 @@ export type MyRentRentAddPayload = {
   paid: 'Y' | 'N';
   currency_id: string;
   exchange: string;
+  /** MyRent kanal — WEB page */
+  rent_source_id: number;
   contact_name: string;
   contact_email: string;
   contact_tel: string | null;

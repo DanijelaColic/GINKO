@@ -27,6 +27,12 @@ export const MYRENT_OBJECT_IDS: Readonly<Record<string, number>> = {
   'ginko-spa-2': 7460, // Apartman s wellnessom (SPA 2)
 };
 
+/** MyRent rent_source_id za kanal „WEB page” (read-only potvrđeno iz računa). */
+export const MYRENT_RENT_SOURCE_WEB_PAGE = 129343;
+
+/** MyRent currency_id za EUR. */
+export const MYRENT_CURRENCY_EUR = '2';
+
 export type MyRentEnvConfig = {
   userGuid: string;
   b2bGuid: string;

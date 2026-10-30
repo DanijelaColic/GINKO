@@ -24,7 +24,7 @@ export type MyRentSyncStore = {
    */
   tryAcquireLock(bookingId: string, erpId: string, objectId: number): Promise<{
     acquired: boolean;
-    reason?: 'already_synced' | 'locked' | 'error';
+    reason?: 'already_synced' | 'locked' | 'uncertain' | 'error';
     existing?: SyncStoreRow | null;
   }>;
   releaseLock(bookingId: string): Promise<void>;
@@ -62,6 +62,11 @@ function isTerminalSuccess(row: SyncStoreRow | null | undefined): boolean {
   return row.confirmedLiveSync === true && Boolean(row.myrentRentId);
 }
 
+/** uncertain blokira auto acquire trajno (i nakon isteka locka). */
+function isUncertainBlocked(row: SyncStoreRow | null | undefined): boolean {
+  return row?.status === 'uncertain';
+}
+
 // ── In-memory (testovi) ───────────────────────────────────────────
 
 export function createMemoryMyRentSyncStore(): MyRentSyncStore {
@@ -85,6 +90,9 @@ export function createMemoryMyRentSyncStore(): MyRentSyncStore {
       const existing = byBooking.get(bookingId) ?? null;
       if (isTerminalSuccess(existing)) {
         return { acquired: false, reason: 'already_synced', existing };
+      }
+      if (isUncertainBlocked(existing)) {
+        return { acquired: false, reason: 'uncertain', existing };
       }
       const now = Date.now();
       if (
@@ -118,6 +126,7 @@ export function createMemoryMyRentSyncStore(): MyRentSyncStore {
         (r) =>
           !r.confirmedLiveSync &&
           (r.status === 'failed' ||
+            r.status === 'uncertain' ||
             r.status === 'skipped_disabled' ||
             r.status === 'mocked_ok' ||
             r.status === 'pending'),
@@ -201,7 +210,7 @@ export function createSupabaseMyRentSyncStore(): MyRentSyncStore {
 
       const payload = data as {
         acquired?: boolean;
-        reason?: 'already_synced' | 'locked' | 'error' | null;
+        reason?: 'already_synced' | 'locked' | 'uncertain' | 'error' | null;
         row?: Record<string, unknown> | null;
       } | null;
 
@@ -213,11 +222,13 @@ export function createSupabaseMyRentSyncStore(): MyRentSyncStore {
         return { acquired: true, existing };
       }
 
+      const reasonRaw = payload?.reason;
       const reason =
-        payload?.reason === 'already_synced' ||
-        payload?.reason === 'locked' ||
-        payload?.reason === 'error'
-          ? payload.reason
+        reasonRaw === 'already_synced' ||
+        reasonRaw === 'locked' ||
+        reasonRaw === 'uncertain' ||
+        reasonRaw === 'error'
+          ? reasonRaw
           : 'error';
 
       return { acquired: false, reason, existing };
@@ -240,7 +251,13 @@ export function createSupabaseMyRentSyncStore(): MyRentSyncStore {
         .from('myrent_booking_sync')
         .select('*')
         .eq('confirmed_live_sync', false)
-        .in('status', ['failed', 'skipped_disabled', 'mocked_ok', 'pending'])
+        .in('status', [
+          'failed',
+          'uncertain',
+          'skipped_disabled',
+          'mocked_ok',
+          'pending',
+        ])
         .order('last_attempted_at', { ascending: false });
       if (error) throw error;
       return (data ?? []).map((r) => rowFromDb(r as Record<string, unknown>));

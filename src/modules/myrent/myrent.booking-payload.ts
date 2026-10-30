@@ -3,8 +3,13 @@
  * Ne šalje ništa — čista transformacija.
  */
 
-import { getMyRentObjectId } from './myrent.config';
+import {
+  getMyRentObjectId,
+  MYRENT_CURRENCY_EUR,
+  MYRENT_RENT_SOURCE_WEB_PAGE,
+} from './myrent.config';
 import type { MyRentRentAddPayload } from './myrent.booking-sync.types';
+import { ginkoBookingNoteMarker } from './myrent.reconcile';
 
 /** Minimalni booking shape za sync (bez ovisnosti o cijelom DB redu). */
 export type BookingForMyRentSync = {
@@ -64,7 +69,7 @@ export function buildMyRentRentAddPayload(
 
   const noteParts = [
     'Source: Ginko website',
-    `Ginko booking: ${booking.id}`,
+    ginkoBookingNoteMarker(booking.id),
     `room_slug: ${booking.room_slug}`,
   ];
   if (spaOffer === 'wellness') {
@@ -93,8 +98,9 @@ export function buildMyRentRentAddPayload(
     in_advance: Number(booking.deposit),
     in_advance_paid: booking.deposit_paid ? 'Y' : 'N',
     paid: 'N',
-    currency_id: '2',
+    currency_id: MYRENT_CURRENCY_EUR,
     exchange: '1',
+    rent_source_id: MYRENT_RENT_SOURCE_WEB_PAGE,
     contact_name: booking.guest_name,
     contact_email: booking.guest_email,
     contact_tel: booking.guest_phone,

@@ -74,7 +74,17 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({ ok: true, issues, count: issues.length });
+    // Plaćene bez potvrđenog live synca — prioritet za admin
+    const paidUnconfirmedCount = issues.filter(
+      (i) => i.depositPaid === true && i.confirmedLiveSync !== true,
+    ).length;
+
+    return NextResponse.json({
+      ok: true,
+      issues,
+      count: issues.length,
+      paidUnconfirmedCount,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : 'Sync issues greška';
     // Migracija možda još nije pokrenuta

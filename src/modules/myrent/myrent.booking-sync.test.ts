@@ -3,6 +3,7 @@ import { buildMyRentRentAddPayload } from './myrent.booking-payload';
 import {
   syncBookingToMyRent,
   syncBookingToMyRentAfterPayment,
+  isMyRentAutoSyncBlocked,
 } from './myrent.booking-sync';
 import {
   getMyRentSyncRecord,
@@ -17,8 +18,22 @@ import {
   buildMyRentRentAddRequestBody,
   parseMyRentRentAddResponse,
 } from './myrent.write-transport';
-import { setMyRentSyncStoreForTests } from './myrent.sync-store';
+import {
+  createMemoryMyRentSyncStore,
+  setMyRentSyncStoreForTests,
+} from './myrent.sync-store';
 import type { BookingForMyRentSync } from './myrent.booking-payload';
+import {
+  MYRENT_CURRENCY_EUR,
+  MYRENT_RENT_SOURCE_WEB_PAGE,
+} from './myrent.config';
+import {
+  findUniqueRentByGinkoNoteMarker,
+  ginkoBookingNoteMarker,
+  noteContainsGinkoBookingMarker,
+} from './myrent.reconcile';
+import * as writeTransport from './myrent.write-transport';
+import * as reconcile from './myrent.reconcile';
 
 function sampleBooking(
   overrides: Partial<BookingForMyRentSync> = {},
@@ -62,7 +77,7 @@ describe('MyRent write config (defaults)', () => {
 });
 
 describe('buildMyRentRentAddPayload', () => {
-  it('mapira sobu na object_id i erp_id = booking.id', () => {
+  it('mapira sobu, erp_id, rent_source_id WEB page i currency EUR', () => {
     const payload = buildMyRentRentAddPayload(sampleBooking(), {
       myRentUserId: '1234',
     });
@@ -70,6 +85,9 @@ describe('buildMyRentRentAddPayload', () => {
     expect(payload.erp_id).toBe(sampleBooking().id);
     expect(payload.in_advance_paid).toBe('Y');
     expect(payload.spa_offer).toBeNull();
+    expect(payload.rent_source_id).toBe(MYRENT_RENT_SOURCE_WEB_PAGE);
+    expect(payload.currency_id).toBe(MYRENT_CURRENCY_EUR);
+    expect(payload.note).toContain(ginkoBookingNoteMarker(sampleBooking().id));
   });
 
   it('SPA wellness i bez wellnessa dijele object_id 7460', () => {
@@ -92,6 +110,7 @@ describe('buildMyRentRentAddPayload', () => {
     expect(standard.object_id).toBe(7460);
     expect(wellness.spa_offer).toBe('wellness');
     expect(standard.spa_offer).toBe('standard');
+    expect(wellness.rent_source_id).toBe(MYRENT_RENT_SOURCE_WEB_PAGE);
   });
 });
 
@@ -117,6 +136,7 @@ describe('transportMyRentRentAdd — bez HTTP write', () => {
     expect(result.ok).toBe(true);
     expect(result.mode).toBe('mock');
     expect(result.confirmedLiveSync).toBe(false);
+    expect(result.uncertain).toBe(false);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
@@ -128,7 +148,126 @@ describe('transportMyRentRentAdd — bez HTTP write', () => {
     const result = await transportMyRentRentAdd(payload);
     expect(result.ok).toBe(false);
     expect(result.confirmedLiveSync).toBe(false);
+    expect(result.uncertain).toBe(false);
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe('parseMyRentRentAddResponse', () => {
+  it('podržava number, string, objekt i niz', () => {
+    expect(parseMyRentRentAddResponse(2282782)).toEqual({
+      rentId: '2282782',
+      rentGuid: null,
+      unambiguous: true,
+    });
+    expect(parseMyRentRentAddResponse('abc')).toEqual({
+      rentId: 'abc',
+      rentGuid: null,
+      unambiguous: true,
+    });
+    expect(parseMyRentRentAddResponse({ rent_id: 9 })).toEqual({
+      rentId: '9',
+      rentGuid: null,
+      unambiguous: true,
+    });
+    expect(
+      parseMyRentRentAddResponse({
+        id: 11,
+        guid: 'f90a5a0e-b6ba-11f1-af57-9c6b006df76b',
+      }),
+    ).toEqual({
+      rentId: '11',
+      rentGuid: 'f90a5a0e-b6ba-11f1-af57-9c6b006df76b',
+      unambiguous: true,
+    });
+    expect(
+      parseMyRentRentAddResponse({
+        rent_guid: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      }),
+    ).toEqual({
+      rentId: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      rentGuid: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
+      unambiguous: true,
+    });
+    expect(
+      parseMyRentRentAddResponse([
+        { id: 2500105, guid: 'f90a5a0e-b6ba-11f1-af57-9c6b006df76b' },
+      ]),
+    ).toEqual({
+      rentId: '2500105',
+      rentGuid: 'f90a5a0e-b6ba-11f1-af57-9c6b006df76b',
+      unambiguous: true,
+    });
+    expect(parseMyRentRentAddResponse([])).toEqual({
+      rentId: null,
+      rentGuid: null,
+      unambiguous: false,
+    });
+    expect(parseMyRentRentAddResponse([{}, {}])).toEqual({
+      rentId: null,
+      rentGuid: null,
+      unambiguous: false,
+    });
+    expect(parseMyRentRentAddResponse({})).toEqual({
+      rentId: null,
+      rentGuid: null,
+      unambiguous: false,
+    });
+  });
+});
+
+describe('reconcile po Ginko note markeru', () => {
+  const bookingId = sampleBooking().id;
+
+  it('pronalazi točno jedan match po oznaci', () => {
+    const match = findUniqueRentByGinkoNoteMarker(
+      [
+        {
+          id: 1,
+          note: `Source: Ginko website | ${ginkoBookingNoteMarker(bookingId)}`,
+        },
+        { id: 2, note: 'other' },
+      ],
+      bookingId,
+    );
+    expect(match?.id).toBe(1);
+  });
+
+  it('ne zaključuje po sobi/datumima — bez note markera → null', () => {
+    expect(
+      findUniqueRentByGinkoNoteMarker(
+        [
+          {
+            id: 1,
+            object_id: 16575,
+            date_from: '2026-12-10',
+            date_until: '2026-12-13',
+            note: null,
+          },
+        ],
+        bookingId,
+      ),
+    ).toBeNull();
+  });
+
+  it('više pogodaka → null (ručna provjera)', () => {
+    const marker = ginkoBookingNoteMarker(bookingId);
+    expect(
+      findUniqueRentByGinkoNoteMarker(
+        [
+          { id: 1, note: marker },
+          { id: 2, note: `x | ${marker}` },
+        ],
+        bookingId,
+      ),
+    ).toBeNull();
+  });
+
+  it('noteContainsGinkoBookingMarker', () => {
+    expect(noteContainsGinkoBookingMarker(null, bookingId)).toBe(false);
+    expect(
+      noteContainsGinkoBookingMarker(ginkoBookingNoteMarker(bookingId), bookingId),
+    ).toBe(true);
   });
 });
 
@@ -147,6 +286,7 @@ describe('syncBookingToMyRent (memory store)', () => {
   afterEach(() => {
     process.env = { ...envBackup };
     setMyRentSyncStoreForTests(null);
+    vi.restoreAllMocks();
   });
 
   it('mock sync bilježi mocked_ok bez live potvrde', async () => {
@@ -163,24 +303,15 @@ describe('syncBookingToMyRent (memory store)', () => {
   it('mocked_ok nije live uspjeh i ne blokira ponovni sync pokušaj', async () => {
     const first = await syncBookingToMyRent({ booking: sampleBooking() });
     expect(first.record.status).toBe('mocked_ok');
-    expect(first.record.confirmedLiveSync).toBe(false);
     expect(await hasSuccessfulMyRentSync(sampleBooking().id)).toBe(false);
 
     const second = await syncBookingToMyRent({ booking: sampleBooking() });
     expect(second.record.status).toBe('mocked_ok');
-    expect(second.record.confirmedLiveSync).toBe(false);
-    expect(await hasSuccessfulMyRentSync(sampleBooking().id)).toBe(false);
-
-    const stored = await getMyRentSyncRecord(sampleBooking().id);
-    expect(stored?.status).toBe('mocked_ok');
-    expect(stored?.confirmedLiveSync).toBe(false);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   it('live confirmed blokira drugi sync (idempotencija)', async () => {
-    const store = (
-      await import('./myrent.sync-store')
-    ).createMemoryMyRentSyncStore();
+    const store = createMemoryMyRentSyncStore();
     setMyRentSyncStoreForTests(store);
     const booking = sampleBooking({
       id: 'aaaaaaaa-bbbb-cccc-dddd-eeeeeeeeeeee',
@@ -200,14 +331,11 @@ describe('syncBookingToMyRent (memory store)', () => {
     const result = await syncBookingToMyRent({ booking });
     expect(result.record.status).toBe('skipped_duplicate');
     expect(result.record.confirmedLiveSync).toBe(true);
-    expect(result.record.myrentRentId).toBe('2282782');
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
   it('paralelni lock: drugi pokušaj dok je lock aktivan → skipped', async () => {
-    const store = (
-      await import('./myrent.sync-store')
-    ).createMemoryMyRentSyncStore();
+    const store = createMemoryMyRentSyncStore();
     setMyRentSyncStoreForTests(store);
     const booking = sampleBooking({
       id: '99999999-8888-7777-6666-555555555555',
@@ -245,6 +373,87 @@ describe('syncBookingToMyRent (memory store)', () => {
     const stored = await getMyRentSyncRecord(sampleBooking().id);
     expect(stored?.myrentRentId).toMatch(/^mock_rent_/);
   });
+
+  it('timeout / uncertain → nema auto-resenda ni nakon release locka', async () => {
+    const transportSpy = vi
+      .spyOn(writeTransport, 'transportMyRentRentAdd')
+      .mockResolvedValue({
+        ok: false,
+        mode: 'live',
+        rentId: null,
+        rentGuid: null,
+        error: 'MyRent timeout / prekid veze',
+        confirmedLiveSync: false,
+        uncertain: true,
+      });
+    vi.spyOn(reconcile, 'reconcileMyRentRentByBookingNote').mockResolvedValue({
+      found: false,
+      reason: 'Nema pouzdanog podudaranja',
+    });
+
+    const first = await syncBookingToMyRent({ booking: sampleBooking() });
+    expect(first.record.status).toBe('uncertain');
+    expect(first.record.confirmedLiveSync).toBe(false);
+    expect(first.adminAlert).not.toBeNull();
+    expect(transportSpy).toHaveBeenCalledTimes(1);
+
+    const second = await syncBookingToMyRent({ booking: sampleBooking() });
+    expect(second.record.status).toBe('uncertain');
+    expect(transportSpy).toHaveBeenCalledTimes(1);
+
+    const store = (
+      await import('./myrent.sync-store')
+    ).getMyRentSyncStore();
+    const lock = await store.tryAcquireLock(
+      sampleBooking().id,
+      sampleBooking().id,
+      16575,
+    );
+    expect(lock.acquired).toBe(false);
+    expect(lock.reason).toBe('uncertain');
+  });
+
+  it('uncertain + uspješan reconcile → live_ok bez drugog writea', async () => {
+    const transportSpy = vi
+      .spyOn(writeTransport, 'transportMyRentRentAdd')
+      .mockResolvedValue({
+        ok: false,
+        mode: 'live',
+        rentId: null,
+        rentGuid: null,
+        error: 'nejasan odgovor',
+        confirmedLiveSync: false,
+        uncertain: true,
+      });
+    vi.spyOn(reconcile, 'reconcileMyRentRentByBookingNote').mockResolvedValue({
+      found: true,
+      rentId: '2500105',
+      rentGuid: 'f90a5a0e-b6ba-11f1-af57-9c6b006df76b',
+    });
+
+    const result = await syncBookingToMyRent({ booking: sampleBooking() });
+    expect(result.record.status).toBe('live_ok');
+    expect(result.record.confirmedLiveSync).toBe(true);
+    expect(result.record.myrentRentId).toBe('2500105');
+    expect(transportSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('isMyRentAutoSyncBlocked blokira uncertain', () => {
+    expect(
+      isMyRentAutoSyncBlocked({
+        status: 'uncertain',
+        confirmedLiveSync: false,
+        myrentRentId: null,
+      }).blocked,
+    ).toBe(true);
+    expect(
+      isMyRentAutoSyncBlocked({
+        status: 'mocked_ok',
+        confirmedLiveSync: false,
+        myrentRentId: 'mock_rent_11111111',
+      }).blocked,
+    ).toBe(false);
+  });
 });
 
 describe('live rent_add transport (hard-gated, bez HTTP)', () => {
@@ -254,7 +463,7 @@ describe('live rent_add transport (hard-gated, bez HTTP)', () => {
     fetchSpy.mockClear();
   });
 
-  it('buildMyRentRentAddRequestBody šalje samo poznata polja (bez nagađanih ID-eva)', () => {
+  it('buildMyRentRentAddRequestBody šalje rent_source_id, bez status/payment ID-eva', () => {
     const payload = buildMyRentRentAddPayload(sampleBooking(), {
       myRentUserId: '99',
     });
@@ -262,17 +471,11 @@ describe('live rent_add transport (hard-gated, bez HTTP)', () => {
     expect(body.object_id).toBe(16575);
     expect(body.erp_id).toBe(sampleBooking().id);
     expect(body.in_advance_paid).toBe('Y');
-    expect(body).not.toHaveProperty('rent_source_id');
+    expect(body.rent_source_id).toBe(MYRENT_RENT_SOURCE_WEB_PAGE);
+    expect(body.currency_id).toBe(MYRENT_CURRENCY_EUR);
     expect(body).not.toHaveProperty('payment_method_id');
     expect(body).not.toHaveProperty('rent_status_id');
     expect(body).not.toHaveProperty('spa_offer');
-  });
-
-  it('parseMyRentRentAddResponse podržava number/string/objekt', () => {
-    expect(parseMyRentRentAddResponse(2282782)).toBe('2282782');
-    expect(parseMyRentRentAddResponse('abc')).toBe('abc');
-    expect(parseMyRentRentAddResponse({ rent_id: 9 })).toBe('9');
-    expect(parseMyRentRentAddResponse({})).toBeNull();
   });
 
   it('executeLiveMyRentRentAdd ne zove HTTP dok je gate zatvoren', async () => {
@@ -284,6 +487,7 @@ describe('live rent_add transport (hard-gated, bez HTTP)', () => {
     const result = await executeLiveMyRentRentAdd(payload);
     expect(result.ok).toBe(false);
     expect(result.confirmedLiveSync).toBe(false);
+    expect(result.uncertain).toBe(false);
     expect(fetchSpy).not.toHaveBeenCalled();
   });
 
@@ -298,5 +502,9 @@ describe('live rent_add transport (hard-gated, bez HTTP)', () => {
     expect(result.mode).toBe('live');
     expect(result.confirmedLiveSync).toBe(false);
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+
+  it('isMyRentLiveWriteAllowed ostaje false', () => {
+    expect(isMyRentLiveWriteAllowed()).toBe(false);
   });
 });

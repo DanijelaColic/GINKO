@@ -2,12 +2,16 @@
  * Orkestracija Ginko → MyRent sync (mock faza).
  * Persistencija: myrent_booking_sync (Supabase) ili memory store u testovima.
  * Ne mijenja Saferpay potvrdu gostu; greške → admin alert, ne "live OK".
+ *
+ * uncertain = moguće da je MyRent zaprimio — NIKAD automatski resend.
  */
 
 import { buildMyRentRentAddPayload } from './myrent.booking-payload';
 import type { BookingForMyRentSync } from './myrent.booking-payload';
 import { getMyRentSyncStore } from './myrent.sync-store';
-import { transportMyRentRentAdd } from './myrent.write-transport';
+import type { SyncStoreRow } from './myrent.sync-store';
+import * as writeTransport from './myrent.write-transport';
+import * as reconcileMod from './myrent.reconcile';
 import type { MyRentSyncResult, MyRentSyncRecord } from './myrent.booking-sync.types';
 
 export type SyncBookingToMyRentInput = {
@@ -20,6 +24,24 @@ function toResult(
   adminAlert: MyRentSyncResult['adminAlert'],
 ): MyRentSyncResult {
   return { record, adminAlert };
+}
+
+/** Blokira auto-slanje: uncertain nikad; live uspjeh nikad. */
+export function isMyRentAutoSyncBlocked(
+  existing: Pick<SyncStoreRow, 'status' | 'confirmedLiveSync' | 'myrentRentId'> | null,
+): { blocked: boolean; reason: string | null } {
+  if (!existing) return { blocked: false, reason: null };
+  if (existing.confirmedLiveSync === true && existing.myrentRentId) {
+    return { blocked: true, reason: 'already_synced' };
+  }
+  if (existing.status === 'uncertain') {
+    return {
+      blocked: true,
+      reason:
+        'Status uncertain — automatsko ponovno slanje zabranjeno (reconcile / ručna provjera).',
+    };
+  }
+  return { blocked: false, reason: null };
 }
 
 /**
@@ -53,6 +75,39 @@ export async function syncBookingToMyRent(
       message: record.error!,
     });
     return toResult(record, adminAlert);
+  }
+
+  const existing = await store.get(booking.id);
+  const autoBlock = isMyRentAutoSyncBlocked(existing);
+  if (autoBlock.blocked) {
+    if (existing?.status === 'uncertain') {
+      return toResult(
+        {
+          bookingId: existing.bookingId,
+          status: 'uncertain',
+          myrentRentId: existing.myrentRentId,
+          error: existing.error ?? autoBlock.reason,
+          payloadErpId: existing.payloadErpId,
+          objectId: existing.objectId,
+          attemptedAt: now,
+          confirmedLiveSync: false,
+        },
+        null,
+      );
+    }
+    return toResult(
+      {
+        bookingId: existing!.bookingId,
+        status: 'skipped_duplicate',
+        myrentRentId: existing!.myrentRentId,
+        error: null,
+        payloadErpId: existing!.payloadErpId,
+        objectId: existing!.objectId,
+        attemptedAt: now,
+        confirmedLiveSync: existing!.confirmedLiveSync === true,
+      },
+      null,
+    );
   }
 
   let payload;
@@ -101,6 +156,23 @@ export async function syncBookingToMyRent(
         null,
       );
     }
+    if (lock.existing?.status === 'uncertain') {
+      return toResult(
+        {
+          bookingId: lock.existing.bookingId,
+          status: 'uncertain',
+          myrentRentId: lock.existing.myrentRentId,
+          error:
+            lock.existing.error ??
+            'Status uncertain — automatsko ponovno slanje zabranjeno.',
+          payloadErpId: lock.existing.payloadErpId,
+          objectId: lock.existing.objectId,
+          attemptedAt: now,
+          confirmedLiveSync: false,
+        },
+        null,
+      );
+    }
     const record: MyRentSyncRecord = {
       bookingId: booking.id,
       status: 'skipped_duplicate',
@@ -115,7 +187,7 @@ export async function syncBookingToMyRent(
   }
 
   try {
-    const transport = await transportMyRentRentAdd(payload);
+    const transport = await writeTransport.transportMyRentRentAdd(payload);
 
     if (transport.ok && transport.mode === 'mock') {
       const record: MyRentSyncRecord = {
@@ -132,7 +204,7 @@ export async function syncBookingToMyRent(
       return toResult(record, null);
     }
 
-    // Live OK — samo ako gate + transport potvrde (trenutno nedostupno)
+    // Live OK — samo nedvosmislen odgovor (confirmedLiveSync iz transporta)
     if (
       transport.ok &&
       transport.mode === 'live' &&
@@ -151,6 +223,57 @@ export async function syncBookingToMyRent(
       };
       await store.save(record);
       return toResult(record, null);
+    }
+
+    // Timeout / nejasan odgovor → pokušaj read-only reconcile; inače uncertain
+    if (transport.uncertain) {
+      const reconciled = await reconcileMod
+        .reconcileMyRentRentByBookingNote({
+          bookingId: booking.id,
+          objectId: payload.object_id,
+          checkIn: booking.check_in,
+          checkOut: booking.check_out,
+        })
+        .catch(() => ({
+          found: false as const,
+          reason: 'Reconcile nije uspio.',
+        }));
+
+      if (reconciled.found) {
+        const record: MyRentSyncRecord = {
+          bookingId: booking.id,
+          status: 'live_ok',
+          myrentRentId: reconciled.rentId,
+          error: null,
+          payloadErpId: payload.erp_id,
+          objectId: payload.object_id,
+          attemptedAt: now,
+          confirmedLiveSync: true,
+        };
+        await store.save(record);
+        return toResult(record, null);
+      }
+
+      const record: MyRentSyncRecord = {
+        bookingId: booking.id,
+        status: 'uncertain',
+        myrentRentId: null,
+        error:
+          transport.error ??
+          reconciled.reason ??
+          'MyRent odgovor nejasan — potrebna ručna provjera.',
+        payloadErpId: payload.erp_id,
+        objectId: payload.object_id,
+        attemptedAt: now,
+        confirmedLiveSync: false,
+      };
+      await store.save(record);
+      const adminAlert = await store.recordAlert({
+        type: 'myrent_sync_failed',
+        bookingId: booking.id,
+        message: record.error!,
+      });
+      return toResult(record, adminAlert);
     }
 
     if (!transport.ok) {
@@ -205,6 +328,7 @@ export async function syncBookingToMyRent(
     });
     return toResult(record, adminAlert);
   } finally {
+    // uncertain mora ostati blokiran i nakon releaseLocka — status u redu je izvor istine
     await store.releaseLock(booking.id).catch(() => undefined);
   }
 }
