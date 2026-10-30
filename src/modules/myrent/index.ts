@@ -19,6 +19,7 @@ export {
 } from './myrent.auth';
 
 export { myrentRequest, MyRentApiError } from './myrent.client';
+export { MYRENT_USER_AGENT, myrentCommonHeaders } from './myrent.http';
 
 export {
   fetchMyRentCalendar,

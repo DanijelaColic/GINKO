@@ -71,6 +71,7 @@ export default async function HomePage() {
     selectDates: t('availabilitySelectDates'),
     selectGuests: t('availabilitySelectGuests'),
     unavailableDates: t('availabilityUnavailableDates'),
+    checkFailed: t('availabilityCheckFailed'),
     searching: t('availabilitySearching'),
     search: t('heroSearch'),
     typeFilter: t('availabilityTypeFilter'),

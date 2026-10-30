@@ -183,6 +183,7 @@
     "availabilitySelectDates": "Před pokračováním vyberte datum příjezdu a odjezdu.",
     "availabilitySelectGuests": "Před pokračováním vyberte počet dospělých hostů.",
     "availabilityUnavailableDates": "Pokoj není v vybraných datech dostupný. Zkuste jiná data.",
+    "availabilityCheckFailed": "Momentálně nelze ověřit dostupnost. Zkuste to prosím za chvíli znovu.",
     "availabilityTypeFilter": "Typ ubytování",
     "availabilityTypeAll": "Vše",
     "availabilityTypeRoom": "Pokoje",

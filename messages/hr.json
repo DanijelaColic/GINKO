@@ -183,6 +183,7 @@
     "availabilitySelectDates": "Molimo odaberite datum dolaska i odlaska prije nastavka.",
     "availabilitySelectGuests": "Molimo odaberite broj odraslih gostiju prije nastavka.",
     "availabilityUnavailableDates": "Soba nije dostupna za odabrane datume. Pokušajte s drugim datumima.",
+    "availabilityCheckFailed": "Trenutačno nije moguće provjeriti raspoloživost. Pokušajte ponovo za koji trenutak.",
     "availabilityTypeFilter": "Tip smještaja",
     "availabilityTypeAll": "Sve",
     "availabilityTypeRoom": "Sobe",

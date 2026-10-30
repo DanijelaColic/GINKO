@@ -183,6 +183,7 @@
     "availabilitySelectDates": "Please select check-in and check-out dates before continuing.",
     "availabilitySelectGuests": "Please select the number of adult guests before continuing.",
     "availabilityUnavailableDates": "This room is not available for the selected dates. Please try different dates.",
+    "availabilityCheckFailed": "Availability cannot be checked right now. Please try again in a moment.",
     "availabilityTypeFilter": "Accommodation type",
     "availabilityTypeAll": "All",
     "availabilityTypeRoom": "Rooms",

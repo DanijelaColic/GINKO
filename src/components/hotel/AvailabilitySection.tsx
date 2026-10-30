@@ -48,6 +48,8 @@ export type AvailabilityLabels = {
   selectDates: string;
   selectGuests: string;
   unavailableDates: string;
+  /** API / MyRent greška (npr. 503) — ne miješati s „nema slobodnih soba”. */
+  checkFailed: string;
   searching: string;
   search: string;
   typeFilter: string;
@@ -127,6 +129,8 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
   const [statuses, setStatuses] = useState<Record<string, RoomStatus | null>>({});
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
+  /** true = MyRent/API nije vratio status nijednoj sobi (503 / mreža). */
+  const [checkFailed, setCheckFailed] = useState(false);
   const [dateError, setDateError] = useState<string | null>(null);
   const [guestsOpen, setGuestsOpen] = useState(false);
   const [showAgeErrors, setShowAgeErrors] = useState(false);
@@ -186,6 +190,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
       }
 
       setDateError(null);
+      setCheckFailed(false);
       setShowAgeErrors(false);
       setLoading(true);
       setSearched(true);
@@ -228,10 +233,13 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
       results.forEach(({ slug, status }) => { map[slug] = status; });
       setStatuses(map);
 
-      // Ako nijedna soba nije uspješno provjerena — ne prikazuj "sve slobodno"
+      // Ako nijedna soba nije uspješno provjerena — API/MyRent greška, ne "nema soba"
       const anyChecked = results.some((r) => r.status != null);
       if (!anyChecked) {
-        setDateError(labels.unavailableDates);
+        setCheckFailed(true);
+        setDateError(labels.checkFailed);
+      } else {
+        setCheckFailed(false);
       }
 
       setLoading(false);
@@ -253,7 +261,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
       checkOut,
       rooms,
       labels.selectDates,
-      labels.unavailableDates,
+      labels.checkFailed,
       adults,
       children,
       childAges,
@@ -365,7 +373,10 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
       } else if (state === 'search') {
         void runAvailabilityCheck(undefined, true);
       } else if (state === 'unavailable') {
-        setDateError(labels.unavailableDates);
+        // null status = API/MyRent greška; available:false = stvarno zauzeto
+        setDateError(
+          statuses[roomSlug] == null ? labels.checkFailed : labels.unavailableDates,
+        );
       }
 
       requestAnimationFrame(() => scrollToSectionId(AVAILABILITY_SECTION_ID));
@@ -726,17 +737,21 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
           {searched && !loading && availableRooms.length === 0 && (
             <div className="text-center py-14 text-muted">
               <p className="font-serif text-xl font-semibold text-text mb-2">
-                {noResultsMessage}
+                {checkFailed ? labels.checkFailed : noResultsMessage}
               </p>
-              <p className="text-sm mb-6">
-                {labels.noResultsHint}
-              </p>
-              <a
-                href={`mailto:${CONTACT_EMAIL}`}
-                className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-medium px-6 py-3 rounded-lg transition-colors text-sm"
-              >
-                {labels.contactUs}
-              </a>
+              {!checkFailed && (
+                <p className="text-sm mb-6">
+                  {labels.noResultsHint}
+                </p>
+              )}
+              {!checkFailed && (
+                <a
+                  href={`mailto:${CONTACT_EMAIL}`}
+                  className="inline-flex items-center gap-2 bg-primary hover:bg-primary-dark text-white font-medium px-6 py-3 rounded-lg transition-colors text-sm"
+                >
+                  {labels.contactUs}
+                </a>
+              )}
             </div>
           )}
         </div>

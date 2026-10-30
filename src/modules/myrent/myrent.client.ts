@@ -6,6 +6,7 @@
 
 import { clearMyRentTokenCache, getMyRentToken, MyRentAuthError } from './myrent.auth';
 import { getMyRentConfig } from './myrent.config';
+import { myrentCommonHeaders } from './myrent.http';
 
 export class MyRentApiError extends Error {
   status: number;
@@ -58,11 +59,11 @@ export async function myrentRequest<T = unknown>(
   const method = options.method ?? 'GET';
   const url = buildUrl(config.apiBaseUrl, options.path, options.query);
 
-  const headers: Record<string, string> = {
+  const headers: Record<string, string> = myrentCommonHeaders({
     b2b_guid: config.b2bGuid,
     user_guid: config.userGuid,
     token,
-  };
+  });
 
   if (method === 'POST') {
     headers['Content-Type'] = 'application/json';

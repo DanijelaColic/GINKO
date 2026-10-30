@@ -9,6 +9,7 @@ import {
   MYRENT_TOKEN_TTL_MS,
   type MyRentEnvConfig,
 } from './myrent.config';
+import { myrentCommonHeaders } from './myrent.http';
 
 type TokenCache = {
   token: string;
@@ -46,11 +47,11 @@ function readTokenFromResponse(data: unknown): string {
 async function requestNewToken(config: MyRentEnvConfig): Promise<string> {
   const res = await fetch(config.authUrl, {
     method: 'POST',
-    headers: {
+    headers: myrentCommonHeaders({
       'Content-Type': 'application/json',
       user_guid: config.userGuid,
       Authorization: config.apiAuth,
-    },
+    }),
     body: JSON.stringify({
       user_id: config.userId,
       public_key: config.publicKey,
