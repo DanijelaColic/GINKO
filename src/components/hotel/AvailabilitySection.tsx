@@ -26,6 +26,7 @@ import {
   BREAKFAST_PRICE_PER_PERSON_PER_NIGHT,
   BREAKFAST_PRICE_CHILD_3_12,
   EXTRA_BED_PRICE_PER_NIGHT,
+  calculateDeposit,
   DEPOSIT_PERCENT,
 } from '@/modules/booking/booking.config';
 import { fetchStayQuote } from '@/modules/booking/fetch-stay-quote';
@@ -776,7 +777,7 @@ export default function AvailabilitySection({
                           const depositAmt =
                             status.deposit != null && !plan.breakfast
                               ? status.deposit
-                              : Math.round(displayTotal * DEPOSIT_PERCENT);
+                              : calculateDeposit(displayTotal);
                           return (
                             <>
                               <p className="text-2xl font-bold text-primary leading-none">

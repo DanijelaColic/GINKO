@@ -4,7 +4,7 @@
 import type { BookedRange } from './booking.types';
 import type { Room } from '@/modules/rooms/room.types';
 import {
-  DEPOSIT_PERCENT,
+  calculateDeposit,
   CLEANING_FEE,
   EXTRA_BED_PRICE_PER_NIGHT,
   CRIB_PRICE_PER_NIGHT,
@@ -201,7 +201,7 @@ export function calculatePrice(
     (breakfastPerNight > 0 ? nights * breakfastPerNight : 0);
 
   const totalPrice = rawAccommodationPrice + CLEANING_FEE + extrasTotal;
-  const deposit = Math.round(totalPrice * DEPOSIT_PERCENT);
+  const deposit = calculateDeposit(totalPrice);
 
   return {
     nights,

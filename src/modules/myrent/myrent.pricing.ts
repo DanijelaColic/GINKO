@@ -19,9 +19,9 @@ import {
 } from '@/modules/booking/dates';
 import {
   BREAKFAST_PRICE_PER_PERSON_PER_NIGHT,
+  calculateDeposit,
   CLEANING_FEE,
   CRIB_PRICE_PER_NIGHT,
-  DEPOSIT_PERCENT,
   EXTRA_BED_PRICE_PER_NIGHT,
 } from '@/modules/booking/booking.config';
 import { addIsoDays } from './myrent.ranges';
@@ -306,7 +306,7 @@ export function buildPriceBreakdownFromMyRentNights(
 
   const totalPrice =
     quote.accommodationSubtotal + CLEANING_FEE + extrasTotal;
-  const deposit = Math.round(totalPrice * DEPOSIT_PERCENT);
+  const deposit = calculateDeposit(totalPrice);
   const ratesVary =
     nightsCount > 1 &&
     quote.nights.some((n) => n.price !== quote.nights[0]!.price);

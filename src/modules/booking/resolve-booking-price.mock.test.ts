@@ -40,7 +40,7 @@ describe('resolveBookingPrice mock mode (env)', () => {
     expect(resolved.source).toBe('myrent_mock');
     // 50×3 noći + 15×3 doručak = 195
     expect(resolved.breakdown.totalPrice).toBe(195);
-    expect(resolved.breakdown.deposit).toBe(98);
+    expect(resolved.breakdown.deposit).toBe(97.5);
     expect(resolved.ratesVary).toBe(false);
     expect(resolved.nightlyRates).toHaveLength(3);
   });

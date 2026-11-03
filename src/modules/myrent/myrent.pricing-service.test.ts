@@ -164,7 +164,7 @@ describe('fetchMyRentStayPrice (period)', () => {
     expect(standard.breakdown.totalPrice).toBe(390);
     expect(wellness.breakdown.totalPrice).toBe(390 + 100 * 2);
     expect(wellness.breakdown.deposit).toBe(
-      Math.round(wellness.breakdown.totalPrice * 0.5),
+      Math.round(wellness.breakdown.totalPrice * 100 * 0.5) / 100,
     );
     expect(wellness.breakdown.lines).toHaveLength(1); // samo Smještaj
   });

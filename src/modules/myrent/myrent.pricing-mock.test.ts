@@ -80,7 +80,7 @@ describe('buildMockMyRentPricePeriod', () => {
     );
     // 390 + 100×2 + 30 breakfast
     expect(breakdown.totalPrice).toBe(390 + 200 + 30);
-    expect(breakdown.deposit).toBe(Math.round(breakdown.totalPrice * 0.5));
+    expect(breakdown.deposit).toBe(breakdown.totalPrice * 0.5);
     setSpaWellnessSurchargeForTests(undefined);
   });
 });

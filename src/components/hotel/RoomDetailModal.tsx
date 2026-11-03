@@ -7,7 +7,13 @@ import BedTypeIcons from '@/components/hotel/BedTypeIcons';
 import RoomModalGallery from '@/components/hotel/RoomModalGallery';
 import { ROOM_AMENITY_ICONS } from '@/components/hotel/roomAmenityIcons';
 import { groupRoomAmenities } from '@/modules/rooms/room-amenities.config';
-import { BREAKFAST_PRICE_PER_PERSON_PER_NIGHT, BREAKFAST_PRICE_CHILD_3_12, DEPOSIT_PERCENT, EXTRA_BED_PRICE_PER_NIGHT } from '@/modules/booking/booking.config';
+import {
+  BREAKFAST_PRICE_PER_PERSON_PER_NIGHT,
+  BREAKFAST_PRICE_CHILD_3_12,
+  calculateDeposit,
+  DEPOSIT_PERCENT,
+  EXTRA_BED_PRICE_PER_NIGHT,
+} from '@/modules/booking/booking.config';
 import type { GoogleReviewSummary } from '@/modules/reviews/google-reviews.types';
 import {
   formatReviewRating,
@@ -96,7 +102,7 @@ export default function RoomDetailModal({
 
   const depositPct = Math.round(DEPOSIT_PERCENT * 100);
   const balancePct = 100 - depositPct;
-  const depositAmount = Math.round(displayTotal * DEPOSIT_PERCENT);
+  const depositAmount = calculateDeposit(displayTotal);
   const balanceAmount = displayTotal - depositAmount;
 
   const reviewScore = reviewSummary

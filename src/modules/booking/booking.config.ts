@@ -62,6 +62,22 @@ export function houseRulesSectionHref() {
 /** 50% depozit pri rezervaciji; ostatak u smještajnom objektu */
 export const DEPOSIT_PERCENT = 0.5;
 
+/**
+ * Depozit = percent × total, zaokruženo na 2 decimale (centi).
+ * Primjer: 585 × 50% → 292.50 (ne 293).
+ * Radi u centima da UI / Supabase / Saferpay dijele isti iznos.
+ */
+export function calculateDeposit(
+  totalPrice: number,
+  percent: number = DEPOSIT_PERCENT,
+): number {
+  if (!Number.isFinite(totalPrice) || totalPrice < 0) return 0;
+  if (!Number.isFinite(percent) || percent < 0) return 0;
+  const totalCents = Math.round(totalPrice * 100);
+  const depositCents = Math.round(totalCents * percent);
+  return depositCents / 100;
+}
+
 /** Ostatak se plaća u smještajnom objektu pri dolasku (ne online) */
 export const BALANCE_DAYS_BEFORE_CHECK_IN = 0;
 
