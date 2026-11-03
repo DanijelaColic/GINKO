@@ -199,6 +199,9 @@
     "availabilityContactUs": "Contact us",
     "availabilityReserve": "Book",
     "availabilityPerNight": "per night",
+    "availabilityPricingUnavailable": "The price is currently unavailable. Please try again or contact us.",
+    "availabilityDepositLabel": "Deposit {percent}%: {amount} €",
+
     "availabilityNightOne": "night",
     "availabilityNightFew": "nights",
     "availabilityNightMany": "nights",
@@ -513,7 +516,14 @@
       "accommodation": "Accommodation",
       "extraBed": "Extra bed",
       "crib": "Baby crib",
-      "breakfast": "Breakfast (buffet)"
+      "breakfast": "Breakfast (buffet)",
+      "nightlyRatesTitle": "Price per night"
+    },
+    "pricing": {
+      "loading": "Fetching price…",
+      "changedTitle": "The price has changed",
+      "changedBody": "The new total is {total} € (deposit {deposit} €). Confirm the new price before continuing.",
+      "changedConfirm": "I accept the new price and want to continue with the booking."
     },
     "form": {
       "optional": "(optional)",
@@ -626,6 +636,10 @@
       "breakfastGuestsInvalid": "Breakfast cannot be for more people than the number of guests.",
       "datesUnavailable": "The selected dates are already booked. Please choose different dates.",
       "availabilityUnavailable": "We can’t confirm availability right now. Please try again shortly or contact us.",
+      "pricingUnavailable": "We can’t confirm the price right now. Please try again shortly or contact us.",
+      "wellnessSurchargeNotConfigured": "The wellness apartment is not available for online booking right now. Choose the apartment without wellness or contact us.",
+      "priceChanged": "The price changed since it was shown. Review the new amount and confirm it before payment.",
+      "priceChangedConfirmRequired": "Confirm the new price to continue with the booking.",
       "createFailed": "Could not create the booking. Please try again or contact us."
     },
     "policies": {

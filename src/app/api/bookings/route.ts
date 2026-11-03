@@ -10,7 +10,6 @@ import { getRoomBySlug } from '@/modules/rooms/room.repository';
 import {
   parseLocalDate,
   diffDays,
-  calculatePrice,
 } from '@/modules/booking/dates';
 import {
   assertBookingStayAvailable,
@@ -18,6 +17,11 @@ import {
   DatesUnavailableError,
   getGuestBookedRanges,
 } from '@/modules/booking/availability.service';
+import { resolveBookingPrice } from '@/modules/booking/resolve-booking-price';
+import { evaluateQuotedPrice } from '@/modules/booking/quoted-price';
+import { MyRentPricingUnavailableError } from '@/modules/myrent/myrent.pricing-service';
+import { SpaWellnessSurchargeNotConfiguredError } from '@/modules/myrent/myrent.spa-pricing';
+import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
 import { MIN_NIGHTS } from '@/modules/booking/booking.config';
 import { guestApiError } from '@/lib/guest-api-error';
 import {
@@ -93,6 +97,8 @@ export async function POST(request: NextRequest) {
       vat_id,
       notes,
       locale: bodyLocale,
+      quoted_total_price,
+      quoted_deposit,
     } = body;
 
     const locale = getValidLocale(typeof bodyLocale === 'string' ? bodyLocale : 'hr');
@@ -166,14 +172,64 @@ export async function POST(request: NextRequest) {
 
     const supabase = createServerSupabaseClient();
 
-    // Server-side pricing (source of truth) — uključuje sve extras
-    const priceData = calculatePrice(checkInDate, checkOutDate, room, {
-      extraBeds: autoExtraBed ? 1 : 0,
-      crib: needs_crib === true,
-      breakfastPerNight,
-    });
-    const { totalPrice, deposit } = priceData;
-    const avgPricePerNight = Math.round(totalPrice / nights);
+    // Server-side pricing (SoT). Default: legacy room.price.
+    // Ako MYRENT_PRICING_ENABLED=true → svježi MyRent/mock po noćima + usporedba quotea.
+    let totalPrice: number;
+    let deposit: number;
+    let avgPricePerNight: number;
+    try {
+      const resolved = await resolveBookingPrice({
+        room,
+        checkIn: checkInDate,
+        checkOut: checkOutDate,
+        adults: adultsCount,
+        children: childrenCount,
+        extras: {
+          // MyRent period već uključuje dodatne osobe — Ginko EXTRA_BED se ne zbraja.
+          // Legacy put i dalje koristi autoExtraBed.
+          extraBeds: autoExtraBed ? 1 : 0,
+          crib: needs_crib === true,
+          breakfastPerNight,
+        },
+      });
+      totalPrice = resolved.breakdown.totalPrice;
+      deposit = resolved.breakdown.deposit;
+      avgPricePerNight = resolved.pricePerNight;
+
+      // MyRent pricing: quote mora točno odgovarati serveru (nema klijentskog bypassa).
+      // UI nakon 409 prikaže novi iznos; gost potvrdi; pošalje novi quoted_*.
+      if (isMyRentPricingEnabled()) {
+        const verdict = evaluateQuotedPrice({
+          quoted: {
+            totalPrice:
+              typeof quoted_total_price === 'number' ? quoted_total_price : null,
+            deposit: typeof quoted_deposit === 'number' ? quoted_deposit : null,
+          },
+          server: resolved.breakdown,
+        });
+        if (verdict !== 'ok') {
+          return NextResponse.json(
+            {
+              error: 'priceChanged',
+              source: resolved.source,
+              breakdown: resolved.breakdown,
+              pricePerNight: resolved.pricePerNight,
+              nightlyRates: resolved.nightlyRates,
+              ratesVary: resolved.ratesVary,
+            },
+            { status: 409 },
+          );
+        }
+      }
+    } catch (err) {
+      if (err instanceof SpaWellnessSurchargeNotConfiguredError) {
+        return guestApiError('wellnessSurchargeNotConfigured', 503);
+      }
+      if (err instanceof MyRentPricingUnavailableError) {
+        return guestApiError('pricingUnavailable', 503);
+      }
+      throw err;
+    }
 
     const { data: booking, error: insertError } = await supabase
       .from('bookings')

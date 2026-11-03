@@ -50,6 +50,12 @@ export type PriceLine = {
   subtotal: number;
 };
 
+/** Pojedinačna noć smještaja (MyRent kalendar / mock). */
+export type NightlyRate = {
+  day: string;
+  price: number;
+};
+
 export type PriceBreakdown = {
   nights: number;
   totalPrice: number;
@@ -57,6 +63,10 @@ export type PriceBreakdown = {
   lines: PriceLine[];
   discountAmount?: number;
   cleaningFee?: number;
+  /** Popis noćnih cijena smještaja kad dolaze iz MyRent/mock puta. */
+  nightlyRates?: NightlyRate[];
+  /** True ako se cijene noćenja međusobno razlikuju. */
+  ratesVary?: boolean;
 };
 
 // ── Booking public confirmation view ──────────────────────────────

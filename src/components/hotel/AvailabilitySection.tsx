@@ -26,7 +26,9 @@ import {
   BREAKFAST_PRICE_PER_PERSON_PER_NIGHT,
   BREAKFAST_PRICE_CHILD_3_12,
   EXTRA_BED_PRICE_PER_NIGHT,
+  DEPOSIT_PERCENT,
 } from '@/modules/booking/booking.config';
+import { fetchStayQuote } from '@/modules/booking/fetch-stay-quote';
 import {
   calculateBreakfastPerNight,
   childAgesComplete,
@@ -67,6 +69,9 @@ export type AvailabilityLabels = {
   contactUs: string;
   reserve: string;
   perNight: string;
+  /** MyRent pricing unavailable (flag on). */
+  pricingUnavailable?: string;
+  depositLabel?: string;
   nightOne: string;
   nightFew: string;
   nightMany: string;
@@ -101,12 +106,21 @@ type Props = {
   rooms: Room[];
   labels: AvailabilityLabels;
   reviewSummary?: GoogleReviewSummary | null;
+  /**
+   * Server-prop: MYRENT_PRICING_ENABLED. Zadano false — lokalni calculatePrice
+   * (postojeće ponašanje).
+   */
+  myRentPricingEnabled?: boolean;
 };
 
 type RoomStatus = {
   available: boolean;
   totalPrice: number;
   nights: number;
+  deposit?: number;
+  ratesVary?: boolean;
+  /** Quote API fail — rezervacija onemogućena. */
+  pricingError?: boolean;
 };
 
 type TypeFilter = 'all' | AccommodationType;
@@ -115,7 +129,12 @@ type RoomPlan = {
   breakfast: boolean;
 };
 
-export default function AvailabilitySection({ rooms, labels, reviewSummary }: Props) {
+export default function AvailabilitySection({
+  rooms,
+  labels,
+  reviewSummary,
+  myRentPricingEnabled = false,
+}: Props) {
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -214,14 +233,62 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
             const bookedRanges = payload as BookedRange[];
             const available = isRangeAvailable(ciDate, coDate, bookedRanges);
             const extraBeds = roomNeedsExtraBed(room, adultsCount, ages) ? 1 : 0;
-            const priceData = available
-              ? calculatePrice(ciDate, coDate, room, { extraBeds })
-              : null;
+
+            if (!available) {
+              return {
+                slug: room.slug,
+                status: {
+                  available: false,
+                  totalPrice: 0,
+                  nights: 0,
+                } as RoomStatus,
+              };
+            }
+
+            // MyRent pricing: zajednički quote API (bez doručka — doručak se dodaje u UI)
+            if (myRentPricingEnabled) {
+              try {
+                const quote = await fetchStayQuote({
+                  roomSlug: room.slug,
+                  checkIn: ci,
+                  checkOut: co,
+                  adults: adultsCount,
+                  children: childrenCount,
+                  // extraBeds se na MyRent putu ne naplaćuje (gostu u period totalu)
+                  extras: { extraBeds },
+                });
+                return {
+                  slug: room.slug,
+                  status: {
+                    available: true,
+                    totalPrice: quote.breakdown.totalPrice,
+                    nights: quote.breakdown.nights,
+                    deposit: quote.breakdown.deposit,
+                    ratesVary: quote.ratesVary,
+                  } as RoomStatus,
+                };
+              } catch {
+                return {
+                  slug: room.slug,
+                  status: {
+                    available: false,
+                    totalPrice: 0,
+                    nights: 0,
+                    pricingError: true,
+                  } as RoomStatus,
+                };
+              }
+            }
+
+            const priceData = calculatePrice(ciDate, coDate, room, { extraBeds });
             return {
               slug: room.slug,
-              status: available && priceData
-                ? { available: true, totalPrice: priceData.totalPrice, nights: priceData.nights }
-                : { available: false, totalPrice: 0, nights: 0 },
+              status: {
+                available: true,
+                totalPrice: priceData.totalPrice,
+                nights: priceData.nights,
+                deposit: priceData.deposit,
+              } as RoomStatus,
             };
           } catch {
             return { slug: room.slug, status: null as RoomStatus | null };
@@ -265,6 +332,7 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
       adults,
       children,
       childAges,
+      myRentPricingEnabled,
     ],
   );
 
@@ -373,10 +441,15 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
       } else if (state === 'search') {
         void runAvailabilityCheck(undefined, true);
       } else if (state === 'unavailable') {
-        // null status = API/MyRent greška; available:false = stvarno zauzeto
-        setDateError(
-          statuses[roomSlug] == null ? labels.checkFailed : labels.unavailableDates,
-        );
+        // null = API greška; pricingError = quote fail; inače zauzeto
+        const st = statuses[roomSlug];
+        if (st == null) {
+          setDateError(labels.checkFailed);
+        } else if (st.pricingError) {
+          setDateError(labels.pricingUnavailable ?? labels.checkFailed);
+        } else {
+          setDateError(labels.unavailableDates);
+        }
       }
 
       requestAnimationFrame(() => scrollToSectionId(AVAILABILITY_SECTION_ID));
@@ -638,7 +711,11 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                     {(() => {
                       const plan = getRoomPlan(room.slug);
                       const needsExtra = roomNeedsExtraBed(room, adults, agesResolved);
-                      const basePrice = room.price + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0);
+                      // Nakon MyRent quotea: prosjek noći iz ukupnog (bez doručka)
+                      const basePrice =
+                        searched && status?.available && status.nights > 0
+                          ? Math.round(status.totalPrice / status.nights)
+                          : room.price + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0);
                       const bfExtra = breakfastPerNight;
                       return (
                         <div className="mt-3 border border-stone rounded-lg overflow-hidden text-sm divide-y divide-stone">
@@ -685,12 +762,21 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                   {/* Desno: ukupna cijena + CTA */}
                   <div className="flex sm:flex-col items-center sm:items-end justify-between sm:justify-center gap-3 shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 sm:border-l border-stone sm:pl-5">
                     <div className="text-right">
-                      {searched && status?.available && status.totalPrice ? (
+                      {searched && status?.pricingError ? (
+                        <p className="text-xs text-red-600 max-w-[11rem]">
+                          {labels.pricingUnavailable ?? labels.checkFailed}
+                        </p>
+                      ) : searched && status?.available && status.totalPrice ? (
                         (() => {
                           const plan = getRoomPlan(room.slug);
                           const nights = status.nights;
+                          // Doručak se dodaje lokalno — nije u quoteu (bez dvostrukog naplaćivanja)
                           const bfExtra = plan.breakfast ? breakfastPerNight * nights : 0;
                           const displayTotal = status.totalPrice + bfExtra;
+                          const depositAmt =
+                            status.deposit != null && !plan.breakfast
+                              ? status.deposit
+                              : Math.round(displayTotal * DEPOSIT_PERCENT);
                           return (
                             <>
                               <p className="text-2xl font-bold text-primary leading-none">
@@ -699,7 +785,15 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                               <p className="text-xs text-muted mt-0.5">
                                 {nights}{' '}
                                 {nightCountLabel(nights, labels)}
+                                {status.ratesVary ? ' · ≠' : ''}
                               </p>
+                              {labels.depositLabel && (
+                                <p className="text-[11px] text-muted mt-1">
+                                  {labels.depositLabel
+                                    .replace('{percent}', String(Math.round(DEPOSIT_PERCENT * 100)))
+                                    .replace('{amount}', String(depositAmt))}
+                                </p>
+                              )}
                             </>
                           );
                         })()
@@ -724,7 +818,8 @@ export default function AvailabilitySection({ rooms, labels, reviewSummary }: Pr
                     <button
                       type="button"
                       onClick={() => handleReserve(room.slug)}
-                      className="bg-primary hover:bg-primary-dark text-white font-medium px-5 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap"
+                      disabled={!!status?.pricingError}
+                      className="bg-primary hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium px-5 py-2.5 rounded-lg transition-colors text-sm whitespace-nowrap"
                     >
                       {labels.reserve}
                     </button>

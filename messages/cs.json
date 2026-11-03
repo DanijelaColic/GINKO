@@ -199,6 +199,9 @@
     "availabilityContactUs": "Kontaktujte nás",
     "availabilityReserve": "Rezervovat",
     "availabilityPerNight": "za noc",
+    "availabilityPricingUnavailable": "Cena teď není dostupná. Zkuste to znovu nebo nás kontaktujte.",
+    "availabilityDepositLabel": "Záloha {percent} %: {amount} €",
+
     "availabilityNightOne": "noc",
     "availabilityNightFew": "noci",
     "availabilityNightMany": "nocí",
@@ -513,7 +516,14 @@
       "accommodation": "Ubytování",
       "extraBed": "Přistýlka",
       "crib": "Dětská postýlka",
-      "breakfast": "Snídaně (bufet)"
+      "breakfast": "Snídaně (bufet)",
+      "nightlyRatesTitle": "Cena za noc"
+    },
+    "pricing": {
+      "loading": "Načítám cenu…",
+      "changedTitle": "Cena se změnila",
+      "changedBody": "Nová celková cena je {total} € (záloha {deposit} €). Před pokračováním potvrďte novou cenu.",
+      "changedConfirm": "Přijímám novou cenu a chci pokračovat v rezervaci."
     },
     "form": {
       "optional": "(není povinné)",
@@ -626,6 +636,10 @@
       "breakfastGuestsInvalid": "Počet osob se snídaní nemůže být vyšší než počet hostů.",
       "datesUnavailable": "Vybrané termíny jsou už obsazené. Zvolte jiná data.",
       "availabilityUnavailable": "Dostupnost teď nemůžeme potvrdit. Zkuste to za chvíli znovu nebo nás kontaktujte.",
+      "pricingUnavailable": "Cenu teď nemůžeme potvrdit. Zkuste to za chvíli znovu nebo nás kontaktujte.",
+      "wellnessSurchargeNotConfigured": "Wellness apartmán teď není dostupný pro online rezervaci. Zvolte apartmán bez wellness nebo nás kontaktujte.",
+      "priceChanged": "Cena se od zobrazení změnila. Zkontrolujte novou částku a potvrďte ji před platbou.",
+      "priceChangedConfirmRequired": "Pro pokračování v rezervaci potvrďte novou cenu.",
       "createFailed": "Rezervaci se nepodařilo vytvořit. Zkuste to znovu nebo nás kontaktujte."
     },
     "policies": {

@@ -19,6 +19,18 @@ export {
 } from './booking.config';
 
 export { calculatePrice } from './pricing.service';
+export { resolveBookingPrice } from './resolve-booking-price';
+export type {
+  BookingPriceSource,
+  ResolvedBookingPrice,
+} from './resolve-booking-price';
+export { evaluateQuotedPrice, pricesMatch } from './quoted-price';
+export type { QuotedPriceInput } from './quoted-price';
+export { fetchStayQuote, StayQuoteError } from './fetch-stay-quote';
+export type {
+  StayPriceQuoteResponse,
+  StayPriceQuoteRequest,
+} from './quote.types';
 export {
   isDateBooked,
   isRangeAvailable,

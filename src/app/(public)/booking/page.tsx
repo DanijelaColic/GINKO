@@ -10,6 +10,7 @@ import { buildAvailabilityHref } from '@/modules/booking/booking.config';
 import BookingWidget from '@/components/hotel/BookingWidget';
 import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { redirect } from '@/i18n/navigation';
+import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -62,6 +63,7 @@ export default async function BookingPage({ searchParams }: Props) {
             initialBreakfast={breakfast}
             initialStep={parseInitialStep(step)}
             reviewSummary={reviewSummary}
+            myRentPricingEnabled={isMyRentPricingEnabled()}
           />
         </div>
       </section>

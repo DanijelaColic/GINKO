@@ -257,6 +257,26 @@ export default function BookingSummaryCard({
               </div>
             ))}
 
+            {/* Različite noćne cijene (MyRent / mock) */}
+            {priceData.ratesVary &&
+              priceData.nightlyRates &&
+              priceData.nightlyRates.length > 0 && (
+                <div className="rounded-lg bg-stone-light/80 border border-stone px-3 py-2 space-y-1">
+                  <p className="text-[11px] font-semibold text-muted uppercase tracking-wide">
+                    {t('summary.nightlyRatesTitle')}
+                  </p>
+                  {priceData.nightlyRates.map((n) => (
+                    <div
+                      key={n.day}
+                      className="flex justify-between gap-2 text-[11px] text-muted"
+                    >
+                      <span>{n.day}</span>
+                      <span className="text-text font-medium">{n.price} €</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+
             {!!priceData.cleaningFee && (
               <div className="flex justify-between gap-2">
                 <span className="text-muted">{t('summary.cleaningFee')}</span>

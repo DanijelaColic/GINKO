@@ -21,6 +21,7 @@ import PropertySurroundingsSection from '@/components/hotel/PropertySurroundings
 import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
 import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF, OVERVIEW_SECTION_ID, CONTACT_PHONE_TEL, CONTACT_PHONE_DISPLAY } from '@/modules/booking/booking.config';
+import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -89,6 +90,8 @@ export default async function HomePage() {
     contactUs: t('availabilityContactUs'),
     reserve: t('availabilityReserve'),
     perNight: t('availabilityPerNight'),
+    pricingUnavailable: t('availabilityPricingUnavailable'),
+    depositLabel: t('availabilityDepositLabel'),
     nightOne: t('availabilityNightOne'),
     nightFew: t('availabilityNightFew'),
     nightMany: t('availabilityNightMany'),
@@ -240,6 +243,7 @@ export default async function HomePage() {
         <AvailabilitySection
           rooms={rooms}
           labels={availabilityLabels}
+          myRentPricingEnabled={isMyRentPricingEnabled()}
           reviewSummary={googleReviews
             ? { rating: googleReviews.rating, reviewCount: googleReviews.reviewCount }
             : null}

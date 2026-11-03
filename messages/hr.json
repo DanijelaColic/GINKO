@@ -199,6 +199,9 @@
     "availabilityContactUs": "Kontaktirajte nas",
     "availabilityReserve": "Rezerviraj",
     "availabilityPerNight": "po noći",
+    "availabilityPricingUnavailable": "Cijena trenutno nije dostupna. Pokušajte ponovo ili nas kontaktirajte.",
+    "availabilityDepositLabel": "Depozit {percent}%: {amount} €",
+
     "availabilityNightOne": "noć",
     "availabilityNightFew": "noći",
     "availabilityNightMany": "noći",
@@ -513,7 +516,14 @@
       "accommodation": "Smještaj",
       "extraBed": "Pomoćni ležaj",
       "crib": "Dječji krevetić",
-      "breakfast": "Doručak (buffet)"
+      "breakfast": "Doručak (buffet)",
+      "nightlyRatesTitle": "Cijena po noćenju"
+    },
+    "pricing": {
+      "loading": "Dohvaćam cijenu…",
+      "changedTitle": "Cijena se promijenila",
+      "changedBody": "Nova ukupna cijena je {total} € (depozit {deposit} €). Potvrdite novu cijenu prije nastavka.",
+      "changedConfirm": "Prihvaćam novu cijenu i želim nastaviti s rezervacijom."
     },
     "form": {
       "optional": "(nije obavezno)",
@@ -626,6 +636,10 @@
       "breakfastGuestsInvalid": "Broj osoba uz doručak ne može biti veći od ukupnog broja gostiju.",
       "datesUnavailable": "Odabrani termini su već zauzeti. Molimo odaberite druge datume.",
       "availabilityUnavailable": "Trenutno ne možemo potvrditi dostupnost. Pokušajte ponovo za trenutak ili nas kontaktirajte.",
+      "pricingUnavailable": "Trenutno ne možemo potvrditi cijenu. Pokušajte ponovo za trenutak ili nas kontaktirajte.",
+      "wellnessSurchargeNotConfigured": "Wellness apartman trenutno nije dostupan za online rezervaciju. Odaberite apartman bez wellnessa ili nas kontaktirajte.",
+      "priceChanged": "Cijena se promijenila od prikaza. Pregledajte novi iznos i potvrdite ga prije plaćanja.",
+      "priceChangedConfirmRequired": "Potvrdite novu cijenu kako biste nastavili s rezervacijom.",
       "createFailed": "Greška pri kreiranju rezervacije. Pokušajte ponovo ili nas kontaktirajte."
     },
     "policies": {

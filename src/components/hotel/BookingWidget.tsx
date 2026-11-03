@@ -46,6 +46,8 @@ import {
   roomFitsGuests,
   roomNeedsExtraBed,
 } from '@/modules/booking/guest-occupancy';
+import type { PriceBreakdown } from '@/modules/booking/booking.types';
+import { useStayPriceQuote } from '@/components/hotel/useStayPriceQuote';
 
 const DEPOSIT_PCT_DISPLAY = Math.round(DEPOSIT_PERCENT * 100);
 const BALANCE_PCT_DISPLAY = 100 - DEPOSIT_PCT_DISPLAY;
@@ -66,9 +68,16 @@ type Props = {
   initialBreakfast?: string;
   initialStep?: 1 | 2 | 3;
   bookingsApiPath?: string;
+  /** Zajednički quote API — default /api/bookings/quote */
+  quoteApiPath?: string;
   barcodeApiPath?: string;
   rulesText?: React.ReactNode;
   reviewSummary?: GoogleReviewSummary | null;
+  /**
+   * Server-prop: MYRENT_PRICING_ENABLED. Zadano false — legacy calculatePrice,
+   * bez quote API poziva (postojeće ponašanje).
+   */
+  myRentPricingEnabled?: boolean;
 };
 
 export default function BookingWidget({
@@ -81,9 +90,11 @@ export default function BookingWidget({
   initialBreakfast,
   initialStep,
   bookingsApiPath = '/api/bookings',
+  quoteApiPath = '/api/bookings/quote',
   barcodeApiPath = '/api/generate-barcode',
   rulesText,
   reviewSummary,
+  myRentPricingEnabled = false,
 }: Props) {
   const locale = useLocale();
   const router = useRouter();
@@ -153,6 +164,10 @@ export default function BookingWidget({
   const [success, setSuccess] = useState(false);
   const [hub3Barcode, setHub3Barcode] = useState<string | null>(null);
   const [epcQR, setEpcQR] = useState<string | null>(null);
+  /** Gost je izričito potvrdio novu cijenu nakon priceChanged 409. */
+  const [acceptedUpdatedPrice, setAcceptedUpdatedPrice] = useState(false);
+  const [pendingPriceUpdate, setPendingPriceUpdate] =
+    useState<PriceBreakdown | null>(null);
 
   useEffect(() => {
     if (success && successRef.current) {
@@ -191,14 +206,49 @@ export default function BookingWidget({
     ? calculateBreakfastPerNight(adultsCount, childAges)
     : 0;
 
-  const priceData =
-    checkIn && checkOut && selectedRoom
-      ? calculatePrice(checkIn, checkOut, selectedRoom, {
-          extraBeds: autoExtraBed ? 1 : 0,
-          crib: form.needsCrib,
-          breakfastPerNight,
-        })
+  const priceExtras = useMemo(
+    () => ({
+      extraBeds: autoExtraBed ? 1 : 0,
+      crib: form.needsCrib,
+      breakfastPerNight,
+    }),
+    [autoExtraBed, form.needsCrib, breakfastPerNight],
+  );
+
+  const quoteState = useStayPriceQuote({
+    enabled: myRentPricingEnabled,
+    roomSlug: selectedSlug || null,
+    checkIn,
+    checkOut,
+    adults: adultsCount,
+    children: childrenCount,
+    extras: priceExtras,
+    quoteApiPath,
+  });
+
+  // Reset potvrde nove cijene kad se quote/datumi/gosti promijene
+  useEffect(() => {
+    setAcceptedUpdatedPrice(false);
+    setPendingPriceUpdate(null);
+  }, [selectedSlug, checkIn, checkOut, adultsCount, childrenCount, priceExtras]);
+
+  const legacyPriceData =
+    !myRentPricingEnabled && checkIn && checkOut && selectedRoom
+      ? calculatePrice(checkIn, checkOut, selectedRoom, priceExtras)
       : null;
+
+  const priceData: PriceBreakdown | null = myRentPricingEnabled
+    ? pendingPriceUpdate ??
+      (quoteState.status === 'ready' ? quoteState.breakdown : null)
+    : legacyPriceData;
+
+  const pricingLoading = myRentPricingEnabled && quoteState.status === 'loading';
+  const pricingError =
+    myRentPricingEnabled && quoteState.status === 'error'
+      ? quoteState.code
+      : null;
+  const canProceedWithPrice =
+    !!priceData && !pricingLoading && !pricingError;
 
   // ── Barcode fetch — legacy success UI; API endpoint not wired yet (HUB3 skill)
   // Kept for when /api/generate-barcode ships; unused until then.
@@ -291,12 +341,29 @@ export default function BookingWidget({
         company_name: form.isBusiness ? form.companyName.trim() || null : null,
         vat_id: form.isBusiness ? form.vatId.trim() || null : null,
         notes: buildNotes() || null,
+        // quoted_* mora odgovarati serveru — nakon priceChanged UI ažurira
+        // priceData na novi breakdown pa gost potvrdi checkboxom prije retryja.
+        ...(myRentPricingEnabled
+          ? {
+              quoted_total_price: priceData.totalPrice,
+              quoted_deposit: priceData.deposit,
+            }
+          : {}),
       }),
     });
 
     const data = await res.json();
     if (!res.ok) {
       const code = typeof data.error === 'string' ? data.error : undefined;
+
+      // Cijena se promijenila — pokaži novu i traži izričitu potvrdu
+      if (code === 'priceChanged' && data.breakdown) {
+        setPendingPriceUpdate(data.breakdown as PriceBreakdown);
+        setAcceptedUpdatedPrice(false);
+        setStep(2);
+        throw new Error(t('errors.priceChanged'));
+      }
+
       if (code === 'minNights') {
         throw new Error(t('errors.minNights', { min: MIN_NIGHTS }));
       }
@@ -357,6 +424,7 @@ export default function BookingWidget({
     childrenCount,
     form,
     locale,
+    myRentPricingEnabled,
     priceData,
     selectedRoom,
     selectedSlug,
@@ -365,7 +433,12 @@ export default function BookingWidget({
 
   const handleStep2Submit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!checkIn || !checkOut || !priceData || !selectedRoom) return;
+    if (!checkIn || !checkOut || !canProceedWithPrice || !selectedRoom) return;
+
+    if (pendingPriceUpdate && !acceptedUpdatedPrice) {
+      setSubmitError(t('errors.priceChangedConfirmRequired'));
+      return;
+    }
 
     const errors = validateBookingForm(form);
     if (Object.keys(errors).length > 0) return;
@@ -387,7 +460,9 @@ export default function BookingWidget({
   // Korak 3: kreiraj rezervaciju → Saferpay checkout (bez međukoraka)
   useEffect(() => {
     if (step !== 3 || bookingCreateStarted.current) return;
-    if (!checkIn || !checkOut || !priceData || !selectedRoom) return;
+    if (!checkIn || !checkOut || !canProceedWithPrice || !priceData || !selectedRoom) {
+      return;
+    }
 
     bookingCreateStarted.current = true;
     let cancelled = false;
@@ -437,6 +512,7 @@ export default function BookingWidget({
     step,
     checkIn,
     checkOut,
+    canProceedWithPrice,
     priceData,
     selectedRoom,
     createBookingRequest,
@@ -697,10 +773,28 @@ export default function BookingWidget({
         )}
       </section>
 
+      {pricingLoading && (
+        <div className="flex items-center gap-2 text-sm text-muted mb-3">
+          <Loader2 size={16} className="animate-spin shrink-0" />
+          {t('pricing.loading')}
+        </div>
+      )}
+
+      {pricingError && (
+        <div className="flex items-start gap-2 text-red-600 bg-red-50 border border-red-200 rounded-xl px-4 py-3 text-sm mb-3">
+          <AlertCircle size={16} className="shrink-0 mt-0.5" />
+          <span>
+            {t.has(`errors.${pricingError}`)
+              ? t(`errors.${pricingError}`)
+              : t('errors.pricingUnavailable')}
+          </span>
+        </div>
+      )}
+
       {/* Nastavi gumb */}
       <button
         type="button"
-        disabled={!checkIn || !checkOut || !priceData}
+        disabled={!checkIn || !checkOut || !canProceedWithPrice}
         onClick={() => setStep(2)}
         className="w-full bg-primary hover:bg-primary-dark disabled:opacity-40 disabled:cursor-not-allowed text-white font-medium py-4 rounded-full transition-colors text-sm"
       >
@@ -733,6 +827,29 @@ export default function BookingWidget({
           <h2 className="font-serif text-2xl font-semibold text-text mb-6">
             {t('steps.details')}
           </h2>
+
+          {pendingPriceUpdate && (
+            <div className="mb-6 rounded-xl border border-amber-300 bg-amber-50 px-4 py-3 space-y-3">
+              <p className="text-sm text-amber-950 font-medium">
+                {t('pricing.changedTitle')}
+              </p>
+              <p className="text-sm text-amber-900/80">
+                {t('pricing.changedBody', {
+                  total: pendingPriceUpdate.totalPrice,
+                  deposit: pendingPriceUpdate.deposit,
+                })}
+              </p>
+              <label className="flex items-start gap-2 cursor-pointer text-sm text-amber-950">
+                <input
+                  type="checkbox"
+                  checked={acceptedUpdatedPrice}
+                  onChange={(e) => setAcceptedUpdatedPrice(e.target.checked)}
+                  className="mt-0.5 accent-primary"
+                />
+                <span>{t('pricing.changedConfirm')}</span>
+              </label>
+            </div>
+          )}
 
           <form onSubmit={handleStep2Submit} className="space-y-6">
 
@@ -1080,7 +1197,11 @@ export default function BookingWidget({
               </button>
               <button
                 type="submit"
-                disabled={!form.agreeRules}
+                disabled={
+                  !form.agreeRules ||
+                  !canProceedWithPrice ||
+                  (!!pendingPriceUpdate && !acceptedUpdatedPrice)
+                }
                 className="flex-1 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-full transition-colors text-sm flex items-center justify-center gap-2"
               >
                 {t('form.submit', { totalPrice: priceData.totalPrice })} →

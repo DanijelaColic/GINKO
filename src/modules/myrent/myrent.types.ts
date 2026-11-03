@@ -1,8 +1,21 @@
-/** Kalendarski dan iz MyRent GET /object_prices/get_calendar */
+/**
+ * Kalendarski dan iz MyRent GET /object_prices/get_calendar
+ * Docs example uključuje više price_* polja; značenje `price` vs PRICE EDIT
+ * nije potvrđeno u tekstu docs — vidi MYRENT_PRICING_OPEN_QUESTIONS.
+ */
 
 export type MyRentCalendarDay = {
   day: string;
+  /** Provizorno korišteno za nightly rate (docs example: 150). */
   price?: number;
+  price1?: number;
+  price_default?: number;
+  price_single?: number;
+  price_b2b?: number;
+  price_special?: number;
+  price_extra?: number;
+  price_extra_child?: number;
+  extra_from?: number;
   free?: string;
   enable?: string;
   is_booked?: string;
