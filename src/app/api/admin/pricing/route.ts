@@ -3,6 +3,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
+import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
+
+function myRentPricingWriteBlocked() {
+  if (!isMyRentPricingEnabled()) return null;
+  return NextResponse.json(
+    {
+      error:
+        'Cijene smještaja i sezonske cijene uređuju se u MyRent sustavu.',
+    },
+    { status: 403 },
+  );
+}
 
 // GET /api/admin/pricing?room=slug
 export async function GET(request: NextRequest) {
@@ -31,6 +43,9 @@ export async function POST(request: NextRequest) {
   if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  const blocked = myRentPricingWriteBlocked();
+  if (blocked) return blocked;
 
   const { room_slug, valid_from, valid_to, price_per_night, label } = await request.json();
 
@@ -65,6 +80,9 @@ export async function DELETE(request: NextRequest) {
   if (!(await isAdminAuthenticatedFromRequest(request))) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
+
+  const blocked = myRentPricingWriteBlocked();
+  if (blocked) return blocked;
 
   const { id } = await request.json();
   if (!id) return NextResponse.json({ error: 'Nedostaje id' }, { status: 400 });

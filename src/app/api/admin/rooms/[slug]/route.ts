@@ -2,6 +2,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createServerSupabaseClient } from '@/lib/supabase';
 import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
+import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
 
 type Params = { params: Promise<{ slug: string }> };
 
@@ -24,6 +25,20 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     amenities,
     translations, // { hr: { name, tagline, description }, en: {...}, cs: {...} }
   } = body;
+
+  // MyRent SoT — ne dopusti izmjenu Ginko osnovnih/sezonskih cijena sobe
+  if (
+    isMyRentPricingEnabled() &&
+    (price_off_season !== undefined || price_high_season !== undefined)
+  ) {
+    return NextResponse.json(
+      {
+        error:
+          'Cijene smještaja uređuju se u MyRent sustavu. Ginko administracija ne mijenja osnovne cijene.',
+      },
+      { status: 403 },
+    );
+  }
 
   const supabase = createServerSupabaseClient();
 

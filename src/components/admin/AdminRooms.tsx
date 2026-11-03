@@ -1,7 +1,7 @@
 'use client';
 
-// New — no equivalent in source projects
 // Practical room editor: base fields + localized translations (hr/en/cs)
+// Kad je MyRent pricing SoT — cijene se ne uređuju ovdje (samo MyRent + wellness u Cijenama)
 import { useState, useEffect, useCallback } from 'react';
 import { Loader2, ChevronDown, ChevronUp, Save } from 'lucide-react';
 import clsx from 'clsx';
@@ -32,10 +32,12 @@ const LOCALE_LABELS: Record<LocaleKey, string> = { hr: 'Hrvatski', en: 'English'
 
 function RoomEditor({
   room,
+  myRentPricingEnabled,
   onSaved,
   onError,
 }: {
   room: DbRoom;
+  myRentPricingEnabled: boolean;
   onSaved: () => void;
   onError: (msg: string) => void;
 }) {
@@ -73,18 +75,23 @@ function RoomEditor({
 
   const handleSave = async () => {
     setSaving(true);
+    // MyRent SoT — ne šalji price_* (API ih ionako odbija s 403)
+    const body: Record<string, unknown> = {
+      min_nights: parseInt(fields.min_nights),
+      capacity: parseInt(fields.capacity),
+      active: fields.active,
+      sort_order: parseInt(fields.sort_order),
+      translations,
+    };
+    if (!myRentPricingEnabled) {
+      body.price_off_season = parseFloat(fields.price_off_season);
+      body.price_high_season = parseFloat(fields.price_high_season);
+    }
+
     const res = await fetch(`/api/admin/rooms/${room.slug}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        price_off_season: parseFloat(fields.price_off_season),
-        price_high_season: parseFloat(fields.price_high_season),
-        min_nights: parseInt(fields.min_nights),
-        capacity: parseInt(fields.capacity),
-        active: fields.active,
-        sort_order: parseInt(fields.sort_order),
-        translations,
-      }),
+      body: JSON.stringify(body),
     });
     if (res.ok) onSaved();
     else {
@@ -109,7 +116,9 @@ function RoomEditor({
           />
           <span className="font-semibold text-gray-800">{room.slug}</span>
           <span className="text-sm text-gray-500">
-            {room.price_off_season}€ / {room.price_high_season}€ · {room.capacity} osoba
+            {myRentPricingEnabled
+              ? `${room.capacity} osoba`
+              : `${room.price_off_season}€ / ${room.price_high_season}€ · ${room.capacity} osoba`}
           </span>
         </div>
         {expanded ? (
@@ -126,33 +135,46 @@ function RoomEditor({
             <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
               Osnovna polja
             </h4>
+
+            {myRentPricingEnabled && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-3 mb-4">
+                <p className="text-sm text-amber-800 font-medium">
+                  Cijene smještaja uređuju se u MyRent sustavu.
+                </p>
+              </div>
+            )}
+
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  Cijena van sezone (€)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={fields.price_off_season}
-                  onChange={(e) => setFields((p) => ({ ...p, price_off_season: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                />
-              </div>
-              <div>
-                <label className="block text-xs font-medium text-gray-600 mb-1">
-                  Cijena visoka sezona (€)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  step="0.01"
-                  value={fields.price_high_season}
-                  onChange={(e) => setFields((p) => ({ ...p, price_high_season: e.target.value }))}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
-                />
-              </div>
+              {!myRentPricingEnabled && (
+                <>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Cijena van sezone (€)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={fields.price_off_season}
+                      onChange={(e) => setFields((p) => ({ ...p, price_off_season: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-medium text-gray-600 mb-1">
+                      Cijena visoka sezona (€)
+                    </label>
+                    <input
+                      type="number"
+                      min="0"
+                      step="0.01"
+                      value={fields.price_high_season}
+                      onChange={(e) => setFields((p) => ({ ...p, price_high_season: e.target.value }))}
+                      className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary"
+                    />
+                  </div>
+                </>
+              )}
               <div>
                 <label className="block text-xs font-medium text-gray-600 mb-1">
                   Minimalan boravak (noći)
@@ -283,7 +305,14 @@ function RoomEditor({
   );
 }
 
-export default function AdminRooms() {
+type AdminRoomsProps = {
+  /** Server-prop: MYRENT_PRICING_ENABLED. Zadano false — legacy cijene u formi. */
+  myRentPricingEnabled?: boolean;
+};
+
+export default function AdminRooms({
+  myRentPricingEnabled = false,
+}: AdminRoomsProps) {
   const [rooms, setRooms] = useState<DbRoom[]>([]);
   const [loading, setLoading] = useState(true);
   const [toasts, setToasts] = useState<ToastItem[]>([]);
@@ -316,7 +345,9 @@ export default function AdminRooms() {
         <div className="mb-6">
           <h1 className="text-xl font-serif font-semibold text-gray-900">Upravljanje sobama</h1>
           <p className="text-sm text-gray-500 mt-0.5">
-            Uredi cijene, prijevode i vidljivost soba
+            {myRentPricingEnabled
+              ? 'Uredi prijevode, kapacitete i vidljivost soba'
+              : 'Uredi cijene, prijevode i vidljivost soba'}
           </p>
         </div>
 
@@ -336,6 +367,7 @@ export default function AdminRooms() {
               <RoomEditor
                 key={room.id}
                 room={room}
+                myRentPricingEnabled={myRentPricingEnabled}
                 onSaved={() => {
                   showToast(`Soba ${room.slug} spremljena`);
                   fetchRooms();

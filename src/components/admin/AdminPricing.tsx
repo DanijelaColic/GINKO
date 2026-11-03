@@ -1,7 +1,6 @@
 'use client';
 
-// New — no equivalent in source (Ginko has seasonal_rates table, VJ/VV did not)
-// Manage base room pricing (from rooms.config) + seasonal rate overrides
+// Manage base room pricing + seasonal overrides (legacy) or wellness surcharge (MyRent SoT)
 import { useState, useEffect, useCallback } from 'react';
 import { Plus, Trash2, Loader2, X } from 'lucide-react';
 import clsx from 'clsx';
@@ -17,7 +16,14 @@ type SeasonalRate = {
   label: string | null;
 };
 
-export default function AdminPricing() {
+type AdminPricingProps = {
+  /** Server-prop: MYRENT_PRICING_ENABLED. Zadano false — legacy UI. */
+  myRentPricingEnabled?: boolean;
+};
+
+export default function AdminPricing({
+  myRentPricingEnabled = false,
+}: AdminPricingProps) {
   const [selectedRoom, setSelectedRoom] = useState(rooms[0]?.slug ?? '');
   const [rates, setRates] = useState<SeasonalRate[]>([]);
   const [loading, setLoading] = useState(false);
@@ -95,10 +101,12 @@ export default function AdminPricing() {
     setLoading(false);
   }, [selectedRoom]);
 
+  // Legacy sezonske cijene — samo dok MyRent pricing nije SoT
   useEffect(() => {
+    if (myRentPricingEnabled) return;
     // eslint-disable-next-line react-hooks/set-state-in-effect
     fetchRates();
-  }, [fetchRates]);
+  }, [fetchRates, myRentPricingEnabled]);
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -128,16 +136,35 @@ export default function AdminPricing() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
           <div>
             <h1 className="text-xl font-serif font-semibold text-gray-900">Upravljanje cijenama</h1>
-            <p className="text-sm text-gray-500 mt-0.5">Osnovne cijene i sezonski popusti / dodaci</p>
+            <p className="text-sm text-gray-500 mt-0.5">
+              {myRentPricingEnabled
+                ? 'Wellness nadoplata i dodatne usluge'
+                : 'Osnovne cijene i sezonski popusti / dodaci'}
+            </p>
           </div>
-          <button
-            onClick={() => setShowAddRate(true)}
-            className="flex items-center gap-2 bg-primary text-white text-sm font-medium px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
-          >
-            <Plus size={15} />
-            Dodaj sezonsku cijenu
-          </button>
+          {!myRentPricingEnabled && (
+            <button
+              onClick={() => setShowAddRate(true)}
+              className="flex items-center gap-2 bg-primary text-white text-sm font-medium px-4 py-2 rounded-full hover:opacity-90 transition-opacity"
+            >
+              <Plus size={15} />
+              Dodaj sezonsku cijenu
+            </button>
+          )}
         </div>
+
+        {/* MyRent SoT — nema uređivanja osnovnih/sezonskih cijena u Ginku */}
+        {myRentPricingEnabled && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl px-5 py-4 mb-6">
+            <p className="text-sm text-amber-800 font-medium">
+              Cijene smještaja i sezonske cijene uređuju se u MyRent sustavu.
+            </p>
+            <p className="text-xs text-amber-700 mt-1">
+              U Ginko administraciji uređujete wellness nadoplatu (i kasnije dodatne
+              usluge). Osnovne i sezonske cijene iz Ginka više ne utječu na goste.
+            </p>
+          </div>
+        )}
 
         {/* SPA wellness nadoplata — MyRent baza + ova postavka × noći */}
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
@@ -191,101 +218,105 @@ export default function AdminPricing() {
             >
               {wellnessConfigured
                 ? `Postavljeno: ${wellnessSurcharge} € / noć`
-                : 'Nije postavljeno — unesite iznos prije uključivanja MyRent cijena.'}
+                : myRentPricingEnabled
+                  ? 'Nije postavljeno — unesite iznos da bi wellness apartman bio dostupan za rezervaciju.'
+                  : 'Nije postavljeno — unesite iznos prije uključivanja MyRent cijena.'}
             </p>
           )}
         </div>
 
-        {/* Room selector */}
-        <div className="flex gap-2 mb-6 flex-wrap">
-          {rooms.map((r) => (
-            <button
-              key={r.slug}
-              onClick={() => setSelectedRoom(r.slug)}
-              className={clsx(
-                'px-4 py-2 rounded-full text-sm font-medium transition-colors',
-                selectedRoom === r.slug
-                  ? 'bg-primary text-white'
-                  : 'bg-white border border-gray-200 text-gray-600 hover:border-primary hover:text-primary',
-              )}
-            >
-              {r.name}
-            </button>
-          ))}
-        </div>
-
-        {/* Base pricing card */}
-        {currentRoom && (
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
-            <h3 className="font-semibold text-gray-800 mb-4">Cijena — {currentRoom.name}</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-              <div className="bg-primary/5 rounded-xl p-4">
-                <p className="text-xs text-gray-400 mb-1">Cijena po noći</p>
-                <p className="text-2xl font-bold text-primary">{currentRoom.price}€</p>
-              </div>
-              <div className="bg-gray-50 rounded-xl p-4">
-                <p className="text-xs text-gray-400 mb-1">Kapacitet</p>
-                <p className="text-2xl font-bold text-gray-900">{currentRoom.capacity}</p>
-                <p className="text-xs text-gray-400 mt-0.5">osoba</p>
-              </div>
-            </div>
-            <p className="text-xs text-gray-400 mt-4">
-              Za promjenu osnovnih cijena, uredi{' '}
-              <code className="bg-gray-100 px-1 rounded">src/modules/rooms/rooms.config.ts</code>{' '}
-              ili koristi panel Sobe.
-            </p>
-          </div>
-        )}
-
-        {/* Seasonal rates */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-6 py-4 border-b border-gray-100">
-            <h3 className="font-semibold text-gray-800 text-sm">Sezonske cijene</h3>
-          </div>
-          {loading ? (
-            <div className="flex items-center justify-center py-12 text-gray-400">
-              <Loader2 size={20} className="animate-spin mr-2" />
-              Učitavanje...
-            </div>
-          ) : rates.length === 0 ? (
-            <div className="py-10 text-center text-gray-400 text-sm">
-              Nema sezonskih cijena za ovu sobu
-            </div>
-          ) : (
-            <div className="divide-y divide-gray-50">
-              {rates.map((rate) => (
-                <div key={rate.id} className="flex items-center justify-between px-6 py-4">
-                  <div>
-                    <p className="text-sm font-semibold text-gray-800">
-                      {rate.valid_from} → {rate.valid_to}
-                    </p>
-                    <div className="flex items-center gap-3 mt-0.5">
-                      <span className="text-primary font-bold text-base">
-                        {rate.price_per_night}€
-                      </span>
-                      <span className="text-xs text-gray-400">po noći</span>
-                      {rate.label && (
-                        <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-                          {rate.label}
-                        </span>
-                      )}
-                    </div>
-                  </div>
-                  <button
-                    onClick={() => deleteRate(rate.id)}
-                    className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
-                    title="Obriši sezonsku cijenu"
-                  >
-                    <Trash2 size={15} />
-                  </button>
-                </div>
+        {/* Legacy: sobe + osnovne + sezonske — sakriveno kad je MyRent SoT */}
+        {!myRentPricingEnabled && (
+          <>
+            <div className="flex gap-2 mb-6 flex-wrap">
+              {rooms.map((r) => (
+                <button
+                  key={r.slug}
+                  onClick={() => setSelectedRoom(r.slug)}
+                  className={clsx(
+                    'px-4 py-2 rounded-full text-sm font-medium transition-colors',
+                    selectedRoom === r.slug
+                      ? 'bg-primary text-white'
+                      : 'bg-white border border-gray-200 text-gray-600 hover:border-primary hover:text-primary',
+                  )}
+                >
+                  {r.name}
+                </button>
               ))}
             </div>
-          )}
-        </div>
+
+            {currentRoom && (
+              <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-6 mb-6">
+                <h3 className="font-semibold text-gray-800 mb-4">Cijena — {currentRoom.name}</h3>
+                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                  <div className="bg-primary/5 rounded-xl p-4">
+                    <p className="text-xs text-gray-400 mb-1">Cijena po noći</p>
+                    <p className="text-2xl font-bold text-primary">{currentRoom.price}€</p>
+                  </div>
+                  <div className="bg-gray-50 rounded-xl p-4">
+                    <p className="text-xs text-gray-400 mb-1">Kapacitet</p>
+                    <p className="text-2xl font-bold text-gray-900">{currentRoom.capacity}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">osoba</p>
+                  </div>
+                </div>
+                <p className="text-xs text-gray-400 mt-4">
+                  Za promjenu osnovnih cijena, uredi{' '}
+                  <code className="bg-gray-100 px-1 rounded">src/modules/rooms/rooms.config.ts</code>{' '}
+                  ili koristi panel Sobe.
+                </p>
+              </div>
+            )}
+
+            <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+              <div className="px-6 py-4 border-b border-gray-100">
+                <h3 className="font-semibold text-gray-800 text-sm">Sezonske cijene</h3>
+              </div>
+              {loading ? (
+                <div className="flex items-center justify-center py-12 text-gray-400">
+                  <Loader2 size={20} className="animate-spin mr-2" />
+                  Učitavanje...
+                </div>
+              ) : rates.length === 0 ? (
+                <div className="py-10 text-center text-gray-400 text-sm">
+                  Nema sezonskih cijena za ovu sobu
+                </div>
+              ) : (
+                <div className="divide-y divide-gray-50">
+                  {rates.map((rate) => (
+                    <div key={rate.id} className="flex items-center justify-between px-6 py-4">
+                      <div>
+                        <p className="text-sm font-semibold text-gray-800">
+                          {rate.valid_from} → {rate.valid_to}
+                        </p>
+                        <div className="flex items-center gap-3 mt-0.5">
+                          <span className="text-primary font-bold text-base">
+                            {rate.price_per_night}€
+                          </span>
+                          <span className="text-xs text-gray-400">po noći</span>
+                          {rate.label && (
+                            <span className="text-xs bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
+                              {rate.label}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      <button
+                        onClick={() => deleteRate(rate.id)}
+                        className="p-1.5 text-red-400 hover:bg-red-50 rounded-lg transition-colors"
+                        title="Obriši sezonsku cijenu"
+                      >
+                        <Trash2 size={15} />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </>
+        )}
       </div>
 
-      {showAddRate && (
+      {!myRentPricingEnabled && showAddRate && (
         <AddRateModal
           roomSlug={selectedRoom}
           onClose={() => setShowAddRate(false)}
