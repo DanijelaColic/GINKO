@@ -50,6 +50,8 @@ export type MyRentSyncRecord = {
   status: MyRentSyncStatus;
   /** Mock ili budući MyRent rent id — null dok nije uspješno */
   myrentRentId: string | null;
+  /** MyRent rent GUID za rent_get (inbound cancel); opcionalno za stare redove */
+  myrentRentGuid?: string | null;
   error: string | null;
   payloadErpId: string;
   objectId: number;

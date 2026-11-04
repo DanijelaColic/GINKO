@@ -146,6 +146,17 @@ export {
   isMyRentAutoSyncBlocked,
 } from './myrent.booking-sync';
 export {
+  MYRENT_INBOUND_CANCEL_REASON,
+  runMyRentInboundCancelSync,
+  shouldScanBookingForInboundCancel,
+  parseRentActiveFlag,
+} from './myrent.inbound-cancel';
+export type {
+  InboundCancelCandidate,
+  InboundCancelSyncResult,
+  RentActiveStatus,
+} from './myrent.inbound-cancel';
+export {
   queueMyRentSyncAfterPayment,
   /** @deprecated Koristi queueMyRentSyncAfterPayment */
   queueMyRentSyncAfterPayment as voidMyRentSyncAfterPayment,

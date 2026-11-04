@@ -31,3 +31,10 @@ supabase/scripts/backups/
 *.tsbuildinfo
 next-env.d.ts
 .vercel
+
+# Local cron secret (never commit)
+.cron-secret.local
+cron-secret.local.tmp
+
+# Supabase CLI temp
+supabase/.temp/
