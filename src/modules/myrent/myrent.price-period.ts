@@ -2,6 +2,10 @@
  * POST /user/price_period_details — ukupna cijena smještaja za datume + goste.
  * Docs: https://myrent.readme.io/reference/calculate-price-copy
  *
+ * SoT (Website A / WEB page): b2b_object_price_period (+ day.price_b2b).
+ * Empirijski potvrđeno A/B testom (Website A % → b2b_*). Bez tihog fallbacka
+ * na object_price_period_simple (base rate).
+ *
  * Read-only. date_until = Ginko checkOut (checkout dan; noći = [from, until)).
  */
 
@@ -29,14 +33,17 @@ export type MyRentPricePeriodDay = {
 export type MyRentPricePeriodResult = {
   objectId: number;
   objectFree: boolean;
-  /** object_price_period_simple (EUR) — smještaj uključujući MyRent dodatne osobe. */
+  /**
+   * Website (A) prodajna cijena smještaja (EUR) iz b2b_object_price_period —
+   * uključuje channel markup i MyRent dodatne osobe. Nije base rate.
+   */
   accommodationTotal: number;
   currencyCode: string;
   advancePercent: number;
   adults: number;
   children: number;
   totalGuests: number;
-  /** Noći [dateFrom, dateUntil) s baznim dnevnim cijenama (+ proporcionalni guest extra). */
+  /** Noći [dateFrom, dateUntil) — Website dnevne cijene (price_b2b) + udio guest extra. */
   nights: MyRentNightPrice[];
 };
 
@@ -74,8 +81,8 @@ function pickRow(data: unknown): Record<string, unknown> {
 }
 
 /**
- * Raspodjeli period total na noći: bazni day.price + udio guest extra-a,
- * tako da zbroj noći === accommodationTotal.
+ * Raspodjeli Website period total na noći: day.price (price_b2b) + udio guest
+ * extra-a, tako da zbroj noći === accommodationTotal.
  */
 export function distributePeriodTotalAcrossNights(params: {
   checkIn: string;
@@ -85,21 +92,21 @@ export function distributePeriodTotalAcrossNights(params: {
 }): MyRentNightPrice[] {
   const nightDates = stayNightDates(params.checkIn, params.checkOut);
   const byDay = new Map(params.dayRows.map((d) => [d.day, d]));
-  const bases = nightDates.map((day) => {
+  const dayPrices = nightDates.map((day) => {
     const row = byDay.get(day);
     return row?.price ?? null;
   });
 
-  if (bases.some((b) => b == null || b < 0)) {
-    // Fallback: ravnomjerno
+  if (dayPrices.some((b) => b == null || b < 0)) {
+    // Nema pouzdanih dnevnih Website cijena → ravnomjerno iz period totala
     const n = nightDates.length;
     const each =
       n > 0 ? Math.round((params.accommodationTotal / n) * 100) / 100 : 0;
     return nightDates.map((day) => ({ day, price: each }));
   }
 
-  const baseSum = (bases as number[]).reduce((a, b) => a + b, 0);
-  const extraPool = params.accommodationTotal - baseSum;
+  const daySum = (dayPrices as number[]).reduce((a, b) => a + b, 0);
+  const extraPool = params.accommodationTotal - daySum;
   const n = nightDates.length;
 
   if (n === 0) return [];
@@ -109,13 +116,13 @@ export function distributePeriodTotalAcrossNights(params: {
   let allocated = 0;
   for (let i = 0; i < n; i++) {
     const day = nightDates[i]!;
-    const base = bases[i] as number;
+    const dayPrice = dayPrices[i] as number;
     let price: number;
     if (i === n - 1) {
       price = Math.round((params.accommodationTotal - allocated) * 100) / 100;
     } else {
       const share = n > 0 ? extraPool / n : 0;
-      price = Math.round((base + share) * 100) / 100;
+      price = Math.round((dayPrice + share) * 100) / 100;
       allocated += price;
     }
     nights.push({ day, price });
@@ -134,25 +141,36 @@ export function normalizeMyRentPricePeriodPayload(
   const sum = parseJsonField(row.sum) as Record<string, unknown> | null;
   const daysRaw = parseJsonField(row.days);
 
+  // Website (A) SoT — bez fallbacka na base object_price_period*
   const accommodationTotal =
-    toFiniteNumber(row.object_price_period_simple) ??
-    toFiniteNumber(row.object_price_period) ??
-    toFiniteNumber(sum?.object_price_period_simple) ??
-    toFiniteNumber(sum?.object_price_period);
+    toFiniteNumber(row.b2b_object_price_period) ??
+    toFiniteNumber(sum?.b2b_object_price_period);
 
   if (accommodationTotal == null || accommodationTotal < 0) {
+    console.error(
+      '[myrent-pricing] missing b2b_object_price_period (Website A)',
+      {
+        objectId: params.objectId,
+        dateFrom: params.dateFrom,
+        dateUntil: params.dateUntil,
+        hasBaseSimple: toFiniteNumber(row.object_price_period_simple) != null,
+      },
+    );
     throw new MyRentPricingError(
       'missing_price',
-      'MyRent price_period_details nema object_price_period.',
+      'MyRent price_period_details nema b2b_object_price_period (Website cijena).',
     );
   }
 
   const dayRows: MyRentPricePeriodDay[] = Array.isArray(daysRaw)
     ? daysRaw.map((d) => {
         const day = d as Record<string, unknown>;
+        // Samo price_b2b — ne day.price (base), da se channel markup ne izgubi
+        // i da se ne miješa base s Website totalom.
+        const websiteDayPrice = toFiniteNumber(day.price_b2b);
         return {
           day: String(day.day ?? ''),
-          price: toFiniteNumber(day.price) ?? 0,
+          price: websiteDayPrice != null && websiteDayPrice >= 0 ? websiteDayPrice : -1,
           priceDef: toFiniteNumber(day.price_def),
           priceExtra: toFiniteNumber(day.price_extra) ?? 0,
           extraFrom: toFiniteNumber(day.extra_from) ?? 0,

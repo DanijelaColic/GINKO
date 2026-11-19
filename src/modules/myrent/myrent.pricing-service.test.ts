@@ -32,6 +32,7 @@ vi.mock('./myrent.pricing-config', () => ({
   isVercelProductionEnv: vi.fn(() => false),
 }));
 
+import { evaluateQuotedPrice } from '@/modules/booking/quoted-price';
 import { MyRentApiError } from './myrent.client';
 import { fetchMyRentPricePeriodDetails } from './myrent.price-period';
 import { isMyRentPricingMock } from './myrent.pricing-config';
@@ -73,7 +74,7 @@ describe('fetchMyRentStayPrice (period)', () => {
     vi.clearAllMocks();
   });
 
-  it('računa stay iz price_period_details + 50% depozit', async () => {
+  it('računa stay iz Website (b2b) period totala + 50% depozit', async () => {
     fetchPeriodMock.mockResolvedValue(
       periodResult(150, [
         { day: '2027-06-01', price: 70 },
@@ -101,6 +102,63 @@ describe('fetchMyRentStayPrice (period)', () => {
         children: 0,
       }),
     );
+  });
+
+  it('Website A scenariji: 60/30, 120/60, ginko-6 42, spa 234 + wellness', async () => {
+    fetchPeriodMock.mockResolvedValue(
+      periodResult(60, [{ day: '2026-11-25', price: 60 }]),
+    );
+    const oneNight = await fetchMyRentStayPrice({
+      roomSlug: 'ginko-1',
+      checkIn: '2026-11-25',
+      checkOut: '2026-11-26',
+      adults: 2,
+    });
+    expect(oneNight.breakdown.totalPrice).toBe(60);
+    expect(oneNight.breakdown.deposit).toBe(30);
+
+    fetchPeriodMock.mockResolvedValue(
+      periodResult(120, [
+        { day: '2026-11-25', price: 60 },
+        { day: '2026-11-26', price: 60 },
+      ]),
+    );
+    const twoNights = await fetchMyRentStayPrice({
+      roomSlug: 'ginko-1',
+      checkIn: '2026-11-25',
+      checkOut: '2026-11-27',
+      adults: 2,
+    });
+    expect(twoNights.breakdown.totalPrice).toBe(120);
+    expect(twoNights.breakdown.deposit).toBe(60);
+
+    // ginko-6 object 22437 — mock objectId null u config mocku; koristi ginko-1 path
+    // s totalom 42 kao Website cijena sobe 6
+    fetchPeriodMock.mockResolvedValue(
+      periodResult(42, [{ day: '2026-11-25', price: 42 }]),
+    );
+    const room6 = await fetchMyRentStayPrice({
+      roomSlug: 'ginko-1',
+      checkIn: '2026-11-25',
+      checkOut: '2026-11-26',
+      adults: 2,
+    });
+    expect(room6.breakdown.totalPrice).toBe(42);
+    expect(room6.breakdown.deposit).toBe(21);
+
+    setSpaWellnessSurchargeForTests(40);
+    fetchPeriodMock.mockResolvedValue({
+      ...periodResult(234, [{ day: '2026-11-25', price: 234 }]),
+      objectId: 7460,
+    });
+    const spa = await fetchMyRentStayPrice({
+      roomSlug: 'ginko-spa-2',
+      checkIn: '2026-11-25',
+      checkOut: '2026-11-26',
+      adults: 2,
+    });
+    expect(spa.breakdown.totalPrice).toBe(234 + 40);
+    expect(spa.breakdown.deposit).toBe(137);
   });
 
   it('ne zbraja Ginko EXTRA_BED uz MyRent goste (nema dvostruke naplate)', async () => {
@@ -187,6 +245,38 @@ describe('fetchMyRentStayPrice (period)', () => {
         adults: 2,
       }),
     ).rejects.toBeInstanceOf(SpaWellnessSurchargeNotConfiguredError);
+  });
+
+  it('quote i create koriste isti Website total (evaluateQuotedPrice ok)', async () => {
+    fetchPeriodMock.mockResolvedValue(
+      periodResult(60, [{ day: '2026-11-25', price: 60 }]),
+    );
+    const quote = await fetchMyRentStayPrice({
+      roomSlug: 'ginko-1',
+      checkIn: '2026-11-25',
+      checkOut: '2026-11-26',
+      adults: 2,
+    });
+    fetchPeriodMock.mockResolvedValue(
+      periodResult(60, [{ day: '2026-11-25', price: 60 }]),
+    );
+    const create = await fetchMyRentStayPrice({
+      roomSlug: 'ginko-1',
+      checkIn: '2026-11-25',
+      checkOut: '2026-11-26',
+      adults: 2,
+    });
+    expect(
+      evaluateQuotedPrice({
+        quoted: {
+          totalPrice: quote.breakdown.totalPrice,
+          deposit: quote.breakdown.deposit,
+        },
+        server: create.breakdown,
+      }),
+    ).toBe('ok');
+    expect(quote.breakdown.totalPrice).toBe(60);
+    expect(quote.breakdown.deposit).toBe(30);
   });
 
   it('fail-closed kad MyRent API nije dostupan', async () => {

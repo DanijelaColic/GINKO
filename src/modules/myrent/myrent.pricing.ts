@@ -1,12 +1,13 @@
 /**
  * Pure izračun smještajne cijene.
  *
- * SoT za rezervaciju: POST /user/price_period_details (ukupno + gosti).
+ * SoT za rezervaciju: POST /user/price_period_details → b2b_object_price_period
+ * (Website A prodajna cijena; ne base object_price_period_simple).
  * get_calendar.day.price: pomoćni prikaz / mock / legacy testovi.
  *
  * Ginko dodaci (doručak, krevetić) ostaju ovdje.
  * Pomoćni ležaj / dodatne osobe: u MyRent period putu NE naplaćuj Ginko
- * EXTRA_BED — već su u object_price_period (vidi ginkoAddonsForMyRentPricing).
+ * EXTRA_BED — već su u b2b_object_price_period (vidi ginkoAddonsForMyRentPricing).
  */
 
 import type { PriceBreakdown, PriceLine } from '@/modules/booking/booking.types';
@@ -153,7 +154,8 @@ function toFiniteNumber(value: unknown): number | null {
 
 /**
  * Provizorno: uzmi day.price.
- * Ne koristi price_extra / price_b2b / price_special dok podrška ne potvrdi.
+ * Ne koristi price_extra / price_special za kalendarski quote.
+ * Website SoT je price_period_details.b2b_* (ne get_calendar).
  */
 export function readCalendarNightlyPrice(
   day: MyRentCalendarDay,

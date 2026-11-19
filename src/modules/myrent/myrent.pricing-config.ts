@@ -5,7 +5,8 @@
  * Aktivacija (tek nakon odobrenja + deploy):
  *   MYRENT_PRICING_ENABLED=true
  *
- * Live put: POST /user/price_period_details (+ SPA wellness nadoplata iz Ginko).
+ * Live put: POST /user/price_period_details → b2b_object_price_period
+ * (Website A) + SPA wellness nadoplata iz Ginko.
  *
  * Mock (lokalni UI / testovi):
  *   MYRENT_PRICING_ENABLED=true

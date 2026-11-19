@@ -2,7 +2,7 @@
  * Server-side izbor izvora cijene za quote API i POST /api/bookings.
  *
  * - MYRENT_PRICING_ENABLED off (default) → legacy calculatePrice(room.price)
- * - on → MyRent price_period_details (+ SPA wellness nadoplata) + Ginko dodaci
+ * - on → MyRent b2b_object_price_period / Website A (+ SPA wellness) + Ginko dodaci
  */
 
 import type { Room } from '@/modules/rooms/room.types';

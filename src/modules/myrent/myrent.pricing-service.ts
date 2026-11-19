@@ -1,7 +1,8 @@
 /**
  * Async MyRent pricing za guest quote / POST bookings.
  *
- * SoT: POST /user/price_period_details (+ SPA wellness nadoplata iz Ginko configa)
+ * SoT: POST /user/price_period_details → b2b_object_price_period (Website A)
+ * + SPA wellness nadoplata iz Ginko configa (samo spa-2; nije channel markup)
  * + Ginko dodaci (doručak, krevetić) bez Ginko EXTRA_BED.
  *
  * Fail-closed: API greška → MyRentPricingUnavailableError (osim mock moda).
