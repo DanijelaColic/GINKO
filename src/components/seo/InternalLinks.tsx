@@ -24,13 +24,21 @@ export async function InternalLinks({ currentPath }: InternalLinksProps) {
   const t = await getTranslations('navbar');
   const normalizedCurrent = normalizePath(currentPath);
 
-  const links = [
+  const merged = [
     ...getSeoNavLinks(locale),
     ...CORE_LINKS.map((item) => ({
       href: item.href,
       label: t(`links.${item.labelKey}`),
     })),
   ].filter((item) => normalizePath(item.href) !== normalizedCurrent);
+
+  const seenHref = new Set<string>();
+  const links = merged.filter((item) => {
+    const key = normalizePath(item.href);
+    if (seenHref.has(key)) return false;
+    seenHref.add(key);
+    return true;
+  });
 
   return (
     <nav

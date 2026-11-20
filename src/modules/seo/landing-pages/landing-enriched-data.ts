@@ -5,302 +5,303 @@ const IMG_PROPERTY = '/images/property/20240504_154454.webp';
 const IMG_WELLNESS = '/images/property/20240906_091154.webp';
 const IMG_TOWN = '/images/property/20241101_080530.webp';
 const IMG_ROOM = '/images/property/20250405_085232.webp';
+const IMG_BREAKFAST = '/images/property/breakfast-cold-buffet-01.webp';
 
 export const LANDING_ENRICHED: LandingEnrichedMap = {
   'sobe-daruvar': {
     hr: {
-      eyebrow: 'Daruvar · Boutique sobe',
+      eyebrow: 'Daruvar · Tipovi soba',
       heroImage: {
         src: HERO,
         alt: 'Ginko Boutique Rooms & Wellness – fasada objekta u Daruvaru',
       },
       highlights: [
-        'Nekoliko minuta hoda do Daruvarskih toplica',
+        'Šest boutique soba Ginko 1–6 + apartmani',
         'WiFi, klima i besplatan privatni parking',
-        'Direktna rezervacija bez provizije platforme',
+        'Usporedite tipove na jednoj stranici soba',
       ],
       sections: [
         {
-          heading: 'Zašto birati sobe u centru Daruvara',
+          heading: 'Koje sobe nudimo u Daruvaru',
           paragraphs: [
-            'Daruvar je miran spa grad: toplice, aqua park, dvorac Janković i stablo ginka u istom krugu. Sobe u centru štede vrijeme na prijevozu i omogućuju lagan ritam — jutarnji dolazak na tretman, popodne u gradu, večer u miru.',
-            'Ginko Boutique Rooms & Wellness nalazi se na Ulici Tomaša Garika Masaryka 1. Odavde ste blizu restorana, kafića i javnog prijevoza, a ipak u privatnom boutique smještaju.',
+            'U ponudi su sobe [Ginko 1–6](/rooms), [Apartman](/rooms/ginko-spa-1) s kuhinjom i terasom te [Wellness apartman](/rooms/ginko-spa-2) s privatnom saunom i jacuzzijem. Svaka jedinica ima klimu i WiFi; gosti koriste besplatno parkiralište uz objekt.',
+            'Sobe su u rasponu kapaciteta: intimne opcije za 2 gosta te sobe i apartmani s opcijom pomoćnog ležaja. Detaljne veličine, krevete i cijene vidite na [stranici soba](/rooms).',
           ],
         },
         {
-          heading: 'Što očekivati od Ginko soba',
+          heading: 'Za koga je koja jedinica',
           paragraphs: [
-            'U ponudi su sobe Ginko 1–6 te wellness apartmani s privatnom saunom i jacuzzijem. Svaka jedinica ima klimu, WiFi i pristup zajedničkim prostorima; gosti dobivaju besplatno parkiralište uz objekt.',
-            'Direktna rezervacija na ginko-sobe.com znači jasan depozit od 50 % i ostatak na dolasku — bez skrivenih naknada posrednika.',
+            'Solo i poslovni gosti često biraju manje boutique sobe. Parovi na kraćem boravku biraju sobu s terasom ili Apartman. Za privatni spa nakon dana u gradu — [Wellness apartman](/wellness-daruvar).',
+            'Ako vam je prioritet blizina toplica i ritam dana oko bazena, detaljnije o tome pišemo na stranici [smještaj uz Daruvarske toplice](/smjestaj-uz-daruvarske-toplice). Ovdje je fokus na usporedbu tipova soba.',
           ],
         },
         {
-          heading: 'Idealno za wellness, poslovni put ili vikend',
+          heading: 'Doručak, terasa i miran večernji ritam',
           paragraphs: [
-            'Gosti dolaze zbog toplica, oporavka, kraćeg poslovnog putovanja ili opuštenog vikenda u Slavoniji. Kućni red podržava tišinu nakon 23:00.',
-            'Za više prostora ili kuhanje birajte apartman; za privatni wellness — Wellness apartman. Detalje i dostupnost provjerite na stranici soba.',
+            'Doručak se naručuje pri rezervaciji — nije automatski uključen u cijenu sobe. Dio soba ima terasu; Apartman i Wellness apartman nude više prostora i kuhinju.',
+            'Kućni red podržava tišinu nakon 23:00. Kućni ljubimci su dozvoljeni na upit (15 € / dan).',
           ],
         },
       ],
-      activitiesSectionTitle: 'Što raditi u blizini',
+      activitiesSectionTitle: 'Što očekivati u objektu',
       activities: [
         {
-          title: 'Daruvarske toplice',
+          title: 'Boutique sobe Ginko 1–6',
           description:
-            'Termalni bazeni i aqua park Aquae Ballisae na nekoliko minuta hoda od objekta.',
-          image: IMG_TOWN,
-          imageAlt: 'Okolica Daruvara uz Ginko smještaj',
-        },
-        {
-          title: 'Dvorac Janković i ginkgo',
-          description:
-            'Park i legendarno stablo ginka — inspiracija za ime objekta — u srcu grada.',
-          image: IMG_PROPERTY,
-          imageAlt: 'Ginko Boutique Rooms u centru Daruvara',
-        },
-        {
-          title: 'Wellness u objektu',
-          description:
-            'Za privatnu saunu i jacuzzi rezervirajte Wellness apartman uz direktnu rezervaciju.',
-          image: IMG_WELLNESS,
-          imageAlt: 'Wellness i opuštanje u Ginko smještaju',
-        },
-        {
-          title: 'Boutique sobe',
-          description:
-            'Pažljivo uređene sobe s modernim sadržajima, klimom i WiFi-jem za ugodan boravak.',
+            'Pažljivo uređene sobe s klimom i WiFi-jem — usporedite kapacitete na stranici soba.',
           image: IMG_ROOM,
           imageAlt: 'Boutique soba u Ginko Daruvar',
         },
+        {
+          title: 'Doručak na upit',
+          description:
+            'Svježi doručak u objektu — naručuje se pri rezervaciji, nije default u cijeni sobe.',
+          image: IMG_BREAKFAST,
+          imageAlt: 'Doručak u Ginko Boutique Rooms',
+        },
+        {
+          title: 'Terasa i zajednički prostori',
+          description:
+            'Dio soba i apartmana ima terasu; zajednički prostori podržavaju miran ritam boravka.',
+          image: IMG_PROPERTY,
+          imageAlt: 'Terasa i prostori Ginko Daruvar',
+        },
+        {
+          title: 'Privatni wellness',
+          description:
+            'Sauna i jacuzzi samo u Wellness apartmanu — detalji na [Wellness Daruvar](/wellness-daruvar).',
+          image: IMG_WELLNESS,
+          imageAlt: 'Wellness i opuštanje u Ginko smještaju',
+        },
       ],
-      midCtaTitle: 'Želite termin koji vama odgovara?',
+      midCtaTitle: 'Želite usporediti sobe?',
       midCtaBody:
-        'Pregledajte dostupnost soba i rezervirajte direktno — brži dogovor detalja i bez provizija platformi.',
+        'Otvorite [pregled soba](/rooms), odaberite tip koji vam odgovara i rezervirajte direktno — bez provizije platforme.',
       midCtaPrimaryLabel: 'Rezervacija',
       midCtaGalleryLabel: 'Galerija',
       faqSectionTitle: 'Često postavljana pitanja',
       faqs: [
         {
-          question: 'Koliko su daleko Daruvarske toplice?',
+          question: 'Koliki je kapacitet soba?',
           answer:
-            'Toplice i aqua park udaljeni su oko 400 m — nekoliko minuta hoda od objekta na Masarykovoj ulici.',
+            'Boutique sobe Ginko 1–6 pokrivaju 2 gosta, a dio soba nudi opciju pomoćnog ležaja (2+1). Apartman i Wellness apartman su 2+2. Točne konfiguracije vidite na [stranici soba](/rooms).',
         },
         {
-          question: 'Je li parking uključen?',
+          question: 'Je li doručak uključen u cijenu?',
           answer:
-            'Da. Besplatno privatno parkiralište dostupno je gostima uz objekt, bez posebne rezervacije mjesta.',
+            'Ne automatski. Doručak se naručuje pri rezervaciji i dodaje se prema cjeniku u procesu rezervacije.',
         },
         {
-          question: 'Kako rezervirati sobu?',
+          question: 'Mogu li doći s kućnim ljubimcem?',
           answer:
-            'Odaberite datume na stranici rezervacije ili dostupnosti, pošaljite upit i potvrdite depozit od 50 %. Ostatak plaćate na dolasku.',
+            'Da, na upit u svim sobama i apartmanima. Cijena čišćenja iznosi 15 € / dan.',
         },
         {
-          question: 'Imate li sobe s wellnessom?',
+          question: 'Koja je razlika između Apartmana i Wellness apartmana?',
           answer:
-            'Da. Wellness apartmani uključuju privatnu saunu i jacuzzi. Kapacitet i cijene vidite na stranici soba.',
+            'Oba su 50 m² s kuhinjom i terasom. Wellness apartman (ginko-spa-2) uključuje privatnu saunu i jacuzzi; Apartman (ginko-spa-1) nema pristup privatnoj wellness zoni. Više na [Wellness Daruvar](/wellness-daruvar).',
         },
       ],
       reservationIntro:
-        'Odaberite datume, broj gostiju i sobu — rezervacija ide direktno s objektom, bez posrednika.',
+        'Odaberite datume, broj gostiju i tip sobe na [stranici soba](/rooms) — rezervacija ide direktno s objektom.',
       guidesBlockTitle: 'Vodič za boravak u Daruvaru',
       guidesBlockIntro:
         'Praktični savjeti za planiranje: atrakcije, sezona i kako složiti odmor uz toplice.',
     },
     en: {
-      eyebrow: 'Daruvar · Boutique rooms',
+      eyebrow: 'Daruvar · Room types',
       heroImage: {
         src: HERO,
         alt: 'Ginko Boutique Rooms & Wellness – property exterior in Daruvar',
       },
       highlights: [
-        'A few minutes’ walk to Daruvar Spa',
+        'Six boutique rooms Ginko 1–6 plus apartments',
         'WiFi, air conditioning and free private parking',
-        'Direct booking with no platform commission',
+        'Compare room types on one rooms page',
       ],
       sections: [
         {
-          heading: 'Why choose rooms in central Daruvar',
+          heading: 'Which rooms we offer in Daruvar',
           paragraphs: [
-            'Daruvar is a calm spa town: thermal baths, aqua park, Janković Castle and the ginkgo tree within a short radius. Staying in the centre saves travel time and keeps a gentle pace — morning treatments, afternoon in town, quiet evenings.',
-            'Ginko Boutique Rooms & Wellness is at Ulica Tomaša Garika Masaryka 1. You are close to cafés, restaurants and public transport, yet in private boutique accommodation.',
+            'We offer [Ginko 1–6](/rooms) rooms, an [Apartment](/rooms/ginko-spa-1) with kitchen and terrace, and a [Wellness apartment](/rooms/ginko-spa-2) with a private sauna and jacuzzi. Every unit has AC and WiFi; guests use free parking next to the property.',
+            'Capacities range from intimate options for 2 guests to rooms and apartments with an optional extra bed. Sizes, beds and rates are on the [rooms page](/rooms).',
           ],
         },
         {
-          heading: 'What to expect from Ginko rooms',
+          heading: 'Who each unit suits',
           paragraphs: [
-            'We offer rooms Ginko 1–6 plus wellness apartments with a private sauna and jacuzzi. Every unit has AC, WiFi and access to shared spaces; guests get free parking next to the property.',
-            'Booking direct on ginko-sobe.com means a clear 50% deposit and the balance on arrival — no hidden middleman fees.',
+            'Solo and business guests often pick smaller boutique rooms. Couples on a short stay choose a terrace room or the Apartment. For private spa after a day in town — the [Wellness apartment](/wellness-daruvar).',
+            'If proximity to the baths and your day rhythm around the pools matter most, see [accommodation near Daruvar Spa](/smjestaj-uz-daruvarske-toplice). This page focuses on comparing room types.',
           ],
         },
         {
-          heading: 'Ideal for wellness, business or a weekend',
+          heading: 'Breakfast, terrace and quiet evenings',
           paragraphs: [
-            'Guests come for the spa, recovery, short business trips or a relaxed weekend in Slavonia. House rules support quiet after 23:00.',
-            'For more space or cooking, choose an apartment; for private wellness — the Wellness apartment. Check details and availability on the rooms page.',
+            'Breakfast is ordered when you book — it is not included in the room rate by default. Some rooms have a terrace; the Apartment and Wellness apartment offer more space and a kitchen.',
+            'House rules support quiet after 23:00. Pets are welcome on request (15 € / day).',
           ],
         },
       ],
-      activitiesSectionTitle: 'What to do nearby',
+      activitiesSectionTitle: 'What to expect on site',
       activities: [
         {
-          title: 'Daruvar Spa',
+          title: 'Boutique rooms Ginko 1–6',
           description:
-            'Thermal pools and Aquae Ballisae aqua park a few minutes on foot from the property.',
-          image: IMG_TOWN,
-          imageAlt: 'Daruvar surroundings near Ginko',
-        },
-        {
-          title: 'Janković Castle & ginkgo',
-          description:
-            'The park and legendary ginkgo tree — the inspiration for our name — in the heart of town.',
-          image: IMG_PROPERTY,
-          imageAlt: 'Ginko Boutique Rooms in central Daruvar',
-        },
-        {
-          title: 'On-site wellness',
-          description:
-            'For a private sauna and jacuzzi, book a Wellness apartment with direct reservation.',
-          image: IMG_WELLNESS,
-          imageAlt: 'Wellness at Ginko accommodation',
-        },
-        {
-          title: 'Boutique rooms',
-          description:
-            'Thoughtfully furnished rooms with modern amenities, AC and WiFi for a comfortable stay.',
+            'Thoughtfully furnished rooms with AC and WiFi — compare capacities on the rooms page.',
           image: IMG_ROOM,
           imageAlt: 'Boutique room at Ginko Daruvar',
         },
+        {
+          title: 'Breakfast on request',
+          description:
+            'Fresh breakfast at the property — ordered at booking, not included in the room rate by default.',
+          image: IMG_BREAKFAST,
+          imageAlt: 'Breakfast at Ginko Boutique Rooms',
+        },
+        {
+          title: 'Terrace and shared spaces',
+          description:
+            'Some rooms and apartments have a terrace; shared spaces support a calm stay.',
+          image: IMG_PROPERTY,
+          imageAlt: 'Terrace and spaces at Ginko Daruvar',
+        },
+        {
+          title: 'Private wellness',
+          description:
+            'Sauna and jacuzzi only in the Wellness apartment — details on [Wellness Daruvar](/wellness-daruvar).',
+          image: IMG_WELLNESS,
+          imageAlt: 'Wellness at Ginko accommodation',
+        },
       ],
-      midCtaTitle: 'Want dates that work for you?',
+      midCtaTitle: 'Want to compare rooms?',
       midCtaBody:
-        'Check room availability and book directly — faster detail agreements and no platform commissions.',
+        'Open the [rooms overview](/rooms), pick the type that fits and book direct — no platform commission.',
       midCtaPrimaryLabel: 'Book',
       midCtaGalleryLabel: 'Gallery',
       faqSectionTitle: 'Frequently asked questions',
       faqs: [
         {
-          question: 'How far is Daruvar Spa?',
+          question: 'What are the room capacities?',
           answer:
-            'The spa and aqua park are about 400 m away — a few minutes’ walk from the property on Masaryk Street.',
+            'Boutique rooms Ginko 1–6 sleep 2 guests; some offer an optional extra bed (2+1). The Apartment and Wellness apartment are 2+2. Exact layouts are on the [rooms page](/rooms).',
         },
         {
-          question: 'Is parking included?',
+          question: 'Is breakfast included in the rate?',
           answer:
-            'Yes. Free private parking is available for guests next to the property, with no need to reserve a spot.',
+            'Not by default. Breakfast is ordered when you book and added according to the pricing in the booking flow.',
         },
         {
-          question: 'How do I book a room?',
+          question: 'Can I bring a pet?',
           answer:
-            'Pick dates on the booking or availability page, send your request and confirm the 50% deposit. Pay the balance on arrival.',
+            'Yes, on request in all rooms and apartments. The cleaning fee is 15 € / day.',
         },
         {
-          question: 'Do you have wellness rooms?',
+          question: 'What is the difference between the Apartment and Wellness apartment?',
           answer:
-            'Yes. Wellness apartments include a private sauna and jacuzzi. See capacity and rates on the rooms page.',
+            'Both are 50 m² with a kitchen and terrace. The Wellness apartment (ginko-spa-2) includes a private sauna and jacuzzi; the Apartment (ginko-spa-1) does not include the private wellness zone. More on [Wellness Daruvar](/wellness-daruvar).',
         },
       ],
       reservationIntro:
-        'Choose dates, guests and a room — booking goes directly with the property, no middleman.',
+        'Choose dates, guests and a room type on the [rooms page](/rooms) — booking goes directly with the property.',
       guidesBlockTitle: 'Guide to staying in Daruvar',
       guidesBlockIntro:
         'Practical tips for planning: attractions, season and how to combine a stay with the spa.',
     },
     cs: {
-      eyebrow: 'Daruvar · Boutique pokoje',
+      eyebrow: 'Daruvar · Typy pokojů',
       heroImage: {
         src: HERO,
         alt: 'Ginko Boutique Rooms & Wellness – fasáda objektu v Daruvaru',
       },
       highlights: [
-        'Pár minut chůze k lázním Daruvar',
+        'Šest boutique pokojů Ginko 1–6 plus apartmány',
         'WiFi, klimatizace a soukromé parkování zdarma',
-        'Přímá rezervace bez provize platforem',
+        'Porovnejte typy na jedné stránce pokojů',
       ],
       sections: [
         {
-          heading: 'Proč zvolit pokoje v centru Daruvaru',
+          heading: 'Jaké pokoje nabízíme v Daruvaru',
           paragraphs: [
-            'Daruvar je klidné lázeňské město: termální bazény, aquapark, zámek Janković a strom ginkgo v krátkém okruhu. Pokoje v centru šetří čas na dopravě a umožňují pohodový rytmus.',
-            'Ginko Boutique Rooms & Wellness je na Ulici Tomaša Garika Masaryka 1 — blízko kaváren, restaurací i MHD, přitom v soukromém boutique ubytování.',
+            'Nabízíme pokoje [Ginko 1–6](/rooms), [Apartmán](/rooms/ginko-spa-1) s kuchyní a terasou a [Wellness apartmán](/rooms/ginko-spa-2) se soukromou saunou a vířivkou. Každá jednotka má klimatizaci a WiFi; hosté využívají parkování zdarma u objektu.',
+            'Kapacity sahají od intimních možností pro 2 hosty po pokoje a apartmány s možností přistýlky. Velikosti, lůžka a ceny najdete na [stránce pokojů](/rooms).',
           ],
         },
         {
-          heading: 'Co očekávat od pokojů Ginko',
+          heading: 'Komu která jednotka sedí',
           paragraphs: [
-            'Nabízíme pokoje Ginko 1–6 a wellness apartmány se soukromou saunou a jacuzzi. Každá jednotka má klimatizaci, WiFi a přístup ke společným prostorám; hosté mají parkování zdarma.',
-            'Přímá rezervace na ginko-sobe.com znamená jasnou zálohu 50 % a doplatek při příjezdu — bez skrytých poplatků zprostředkovatelů.',
+            'Sólo a služební hosté často volí menší boutique pokoje. Páry na kratší pobyt berou pokoj s terasou nebo Apartmán. Pro soukromé spa po dni ve městě — [Wellness apartmán](/wellness-daruvar).',
+            'Pokud je priorita blízkost lázní a rytmus dne kolem bazénů, více píšeme na stránce [ubytování u lázní Daruvar](/smjestaj-uz-daruvarske-toplice). Tady je důraz na porovnání typů pokojů.',
           ],
         },
         {
-          heading: 'Ideální pro wellness, služební cestu nebo víkend',
+          heading: 'Snídaně, terasa a klidný večer',
           paragraphs: [
-            'Hosté přijíždějí kvůli lázním, regeneraci, krátké služební cestě nebo odpočinkovému víkendu ve Slavonii. Domovní řád podporuje ticho po 23:00.',
-            'Pro více prostoru nebo vaření zvolte apartmán; pro soukromý wellness — Wellness apartmán. Detaily a dostupnost najdete na stránce pokojů.',
+            'Snídani objednáte při rezervaci — není automaticky v ceně pokoje. Část pokojů má terasu; Apartmán a Wellness apartmán nabízejí více prostoru a kuchyni.',
+            'Domovní řád podporuje ticho po 23:00. Domácí mazlíčci jsou vítáni na vyžádání (15 € / den).',
           ],
         },
       ],
-      activitiesSectionTitle: 'Co dělat v okolí',
+      activitiesSectionTitle: 'Co očekávat v objektu',
       activities: [
         {
-          title: 'Lázně Daruvar',
+          title: 'Boutique pokoje Ginko 1–6',
           description:
-            'Termální bazény a aquapark Aquae Ballisae pár minut chůze od objektu.',
-          image: IMG_TOWN,
-          imageAlt: 'Okolí Daruvaru u ubytování Ginko',
-        },
-        {
-          title: 'Zámek Janković a ginkgo',
-          description:
-            'Park a legendární strom ginkgo — inspirace pro název objektu — v srdci města.',
-          image: IMG_PROPERTY,
-          imageAlt: 'Ginko Boutique Rooms v centru Daruvaru',
-        },
-        {
-          title: 'Wellness v objektu',
-          description:
-            'Pro soukromou saunu a jacuzzi rezervujte Wellness apartmán s přímou rezervací.',
-          image: IMG_WELLNESS,
-          imageAlt: 'Wellness v ubytování Ginko',
-        },
-        {
-          title: 'Boutique pokoje',
-          description:
-            'Pečlivě zařízené pokoje s moderním vybavením, klimatizací a WiFi.',
+            'Pečlivě zařízené pokoje s klimatizací a WiFi — kapacity porovnáte na stránce pokojů.',
           image: IMG_ROOM,
           imageAlt: 'Boutique pokoj v Ginko Daruvar',
         },
+        {
+          title: 'Snídaně na vyžádání',
+          description:
+            'Čerstvá snídaně v objektu — objednává se při rezervaci, není default v ceně pokoje.',
+          image: IMG_BREAKFAST,
+          imageAlt: 'Snídaně v Ginko Boutique Rooms',
+        },
+        {
+          title: 'Terasa a společné prostory',
+          description:
+            'Část pokojů a apartmánů má terasu; společné prostory podporují klidný rytmus pobytu.',
+          image: IMG_PROPERTY,
+          imageAlt: 'Terasa a prostory Ginko Daruvar',
+        },
+        {
+          title: 'Soukromý wellness',
+          description:
+            'Sauna a vířivka jen ve Wellness apartmánu — detaily na [Wellness Daruvar](/wellness-daruvar).',
+          image: IMG_WELLNESS,
+          imageAlt: 'Wellness v ubytování Ginko',
+        },
       ],
-      midCtaTitle: 'Chcete termín, který vám vyhovuje?',
+      midCtaTitle: 'Chcete porovnat pokoje?',
       midCtaBody:
-        'Prohlédněte dostupnost pokojů a rezervujte přímo — rychlejší domluva detailů a bez provizí platforem.',
+        'Otevřete [přehled pokojů](/rooms), vyberte typ, který vám sedí, a rezervujte přímo — bez provize platforem.',
       midCtaPrimaryLabel: 'Rezervace',
       midCtaGalleryLabel: 'Galerie',
       faqSectionTitle: 'Často kladené otázky',
       faqs: [
         {
-          question: 'Jak daleko jsou lázně Daruvar?',
+          question: 'Jaká je kapacita pokojů?',
           answer:
-            'Lázně a aquapark jsou asi 400 m — pár minut chůze od objektu na Masarykově ulici.',
+            'Boutique pokoje Ginko 1–6 jsou pro 2 hosty; část nabízí přistýlku (2+1). Apartmán a Wellness apartmán jsou 2+2. Přesné konfigurace najdete na [stránce pokojů](/rooms).',
         },
         {
-          question: 'Je parkování v ceně?',
+          question: 'Je snídaně v ceně?',
           answer:
-            'Ano. Soukromé parkování zdarma je k dispozici hostům u objektu, bez nutnosti rezervovat místo.',
+            'Ne automaticky. Snídani objednáte při rezervaci a připočte se podle ceníku v rezervačním procesu.',
         },
         {
-          question: 'Jak rezervovat pokoj?',
+          question: 'Mohu přijet s domácím mazlíčkem?',
           answer:
-            'Vyberte data na stránce rezervace nebo dostupnosti, odešlete poptávku a potvrďte zálohu 50 %. Doplatek platíte při příjezdu.',
+            'Ano, na vyžádání ve všech pokojích a apartmánech. Poplatek za úklid je 15 € / den.',
         },
         {
-          question: 'Máte pokoje s wellness?',
+          question: 'Jaký je rozdíl mezi Apartmánem a Wellness apartmánem?',
           answer:
-            'Ano. Wellness apartmány zahrnují soukromou saunu a jacuzzi. Kapacitu a ceny najdete na stránce pokojů.',
+            'Oba mají 50 m², kuchyni a terasu. Wellness apartmán (ginko-spa-2) zahrnuje soukromou saunu a vířivku; Apartmán (ginko-spa-1) nemá přístup do soukromé wellness zóny. Více na [Wellness Daruvar](/wellness-daruvar).',
         },
       ],
       reservationIntro:
-        'Zvolte data, počet hostů a pokoj — rezervace probíhá přímo s objektem, bez prostředníka.',
+        'Zvolte data, počet hostů a typ pokoje na [stránce pokojů](/rooms) — rezervace probíhá přímo s objektem.',
       guidesBlockTitle: 'Průvodce pobytem v Daruvaru',
       guidesBlockIntro:
         'Praktické tipy pro plánování: atrakce, sezóna a jak spojit pobyt s lázněmi.',
@@ -324,21 +325,21 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
           heading: 'Što znači privatni smještaj u Daruvaru',
           paragraphs: [
             'Privatni smještaj nudi više kontrole nad ritmom boravka nego veliki hotel: manje gužve, osobniji kontakt i fokus na udobnost sobe ili apartmana. U Daruvaru je to osobito praktično uz toplice — dolazite i odlazite kad vama odgovara.',
-            'Ginko Boutique Rooms & Wellness spaja boutique doživljaj s pouzdanim sadržajima: WiFi, klima, parking i opcija privatnog wellnessa.',
+            'Ginko Boutique Rooms & Wellness spaja boutique doživljaj s pouzdanim sadržajima: WiFi, klima, parking i opcija privatnog wellnessa. Pregled jedinica: [sobe](/rooms) i [Wellness Daruvar](/wellness-daruvar).',
           ],
         },
         {
           heading: 'Zašto rezervirati direktno',
           paragraphs: [
             'Direktna rezervacija znači da dogovor ide s objektom — bez Booking ili Airbnb provizije koja se često prelije na cijenu. Depozit od 50 % potvrđuje termin; ostatak plaćate u smještaju.',
-            'Lakše dogovarate doručak, pomoćni ležaj, kasniji check-in ili posebne potrebe jer komunicirate s domaćinom, ne s call centrom platforme.',
+            'Što dobivate direktno naspram OTA: transparentniju cijenu bez platformske marže, lakši dogovor check-ina i doručka te komunikaciju s domaćinom umjesto call centra.',
           ],
         },
         {
           heading: 'Za koga je Ginko dobar izbor',
           paragraphs: [
             'Parovi na wellness vikendu, gosti na oporavku uz toplice, solo ili poslovni putnici, te manje obitelji koje žele miran centar Daruvara.',
-            'Ako vam treba više prostora ili kuhanje, pogledajte apartmane; za saunu i jacuzzi — Wellness apartman. Usporedite sobe i rezervirajte termin koji vam odgovara.',
+            'Ako vam treba više prostora ili kuhanje, pogledajte apartmane; za saunu i jacuzzi — [Wellness apartman](/wellness-daruvar). Usporedite tipove na [stranici soba](/rooms).',
           ],
         },
       ],
@@ -423,21 +424,21 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
           heading: 'What private accommodation in Daruvar means',
           paragraphs: [
             'Private stays give more control over your pace than a large hotel: fewer crowds, more personal contact, and a focus on room or apartment comfort. In Daruvar that pairs well with the spa — come and go on your schedule.',
-            'Ginko Boutique Rooms & Wellness combines a boutique feel with reliable amenities: WiFi, AC, parking and optional private wellness.',
+            'Ginko Boutique Rooms & Wellness combines a boutique feel with reliable amenities: WiFi, AC, parking and optional private wellness. Browse units on [rooms](/rooms) and [Wellness Daruvar](/wellness-daruvar).',
           ],
         },
         {
           heading: 'Why book directly',
           paragraphs: [
             'Direct booking means you arrange with the property — no Booking or Airbnb commission that often ends up in the price. A 50% deposit secures the dates; pay the rest on arrival.',
-            'It is easier to arrange breakfast, an extra bed, late check-in or special needs because you talk to the host, not a platform call centre.',
+            'What you get direct vs OTA: clearer pricing without platform markup, easier check-in and breakfast arrangements, and host communication instead of a call centre.',
           ],
         },
         {
           heading: 'Who Ginko suits',
           paragraphs: [
             'Couples on a wellness weekend, guests recovering at the spa, solo or business travellers, and smaller families who want a quiet Daruvar centre.',
-            'Need more space or a kitchen? See the apartments. Want a sauna and jacuzzi? Choose a Wellness apartment. Compare rooms and book the dates that fit.',
+            'Need more space or a kitchen? See the apartments. Want a sauna and jacuzzi? Choose the [Wellness apartment](/wellness-daruvar). Compare types on the [rooms page](/rooms).',
           ],
         },
       ],
@@ -522,21 +523,21 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
           heading: 'Co znamená soukromé ubytování v Daruvaru',
           paragraphs: [
             'Soukromé ubytování dává víc kontroly nad rytmem pobytu než velký hotel: méně davů, osobnější kontakt a důraz na pohodlí pokoje nebo apartmánu. V Daruvaru to skvěle ladí s lázněmi.',
-            'Ginko Boutique Rooms & Wellness spojuje boutique atmosféru se spolehlivým zázemím: WiFi, klimatizace, parkování a možnost soukromého wellness.',
+            'Ginko Boutique Rooms & Wellness spojuje boutique atmosféru se spolehlivým zázemím: WiFi, klimatizace, parkování a možnost soukromého wellness. Přehled jednotek: [pokoje](/rooms) a [Wellness Daruvar](/wellness-daruvar).',
           ],
         },
         {
           heading: 'Proč rezervovat přímo',
           paragraphs: [
             'Přímá rezervace znamená dohodu s objektem — bez Booking nebo Airbnb provize, která často končí v ceně. Záloha 50 % potvrzuje termín; zbytek platíte při příjezdu.',
-            'Snáz domluvíte snídani, přistýlku, pozdní check-in nebo speciální požadavky, protože mluvíte s hostitelem, ne s call centrem platformy.',
+            'Co získáte přímo oproti OTA: přehlednější cenu bez marže platformy, snazší domluvu check-inu a snídaně a komunikaci s hostitelem místo call centra.',
           ],
         },
         {
           heading: 'Pro koho je Ginko vhodné',
           paragraphs: [
             'Páry na wellness víkend, hosté na regeneraci u lázní, sólo nebo služební cestující a menší rodiny, které chtějí klidné centrum Daruvaru.',
-            'Potřebujete víc prostoru nebo kuchyň? Podívejte se na apartmány. Chcete saunu a jacuzzi? Zvolte Wellness apartmán.',
+            'Potřebujete víc prostoru nebo kuchyň? Podívejte se na apartmány. Chcete saunu a jacuzzi? Zvolte [Wellness apartmán](/wellness-daruvar). Typy porovnejte na [stránce pokojů](/rooms).',
           ],
         },
       ],
@@ -621,24 +622,24 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
       ],
       sections: [
         {
-          heading: 'Wellness koji ostaje privatno',
+          heading: 'Obične sobe nisu privatni spa',
           paragraphs: [
-            'Nakon dana u Daruvarskim toplicama želite mir, ne gužvu u hotelskom spa centru. Ginko Wellness apartman daje saunu i jacuzzi unutar vaše jedinice — ritam birate sami.',
-            'U istom objektu dostupne su i boutique sobe ako putujete u grupi: netko bira wellness, netko klasičnu sobu.',
+            'Privatna sauna i jacuzzi dolaze samo uz [Wellness apartman (ginko-spa-2)](/rooms/ginko-spa-2). Ostale boutique sobe i Apartman bez wellnessa nemaju privatnu spa zonu — toplice ostaju ~400 m pješice.',
+            'Nakon dana u Daruvarskim toplicama želite mir, ne gužvu u hotelskom spa centru. Wellness apartman daje saunu i jacuzzi unutar vaše jedinice — ritam birate sami.',
+          ],
+        },
+        {
+          heading: 'Što je uključeno u Wellness apartman',
+          paragraphs: [
+            '50 m², kapacitet 2+2, privatna sauna, jacuzzi, klima, WiFi, terasa i odvojena kuhinja — uz besplatno parkiralište.',
+            'Depozit 50 % pri rezervaciji; ostatak na dolasku. Doručak i pomoćni ležaj dogovaraju se po potrebi. Ideje za 2–3 noći: vodič [Wellness vikend u Daruvaru](/guides/wellness-vikend-u-daruvaru).',
           ],
         },
         {
           heading: 'Kombinacija toplica i privatnog spa',
           paragraphs: [
-            'Jutro ili popodne u toplicama i aqua parku, navečer sauna i jacuzzi u apartmanu. Blizina (~400 m) štedi vrijeme i energiju.',
-            'Za kraći wellness vikend dovoljna su 2–3 noćenja; u sezoni toplica termine rezervirajte unaprijed.',
-          ],
-        },
-        {
-          heading: 'Što je uključeno',
-          paragraphs: [
-            'Wellness apartman uključuje privatnu saunu, jacuzzi, klimu, WiFi, terasu i pristup kuhinji — uz besplatno parkiralište.',
-            'Depozit 50 % pri rezervaciji; ostatak na dolasku. Doručak i pomoćni ležaj dogovaraju se po potrebi.',
+            'Jutro ili popodne u toplicama i aqua parku, navečer sauna i jacuzzi u apartmanu. Blizina (~400 m) štedi vrijeme — više o ritmu dana na [smještaju uz toplice](/smjestaj-uz-daruvarske-toplice).',
+            'U istom objektu dostupne su i boutique sobe ako putujete u grupi: netko bira wellness, netko klasičnu sobu na [stranici soba](/rooms).',
           ],
         },
       ],
@@ -715,24 +716,24 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
       ],
       sections: [
         {
-          heading: 'Wellness that stays private',
+          heading: 'Regular rooms are not a private spa',
           paragraphs: [
-            'After a day at Daruvar Spa you want quiet, not a crowded hotel spa floor. The Ginko Wellness apartment puts a sauna and jacuzzi inside your unit — you set the pace.',
-            'Boutique rooms are available in the same property if you travel as a group: some guests choose wellness, others a classic room.',
+            'A private sauna and jacuzzi come only with the [Wellness apartment (ginko-spa-2)](/rooms/ginko-spa-2). Other boutique rooms and the non-wellness Apartment do not include a private spa zone — the public baths remain ~400 m on foot.',
+            'After a day at Daruvar Spa you want quiet, not a crowded hotel spa floor. The Wellness apartment puts a sauna and jacuzzi inside your unit — you set the pace.',
+          ],
+        },
+        {
+          heading: 'What the Wellness apartment includes',
+          paragraphs: [
+            '50 m², capacity 2+2, private sauna, jacuzzi, AC, WiFi, terrace and a separate kitchen — plus free parking.',
+            '50% deposit at booking; balance on arrival. Breakfast and an extra bed can be arranged if needed. Ideas for 2–3 nights: the [Wellness weekend in Daruvar](/guides/wellness-vikend-u-daruvaru) guide.',
           ],
         },
         {
           heading: 'Spa plus private recovery',
           paragraphs: [
-            'Morning or afternoon at the baths and aqua park, evening sauna and jacuzzi in the apartment. The short walk (~400 m) saves time and energy.',
-            'A 2–3 night wellness weekend is enough for many guests; book ahead in spa season.',
-          ],
-        },
-        {
-          heading: 'What is included',
-          paragraphs: [
-            'The Wellness apartment includes a private sauna, jacuzzi, AC, WiFi, terrace and kitchen access — plus free parking.',
-            '50% deposit at booking; balance on arrival. Breakfast and an extra bed can be arranged if needed.',
+            'Morning or afternoon at the baths and aqua park, evening sauna and jacuzzi in the apartment. The short walk (~400 m) saves time — more on day rhythm at [accommodation near the spa](/smjestaj-uz-daruvarske-toplice).',
+            'Boutique rooms are available in the same property if you travel as a group — compare on the [rooms page](/rooms).',
           ],
         },
       ],
@@ -809,24 +810,24 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
       ],
       sections: [
         {
-          heading: 'Wellness, který zůstává soukromý',
+          heading: 'Běžné pokoje nejsou soukromé spa',
           paragraphs: [
-            'Po dni v lázních Daruvar chcete klid, ne přeplněné hotelové spa. Ginko Wellness apartmán má saunu a vířivku ve vaší jednotce — tempo volíte vy.',
-            'Ve stejném objektu jsou i boutique pokoje, pokud cestujete ve skupině.',
+            'Soukromá sauna a vířivka jsou jen u [Wellness apartmánu (ginko-spa-2)](/rooms/ginko-spa-2). Ostatní boutique pokoje a Apartmán bez wellnessu nemají soukromou spa zónu — veřejné lázně zůstávají ~400 m pěšky.',
+            'Po dni v lázních Daruvar chcete klid, ne přeplněné hotelové spa. Wellness apartmán má saunu a vířivku ve vaší jednotce — tempo volíte vy.',
+          ],
+        },
+        {
+          heading: 'Co Wellness apartmán zahrnuje',
+          paragraphs: [
+            '50 m², kapacita 2+2, soukromá sauna, vířivka, klimatizace, WiFi, terasa a oddělená kuchyň — plus parkování zdarma.',
+            'Záloha 50 % při rezervaci; doplatek při příjezdu. Snídani a přistýlku lze domluvit dle potřeby. Nápady na 2–3 noci: průvodce [Wellness víkend v Daruvaru](/guides/wellness-vikend-u-daruvaru).',
           ],
         },
         {
           heading: 'Lázně plus soukromá regenerace',
           paragraphs: [
-            'Dopoledne nebo odpoledne v lázních a aquaparku, večer sauna a vířivka v apartmánu. Krátká cesta (~400 m) šetří čas.',
-            'Na wellness víkend často stačí 2–3 noci; v lázeňské sezóně rezervujte předem.',
-          ],
-        },
-        {
-          heading: 'Co je v ceně',
-          paragraphs: [
-            'Wellness apartmán zahrnuje soukromou saunu, vířivku, klimatizaci, WiFi, terasu a přístup do kuchyně — plus parkování zdarma.',
-            'Záloha 50 % při rezervaci; doplatek při příjezdu. Snídani a přistýlku lze domluvit dle potřeby.',
+            'Dopoledne nebo odpoledne v lázních a aquaparku, večer sauna a vířivka v apartmánu. Krátká cesta (~400 m) šetří čas — více o rytmu dne na [ubytování u lázní](/smjestaj-uz-daruvarske-toplice).',
+            'Ve stejném objektu jsou i boutique pokoje, pokud cestujete ve skupině — porovnejte na [stránce pokojů](/rooms).',
           ],
         },
       ],
@@ -909,21 +910,21 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
           heading: 'Zašto smještaj blizu toplica mijenja ritam',
           paragraphs: [
             'Kad su toplice prioritet, udaljenost od smještaja određuje koliko energije trošite na dolaske i odlaske. Ginko je u centru Daruvara, oko 400 m od Daruvarskih toplica i aqua parka Aquae Ballisae.',
-            'Možete planirati jutarnji tretman, povratak na odmor i drugi odlazak navečer — bez traženja parkinga na drugom kraju grada.',
+            'Možete planirati jutarnji tretman, povratak na odmor i drugi odlazak navečer — bez traženja parkinga na drugom kraju grada. Više o tipovima soba: [sobe u Daruvaru](/sobe-daruvar).',
           ],
         },
         {
-          heading: 'Što dobivate uz lokaciju',
+          heading: 'Pješačka ruta i ritam dana',
           paragraphs: [
-            'Boutique sobe i apartmani s WiFi-jem, klimom i besplatnim parkingom. Za privatni spa nakon toplica — Wellness apartman s saunom i jacuzzijem.',
-            'Direktna rezervacija znači jasan depozit i komunikaciju s objektom, korisno kad usklađujete termine tretmana i check-in.',
+            'Od Ulica Tomaša Garika Masaryka 1 većina gostiju ide pješice do ulaza u toplice — nekoliko minuta hoda. Točno vrijeme ovisi o tempu i odabranom ulazu.',
+            'Tipičan ritam: prijepodne termalni bazeni ili aqua park, popodne pauza u smještaju, navečer drugi odlazak ili [privatni spa u Wellness apartmanu](/wellness-daruvar).',
           ],
         },
         {
           heading: 'Praktično za obitelji i parove',
           paragraphs: [
-            'Obitelji cijene kratku šetnju do aqua parka; parovi miran povratak u boutique sobu. Kućni red podržava tišinu nakon 23:00.',
-            'Zagreb je ~120 km; autobusna i željeznička stanica ~500 m — pogodno i bez auta.',
+            'Obitelji cijene kratku šetnju do aqua parka; parovi miran povratak bez dugog transfera. Kućni red podržava tišinu nakon 23:00.',
+            'Zagreb je ~120 km; autobusna i željeznička stanica ~500 m — pogodno i bez auta. Parking uz objekt ostaje besplatan ako vozite.',
           ],
         },
       ],
@@ -937,26 +938,28 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
         },
         {
           title: 'Park i ginkgo',
-          description: 'Dvorac Janković i stablo ginka — 50 m od centra, lagana šetnja.',
+          description: 'Dvorac Janković i stablo ginka — lagana šetnja iz centra.',
           image: IMG_PROPERTY,
           imageAlt: 'Centar Daruvara uz Ginko',
         },
         {
           title: 'Privatni wellness',
-          description: 'Sauna i jacuzzi u apartmanu nakon dana u toplicama.',
+          description:
+            'Sauna i jacuzzi nakon termalnog dana — detalji na [Wellness Daruvar](/wellness-daruvar).',
           image: IMG_WELLNESS,
           imageAlt: 'Wellness uz smještaj kod toplica',
         },
         {
-          title: 'Sobe za kraći boravak',
-          description: 'Ginko 1–6 za vikend uz toplice bez nepotrebnog prostora.',
+          title: 'Aqua park s djecom',
+          description:
+            'Kratka udaljenost pojednostavljuje više odlazaka dnevno s djecom.',
           image: IMG_ROOM,
-          imageAlt: 'Soba blizu Daruvarskih toplica',
+          imageAlt: 'Smještaj blizu aqua parka Daruvar',
         },
       ],
       midCtaTitle: 'Planirate boravak uz toplice?',
       midCtaBody:
-        'Odaberite datume i sobu u blizini toplica — rezervacija direktno, bez posrednika.',
+        'Odaberite datume i rezervirajte bazu ~400 m od toplica — usporedbu tipova soba ostavite za [stranicu soba](/rooms).',
       midCtaPrimaryLabel: 'Rezervacija',
       midCtaGalleryLabel: 'Galerija',
       faqSectionTitle: 'Često postavljana pitanja',
@@ -974,18 +977,19 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
         {
           question: 'Je li smještaj pogodan za aqua park s djecom?',
           answer:
-            'Da. Kratka udaljenost pojednostavljuje dolaske s djecom; sobe i apartmani pokrivaju različite kapacitete.',
+            'Da. Kratka udaljenost pojednostavljuje dolaske s djecom. Koji tip sobe odabrati ovisi o kapacitetu — usporedite na [sobama u Daruvaru](/sobe-daruvar).',
         },
         {
           question: 'Mogu li spojiti toplice i privatni spa?',
           answer:
-            'Da — rezervirajte Wellness apartman za saunu i jacuzzi nakon termalnog dana.',
+            'Da — rezervirajte [Wellness apartman](/wellness-daruvar) za saunu i jacuzzi nakon termalnog dana.',
         },
       ],
       reservationIntro:
-        'Pošaljite upit s datumima — potvrda i depozit stižu e-mailom.',
+        'Pošaljite upit s datumima — potvrda i depozit stižu e-mailom. Za tipove soba vidi [sobe u Daruvaru](/sobe-daruvar).',
       guidesBlockTitle: 'Vodič uz toplice',
-      guidesBlockIntro: 'Što posjetiti i kako složiti dan između toplica i centra Daruvara.',
+      guidesBlockIntro:
+        'Što posjetiti i kako složiti dan između toplica i centra — vodič [Daruvarske toplice](/guides/daruvarske-toplice-vodic).',
     },
     en: {
       eyebrow: 'Daruvar · Near the spa',
@@ -1003,21 +1007,21 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
           heading: 'Why staying near the spa changes your day',
           paragraphs: [
             'When the spa is the priority, distance from your room decides how much energy you spend commuting. Ginko sits in central Daruvar, about 400 m from Daruvar Spa and Aquae Ballisae aqua park.',
-            'You can plan a morning treatment, return to rest, and go again in the evening — without hunting for parking across town.',
+            'You can plan a morning treatment, return to rest, and go again in the evening — without hunting for parking across town. For room types, see [rooms in Daruvar](/sobe-daruvar).',
           ],
         },
         {
-          heading: 'What you get with the location',
+          heading: 'Walking route and day rhythm',
           paragraphs: [
-            'Boutique rooms and apartments with WiFi, AC and free parking. For private spa after the baths — the Wellness apartment with sauna and jacuzzi.',
-            'Direct booking means a clear deposit and communication with the property, useful when aligning treatment times and check-in.',
+            'From Ulica Tomaša Garika Masaryka 1 most guests walk to the spa entrance — a few minutes on foot. Exact time depends on pace and which entrance you use.',
+            'A typical rhythm: thermal pools or aqua park before noon, a break at the property in the afternoon, then a second visit or [private spa in the Wellness apartment](/wellness-daruvar) in the evening.',
           ],
         },
         {
           heading: 'Practical for families and couples',
           paragraphs: [
-            'Families value the short walk to the aqua park; couples value a quiet return to a boutique room. House rules support quiet after 23:00.',
-            'Zagreb is ~120 km; bus and train stations ~500 m — workable even without a car.',
+            'Families value the short walk to the aqua park; couples value a quiet return without a long transfer. House rules support quiet after 23:00.',
+            'Zagreb is ~120 km; bus and train stations ~500 m — workable even without a car. Parking at the property stays free if you drive.',
           ],
         },
       ],
@@ -1037,20 +1041,22 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
         },
         {
           title: 'Private wellness',
-          description: 'Sauna and jacuzzi in the apartment after a spa day.',
+          description:
+            'Sauna and jacuzzi after a thermal day — details on [Wellness Daruvar](/wellness-daruvar).',
           image: IMG_WELLNESS,
           imageAlt: 'Wellness with a spa-side stay',
         },
         {
-          title: 'Rooms for shorter stays',
-          description: 'Ginko 1–6 for a spa weekend without unused space.',
+          title: 'Aqua park with children',
+          description:
+            'The short distance makes multiple trips a day with kids much easier.',
           image: IMG_ROOM,
-          imageAlt: 'Room near Daruvar Spa',
+          imageAlt: 'Stay near Daruvar aqua park',
         },
       ],
       midCtaTitle: 'Planning a spa-side stay?',
       midCtaBody:
-        'Pick dates and a room near the spa — book direct, no middleman.',
+        'Pick dates and book a base ~400 m from the spa — compare room types on the [rooms page](/rooms).',
       midCtaPrimaryLabel: 'Book',
       midCtaGalleryLabel: 'Gallery',
       faqSectionTitle: 'Frequently asked questions',
@@ -1068,18 +1074,19 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
         {
           question: 'Is it suitable for the aqua park with children?',
           answer:
-            'Yes. The short distance simplifies trips with kids; rooms and apartments cover different capacities.',
+            'Yes. The short distance simplifies trips with kids. Which room type to pick depends on capacity — compare on [rooms in Daruvar](/sobe-daruvar).',
         },
         {
           question: 'Can I combine the spa with private wellness?',
           answer:
-            'Yes — book the Wellness apartment for a sauna and jacuzzi after a thermal day.',
+            'Yes — book the [Wellness apartment](/wellness-daruvar) for a sauna and jacuzzi after a thermal day.',
         },
       ],
       reservationIntro:
-        'Send a request with dates — confirmation and deposit arrive by email.',
+        'Send a request with dates — confirmation and deposit arrive by email. For room types see [rooms in Daruvar](/sobe-daruvar).',
       guidesBlockTitle: 'Guide for a spa stay',
-      guidesBlockIntro: 'What to visit and how to split the day between the spa and Daruvar centre.',
+      guidesBlockIntro:
+        'What to visit and how to split the day — see the [Daruvar Spa guide](/guides/daruvarske-toplice-vodic).',
     },
     cs: {
       eyebrow: 'Daruvar · U lázní',
@@ -1097,21 +1104,21 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
           heading: 'Proč ubytování u lázní mění rytmus dne',
           paragraphs: [
             'Když jsou lázně prioritou, vzdálenost od pokoje rozhoduje, kolik energie spálíte na dojíždění. Ginko je v centru Daruvaru, asi 400 m od lázní a aquaparku Aquae Ballisae.',
-            'Můžete naplánovat ranní proceduru, návrat k odpočinku a další odchod večer — bez hledání parkování na druhém konci města.',
+            'Můžete naplánovat ranní proceduru, návrat k odpočinku a další odchod večer — bez hledání parkování na druhém konci města. Typy pokojů: [pokoje v Daruvaru](/sobe-daruvar).',
           ],
         },
         {
-          heading: 'Co získáte s lokalitou',
+          heading: 'Pěší trasa a rytmus dne',
           paragraphs: [
-            'Boutique pokoje a apartmány s WiFi, klimatizací a parkováním zdarma. Pro soukromé spa po lázních — Wellness apartmán se saunou a vířivkou.',
-            'Přímá rezervace znamená jasnou zálohu a komunikaci s objektem — užitečné při slaďování procedur a check-inu.',
+            'Z Ulice Tomaša Garika Masaryka 1 většina hostů jde pěšky ke vchodu do lázní — pár minut chůze. Přesný čas závisí na tempu a zvoleném vchodu.',
+            'Typický rytmus: dopoledne termální bazény nebo aquapark, odpoledne pauza v ubytování, večer druhá návštěva nebo [soukromé spa ve Wellness apartmánu](/wellness-daruvar).',
           ],
         },
         {
           heading: 'Praktické pro rodiny i páry',
           paragraphs: [
-            'Rodiny ocení krátkou cestu k aquaparku; páry klidný návrat do boutique pokoje. Domovní řád podporuje ticho po 23:00.',
-            'Záhřeb je ~120 km; autobus a vlak ~500 m — zvládnutelné i bez auta.',
+            'Rodiny ocení krátkou cestu k aquaparku; páry klidný návrat bez dlouhého transferu. Domovní řád podporuje ticho po 23:00.',
+            'Záhřeb je ~120 km; autobus a vlak ~500 m — zvládnutelné i bez auta. Parkování u objektu zůstává zdarma, pokud jedete autem.',
           ],
         },
       ],
@@ -1131,20 +1138,22 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
         },
         {
           title: 'Soukromý wellness',
-          description: 'Sauna a vířivka v apartmánu po dni v lázních.',
+          description:
+            'Sauna a vířivka po termálním dni — detaily na [Wellness Daruvar](/wellness-daruvar).',
           image: IMG_WELLNESS,
           imageAlt: 'Wellness u ubytování u lázní',
         },
         {
-          title: 'Pokoje na kratší pobyt',
-          description: 'Ginko 1–6 na víkend u lázní bez zbytečného prostoru.',
+          title: 'Aquapark s dětmi',
+          description:
+            'Krátká vzdálenost zjednodušuje více odchodů denně s dětmi.',
           image: IMG_ROOM,
-          imageAlt: 'Pokoj blízko lázní Daruvar',
+          imageAlt: 'Ubytování blízko aquaparku Daruvar',
         },
       ],
       midCtaTitle: 'Plánujete pobyt u lázní?',
       midCtaBody:
-        'Vyberte data a pokoj blízko lázní — rezervace přímo, bez prostředníka.',
+        'Vyberte data a rezervujte základnu ~400 m od lázní — typy pokojů porovnejte na [stránce pokojů](/rooms).',
       midCtaPrimaryLabel: 'Rezervace',
       midCtaGalleryLabel: 'Galerie',
       faqSectionTitle: 'Často kladené otázky',
@@ -1152,7 +1161,7 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
         {
           question: 'Jak přesně daleko je vchod do lázní?',
           answer:
-            'Asi 400 m / pár minut chůze od Ulici Tomaša Garika Masaryka 1. Přesný čas závisí na tempu a zvoleném vchodu.',
+            'Asi 400 m / pár minut chůze od Ulice Tomaša Garika Masaryka 1. Přesný čas závisí na tempu a zvoleném vchodu.',
         },
         {
           question: 'Potřebuji auto k lázním?',
@@ -1162,18 +1171,19 @@ export const LANDING_ENRICHED: LandingEnrichedMap = {
         {
           question: 'Hodí se to k aquaparku s dětmi?',
           answer:
-            'Ano. Krátká vzdálenost zjednodušuje cesty s dětmi; pokoje a apartmány pokrývají různé kapacity.',
+            'Ano. Krátká vzdálenost zjednodušuje cesty s dětmi. Který typ pokoje zvolit závisí na kapacitě — porovnejte na [pokojích v Daruvaru](/sobe-daruvar).',
         },
         {
           question: 'Mohu spojit lázně a soukromé spa?',
           answer:
-            'Ano — rezervujte Wellness apartmán pro saunu a vířivku po termálním dni.',
+            'Ano — rezervujte [Wellness apartmán](/wellness-daruvar) pro saunu a vířivku po termálním dni.',
         },
       ],
       reservationIntro:
-        'Pošlete poptávku s daty — potvrzení a záloha přijdou e-mailem.',
+        'Pošlete poptávku s daty — potvrzení a záloha přijdou e-mailem. Typy pokojů: [pokoje v Daruvaru](/sobe-daruvar).',
       guidesBlockTitle: 'Průvodce pobytem u lázní',
-      guidesBlockIntro: 'Co navštívit a jak rozdělit den mezi lázně a centrum Daruvaru.',
+      guidesBlockIntro:
+        'Co navštívit a jak rozdělit den — průvodce [lázně Daruvar](/guides/daruvarske-toplice-vodic).',
     },
   },
 };

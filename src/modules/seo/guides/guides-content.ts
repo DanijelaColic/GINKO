@@ -226,7 +226,7 @@ export const GUIDES: GuideArticle[] = [
         heading: 'Zámek Jankovićů a strom ginkgo',
         paragraphs: [
           'Park zámku hraběte Jankoviće a legendární ginkgo biloba leží v samém srdci města. Procházka parkem a fotka stromu, který inspiroval název našeho objektu, je příjemný začátek pobytu.',
-          'Kostel Nejsvětější Trojice a historické centrum jsou jen pár minut pěšky od Ulici Tomaša Garika Masaryka 1.',
+          'Kostel Nejsvětější Trojice a historické centrum jsou jen pár minut pěšky od Ulice Tomaša Garika Masaryka 1.',
         ],
       },
       {
@@ -321,7 +321,7 @@ export const GUIDES: GuideArticle[] = [
         heading: 'Smještaj uz toplice',
         paragraphs: [
           'Blizina toplica štedi energiju: možete ići više puta dnevno. Direktna rezervacija na ginko-sobe.com daje jasan depozit i dogovor detalja s objektom.',
-          'Više o lokaciji i sobama: vodič „Što posjetiti u Daruvaru“ i landing stranice za smještaj uz toplice.',
+          'Više o lokaciji: vodič [Što posjetiti u Daruvaru](/guides/sto-posjetiti-u-daruvaru) i [smještaj uz Daruvarske toplice](/smjestaj-uz-daruvarske-toplice).',
         ],
       },
     ],
@@ -364,7 +364,7 @@ export const GUIDES: GuideArticle[] = [
         heading: 'Rezervacija',
         paragraphs: [
           'Vikendi u sezoni toplica brzo se pune. Rezervirajte unaprijed, osobito Wellness apartman. Depozit 50 %, ostatak na dolasku.',
-          'Provjerite dostupnost na stranici rezervacije ili landing stranici Wellness Daruvar.',
+          'Provjerite dostupnost na stranici rezervacije ili na [Wellness Daruvar](/wellness-daruvar).',
         ],
       },
     ],
@@ -452,7 +452,7 @@ export const GUIDES: GuideArticle[] = [
         heading: 'Staying near the spa',
         paragraphs: [
           'Proximity saves energy: you can go more than once a day. Direct booking on ginko-sobe.com gives a clear deposit and arrangements with the property.',
-          'More on location and rooms: the “What to visit in Daruvar” guide and the spa-side accommodation landing page.',
+          'More on location: [What to visit in Daruvar](/guides/sto-posjetiti-u-daruvaru) and [accommodation near Daruvar Spa](/smjestaj-uz-daruvarske-toplice).',
         ],
       },
     ],
@@ -495,7 +495,7 @@ export const GUIDES: GuideArticle[] = [
         heading: 'Booking',
         paragraphs: [
           'Spa-season weekends fill quickly. Book ahead, especially the Wellness apartment. 50% deposit, balance on arrival.',
-          'Check availability on the booking page or the Wellness Daruvar landing page.',
+          'Check availability on the booking page or on [Wellness Daruvar](/wellness-daruvar).',
         ],
       },
     ],
@@ -583,7 +583,7 @@ export const GUIDES: GuideArticle[] = [
         heading: 'Ubytování u lázní',
         paragraphs: [
           'Blízkost šetří energii: můžete jít i víckrát denně. Přímá rezervace na ginko-sobe.com dává jasnou zálohu a domluvu s objektem.',
-          'Víc o lokalitě a pokojích: průvodce „Co navštívit v Daruvaru“ a landing stránka ubytování u lázní.',
+          'Víc o lokalitě: průvodce [Co navštívit v Daruvaru](/guides/sto-posjetiti-u-daruvaru) a [ubytování u lázní Daruvar](/smjestaj-uz-daruvarske-toplice).',
         ],
       },
     ],
@@ -626,7 +626,7 @@ export const GUIDES: GuideArticle[] = [
         heading: 'Rezervace',
         paragraphs: [
           'Víkendy v lázeňské sezóně se rychle plní. Rezervujte předem, zvlášť Wellness apartmán. Záloha 50 %, doplatek při příjezdu.',
-          'Dostupnost zkontrolujte na stránce rezervace nebo landing stránce Wellness Daruvar.',
+          'Dostupnost zkontrolujte na stránce rezervace nebo na [Wellness Daruvar](/wellness-daruvar).',
         ],
       },
     ],

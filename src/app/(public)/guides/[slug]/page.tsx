@@ -10,6 +10,7 @@ import { getGuideBySlug } from '@/modules/seo/guides/get-guide-by-slug';
 import { getGuides } from '@/modules/seo/guides/get-guides';
 import { GUIDE_HUB_BY_LOCALE } from '@/modules/seo/guides/guides-content';
 import { InternalLinks } from '@/components/seo/InternalLinks';
+import { RichParagraph } from '@/modules/seo/rich-paragraph';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -125,7 +126,7 @@ export default async function GuideArticlePage({ params }: Props) {
             <h2 className="text-2xl font-semibold text-text mb-3">{section.heading}</h2>
             <div className="space-y-3 text-text/80 leading-relaxed">
               {section.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
+                <RichParagraph key={paragraph} text={paragraph} />
               ))}
             </div>
           </section>

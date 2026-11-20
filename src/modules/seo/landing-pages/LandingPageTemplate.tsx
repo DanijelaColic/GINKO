@@ -5,6 +5,12 @@ import { getBreadcrumbStructuredData } from '@/i18n/metadata';
 import type { AppLocale } from '@/i18n/routing';
 import { SITE_NAME, AVAILABILITY_SECTION_HREF } from '@/modules/booking/booking.config';
 import { getGuides } from '@/modules/seo/guides/get-guides';
+import {
+  formatLandingReviewsLine,
+  LANDING_TRUST_COPY,
+} from '@/modules/seo/landing-trust';
+import { RichParagraph, stripRichLinks } from '@/modules/seo/rich-paragraph';
+import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { getLandingPageContent, type LandingPageKey } from './content';
 import {
   LANDING_GUIDES_LINK_LABEL,
@@ -21,7 +27,11 @@ type LandingPageTemplateProps = {
 export async function LandingPageTemplate({ pageKey, locale }: LandingPageTemplateProps) {
   const content = getLandingPageContent(pageKey, locale);
   const pathname = `/${pageKey}`;
-  const relatedGuides = getGuides(locale).slice(0, 3);
+  const [relatedGuides, googleReviews] = await Promise.all([
+    Promise.resolve(getGuides(locale).slice(0, 3)),
+    getGoogleReviews(),
+  ]);
+  const trust = LANDING_TRUST_COPY[locale];
   const breadcrumbJsonLd = getBreadcrumbStructuredData(locale, [
     { name: SITE_NAME, pathname: '/' },
     { name: content.breadcrumbLabel, pathname },
@@ -35,10 +45,20 @@ export async function LandingPageTemplate({ pageKey, locale }: LandingPageTempla
       name: item.question,
       acceptedAnswer: {
         '@type': 'Answer',
-        text: item.answer,
+        text: stripRichLinks(item.answer),
       },
     })),
   };
+
+  const trustItems = [
+    googleReviews
+      ? formatLandingReviewsLine(locale, googleReviews.rating, googleReviews.reviewCount)
+      : null,
+    trust.parking,
+    trust.deposit,
+    trust.cancellation,
+    trust.breakfast,
+  ].filter((item): item is string => Boolean(item));
 
   return (
     <article className="mx-auto max-w-4xl px-4 py-12 sm:py-16">
@@ -57,7 +77,7 @@ export async function LandingPageTemplate({ pageKey, locale }: LandingPageTempla
       <h1 className="mb-4 font-serif text-3xl font-semibold text-text sm:text-4xl">
         {content.h1}
       </h1>
-      <p className="mb-8 leading-relaxed text-text/70">{content.intro}</p>
+      <RichParagraph className="mb-8 leading-relaxed text-text/70" text={content.intro} />
 
       <div className="relative mb-10 aspect-[21/9] w-full overflow-hidden rounded-xl border border-stone/20 bg-stone/10">
         <Image
@@ -89,7 +109,7 @@ export async function LandingPageTemplate({ pageKey, locale }: LandingPageTempla
             </h2>
             <div className="space-y-3 leading-relaxed text-text/70">
               {section.paragraphs.map((paragraph) => (
-                <p key={paragraph}>{paragraph}</p>
+                <RichParagraph key={paragraph} text={paragraph} />
               ))}
             </div>
           </section>
@@ -117,7 +137,10 @@ export async function LandingPageTemplate({ pageKey, locale }: LandingPageTempla
               </div>
               <div className="p-4">
                 <h3 className="mb-2 font-serif text-lg font-semibold text-text">{card.title}</h3>
-                <p className="text-sm leading-relaxed text-text/70">{card.description}</p>
+                <RichParagraph
+                  className="text-sm leading-relaxed text-text/70"
+                  text={card.description}
+                />
               </div>
             </div>
           ))}
@@ -126,7 +149,7 @@ export async function LandingPageTemplate({ pageKey, locale }: LandingPageTempla
 
       <section className="mt-12 rounded-xl border border-accent/25 bg-white p-6 shadow-sm sm:p-8">
         <h2 className="mb-3 font-serif text-2xl font-semibold text-text">{content.midCtaTitle}</h2>
-        <p className="mb-5 leading-relaxed text-text/70">{content.midCtaBody}</p>
+        <RichParagraph className="mb-5 leading-relaxed text-text/70" text={content.midCtaBody} />
         <div className="flex flex-wrap gap-2.5">
           <Link
             href={AVAILABILITY_SECTION_HREF}
@@ -147,7 +170,10 @@ export async function LandingPageTemplate({ pageKey, locale }: LandingPageTempla
         <h2 className="mb-2 font-serif text-xl font-semibold text-text">
           {LANDING_RESERVATION_HEADING[locale]}
         </h2>
-        <p className="mb-4 text-sm leading-relaxed text-text/70">{content.reservationIntro}</p>
+        <RichParagraph
+          className="mb-4 text-sm leading-relaxed text-text/70"
+          text={content.reservationIntro}
+        />
         <div className="flex flex-wrap gap-2.5">
           <Link
             href={AVAILABILITY_SECTION_HREF}
@@ -189,19 +215,38 @@ export async function LandingPageTemplate({ pageKey, locale }: LandingPageTempla
               <summary className="cursor-pointer list-none pr-6 font-semibold text-text marker:content-none [&::-webkit-details-marker]:hidden">
                 {item.question}
               </summary>
-              <p className="mt-3 border-t border-stone/15 pt-3 text-sm leading-relaxed text-text/70">
-                {item.answer}
-              </p>
+              <RichParagraph
+                className="mt-3 border-t border-stone/15 pt-3 text-sm leading-relaxed text-text/70"
+                text={item.answer}
+              />
             </details>
           ))}
         </div>
+      </section>
+
+      {/* Trust / decision info — live Google ocjena + poznati booking uvjeti */}
+      <section className="mt-12 rounded-xl border border-stone/20 bg-stone-light/60 p-5 shadow-sm sm:p-6">
+        <h2 className="mb-3 font-serif text-xl font-semibold text-text">{trust.sectionTitle}</h2>
+        <ul className="grid gap-2 sm:grid-cols-2">
+          {trustItems.map((item) => (
+            <li
+              key={item}
+              className="flex gap-2 text-sm leading-relaxed text-text/80 before:mt-2 before:h-1.5 before:w-1.5 before:shrink-0 before:rounded-full before:bg-accent before:content-['']"
+            >
+              {item}
+            </li>
+          ))}
+        </ul>
       </section>
 
       <section className="mt-10 rounded-xl border border-stone/20 bg-white p-5 shadow-sm">
         <h2 className="mb-2 font-serif text-xl font-semibold text-text">
           {content.guidesBlockTitle}
         </h2>
-        <p className="mb-4 text-sm leading-relaxed text-text/70">{content.guidesBlockIntro}</p>
+        <RichParagraph
+          className="mb-4 text-sm leading-relaxed text-text/70"
+          text={content.guidesBlockIntro}
+        />
         <ul className="space-y-2">
           {relatedGuides.map((guide) => (
             <li key={guide.slug}>

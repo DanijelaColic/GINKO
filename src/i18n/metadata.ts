@@ -3,13 +3,17 @@ import type { Locale } from 'next-intl';
 import { getTranslations } from 'next-intl/server';
 import { CONTACT_EMAIL, CONTACT_PHONE_TEL, SITE_NAME } from '@/modules/booking/booking.config';
 import {
+  PROPERTY_COUNTRY_CODE,
   PROPERTY_LATITUDE,
+  PROPERTY_LOCALITY,
   PROPERTY_LONGITUDE,
   PROPERTY_MAP_URL,
+  PROPERTY_POSTAL_CODE,
   PROPERTY_STREET,
 } from '@/modules/property/property-details.config';
 import { rooms } from '@/modules/rooms/rooms.config';
 import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
+import { getIndexingRobots, resolvePageRobots } from '@/modules/seo/indexing';
 import { routing } from './routing';
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? 'https://ginko-sobe.com';
@@ -123,17 +127,7 @@ export async function getRootMetadata(locale: Locale): Promise<Metadata> {
       description: t('twitter.description'),
       images: [HERO_OG_IMAGE_PATH],
     },
-    robots: {
-      index: true,
-      follow: true,
-      googleBot: {
-        index: true,
-        follow: true,
-        'max-video-preview': -1,
-        'max-image-preview': 'large',
-        'max-snippet': -1,
-      },
-    },
+    robots: getIndexingRobots(),
   };
 }
 
@@ -158,6 +152,8 @@ export async function getPageMetadata({
   const t = await getTranslations({ locale, namespace });
   const localizedPath = getLocalizedPath(locale, pathname);
 
+  const resolvedRobots = resolvePageRobots(robots);
+
   return {
     title: t('title'),
     description: t('description'),
@@ -171,7 +167,7 @@ export async function getPageMetadata({
       description: t('openGraph.description'),
       ...getSharedImageMetadata(locale, t('openGraph.imageAlt')),
     },
-    ...(robots ? { robots } : {}),
+    ...(resolvedRobots ? { robots: resolvedRobots } : {}),
   };
 }
 
@@ -203,9 +199,9 @@ export async function getStructuredData(locale: Locale) {
     address: {
       '@type': 'PostalAddress',
       streetAddress: PROPERTY_STREET,
-      addressLocality: 'Daruvar',
-      postalCode: '43500',
-      addressCountry: 'HR',
+      addressLocality: PROPERTY_LOCALITY,
+      postalCode: PROPERTY_POSTAL_CODE,
+      addressCountry: PROPERTY_COUNTRY_CODE,
     },
     geo: {
       '@type': 'GeoCoordinates',

@@ -8,3 +8,14 @@ export type { LandingPageKey } from './landing-pages/landing-enriched-types';
 export { LANDING_PAGE_PATHS } from './landing-pages/landing-enriched-types';
 export { getLandingPageContent, getLandingPageMetadata } from './landing-pages/content';
 export { LandingPageTemplate } from './landing-pages/LandingPageTemplate';
+export {
+  ALL_LEGACY_REDIRECTS,
+  LEGACY_GUIDE_REDIRECTS,
+  MYRENT_LEGACY_REDIRECTS,
+} from './legacy-redirects';
+export type { LegacyRedirect } from './legacy-redirects';
+export {
+  getIndexingRobots,
+  isSeoNoindexEnvironment,
+  resolvePageRobots,
+} from './indexing';

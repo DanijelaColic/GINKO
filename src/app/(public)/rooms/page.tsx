@@ -11,6 +11,8 @@ import { getRooms } from '@/modules/rooms/room.repository';
 import { getValidLocale } from '@/i18n/messages';
 import { getPageMetadata } from '@/i18n/metadata';
 import RoomGrid from '@/components/hotel/RoomGrid';
+import { Link } from '@/i18n/navigation';
+import { InternalLinks } from '@/components/seo/InternalLinks';
 import type { RoomLocale } from '@/modules/rooms/room.types';
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -54,7 +56,10 @@ export default async function RoomsPage() {
           <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-text mb-4">
             {t('title')}
           </h1>
-          <p className="text-muted text-base leading-relaxed">{t('description')}</p>
+          <p className="text-muted text-base leading-relaxed mb-4">{t('description')}</p>
+          <Link href="/wellness-daruvar" className="inline-flex text-sm font-semibold text-accent underline-offset-2 hover:underline">
+            {t('wellnessLink')}
+          </Link>
         </div>
       </section>
 
@@ -62,6 +67,7 @@ export default async function RoomsPage() {
       <section className="py-16 lg:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <RoomGrid rooms={rooms} cardLabels={cardLabels} filterLabels={filterLabels} />
+          <InternalLinks currentPath="/rooms" />
         </div>
       </section>
     </div>

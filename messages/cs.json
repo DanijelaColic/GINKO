@@ -7,18 +7,18 @@
   "metadata": {
     "layout": {
       "title": {
-        "default": "Ginko Boutique Rooms & Wellness Daruvar",
-        "template": "%s | Ginko Boutique Rooms & Wellness Daruvar"
+        "default": "Pokoje a wellness v Daruvaru | Ginko Boutique Rooms",
+        "template": "%s | Ginko Boutique Rooms"
       },
-      "description": "Boutique pokoje v srdci Daruvaru v Chorvatsku — WiFi, klimatizace, sauna a parkování zdarma. Rezervujte přímo, bez zprostředkovatele.",
+      "description": "Boutique pokoje a wellness v srdci Daruvaru v Chorvatsku — ~400 m od lázní, WiFi, klimatizace, sauna a parkování zdarma. Rezervujte přímo, bez zprostředkovatele.",
       "openGraph": {
-        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
-        "description": "Boutique pokoje v srdci Daruvaru. Sauna, terasa, parkování zdarma. Rezervujte přímo.",
-        "imageAlt": "Ginko Boutique Rooms & Wellness – Daruvar, Chorvatsko"
+        "title": "Pokoje a wellness v Daruvaru | Ginko Boutique Rooms",
+        "description": "Boutique pokoje v centru Daruvaru, ~400 m od lázní. Sauna, terasa, parkování zdarma. Rezervujte přímo.",
+        "imageAlt": "Ginko Boutique Rooms & Wellness – Ulica Tomaša Garika Masaryka 1, Daruvar"
       },
       "twitter": {
-        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
-        "description": "Boutique pokoje v srdci Daruvaru v Chorvatsku. Rezervujte přímo."
+        "title": "Pokoje a wellness v Daruvaru | Ginko Boutique Rooms",
+        "description": "Boutique pokoje a wellness v Daruvaru v Chorvatsku. Rezervujte přímo."
       }
     },
     "structuredData": {
@@ -101,7 +101,7 @@
   },
   "homePage": {
     "heroTitle": "Ginko Boutique Rooms & Wellness",
-    "heroSubtitle": "Elegantní ubytování, wellness a úplný odpočinek v srdci města",
+    "heroSubtitle": "Boutique pokoje a wellness v srdci Daruvaru — lázně asi 400 m",
     "heroCta": "Prohlédnout pokoje",
     "bookCta": "Rezervovat nyní",
     "heroCheckIn": "Příjezd",
@@ -135,8 +135,8 @@
     "feature2Desc": "Rychlé internetové připojení ve všech pokojích.",
     "feature3Title": "Klimatizace",
     "feature3Desc": "Příjemná teplota v každém ročním období.",
-    "feature4Title": "Klidná lokalita",
-    "feature4Desc": "Obklopeni přírodou, daleko od hluku.",
+    "feature4Title": "Klidné centrum",
+    "feature4Desc": "V srdci města, s tichem večer po 23:00.",
     "feature5Title": "Domácí atmosféra",
     "feature5Desc": "Vřelé přivítání a tipy od místních hostitelů.",
     "feature6Title": "Flexibilní check-in",
@@ -173,9 +173,9 @@
       "01-living": "Ginko Boutique Rooms & Wellness — apartmán, obývací pokoj",
       "01-cover": "Ginko Boutique Rooms & Wellness — pokoj"
     },
-    "aboutP1": "V samém srdci Daruvaru, v ulici T. G. Masaryka 1, nabízí GINKO Boutique Rooms & Wellness jedinečné spojení elegance, pohodlí a odpočinku. Název jsme našli v nejstarším a nejznámějším stromu Ginkgo biloba v Evropě, který od 18. století zdobí park zámku Janković.",
-    "aboutP2": "Naše moderně zařízené pokoje a wellness apartmány se nacházejí v chráněném historickém jádru města, jen pár minut chůze od Daruvarských lázní a aquaparku Aquae Balissae. Díky vynikající poloze je GINKO ideální volbou pro wellness pobyt, rodinný víkend, služební cesty nebo rekonvalescenci po lékařských a estetických zákrocích.",
-    "aboutP3": "Ať už si chcete užít soukromý wellness, objevovat krásy Daruvaru, nebo najít klidné místo k odpočinku, GINKO Boutique Rooms & Wellness vám poskytne špičkový servis a pocit domova ve městě zeleně a piva.",
+    "aboutP1": "V samém srdci Daruvaru, na Ulici Tomaša Garika Masaryka 1, nabízí GINKO Boutique Rooms & Wellness jedinečné spojení elegance, pohodlí a odpočinku. Název jsme našli v nejstarším a nejznámějším stromu Ginkgo biloba v Evropě, který od 18. století zdobí park zámku Janković.",
+    "aboutP2": "Naše ubytování v Daruvaru — moderní [pokoje v Daruvaru](/sobe-daruvar) a wellness apartmány — leží v chráněném historickém jádru, jen pár minut chůze od Daruvarských lázní a aquaparku Aquae Ballisae. Pro důraz na blízkost bazénů viz [ubytování u lázní Daruvar](/smjestaj-uz-daruvarske-toplice). GINKO je ideální volbou pro wellness pobyt, rodinný víkend, služební cesty nebo rekonvalescenci po lékařských a estetických zákrocích.",
+    "aboutP3": "Ať už si chcete užít [soukromý wellness](/wellness-daruvar), objevovat Daruvar, nebo najít klidné místo k odpočinku, GINKO Boutique Rooms & Wellness vám poskytne špičkový servis a pocit domova ve městě zeleně a piva.",
     "ctaTitle": "Chystáte se na dovolenou?",
     "ctaSubtitle": "Rezervujte si pokoj ještě dnes a zajistěte si místo v našem klidném koutku Slavonie.",
     "ctaButton": "Rezervovat nyní",
@@ -216,7 +216,8 @@
       "surroundings": "Okolí",
       "facilities": "Vybavení",
       "bookCta": "Rezervovat"
-    }
+    },
+    "aboutHeading": "Boutique ubytování v centru Daruvaru"
   },
   "travelerQuestions": {
     "title": "Otázky cestovatelů",
@@ -306,8 +307,8 @@
   },
   "roomsPage": {
     "eyebrow": "Ubytování",
-    "title": "Naše pokoje",
-    "description": "Pokoje pečlivě zařízené s přírodními materiály a příjemnou atmosférou.",
+    "title": "Pokoje a apartmány v Daruvaru",
+    "description": "Boutique pokoje a apartmány v centru Daruvaru — lázně Daruvar a aquapark asi 400 m chůze. Porovnejte typy a rezervujte přímo.",
     "openGraph": {
       "title": "Pokoje – Ginko Boutique Rooms & Wellness Daruvar",
       "description": "Příjemné boutique pokoje v Daruvaru s přímou rezervací bez provize.",
@@ -336,7 +337,8 @@
       "maxPriceLabel": "Max. cena/noc",
       "any": "Libovolné",
       "noResults": "Žádné pokoje neodpovídají filtru."
-    }
+    },
+    "wellnessLink": "Soukromý wellness (sauna a vířivka)"
   },
   "roomDetailModal": {
     "close": "Zavřít",
