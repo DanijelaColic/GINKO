@@ -5,6 +5,8 @@ import type { RoomPriceDisplay } from '@/modules/booking/room-display-price';
 type Props = {
   display: RoomPriceDisplay;
   perNightLabel: string;
+  fromPerNightLabel: string;
+  fromPriceNote: string;
   selectDatesHint: string;
   /** Kompaktan prikaz u kartici */
   compact?: boolean;
@@ -14,12 +16,11 @@ type Props = {
   amountClassName?: string;
 };
 
-/**
- * Faza 1: fiksna €/noć ili hint bez zastarjelog broja.
- */
 export default function RoomPriceListing({
   display,
   perNightLabel,
+  fromPerNightLabel,
+  fromPriceNote,
   selectDatesHint,
   compact = false,
   extraPerNight = 0,
@@ -33,6 +34,22 @@ export default function RoomPriceListing({
       >
         {selectDatesHint}
       </p>
+    );
+  }
+
+  if (display.mode === 'from') {
+    const amount = display.perNight + extraPerNight;
+    return (
+      <div className={`space-y-1 ${className}`}>
+        <div className={`flex items-baseline gap-1.5 flex-wrap ${compact ? '' : ''}`}>
+          <p className={amountClassName}>
+            {fromPerNightLabel.replace('{amount}', String(amount))}
+          </p>
+        </div>
+        <p className={`text-xs text-muted leading-snug ${compact ? 'text-[11px]' : ''}`}>
+          {fromPriceNote}
+        </p>
+      </div>
     );
   }
 

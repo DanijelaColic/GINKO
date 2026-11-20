@@ -5,7 +5,9 @@
     "openGraphAlt": "Ginko Boutique Rooms & Wellness – pogled na smještaj"
   },
   "pricingDisplay": {
-    "selectDatesHint": "Cijena ovisi o terminu – odaberite datume."
+    "selectDatesHint": "Cijena ovisi o terminu – odaberite datume.",
+    "fromPerNight": "Od {amount} € / noć",
+    "fromPriceNote": "Za 2 odrasle osobe, referentni slobodni termin u idućih 90 dana. Konačna cijena ovisi o odabranim datumima."
   },
   "metadata": {
     "layout": {
@@ -601,7 +603,7 @@
       "submitting": "Priprema plaćanja…",
       "continueToPayment": "Nastavi na plaćanje",
       "step3Redirecting": "Kreiranje rezervacije i preusmjeravanje na plaćanje…",
-      "submit": "Nastavi na plaćanje · {totalPrice} €"
+      "submit": "Nastavi na plaćanje depozita – {deposit} €"
     },
     "success": {
       "title": "Upit za rezervaciju zaprimljen!",

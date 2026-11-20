@@ -22,6 +22,7 @@ import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { RichParagraph } from '@/modules/seo/rich-paragraph';
 import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF, OVERVIEW_SECTION_ID, CONTACT_PHONE_TEL, CONTACT_PHONE_DISPLAY } from '@/modules/booking/booking.config';
 import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
+import { getListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
 // Title/description/robots dolaze iz root layout getRootMetadata — ne ponavljati ovdje
 // (inače Next template napravi „Brand | Brand“).
@@ -67,6 +68,10 @@ export default async function HomePage() {
   }));
 
   const tPricing = await getTranslations('pricingDisplay');
+  const myRentPricingEnabled = isMyRentPricingEnabled();
+  const listingFromBySlug = myRentPricingEnabled
+    ? await getListingFromPriceMap()
+    : {};
 
   const availabilityLabels = {
     selectDates: t('availabilitySelectDates'),
@@ -91,6 +96,8 @@ export default async function HomePage() {
     reserve: t('availabilityReserve'),
     perNight: t('availabilityPerNight'),
     selectDatesPriceHint: tPricing('selectDatesHint'),
+    fromPerNightLabel: tPricing('fromPerNight'),
+    fromPriceNote: tPricing('fromPriceNote'),
     pricingUnavailable: t('availabilityPricingUnavailable'),
     depositLabel: t('availabilityDepositLabel'),
     nightOne: t('availabilityNightOne'),
@@ -256,7 +263,8 @@ export default async function HomePage() {
         <AvailabilitySection
           rooms={rooms}
           labels={availabilityLabels}
-          myRentPricingEnabled={isMyRentPricingEnabled()}
+          myRentPricingEnabled={myRentPricingEnabled}
+          listingFromBySlug={listingFromBySlug}
           reviewSummary={googleReviews
             ? { rating: googleReviews.rating, reviewCount: googleReviews.reviewCount }
             : null}

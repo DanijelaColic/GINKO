@@ -1,6 +1,8 @@
 import { describe, expect, it, vi } from 'vitest';
 import {
   MYRENT_INBOUND_CANCEL_REASON,
+  decideInboundCancel,
+  isMyRentActivationSchemaMissing,
   parseRentActiveFlag,
   runMyRentInboundCancelSync,
   shouldScanBookingForInboundCancel,
@@ -81,11 +83,17 @@ describe('runMyRentInboundCancelSync', () => {
     checkOut: '2026-12-17',
     myrentRentId: '2516049',
     myrentRentGuid: '93d6a393-d7d1-11f1-af57-9c6b006df76b',
+    seenActiveAt: '2026-11-01T00:00:00.000Z',
+  };
+  const markers = {
+    markSeenActive: async () => undefined,
+    markNotYetActive: async () => undefined,
   };
 
-  it('REZ-B70F45D4 scenario: active=N → cancel + audit reason', async () => {
+  it('active=N nakon viđenog active=Y → cancel + audit reason', async () => {
     const cancel = vi.fn(async () => 'cancelled' as const);
     const result = await runMyRentInboundCancelSync({
+      ...markers,
       listCandidates: async () => [candidate],
       fetchRentActive: async () => 'N',
       cancelBookingIfConfirmed: cancel,
@@ -103,9 +111,68 @@ describe('runMyRentInboundCancelSync', () => {
     expect(result.actions[0]?.outcome).toBe('cancelled');
   });
 
+  it('active=N bez prethodnog active=Y ne otkazuje', async () => {
+    const cancel = vi.fn(async () => 'cancelled' as const);
+    const markNotYetActive = vi.fn(async () => undefined);
+    const result = await runMyRentInboundCancelSync({
+      ...markers,
+      markNotYetActive,
+      listCandidates: async () => [{ ...candidate, seenActiveAt: null }],
+      fetchRentActive: async () => 'N',
+      cancelBookingIfConfirmed: cancel,
+    });
+    expect(result.cancelled).toBe(0);
+    expect(cancel).not.toHaveBeenCalled();
+    expect(markNotYetActive).toHaveBeenCalledTimes(1);
+    expect(result.actions[0]?.outcome).toBe('skipped_not_yet_active');
+  });
+
+  it('stari red bez seenActiveAt (nepotpuni podaci) ne otkazuje', async () => {
+    const cancel = vi.fn(async () => 'cancelled' as const);
+    const { seenActiveAt: _dropped, ...legacy } = candidate;
+    const result = await runMyRentInboundCancelSync({
+      ...markers,
+      listCandidates: async () => [legacy],
+      fetchRentActive: async () => 'N',
+      cancelBookingIfConfirmed: cancel,
+    });
+    expect(result.cancelled).toBe(0);
+    expect(cancel).not.toHaveBeenCalled();
+    expect(decideInboundCancel({
+      bookingStatus: 'confirmed',
+      active: 'N',
+      seenActiveAt: undefined,
+    })).toBe('skip_not_yet_active');
+  });
+
+  it('active=Y pa active=N: prvo zabilježi Y, zatim otkaži', async () => {
+    const cancel = vi.fn(async () => 'cancelled' as const);
+    const markSeenActive = vi.fn(async () => undefined);
+    const first = await runMyRentInboundCancelSync({
+      ...markers,
+      markSeenActive,
+      listCandidates: async () => [{ ...candidate, seenActiveAt: null }],
+      fetchRentActive: async () => 'Y',
+      cancelBookingIfConfirmed: cancel,
+    });
+    expect(first.cancelled).toBe(0);
+    expect(markSeenActive).toHaveBeenCalledTimes(1);
+    expect(cancel).not.toHaveBeenCalled();
+
+    const second = await runMyRentInboundCancelSync({
+      ...markers,
+      listCandidates: async () => [candidate],
+      fetchRentActive: async () => 'N',
+      cancelBookingIfConfirmed: cancel,
+    });
+    expect(second.cancelled).toBe(1);
+    expect(second.actions[0]?.outcome).toBe('cancelled');
+  });
+
   it('active=Y → ne mijenja booking', async () => {
     const cancel = vi.fn(async () => 'cancelled' as const);
     const result = await runMyRentInboundCancelSync({
+      ...markers,
       listCandidates: async () => [candidate],
       fetchRentActive: async () => 'Y',
       cancelBookingIfConfirmed: cancel,
@@ -118,6 +185,7 @@ describe('runMyRentInboundCancelSync', () => {
   it('unknown / API nejasan → ne mijenja status', async () => {
     const cancel = vi.fn(async () => 'cancelled' as const);
     const result = await runMyRentInboundCancelSync({
+      ...markers,
       listCandidates: async () => [candidate],
       fetchRentActive: async () => 'unknown',
       cancelBookingIfConfirmed: cancel,
@@ -129,12 +197,71 @@ describe('runMyRentInboundCancelSync', () => {
 
   it('već cancelled u raceu → skipped_already_cancelled', async () => {
     const result = await runMyRentInboundCancelSync({
+      ...markers,
       listCandidates: async () => [candidate],
       fetchRentActive: async () => 'N',
       cancelBookingIfConfirmed: async () => 'already_cancelled',
     });
     expect(result.cancelled).toBe(0);
     expect(result.actions[0]?.outcome).toBe('skipped_already_cancelled');
+  });
+
+  it('već otkazana rezervacija se preskače prije MyRent fetcha', async () => {
+    const fetchRentActive = vi.fn(async () => 'N' as const);
+    const cancel = vi.fn(async () => 'cancelled' as const);
+    const result = await runMyRentInboundCancelSync({
+      ...markers,
+      listCandidates: async () => [
+        { ...candidate, bookingStatus: 'cancelled' },
+      ],
+      fetchRentActive,
+      cancelBookingIfConfirmed: cancel,
+    });
+    expect(result.cancelled).toBe(0);
+    expect(fetchRentActive).not.toHaveBeenCalled();
+    expect(cancel).not.toHaveBeenCalled();
+    expect(result.actions[0]?.outcome).toBe('skipped_already_cancelled');
+  });
+
+  it('nedostupna migracija seen_active_at ne otkazuje', async () => {
+    const cancel = vi.fn(async () => 'cancelled' as const);
+    const result = await runMyRentInboundCancelSync({
+      ...markers,
+      listCandidates: async () => {
+        throw new Error(
+          'column myrent_booking_sync.seen_active_at does not exist',
+        );
+      },
+      fetchRentActive: async () => 'N',
+      cancelBookingIfConfirmed: cancel,
+    });
+    expect(result.migrationPending).toBe(true);
+    expect(result.cancelled).toBe(0);
+    expect(cancel).not.toHaveBeenCalled();
+    expect(
+      isMyRentActivationSchemaMissing(
+        new Error('column seen_active_at does not exist'),
+      ),
+    ).toBe(true);
+  });
+
+  it('privremena API greška ne otkazuje i ne briše seen_active_at', async () => {
+    const cancel = vi.fn(async () => 'cancelled' as const);
+    const markSeenActive = vi.fn(async () => undefined);
+    const result = await runMyRentInboundCancelSync({
+      ...markers,
+      markSeenActive,
+      listCandidates: async () => [candidate],
+      fetchRentActive: async () => {
+        throw new Error('MyRent timeout');
+      },
+      cancelBookingIfConfirmed: cancel,
+    });
+    expect(result.cancelled).toBe(0);
+    expect(result.errors).toBe(1);
+    expect(cancel).not.toHaveBeenCalled();
+    expect(markSeenActive).not.toHaveBeenCalled();
+    expect(result.actions[0]?.outcome).toBe('error');
   });
 
   it('ne poziva refund ni payment API (samo cancel callback)', async () => {

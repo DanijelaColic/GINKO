@@ -15,6 +15,7 @@ import RoomGrid from '@/components/hotel/RoomGrid';
 import { InternalLinks } from '@/components/seo/InternalLinks';
 import type { RoomLocale } from '@/modules/rooms/room.types';
 import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
+import { getListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -27,6 +28,9 @@ export default async function RoomsPage() {
   const tPricing = await getTranslations('pricingDisplay');
   const rooms = await getRooms(locale as RoomLocale);
   const myRentPricingEnabled = isMyRentPricingEnabled();
+  const listingFromBySlug = myRentPricingEnabled
+    ? await getListingFromPriceMap()
+    : {};
 
   const cardLabels = {
     itemLabel: t('itemLabel'),
@@ -41,6 +45,8 @@ export default async function RoomsPage() {
     book: t('actions.book'),
     wellnessBadge: t('wellnessBadge'),
     selectDatesHint: tPricing('selectDatesHint'),
+    fromPerNightLabel: tPricing('fromPerNight'),
+    fromPriceNote: tPricing('fromPriceNote'),
   };
 
   const filterLabels = {
@@ -79,6 +85,7 @@ export default async function RoomsPage() {
             cardLabels={cardLabels}
             filterLabels={filterLabels}
             myRentPricingEnabled={myRentPricingEnabled}
+            listingFromBySlug={listingFromBySlug}
           />
           <InternalLinks currentPath="/rooms" />
         </div>

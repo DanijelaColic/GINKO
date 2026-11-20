@@ -5,7 +5,9 @@
     "openGraphAlt": "Ginko Boutique Rooms & Wellness – accommodation view"
   },
   "pricingDisplay": {
-    "selectDatesHint": "Price depends on dates – select your stay."
+    "selectDatesHint": "Price depends on dates – select your stay.",
+    "fromPerNight": "From {amount} € / night",
+    "fromPriceNote": "For 2 adults, first available reference date in the next 90 days. Final price depends on your selected dates."
   },
   "metadata": {
     "layout": {
@@ -601,7 +603,7 @@
       "submitting": "Preparing payment…",
       "continueToPayment": "Continue to payment",
       "step3Redirecting": "Creating your booking and redirecting to payment…",
-      "submit": "Continue to payment · {totalPrice} €"
+      "submit": "Continue to deposit payment – {deposit} €"
     },
     "success": {
       "title": "Booking inquiry received!",

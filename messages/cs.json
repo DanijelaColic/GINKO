@@ -5,7 +5,9 @@
     "openGraphAlt": "Ginko Boutique Rooms & Wellness – pohled na ubytování"
   },
   "pricingDisplay": {
-    "selectDatesHint": "Cena závisí na termínu – vyberte data."
+    "selectDatesHint": "Cena závisí na termínu – vyberte data.",
+    "fromPerNight": "Od {amount} € / noc",
+    "fromPriceNote": "Pro 2 dospělé, první volný referenční termín v příštích 90 dnech. Konečná cena závisí na zvolených datech."
   },
   "metadata": {
     "layout": {
@@ -601,7 +603,7 @@
       "submitting": "Příprava platby…",
       "continueToPayment": "Pokračovat k platbě",
       "step3Redirecting": "Vytvářím rezervaci a přesměrovávám na platbu…",
-      "submit": "Pokračovat k platbě · {totalPrice} €"
+      "submit": "Pokračovat k platbě zálohy – {deposit} €"
     },
     "success": {
       "title": "Poptávka rezervace přijata!",

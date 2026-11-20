@@ -20,6 +20,7 @@ type SyncIssue = {
   lastAttemptedAt: string | null;
   depositPaid: boolean | null;
   bookingStatus: string | null;
+  issueKind?: 'sync' | 'activation';
 };
 
 function statusLabel(status: string): string {
@@ -37,7 +38,7 @@ function statusLabel(status: string): string {
     case 'pending':
       return 'Na čekanju';
     case 'live_ok':
-      return 'Live OK';
+      return 'Upisano u MyRent, kalendar nije potvrđen';
     default:
       return status;
   }
@@ -93,6 +94,10 @@ export default function MyRentSyncIssuesBanner() {
     () => issues.filter((i) => i.syncStatus === 'failed').length,
     [issues],
   );
+  const calendarGapCount = useMemo(
+    () => issues.filter((i) => i.issueKind === 'activation').length,
+    [issues],
+  );
 
   // Prikaži plaćene bez potvrde prvo
   const sortedIssues = useMemo(() => {
@@ -129,6 +134,9 @@ export default function MyRentSyncIssuesBanner() {
                   : ''}
               {uncertainCount > 0 ? ` · ${uncertainCount} uncertain` : ''}
               {failedCount > 0 ? ` · ${failedCount} s greškom` : ''}
+              {calendarGapCount > 0
+                ? ` · ${calendarGapCount} plaćenih bez zatvorenog MyRent kalendara`
+                : ''}
             </p>
             <button
               type="button"
@@ -168,7 +176,11 @@ export default function MyRentSyncIssuesBanner() {
                       <span className="font-semibold">
                         {bookingReference(i.bookingId)}
                       </span>
-                      {i.depositPaid === true ? (
+                      {i.issueKind === 'activation' ? (
+                        <span className="ml-1.5 inline-flex items-center rounded bg-amber-200/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-950">
+                          Plaćeno · kalendar nije zatvoren
+                        </span>
+                      ) : i.depositPaid === true ? (
                         <span className="ml-1.5 inline-flex items-center rounded bg-amber-200/80 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-amber-950">
                           Plaćeno · nije u MyRentu
                         </span>

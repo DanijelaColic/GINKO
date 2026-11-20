@@ -11,6 +11,7 @@ import BookingWidget from '@/components/hotel/BookingWidget';
 import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
 import { redirect } from '@/i18n/navigation';
 import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
+import { getListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -40,6 +41,10 @@ export default async function BookingPage({ searchParams }: Props) {
   const t = await getTranslations('bookingPage');
   const { room, checkIn, checkOut, adults, children, childAges, breakfast, step } = await searchParams;
   const googleReviews = await getGoogleReviews();
+  const myRentPricingEnabled = isMyRentPricingEnabled();
+  const listingFromBySlug = myRentPricingEnabled
+    ? await getListingFromPriceMap()
+    : {};
   const reviewSummary = googleReviews
     ? { rating: googleReviews.rating, reviewCount: googleReviews.reviewCount }
     : null;
@@ -63,7 +68,8 @@ export default async function BookingPage({ searchParams }: Props) {
             initialBreakfast={breakfast}
             initialStep={parseInitialStep(step)}
             reviewSummary={reviewSummary}
-            myRentPricingEnabled={isMyRentPricingEnabled()}
+            myRentPricingEnabled={myRentPricingEnabled}
+            listingFromBySlug={listingFromBySlug}
           />
         </div>
       </section>

@@ -7,6 +7,7 @@ import { Link } from '@/i18n/navigation';
 import type { Room } from '@/modules/rooms/room.types';
 import { buildAvailabilityHref } from '@/modules/booking/booking.config';
 import { getRoomPriceDisplay } from '@/modules/booking/room-display-price';
+import type { ListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 import RoomPriceListing from '@/components/hotel/RoomPriceListing';
 
 type Props = {
@@ -27,8 +28,11 @@ type Props = {
     /** Badge + deep-link za ginko-spa-2 → /wellness-daruvar */
     wellnessBadge?: string;
     selectDatesHint: string;
+    fromPerNightLabel: string;
+    fromPriceNote: string;
   };
   myRentPricingEnabled?: boolean;
+  listingFromBySlug?: ListingFromPriceMap;
 };
 
 export default function RoomCard({
@@ -36,9 +40,14 @@ export default function RoomCard({
   labels,
   priority = false,
   myRentPricingEnabled = false,
+  listingFromBySlug,
 }: Props) {
   const isWellnessUnit = room.slug === 'ginko-spa-2' && Boolean(labels.wellnessBadge);
-  const priceDisplay = getRoomPriceDisplay(room, myRentPricingEnabled);
+  const priceDisplay = getRoomPriceDisplay(
+    room,
+    myRentPricingEnabled,
+    listingFromBySlug?.[room.slug],
+  );
 
   return (
     <div className="rounded-2xl border border-stone bg-white overflow-hidden flex flex-col">
@@ -129,6 +138,8 @@ export default function RoomCard({
             <RoomPriceListing
               display={priceDisplay}
               perNightLabel={labels.perNight}
+              fromPerNightLabel={labels.fromPerNightLabel}
+              fromPriceNote={labels.fromPriceNote}
               selectDatesHint={labels.selectDatesHint}
             />
           </div>

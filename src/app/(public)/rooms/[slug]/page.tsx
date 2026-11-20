@@ -31,6 +31,7 @@ import {
   getJsonLdOfferPrice,
   getRoomPriceDisplay,
 } from '@/modules/booking/room-display-price';
+import { getListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -80,8 +81,20 @@ export default async function RoomDetailPage({ params }: Props) {
 
   const myRentPricingEnabled = isMyRentPricingEnabled();
   const tPricing = await getTranslations('pricingDisplay');
-  const priceDisplay = getRoomPriceDisplay(room, myRentPricingEnabled);
-  const jsonLdOfferPrice = getJsonLdOfferPrice(room, myRentPricingEnabled);
+  const listingFromBySlug = myRentPricingEnabled
+    ? await getListingFromPriceMap()
+    : {};
+  const listingEntry = listingFromBySlug[room.slug] ?? null;
+  const priceDisplay = getRoomPriceDisplay(
+    room,
+    myRentPricingEnabled,
+    listingEntry,
+  );
+  const jsonLdOfferPrice = getJsonLdOfferPrice(
+    room,
+    myRentPricingEnabled,
+    listingEntry,
+  );
 
   // Soba prvo, zatim zajednički prostori (bez dupliciranja datoteka)
   const galleryImages = appendSharedPropertyImages(room.images);
@@ -288,6 +301,18 @@ export default async function RoomDetailPage({ params }: Props) {
                       <p className="text-sm text-muted leading-snug">
                         {tPricing('selectDatesHint')}
                       </p>
+                    ) : priceDisplay.mode === 'from' ? (
+                      <div className="space-y-2">
+                        <p className="text-2xl text-primary font-bold">
+                          {tPricing('fromPerNight').replace(
+                            '{amount}',
+                            String(priceDisplay.perNight),
+                          )}
+                        </p>
+                        <p className="text-xs text-muted leading-snug">
+                          {tPricing('fromPriceNote')}
+                        </p>
+                      </div>
                     ) : (
                       <div className="flex justify-between items-center">
                         <span className="text-sm text-muted">{t('price.perNight')}</span>

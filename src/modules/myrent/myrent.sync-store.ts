@@ -12,6 +12,9 @@ import type {
 export type SyncStoreRow = MyRentSyncRecord & {
   attemptCount: number;
   syncLockUntil: string | null;
+  seenActiveAt?: string | null;
+  calendarBlocked?: boolean | null;
+  activationIssue?: string | null;
 };
 
 export type OneShotClaimResult = {
@@ -45,6 +48,18 @@ export type MyRentSyncStore = {
   }>;
   releaseLock(bookingId: string): Promise<void>;
   listNeedingAttention(): Promise<SyncStoreRow[]>;
+  /**
+   * Samo stupci aktivacije (019). Ne dira status ni confirmed_live_sync.
+   * seenActiveAt se postavlja samo kad je rent viđen kao active=Y, i ne pregazi stariji trenutak.
+   */
+  recordActivationObservation?(input: {
+    bookingId: string;
+    seenActiveAt: string | null;
+    calendarBlocked: boolean | null;
+    activationIssue: string | null;
+    checkedAt: string;
+  }): Promise<void>;
+  listActivationGaps?(): Promise<SyncStoreRow[]>;
   recordAlert(
     alert: Omit<MyRentAdminAlert, 'id' | 'createdAt' | 'acknowledged'>,
   ): Promise<MyRentAdminAlert>;
@@ -65,6 +80,18 @@ function rowFromDb(r: Record<string, unknown>): SyncStoreRow {
       ? String(r.last_attempted_at)
       : String(r.updated_at ?? new Date().toISOString()),
     confirmedLiveSync: r.confirmed_live_sync === true,
+    seenActiveAt:
+      typeof r.seen_active_at === 'string' && r.seen_active_at
+        ? r.seen_active_at
+        : null,
+    calendarBlocked:
+      r.calendar_blocked === true
+        ? true
+        : r.calendar_blocked === false
+          ? false
+          : null,
+    activationIssue:
+      typeof r.activation_issue === 'string' ? r.activation_issue : null,
     attemptCount: typeof r.attempt_count === 'number' ? r.attempt_count : 0,
     syncLockUntil: r.sync_lock_until ? String(r.sync_lock_until) : null,
   };
@@ -101,6 +128,10 @@ export function createMemoryMyRentSyncStore(): MyRentSyncStore {
         attemptCount:
           record.attemptCount ?? (prev?.attemptCount ?? 0) + 1,
         syncLockUntil: prev?.syncLockUntil ?? null,
+        // save() ne smije obrisati provjeru aktivacije
+        seenActiveAt: prev?.seenActiveAt ?? null,
+        calendarBlocked: prev?.calendarBlocked ?? null,
+        activationIssue: prev?.activationIssue ?? null,
       });
     },
     async claimOneShotAttempt(input) {
@@ -171,6 +202,24 @@ export function createMemoryMyRentSyncStore(): MyRentSyncStore {
             r.status === 'skipped_disabled' ||
             r.status === 'mocked_ok' ||
             r.status === 'pending'),
+      );
+    },
+    async recordActivationObservation(input) {
+      const prev = byBooking.get(input.bookingId);
+      if (!prev) return;
+      byBooking.set(input.bookingId, {
+        ...prev,
+        seenActiveAt: prev.seenActiveAt ?? input.seenActiveAt,
+        calendarBlocked: input.calendarBlocked,
+        activationIssue: input.activationIssue,
+      });
+    },
+    async listActivationGaps() {
+      return [...byBooking.values()].filter(
+        (r) =>
+          r.confirmedLiveSync === true &&
+          r.status === 'live_ok' &&
+          (r.activationIssue != null || r.calendarBlocked === false),
       );
     },
     async recordAlert(alert) {
@@ -336,6 +385,46 @@ export function createSupabaseMyRentSyncStore(): MyRentSyncStore {
           'pending',
         ])
         .order('last_attempted_at', { ascending: false });
+      if (error) throw error;
+      return (data ?? []).map((r) => rowFromDb(r as Record<string, unknown>));
+    },
+
+    async recordActivationObservation(input) {
+      const supabase = createServerSupabaseClient();
+      const patch: Record<string, unknown> = {
+        calendar_blocked: input.calendarBlocked,
+        activation_issue: input.activationIssue,
+        activation_checked_at: input.checkedAt,
+        updated_at: input.checkedAt,
+      };
+      const { error } = await supabase
+        .from('myrent_booking_sync')
+        .update(patch)
+        .eq('booking_id', input.bookingId);
+      if (error) throw error;
+
+      if (input.seenActiveAt) {
+        const seen = await supabase
+          .from('myrent_booking_sync')
+          .update({
+            seen_active_at: input.seenActiveAt,
+            updated_at: input.checkedAt,
+          })
+          .eq('booking_id', input.bookingId)
+          .is('seen_active_at', null);
+        if (seen.error) throw seen.error;
+      }
+    },
+
+    async listActivationGaps() {
+      const supabase = createServerSupabaseClient();
+      const { data, error } = await supabase
+        .from('myrent_booking_sync')
+        .select('*')
+        .eq('confirmed_live_sync', true)
+        .eq('status', 'live_ok')
+        .or('activation_issue.not.is.null,calendar_blocked.eq.false')
+        .order('activation_checked_at', { ascending: false });
       if (error) throw error;
       return (data ?? []).map((r) => rowFromDb(r as Record<string, unknown>));
     },

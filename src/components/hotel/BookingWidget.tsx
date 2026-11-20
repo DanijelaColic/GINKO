@@ -50,6 +50,7 @@ import type { PriceBreakdown } from '@/modules/booking/booking.types';
 import { useStayPriceQuote } from '@/components/hotel/useStayPriceQuote';
 import { usesMyRentStayPricing } from '@/modules/myrent/myrent.pricing-config';
 import { getRoomPriceDisplay } from '@/modules/booking/room-display-price';
+import type { ListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
 const DEPOSIT_PCT_DISPLAY = Math.round(DEPOSIT_PERCENT * 100);
 const BALANCE_PCT_DISPLAY = 100 - DEPOSIT_PCT_DISPLAY;
@@ -80,6 +81,7 @@ type Props = {
    * bez quote API poziva (postojeće ponašanje).
    */
   myRentPricingEnabled?: boolean;
+  listingFromBySlug?: ListingFromPriceMap;
 };
 
 export default function BookingWidget({
@@ -97,6 +99,7 @@ export default function BookingWidget({
   rulesText,
   reviewSummary,
   myRentPricingEnabled = false,
+  listingFromBySlug,
 }: Props) {
   const locale = useLocale();
   const router = useRouter();
@@ -704,11 +707,20 @@ export default function BookingWidget({
             className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
           >
             {availableRooms.map((r) => {
-              const display = getRoomPriceDisplay(r, myRentPricingEnabled);
+              const display = getRoomPriceDisplay(
+                r,
+                myRentPricingEnabled,
+                listingFromBySlug?.[r.slug],
+              );
               const pricePart =
                 display.mode === 'fixed'
                   ? `${display.perNight}€/${t('form.perNight')}`
-                  : tPricing('selectDatesHint');
+                  : display.mode === 'from'
+                    ? tPricing('fromPerNight').replace(
+                        '{amount}',
+                        String(display.perNight),
+                      )
+                    : tPricing('selectDatesHint');
               return (
                 <option key={r.slug} value={r.slug}>
                   {r.name} — {r.capacityNote} · {pricePart}
@@ -1218,7 +1230,7 @@ export default function BookingWidget({
                 }
                 className="flex-1 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-full transition-colors text-sm flex items-center justify-center gap-2"
               >
-                {t('form.submit', { totalPrice: priceData.totalPrice })} →
+                {t('form.submit', { deposit: priceData.deposit })} →
               </button>
             </div>
           </form>

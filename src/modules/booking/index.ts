@@ -33,6 +33,11 @@ export {
   getJsonLdOfferPrice,
 } from './room-display-price';
 export type { RoomPriceDisplay } from './room-display-price';
+export { getListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
+export type {
+  ListingFromPriceEntry,
+  ListingFromPriceMap,
+} from '@/modules/myrent/myrent.listing-from-price';
 export type {
   StayPriceQuoteResponse,
   StayPriceQuoteRequest,

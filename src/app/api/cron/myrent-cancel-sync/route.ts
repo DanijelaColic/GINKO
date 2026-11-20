@@ -30,7 +30,11 @@ export async function GET(request: NextRequest) {
         errors: result.errors,
       }),
     );
-    return NextResponse.json({ ok: true, ...result });
+    return NextResponse.json({
+      ok: true,
+      ...result,
+      // migrationPending: nema otkazivanja dok 019 nije u bazi
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
     console.error('[cron/myrent-cancel-sync] failed:', message);

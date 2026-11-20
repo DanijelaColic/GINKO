@@ -25,6 +25,7 @@ import type { RoomReserveState } from '@/components/hotel/room-reserve-state';
 import { nightCountLabel, type AvailabilityLabels } from '@/components/hotel/AvailabilitySection';
 import { roomNeedsExtraBed } from '@/modules/booking/guest-occupancy';
 import { getRoomPriceDisplay } from '@/modules/booking/room-display-price';
+import type { ListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
 type RoomStatus = {
   available: boolean;
@@ -46,6 +47,7 @@ type Props = {
   breakfastPerNight: number;
   labels: AvailabilityLabels;
   myRentPricingEnabled?: boolean;
+  listingFromBySlug?: ListingFromPriceMap;
   reviewSummary?: GoogleReviewSummary | null;
   reserveState: RoomReserveState;
   onClose: () => void;
@@ -63,6 +65,7 @@ export default function RoomDetailModal({
   breakfastPerNight,
   labels,
   myRentPricingEnabled = false,
+  listingFromBySlug,
   reviewSummary,
   reserveState,
   onClose,
@@ -90,9 +93,13 @@ export default function RoomDetailModal({
   }, []);
 
   const needsExtra = roomNeedsExtraBed(room, adults, childAges);
-  const listingDisplay = getRoomPriceDisplay(room, myRentPricingEnabled);
-  const fixedPerNight =
-    listingDisplay.mode === 'fixed'
+  const listingDisplay = getRoomPriceDisplay(
+    room,
+    myRentPricingEnabled,
+    listingFromBySlug?.[room.slug],
+  );
+  const listingPerNight =
+    listingDisplay.mode === 'fixed' || listingDisplay.mode === 'from'
       ? listingDisplay.perNight + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0)
       : null;
   const breakfastExtra = plan.breakfast
@@ -101,11 +108,12 @@ export default function RoomDetailModal({
   const breakfastNight = plan.breakfast ? breakfastPerNight : 0;
 
   const showListingHint = !searched && listingDisplay.mode === 'select_dates';
+  const showFromListing = !searched && listingDisplay.mode === 'from';
   const displayTotal =
     searched && status?.available && status.totalPrice
       ? status.totalPrice + breakfastExtra
-      : fixedPerNight != null
-        ? fixedPerNight + breakfastNight
+      : listingPerNight != null
+        ? listingPerNight + breakfastNight
         : null;
 
   const nights = status?.nights ?? 0;
@@ -310,6 +318,20 @@ export default function RoomDetailModal({
                 <p className="text-sm text-muted leading-snug">
                   {labels.selectDatesPriceHint}
                 </p>
+              ) : showFromListing && labels.fromPerNightLabel ? (
+                <div>
+                  <p className="text-lg sm:text-xl font-bold text-emerald-700 leading-snug">
+                    {labels.fromPerNightLabel.replace(
+                      '{amount}',
+                      String(listingPerNight ?? listingDisplay.perNight),
+                    )}
+                  </p>
+                  {labels.fromPriceNote ? (
+                    <p className="text-[11px] text-muted mt-1 leading-snug">
+                      {labels.fromPriceNote}
+                    </p>
+                  ) : null}
+                </div>
               ) : displayTotal != null ? (
                 <>
                   <p className="text-xl sm:text-2xl font-bold text-emerald-700 leading-none">
@@ -335,7 +357,7 @@ export default function RoomDetailModal({
                 <Check size={15} className="shrink-0 mt-0.5" />
                 <span>{t('freeCancellation')}</span>
               </p>
-              {!showListingHint && displayTotal != null && (
+              {!showListingHint && !showFromListing && displayTotal != null && (
                 <>
                   <p className="flex items-start gap-2 text-sm text-text">
                     <Check size={15} className="shrink-0 mt-0.5 text-primary" />
@@ -348,7 +370,7 @@ export default function RoomDetailModal({
                   </p>
                 </>
               )}
-              {!showListingHint && displayTotal != null && (
+              {!showListingHint && !showFromListing && displayTotal != null && (
                 <p className="text-sm text-muted pl-[23px]">
                   {t('balanceAtProperty', {
                     percent: balancePct,

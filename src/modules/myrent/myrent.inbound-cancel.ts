@@ -2,8 +2,10 @@
  * MyRent → Ginko: periodična sinkronizacija otkazivanja.
  *
  * Samo confirmed bookinge s live_ok syncom + myrent_rent_id.
- * active=N → bookings.status=cancelled + audit.
- * Nikad Saferpay refund. Fail-closed pri API grešci / nejasnom odgovoru.
+ * active=N otkazuje SAMO ako je seen_active_at već postavljen (rent je
+ * barem jednom viđen kao active=Y). Nikad aktivirana rezervacija ostaje
+ * confirmed. Nikad Saferpay refund. Fail-closed pri API grešci,
+ * nejasnom odgovoru ili nedostajućoj migraciji 019.
  */
 
 import { createServerSupabaseClient } from '@/lib/supabase';
@@ -20,6 +22,8 @@ export type InboundCancelCandidate = {
   checkOut: string;
   myrentRentId: string;
   myrentRentGuid: string | null;
+  /** NULL / izostavljeno = nikad potvrđeno active=Y (stari red ili migracija prazna). */
+  seenActiveAt?: string | null;
 };
 
 export type RentActiveStatus = 'Y' | 'N' | 'unknown';
@@ -34,7 +38,11 @@ export type InboundCancelAction =
   | {
       bookingId: string;
       myrentRentId: string;
-      outcome: 'skipped_already_cancelled' | 'skipped_still_active' | 'skipped_unknown';
+      outcome:
+        | 'skipped_already_cancelled'
+        | 'skipped_still_active'
+        | 'skipped_not_yet_active'
+        | 'skipped_unknown';
       detail?: string;
     }
   | {
@@ -50,7 +58,34 @@ export type InboundCancelSyncResult = {
   skipped: number;
   errors: number;
   actions: InboundCancelAction[];
+  /** true = stupac seen_active_at nije u bazi; ništa nije otkazano. */
+  migrationPending?: boolean;
 };
+
+/** active=N bez prethodnog Y ne otkazuje. Y pa kasnije N otkazuje. */
+export function decideInboundCancel(params: {
+  bookingStatus: string;
+  active: RentActiveStatus;
+  seenActiveAt?: string | null;
+}):
+  | 'cancel'
+  | 'skip_already_cancelled'
+  | 'skip_still_active'
+  | 'skip_not_yet_active'
+  | 'skip_unknown' {
+  if (params.bookingStatus === 'cancelled') return 'skip_already_cancelled';
+  if (params.active === 'Y') return 'skip_still_active';
+  if (params.active !== 'N') return 'skip_unknown';
+  if (!params.seenActiveAt) return 'skip_not_yet_active';
+  return 'cancel';
+}
+
+export function isMyRentActivationSchemaMissing(error: unknown): boolean {
+  const message = error instanceof Error ? error.message : String(error ?? '');
+  return /seen_active_at|calendar_blocked|activation_issue|activation_checked_at/i.test(
+    message,
+  );
+}
 
 /** UTC YYYY-MM-DD — ne sinkaj povijesne (check_out < today). */
 export function utcTodayIsoDate(now: Date = new Date()): string {
@@ -116,6 +151,10 @@ export type InboundCancelDeps = {
   fetchRentActive: (
     candidate: InboundCancelCandidate,
   ) => Promise<RentActiveStatus>;
+  /** Prvi put active=Y — ne otkazuje. */
+  markSeenActive?: (candidate: InboundCancelCandidate) => Promise<void>;
+  /** active=N prije ikakvog Y — admin signal, bez otkazivanja. */
+  markNotYetActive?: (candidate: InboundCancelCandidate) => Promise<void>;
   cancelBookingIfConfirmed: (params: {
     bookingId: string;
     myrentRentId: string;
@@ -204,6 +243,7 @@ export async function listInboundCancelCandidatesFromSupabase(): Promise<
       confirmed_live_sync,
       myrent_rent_id,
       myrent_rent_guid,
+      seen_active_at,
       bookings!inner (
         id,
         status,
@@ -248,6 +288,10 @@ export async function listInboundCancelCandidatesFromSupabase(): Promise<
         typeof row.myrent_rent_guid === 'string' && row.myrent_rent_guid.trim()
           ? row.myrent_rent_guid.trim()
           : null,
+      seenActiveAt:
+        typeof row.seen_active_at === 'string' && row.seen_active_at
+          ? row.seen_active_at
+          : null,
       syncStatus: String(row.status ?? ''),
       confirmedLiveSync: row.confirmed_live_sync === true,
     };
@@ -272,6 +316,7 @@ export async function listInboundCancelCandidatesFromSupabase(): Promise<
       checkOut: candidate.checkOut,
       myrentRentId: candidate.myrentRentId,
       myrentRentGuid: candidate.myrentRentGuid,
+      seenActiveAt: candidate.seenActiveAt,
     });
   }
 
@@ -325,16 +370,69 @@ export async function cancelBookingFromMyRentInSupabase(params: {
   return 'cancelled';
 }
 
+async function markSeenActiveInSupabase(
+  candidate: InboundCancelCandidate,
+): Promise<void> {
+  const supabase = createServerSupabaseClient();
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from('myrent_booking_sync')
+    .update({
+      seen_active_at: now,
+      updated_at: now,
+    })
+    .eq('booking_id', candidate.bookingId)
+    .is('seen_active_at', null);
+  if (error) throw error;
+}
+
+async function markNotYetActiveInSupabase(
+  candidate: InboundCancelCandidate,
+): Promise<void> {
+  const supabase = createServerSupabaseClient();
+  const now = new Date().toISOString();
+  const { error } = await supabase
+    .from('myrent_booking_sync')
+    .update({
+      activation_issue: 'not_yet_active',
+      activation_checked_at: now,
+      calendar_blocked: false,
+      updated_at: now,
+    })
+    .eq('booking_id', candidate.bookingId);
+  if (error) throw error;
+}
+
 export async function runMyRentInboundCancelSync(
   deps?: Partial<InboundCancelDeps>,
 ): Promise<InboundCancelSyncResult> {
   const listCandidates =
     deps?.listCandidates ?? listInboundCancelCandidatesFromSupabase;
   const fetchRentActive = deps?.fetchRentActive ?? fetchMyRentRentActiveStatus;
+  const markSeenActive = deps?.markSeenActive ?? markSeenActiveInSupabase;
+  const markNotYetActive = deps?.markNotYetActive ?? markNotYetActiveInSupabase;
   const cancelBookingIfConfirmed =
     deps?.cancelBookingIfConfirmed ?? cancelBookingFromMyRentInSupabase;
 
-  const candidates = await listCandidates();
+  let candidates: InboundCancelCandidate[];
+  try {
+    candidates = await listCandidates();
+  } catch (err) {
+    if (isMyRentActivationSchemaMissing(err)) {
+      console.error(
+        '[myrent-inbound-cancel] migracija 019 (seen_active_at) nije primijenjena — nema otkazivanja.',
+      );
+      return {
+        scanned: 0,
+        cancelled: 0,
+        skipped: 0,
+        errors: 0,
+        actions: [],
+        migrationPending: true,
+      };
+    }
+    throw err;
+  }
   const actions: InboundCancelAction[] = [];
   let cancelled = 0;
   let skipped = 0;
@@ -376,7 +474,26 @@ export async function runMyRentInboundCancelSync(
       continue;
     }
 
-    if (active === 'Y') {
+    const decision = decideInboundCancel({
+      bookingStatus: candidate.bookingStatus,
+      active,
+      seenActiveAt: candidate.seenActiveAt,
+    });
+
+    if (decision === 'skip_still_active') {
+      if (!candidate.seenActiveAt) {
+        try {
+          await markSeenActive(candidate);
+        } catch (err) {
+          if (!isMyRentActivationSchemaMissing(err)) {
+            console.error(
+              '[myrent-inbound-cancel] seen_active_at nije zapisano:',
+              candidate.bookingId,
+              err instanceof Error ? err.message : err,
+            );
+          }
+        }
+      }
       skipped += 1;
       actions.push({
         bookingId: candidate.bookingId,
@@ -386,13 +503,35 @@ export async function runMyRentInboundCancelSync(
       continue;
     }
 
-    if (active !== 'N') {
+    if (decision === 'skip_unknown') {
       skipped += 1;
       actions.push({
         bookingId: candidate.bookingId,
         myrentRentId: candidate.myrentRentId,
         outcome: 'skipped_unknown',
         detail: 'myrent_active_unclear',
+      });
+      continue;
+    }
+
+    if (decision === 'skip_not_yet_active') {
+      try {
+        await markNotYetActive(candidate);
+      } catch (err) {
+        if (!isMyRentActivationSchemaMissing(err)) {
+          console.error(
+            '[myrent-inbound-cancel] activation_issue nije zapisano:',
+            candidate.bookingId,
+            err instanceof Error ? err.message : err,
+          );
+        }
+      }
+      skipped += 1;
+      actions.push({
+        bookingId: candidate.bookingId,
+        myrentRentId: candidate.myrentRentId,
+        outcome: 'skipped_not_yet_active',
+        detail: 'never_seen_active_Y',
       });
       continue;
     }

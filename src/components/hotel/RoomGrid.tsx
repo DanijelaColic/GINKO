@@ -7,6 +7,7 @@ import RoomCard from './RoomCard';
 import RoomFilters from './RoomFilters';
 import type { Room } from '@/modules/rooms/room.types';
 import { getRoomPriceDisplay } from '@/modules/booking/room-display-price';
+import type { ListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
 type CardLabels = React.ComponentProps<typeof RoomCard>['labels'];
 
@@ -20,6 +21,7 @@ type Props = {
     noResults: string;
   };
   myRentPricingEnabled?: boolean;
+  listingFromBySlug?: ListingFromPriceMap;
 };
 
 export default function RoomGrid({
@@ -27,14 +29,20 @@ export default function RoomGrid({
   cardLabels,
   filterLabels,
   myRentPricingEnabled = false,
+  listingFromBySlug,
 }: Props) {
   const maxGuests = Math.max(...rooms.map((r) => r.capacity), 1);
-  const fixedPrices = rooms
-    .map((r) => getRoomPriceDisplay(r, myRentPricingEnabled))
-    .filter((d): d is { mode: 'fixed'; perNight: number } => d.mode === 'fixed')
+  const filterablePrices = rooms
+    .map((r) =>
+      getRoomPriceDisplay(r, myRentPricingEnabled, listingFromBySlug?.[r.slug]),
+    )
+    .filter(
+      (d): d is { mode: 'fixed' | 'from'; perNight: number } =>
+        d.mode === 'fixed' || d.mode === 'from',
+    )
     .map((d) => d.perNight);
-  const maxPrice = Math.max(...fixedPrices, 200);
-  const hideMaxPrice = myRentPricingEnabled;
+  const maxPrice = Math.max(...filterablePrices, 200);
+  const hideMaxPrice = false;
 
   const [guests, setGuests] = useState(0);
   const [price, setPrice] = useState(0);
@@ -42,8 +50,17 @@ export default function RoomGrid({
   const filtered = rooms.filter((r) => {
     if (guests > 0 && r.capacity < guests) return false;
     if (price > 0) {
-      const display = getRoomPriceDisplay(r, myRentPricingEnabled);
-      if (display.mode === 'fixed' && display.perNight > price) return false;
+      const display = getRoomPriceDisplay(
+        r,
+        myRentPricingEnabled,
+        listingFromBySlug?.[r.slug],
+      );
+      if (
+        (display.mode === 'fixed' || display.mode === 'from') &&
+        display.perNight > price
+      ) {
+        return false;
+      }
     }
     return true;
   });
@@ -74,6 +91,7 @@ export default function RoomGrid({
               labels={cardLabels}
               priority={index === 0}
               myRentPricingEnabled={myRentPricingEnabled}
+              listingFromBySlug={listingFromBySlug}
             />
           ))}
         </div>
