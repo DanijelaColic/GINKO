@@ -5,8 +5,10 @@
  */
 
 import { createServerSupabaseClient } from '@/lib/supabase';
+import { getMyRentSyncStore } from './myrent.sync-store';
 import { syncBookingToMyRentAfterPayment } from './myrent.booking-sync';
 import type { BookingForMyRentSync } from './myrent.booking-payload';
+import { ensureMyRentDepositPaymentSync } from './myrent.payment-sync';
 
 /**
  * Učitaj booking (read-only) i pokreni MyRent sync nakon plaćanja.
@@ -48,6 +50,47 @@ export async function queueMyRentSyncAfterPayment(
     }
 
     const result = await syncBookingToMyRentAfterPayment(booking);
+
+    const rentId =
+      result?.record.myrentRentId ??
+      (await getMyRentSyncStore().get(bookingId))?.myrentRentId ??
+      null;
+    const rentGuid =
+      result?.record.myrentRentGuid ??
+      (await getMyRentSyncStore().get(bookingId))?.myrentRentGuid ??
+      null;
+    const rentReady =
+      result?.record.status === 'live_ok' ||
+      (result?.record.status === 'skipped_duplicate' && Boolean(rentId));
+    if (rentReady && rentId) {
+      const paymentResult = await ensureMyRentDepositPaymentSync({
+        booking,
+        myrentRentId: rentId,
+        myrentRentGuid: rentGuid,
+      });
+      if (paymentResult?.adminAlert) {
+        console.error(
+          '[myrent-payment-sync] UNCERTAIN — bez auto-resenda:',
+          bookingId,
+          paymentResult.adminAlert.message,
+        );
+      } else if (paymentResult?.record.status === 'live_ok') {
+        console.info(
+          '[myrent-payment-sync] live_ok:',
+          bookingId,
+          'rent',
+          rentId,
+          'amount',
+          paymentResult.record.amount,
+        );
+      } else if (paymentResult?.record.status === 'skipped_disabled') {
+        console.info(
+          '[myrent-payment-sync] skipped (gate/disabled):',
+          bookingId,
+          paymentResult.record.error,
+        );
+      }
+    }
 
     if (result?.adminAlert) {
       console.error(

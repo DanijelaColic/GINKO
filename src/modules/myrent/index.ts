@@ -112,6 +112,38 @@ export type {
 } from './myrent.types';
 
 export {
+  explainMyRentPaymentSyncBlocked,
+  getMyRentSaferpayPaymentMethodId,
+  isMyRentPaymentSyncFeatureEnabled,
+  isMyRentPaymentSyncLiveAllowedForBooking,
+  MYRENT_PRODUCTION_PAYMENT_SYNC_CONFIRM_TOKEN,
+  MYRENT_TEST_PAYMENT_SYNC_CONFIRM_TOKEN,
+} from './myrent.payment-sync-config';
+
+export {
+  ensureMyRentDepositPaymentSync,
+  isMyRentPaymentSyncBlocked,
+} from './myrent.payment-sync';
+export type {
+  MyRentPaymentSyncRecord,
+  MyRentPaymentSyncResult,
+  MyRentPaymentSyncStatus,
+  MyRentPaymentAddPayload,
+} from './myrent.payment-sync.types';
+export {
+  buildMyRentPaymentAddRequestBody,
+  executeLiveMyRentPaymentAdd,
+  parseMyRentPaymentAddResponse,
+  transportMyRentPaymentAdd,
+} from './myrent.payment-transport';
+export {
+  getMyRentPaymentSyncStore,
+  setMyRentPaymentSyncStoreForTests,
+  createMemoryMyRentPaymentSyncStore,
+} from './myrent.payment-sync-store';
+export { fetchMyRentAdvancePaidFlag } from './myrent.rent-deposit-read';
+
+export {
   getMyRentWriteConfig,
   getMyRentLiveWriteAllowlist,
   getMyRentTestLiveSiteHosts,
