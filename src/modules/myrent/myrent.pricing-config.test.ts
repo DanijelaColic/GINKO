@@ -5,7 +5,21 @@ import {
   isMyRentPricingMockBlockedOnProduction,
   isMyRentPricingMockRequested,
   isVercelProductionEnv,
+  usesMyRentStayPricing,
 } from './myrent.pricing-config';
+
+describe('usesMyRentStayPricing (hybrid)', () => {
+  it('ginko-spa-1 ostaje legacy čak i kad je flag uključen', () => {
+    expect(usesMyRentStayPricing('ginko-spa-1', true)).toBe(false);
+    expect(usesMyRentStayPricing('ginko-1', true)).toBe(true);
+    expect(usesMyRentStayPricing('ginko-spa-2', true)).toBe(true);
+  });
+
+  it('flag isključen → nijedan slug ne koristi MyRent stay pricing', () => {
+    expect(usesMyRentStayPricing('ginko-1', false)).toBe(false);
+    expect(usesMyRentStayPricing('ginko-spa-2', false)).toBe(false);
+  });
+});
 
 describe('isMyRentPricingEnabled', () => {
   it('zadano je isključeno', () => {

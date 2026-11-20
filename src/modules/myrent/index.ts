@@ -39,11 +39,13 @@ export {
 } from './myrent.calendar';
 
 export {
+  GINKO_LEGACY_ACCOMMODATION_PRICE_SLUGS,
   isMyRentPricingEnabled,
   isMyRentPricingMock,
   isMyRentPricingMockRequested,
   isMyRentPricingMockBlockedOnProduction,
   isVercelProductionEnv,
+  usesMyRentStayPricing,
 } from './myrent.pricing-config';
 export {
   MYRENT_PRICING_OPEN_QUESTIONS,

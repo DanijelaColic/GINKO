@@ -14,6 +14,8 @@ type Props = {
   };
   onGuestsChange: (v: number) => void;
   onPriceChange: (v: number) => void;
+  /** Faza 1: bez poznatih listing cijena za MyRent slugove */
+  hideMaxPrice?: boolean;
 };
 
 export default function RoomFilters({
@@ -24,6 +26,7 @@ export default function RoomFilters({
   labels,
   onGuestsChange,
   onPriceChange,
+  hideMaxPrice = false,
 }: Props) {
   return (
     <div className="flex flex-wrap gap-4 items-end">
@@ -44,19 +47,21 @@ export default function RoomFilters({
         </select>
       </label>
 
-      {/* Max price */}
-      <label className="flex flex-col gap-1 text-sm text-muted">
-        {labels.maxPriceLabel}: <strong className="text-text">{price > 0 ? `${price}€` : labels.any}</strong>
-        <input
-          type="range"
-          min={0}
-          max={maxPrice}
-          step={10}
-          value={price}
-          onChange={(e) => onPriceChange(Number(e.target.value))}
-          className="w-44 accent-primary"
-        />
-      </label>
+      {!hideMaxPrice && (
+        <label className="flex flex-col gap-1 text-sm text-muted">
+          {labels.maxPriceLabel}:{' '}
+          <strong className="text-text">{price > 0 ? `${price}€` : labels.any}</strong>
+          <input
+            type="range"
+            min={0}
+            max={maxPrice}
+            step={10}
+            value={price}
+            onChange={(e) => onPriceChange(Number(e.target.value))}
+            className="w-44 accent-primary"
+          />
+        </label>
+      )}
     </div>
   );
 }

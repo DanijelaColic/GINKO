@@ -3,7 +3,7 @@
  *
  * Zajednički serverski izračun cijene za UI prikaz i usklađenost s POST /api/bookings.
  * - MYRENT_PRICING_ENABLED=false → legacy room.price (isti calculatePrice)
- * - true → MyRent price_period_details (+ SPA nadoplata) + Ginko dodaci + 50% depozit
+ * - true → MyRent Website (A) osim ginko-spa-1 (fiksno 90 €/noć) + Ginko dodaci
  */
 
 import { NextRequest, NextResponse } from 'next/server';

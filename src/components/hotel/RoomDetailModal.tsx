@@ -24,6 +24,7 @@ import { appendSharedPropertyImages } from '@/modules/rooms/shared-property-gall
 import type { RoomReserveState } from '@/components/hotel/room-reserve-state';
 import { nightCountLabel, type AvailabilityLabels } from '@/components/hotel/AvailabilitySection';
 import { roomNeedsExtraBed } from '@/modules/booking/guest-occupancy';
+import { getRoomPriceDisplay } from '@/modules/booking/room-display-price';
 
 type RoomStatus = {
   available: boolean;
@@ -44,6 +45,7 @@ type Props = {
   childAges: number[];
   breakfastPerNight: number;
   labels: AvailabilityLabels;
+  myRentPricingEnabled?: boolean;
   reviewSummary?: GoogleReviewSummary | null;
   reserveState: RoomReserveState;
   onClose: () => void;
@@ -60,6 +62,7 @@ export default function RoomDetailModal({
   childAges,
   breakfastPerNight,
   labels,
+  myRentPricingEnabled = false,
   reviewSummary,
   reserveState,
   onClose,
@@ -87,23 +90,33 @@ export default function RoomDetailModal({
   }, []);
 
   const needsExtra = roomNeedsExtraBed(room, adults, childAges);
-  const basePerNight = room.price + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0);
+  const listingDisplay = getRoomPriceDisplay(room, myRentPricingEnabled);
+  const fixedPerNight =
+    listingDisplay.mode === 'fixed'
+      ? listingDisplay.perNight + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0)
+      : null;
   const breakfastExtra = plan.breakfast
     ? breakfastPerNight * (status?.nights ?? 1)
     : 0;
   const breakfastNight = plan.breakfast ? breakfastPerNight : 0;
 
-  const displayTotal = searched && status?.available && status.totalPrice
-    ? status.totalPrice + breakfastExtra
-    : basePerNight + breakfastNight;
+  const showListingHint = !searched && listingDisplay.mode === 'select_dates';
+  const displayTotal =
+    searched && status?.available && status.totalPrice
+      ? status.totalPrice + breakfastExtra
+      : fixedPerNight != null
+        ? fixedPerNight + breakfastNight
+        : null;
 
   const nights = status?.nights ?? 0;
   const showStayTotal = searched && status?.available && nights > 0;
 
   const depositPct = Math.round(DEPOSIT_PERCENT * 100);
   const balancePct = 100 - depositPct;
-  const depositAmount = calculateDeposit(displayTotal);
-  const balanceAmount = displayTotal - depositAmount;
+  const depositAmount =
+    displayTotal != null ? calculateDeposit(displayTotal) : 0;
+  const balanceAmount =
+    displayTotal != null ? displayTotal - depositAmount : 0;
 
   const reviewScore = reviewSummary
     ? formatReviewRating(reviewSummary.rating, locale)
@@ -292,15 +305,26 @@ export default function RoomDetailModal({
               <Users size={16} className="text-muted shrink-0 mt-0.5" />
               <p className="text-sm font-semibold text-text leading-snug">{room.name}</p>
             </div>
-            <div className="text-right shrink-0">
-              <p className="text-xl sm:text-2xl font-bold text-emerald-700 leading-none">
-                {displayTotal} €
-              </p>
-              <p className="text-xs text-muted mt-0.5">
-                {showStayTotal
-                  ? t('forNights', { nights, label: nightCountLabel(nights, labels) })
-                  : labels.perNight}
-              </p>
+            <div className="text-right shrink-0 max-w-[12rem]">
+              {showListingHint ? (
+                <p className="text-sm text-muted leading-snug">
+                  {labels.selectDatesPriceHint}
+                </p>
+              ) : displayTotal != null ? (
+                <>
+                  <p className="text-xl sm:text-2xl font-bold text-emerald-700 leading-none">
+                    {displayTotal} €
+                  </p>
+                  <p className="text-xs text-muted mt-0.5">
+                    {showStayTotal
+                      ? t('forNights', {
+                          nights,
+                          label: nightCountLabel(nights, labels),
+                        })
+                      : labels.perNight}
+                  </p>
+                </>
+              ) : null}
             </div>
           </div>
 
@@ -311,15 +335,27 @@ export default function RoomDetailModal({
                 <Check size={15} className="shrink-0 mt-0.5" />
                 <span>{t('freeCancellation')}</span>
               </p>
-              <p className="flex items-start gap-2 text-sm text-text">
-                <Check size={15} className="shrink-0 mt-0.5 text-primary" />
-                <span>
-                  {t('depositAtBooking', { percent: depositPct, amount: depositAmount })}
-                </span>
-              </p>
-              <p className="text-sm text-muted pl-[23px]">
-                {t('balanceAtProperty', { percent: balancePct, amount: balanceAmount })}
-              </p>
+              {!showListingHint && displayTotal != null && (
+                <>
+                  <p className="flex items-start gap-2 text-sm text-text">
+                    <Check size={15} className="shrink-0 mt-0.5 text-primary" />
+                    <span>
+                      {t('depositAtBooking', {
+                        percent: depositPct,
+                        amount: depositAmount,
+                      })}
+                    </span>
+                  </p>
+                </>
+              )}
+              {!showListingHint && displayTotal != null && (
+                <p className="text-sm text-muted pl-[23px]">
+                  {t('balanceAtProperty', {
+                    percent: balancePct,
+                    amount: balanceAmount,
+                  })}
+                </p>
+              )}
               <p className="text-sm text-muted pl-[23px]">
                 {plan.breakfast
                   ? t('breakfastIncludedAgeBased', {

@@ -10,8 +10,11 @@ export const revalidate = 3600;
 import { getRooms } from '@/modules/rooms/room.repository';
 import { getValidLocale } from '@/i18n/messages';
 import { getPageMetadata } from '@/i18n/metadata';
+import { Link } from '@/i18n/navigation';
 import RoomGrid from '@/components/hotel/RoomGrid';
+import { InternalLinks } from '@/components/seo/InternalLinks';
 import type { RoomLocale } from '@/modules/rooms/room.types';
+import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
 
 export async function generateMetadata(): Promise<Metadata> {
   const locale = getValidLocale(await getLocale());
@@ -21,7 +24,9 @@ export async function generateMetadata(): Promise<Metadata> {
 export default async function RoomsPage() {
   const locale = getValidLocale(await getLocale());
   const t = await getTranslations('roomsPage');
+  const tPricing = await getTranslations('pricingDisplay');
   const rooms = await getRooms(locale as RoomLocale);
+  const myRentPricingEnabled = isMyRentPricingEnabled();
 
   const cardLabels = {
     itemLabel: t('itemLabel'),
@@ -34,6 +39,8 @@ export default async function RoomsPage() {
     unavailable: t('price.unavailable'),
     details: t('actions.details'),
     book: t('actions.book'),
+    wellnessBadge: t('wellnessBadge'),
+    selectDatesHint: tPricing('selectDatesHint'),
   };
 
   const filterLabels = {
@@ -54,14 +61,26 @@ export default async function RoomsPage() {
           <h1 className="font-serif text-4xl sm:text-5xl font-semibold text-text mb-4">
             {t('title')}
           </h1>
-          <p className="text-muted text-base leading-relaxed">{t('description')}</p>
+          <p className="text-muted text-base leading-relaxed mb-4">{t('description')}</p>
+          <Link
+            href="/wellness-daruvar"
+            className="inline-flex text-sm font-semibold text-accent underline-offset-2 hover:underline"
+          >
+            {t('wellnessLink')}
+          </Link>
         </div>
       </section>
 
       {/* Grid + filters */}
       <section className="py-16 lg:py-20">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <RoomGrid rooms={rooms} cardLabels={cardLabels} filterLabels={filterLabels} />
+          <RoomGrid
+            rooms={rooms}
+            cardLabels={cardLabels}
+            filterLabels={filterLabels}
+            myRentPricingEnabled={myRentPricingEnabled}
+          />
+          <InternalLinks currentPath="/rooms" />
         </div>
       </section>
     </div>

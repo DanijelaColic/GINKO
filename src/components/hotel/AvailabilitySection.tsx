@@ -14,6 +14,7 @@ import SearchFieldCell from '@/components/hotel/SearchFieldCell';
 import { getRoomReserveState } from '@/components/hotel/room-reserve-state';
 import { ROOM_AMENITY_ICONS } from '@/components/hotel/roomAmenityIcons';
 import { calculatePrice, isRangeAvailable, parseLocalDate } from '@/modules/booking/dates';
+import { usesMyRentStayPricing } from '@/modules/myrent/myrent.pricing-config';
 import type { BookedRange } from '@/modules/booking/booking.types';
 import type { AccommodationType, Room } from '@/modules/rooms/room.types';
 import type { GoogleReviewSummary } from '@/modules/reviews/google-reviews.types';
@@ -41,6 +42,7 @@ import {
   serializeChildAges,
 } from '@/modules/booking/guest-occupancy';
 import { scrollToElement, scrollToSectionId } from '@/lib/scroll-to-section';
+import { getRoomPriceDisplay } from '@/modules/booking/room-display-price';
 
 const FIELD_CLASS =
   'text-text text-sm font-medium bg-transparent outline-none cursor-pointer w-full';
@@ -70,6 +72,8 @@ export type AvailabilityLabels = {
   contactUs: string;
   reserve: string;
   perNight: string;
+  /** Prije pretrage — MyRent slugovi bez fiksne listing cijene. */
+  selectDatesPriceHint?: string;
   /** MyRent pricing unavailable (flag on). */
   pricingUnavailable?: string;
   depositLabel?: string;
@@ -247,7 +251,7 @@ export default function AvailabilitySection({
             }
 
             // MyRent pricing: zajednički quote API (bez doručka — doručak se dodaje u UI)
-            if (myRentPricingEnabled) {
+            if (usesMyRentStayPricing(room.slug, myRentPricingEnabled)) {
               try {
                 const quote = await fetchStayQuote({
                   roomSlug: room.slug,
@@ -712,12 +716,26 @@ export default function AvailabilitySection({
                     {(() => {
                       const plan = getRoomPlan(room.slug);
                       const needsExtra = roomNeedsExtraBed(room, adults, agesResolved);
-                      // Nakon MyRent quotea: prosjek noći iz ukupnog (bez doručka)
-                      const basePrice =
+                      const listingDisplay = getRoomPriceDisplay(room, myRentPricingEnabled);
+                      const quotedPerNight =
                         searched && status?.available && status.nights > 0
                           ? Math.round(status.totalPrice / status.nights)
-                          : room.price + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0);
+                          : null;
+                      const fixedPerNight =
+                        listingDisplay.mode === 'fixed'
+                          ? listingDisplay.perNight +
+                            (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0)
+                          : null;
+                      const basePrice = quotedPerNight ?? fixedPerNight;
+                      const showListingHint =
+                        !searched && listingDisplay.mode === 'select_dates';
                       const bfExtra = breakfastPerNight;
+                      const perNightSuffix = (
+                        <span className="text-xs font-normal text-muted">
+                          {' '}
+                          / {labels.perNight}
+                        </span>
+                      );
                       return (
                         <div className="mt-3 border border-stone rounded-lg overflow-hidden text-sm divide-y divide-stone">
                           <label className={`flex items-center justify-between px-3 py-2.5 cursor-pointer transition-colors ${!plan.breakfast ? 'bg-primary/5' : 'hover:bg-stone-light/60'}`}>
@@ -731,8 +749,16 @@ export default function AvailabilitySection({
                               />
                               <span className="font-medium text-text">{labels.planAccommodationOnly}</span>
                             </span>
-                            <span className="font-semibold text-primary shrink-0 ml-3">
-                              {basePrice} € <span className="text-xs font-normal text-muted">/ {labels.perNight}</span>
+                            <span className="font-semibold text-primary shrink-0 ml-3 text-right max-w-[11rem]">
+                              {showListingHint ? (
+                                <span className="text-xs font-normal text-muted leading-snug block">
+                                  {labels.selectDatesPriceHint}
+                                </span>
+                              ) : basePrice != null ? (
+                                <>
+                                  {basePrice} €{perNightSuffix}
+                                </>
+                              ) : null}
                             </span>
                           </label>
                           <label className={`flex items-center justify-between px-3 py-2.5 cursor-pointer transition-colors ${plan.breakfast ? 'bg-primary/5' : 'hover:bg-stone-light/60'}`}>
@@ -751,8 +777,16 @@ export default function AvailabilitySection({
                                 </span>
                               </span>
                             </span>
-                            <span className="font-semibold text-primary shrink-0 ml-3">
-                              {basePrice + bfExtra} € <span className="text-xs font-normal text-muted">/ {labels.perNight}</span>
+                            <span className="font-semibold text-primary shrink-0 ml-3 text-right max-w-[11rem]">
+                              {showListingHint ? (
+                                <span className="text-xs font-normal text-muted leading-snug block">
+                                  {labels.selectDatesPriceHint}
+                                </span>
+                              ) : basePrice != null ? (
+                                <>
+                                  {basePrice + bfExtra} €{perNightSuffix}
+                                </>
+                              ) : null}
                             </span>
                           </label>
                         </div>
@@ -802,8 +836,22 @@ export default function AvailabilitySection({
                         (() => {
                           const plan = getRoomPlan(room.slug);
                           const needsExtra = roomNeedsExtraBed(room, adults, agesResolved);
-                          const basePrice = room.price + (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0);
-                          const displayPrice = basePrice + (plan.breakfast ? breakfastPerNight : 0);
+                          const listingDisplay = getRoomPriceDisplay(
+                            room,
+                            myRentPricingEnabled,
+                          );
+                          if (listingDisplay.mode === 'select_dates') {
+                            return (
+                              <p className="text-sm text-muted leading-snug max-w-[11rem] text-right">
+                                {labels.selectDatesPriceHint}
+                              </p>
+                            );
+                          }
+                          const basePrice =
+                            listingDisplay.perNight +
+                            (needsExtra ? EXTRA_BED_PRICE_PER_NIGHT : 0);
+                          const displayPrice =
+                            basePrice + (plan.breakfast ? breakfastPerNight : 0);
                           return (
                             <>
                               <p className="text-2xl font-bold text-primary leading-none">
@@ -863,6 +911,7 @@ export default function AvailabilitySection({
           childAges={agesResolved}
           breakfastPerNight={breakfastPerNight}
           labels={labels}
+          myRentPricingEnabled={myRentPricingEnabled}
           reviewSummary={reviewSummary}
           reserveState={getRoomReserveState(
             detailRoom.slug,

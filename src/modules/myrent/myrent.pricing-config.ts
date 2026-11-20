@@ -42,6 +42,28 @@ export function isMyRentPricingEnabled(
 }
 
 /**
+ * Apartmani s fiksnom Ginko cijenom (€/noć iz rooms.config), čak i kad je
+ * MYRENT_PRICING_ENABLED=true. Dijele MyRent kalendar (7460), ne period pricing.
+ */
+export const GINKO_LEGACY_ACCOMMODATION_PRICE_SLUGS = [
+  'ginko-spa-1',
+] as const;
+
+/**
+ * Koristi li slug MyRent Website (A) period za smještaj (quote + POST booking).
+ * @param pricingEnabled — na klijentu proslijedi server prop (myRentPricingEnabled).
+ */
+export function usesMyRentStayPricing(
+  roomSlug: string,
+  pricingEnabled: boolean = isMyRentPricingEnabled(),
+): boolean {
+  if (!pricingEnabled) return false;
+  return !(
+    GINKO_LEGACY_ACCOMMODATION_PRICE_SLUGS as readonly string[]
+  ).includes(roomSlug);
+}
+
+/**
  * True ako je mock eksplicitno zatražen env-om (bez Production gate-a).
  * Koristi se za detekciju misconfiguration na Productionu.
  */

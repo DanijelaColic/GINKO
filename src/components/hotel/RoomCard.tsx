@@ -6,6 +6,8 @@ import { Users, Maximize2 } from 'lucide-react';
 import { Link } from '@/i18n/navigation';
 import type { Room } from '@/modules/rooms/room.types';
 import { buildAvailabilityHref } from '@/modules/booking/booking.config';
+import { getRoomPriceDisplay } from '@/modules/booking/room-display-price';
+import RoomPriceListing from '@/components/hotel/RoomPriceListing';
 
 type Props = {
   room: Room;
@@ -22,10 +24,22 @@ type Props = {
     unavailable: string;
     details: string;
     book: string;
+    /** Badge + deep-link za ginko-spa-2 → /wellness-daruvar */
+    wellnessBadge?: string;
+    selectDatesHint: string;
   };
+  myRentPricingEnabled?: boolean;
 };
 
-export default function RoomCard({ room, labels, priority = false }: Props) {
+export default function RoomCard({
+  room,
+  labels,
+  priority = false,
+  myRentPricingEnabled = false,
+}: Props) {
+  const isWellnessUnit = room.slug === 'ginko-spa-2' && Boolean(labels.wellnessBadge);
+  const priceDisplay = getRoomPriceDisplay(room, myRentPricingEnabled);
+
   return (
     <div className="rounded-2xl border border-stone bg-white overflow-hidden flex flex-col">
       {/* Cover image */}
@@ -52,6 +66,11 @@ export default function RoomCard({ room, labels, priority = false }: Props) {
             {labels.fullyBooked}
           </div>
         )}
+        {isWellnessUnit && (
+          <span className="absolute top-3 right-3 z-10 rounded-full bg-accent px-3 py-1.5 text-xs font-medium text-white">
+            {labels.wellnessBadge}
+          </span>
+        )}
       </Link>
 
       {/* Content */}
@@ -60,7 +79,19 @@ export default function RoomCard({ room, labels, priority = false }: Props) {
           {labels.itemLabel}
         </p>
         <h2 className="font-serif text-xl font-semibold text-text mb-1">{room.name}</h2>
-        <p className="text-muted text-sm leading-relaxed mb-4">{room.tagline}</p>
+        <p
+          className={`text-muted text-sm leading-relaxed ${isWellnessUnit ? 'mb-2' : 'mb-4'}`}
+        >
+          {room.tagline}
+        </p>
+        {isWellnessUnit && (
+          <Link
+            href="/wellness-daruvar"
+            className="mb-4 text-xs font-semibold text-accent underline-offset-2 hover:underline"
+          >
+            {labels.wellnessBadge}
+          </Link>
+        )}
 
         {/* Stats */}
         <div className="flex flex-wrap gap-2 mb-4">
@@ -95,10 +126,11 @@ export default function RoomCard({ room, labels, priority = false }: Props) {
             <p className="text-xs text-muted uppercase tracking-widest font-medium mb-1.5">
               {labels.priceTitle}
             </p>
-            <div className="flex items-baseline gap-1.5">
-              <p className="text-primary font-semibold text-lg">{room.price}€</p>
-              <p className="text-xs text-muted">{labels.perNight}</p>
-            </div>
+            <RoomPriceListing
+              display={priceDisplay}
+              perNightLabel={labels.perNight}
+              selectDatesHint={labels.selectDatesHint}
+            />
           </div>
         ) : (
           <div className="mb-4 p-3 bg-stone-light rounded-xl text-muted text-sm">
