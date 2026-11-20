@@ -1,8 +1,19 @@
+/**
+ * Službena NAP adresa objekta (usklađeno s Google Business Profile):
+ * Ul. Tomaša Garika Masaryka 1, 43500 Daruvar, Hrvatska
+ *
+ * U shemama i UI koristimo puni oblik „Ulica …“ (ne skraćenicu Ul.).
+ * Stara MyRent adresa „Trg Presvetog Trojstva 3“ NIJE adresa objekta —
+ * crkva Sv. Trojstva ostaje samo kao atrakcija u okolici.
+ */
 export const PROPERTY_STREET = 'Ulica Tomaša Garika Masaryka 1';
-export const PROPERTY_CITY = '43500 Daruvar, Hrvatska';
+export const PROPERTY_POSTAL_CODE = '43500';
+export const PROPERTY_LOCALITY = 'Daruvar';
+export const PROPERTY_COUNTRY_CODE = 'HR';
+export const PROPERTY_CITY = `${PROPERTY_POSTAL_CODE} ${PROPERTY_LOCALITY}, Hrvatska`;
 export const PROPERTY_ADDRESS = `${PROPERTY_STREET}, ${PROPERTY_CITY}`;
 
-/** WGS84 — Ulica Tomaša Garika Masaryka 1, Daruvar (local SEO / LodgingBusiness) */
+/** WGS84 — Ulica Tomaša Garika Masaryka 1, Daruvar (potvrđeno adresa.com.hr / listing geo) */
 export const PROPERTY_LATITUDE = 45.594636;
 export const PROPERTY_LONGITUDE = 17.222586;
 
@@ -351,4 +362,3 @@ export const REVIEW_TOPICS: { id: ReviewTopicId; label: string }[] = [
   { id: 'cisto', label: 'Čistoća' },
   { id: 'osoblje', label: 'Osoblje' },
 ];
-
