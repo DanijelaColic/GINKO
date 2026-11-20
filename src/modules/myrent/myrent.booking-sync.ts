@@ -20,6 +20,7 @@ import {
 } from './myrent.one-shot-live';
 import { isMyRentLiveWriteAllowedForBooking } from './myrent.write-config';
 import type { MyRentSyncResult, MyRentSyncRecord } from './myrent.booking-sync.types';
+import { observeMyRentActivationAfterLiveOk } from './myrent.activation-check';
 
 export type SyncBookingToMyRentInput = {
   booking: BookingForMyRentSync;
@@ -27,6 +28,28 @@ export type SyncBookingToMyRentInput = {
   /** Za payment hook: mora biti confirmed. */
   requireConfirmed?: boolean;
 };
+
+/** live_ok nije dokaz blokade kalendara. Read-only; ne baca u sync. */
+async function observeActivationAfterLiveWrite(
+  booking: BookingForMyRentSync,
+  record: MyRentSyncRecord,
+): Promise<void> {
+  try {
+    await observeMyRentActivationAfterLiveOk({
+      bookingId: booking.id,
+      rentGuid: record.myrentRentGuid,
+      objectId: record.objectId,
+      checkIn: booking.check_in,
+      checkOut: booking.check_out,
+    });
+  } catch (err) {
+    console.error(
+      '[myrent-activation] provjera nakon rent_add nije uspjela:',
+      booking.id,
+      err instanceof Error ? err.message : err,
+    );
+  }
+}
 
 function toResult(
   record: MyRentSyncRecord,
@@ -293,6 +316,8 @@ export async function syncBookingToMyRent(
         confirmedLiveSync: true,
       };
       await store.save(record);
+      // Odmah rent_get + get_calendar za sve noći. Ne mijenja rent_add.
+      await observeActivationAfterLiveWrite(booking, record);
       return toResult(record, null);
     }
 
@@ -306,6 +331,7 @@ export async function syncBookingToMyRent(
       });
       if (liveOk) {
         await store.save(liveOk);
+        await observeActivationAfterLiveWrite(booking, liveOk);
         return toResult(liveOk, null);
       }
 
@@ -433,6 +459,7 @@ export async function syncBookingToMyRent(
       });
       if (liveOk) {
         await store.save(liveOk);
+        await observeActivationAfterLiveWrite(booking, liveOk);
         return toResult(liveOk, null);
       }
       const record: MyRentSyncRecord = {
