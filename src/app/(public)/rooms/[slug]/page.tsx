@@ -14,8 +14,11 @@ import { getBreadcrumbStructuredData, getLanguageAlternates } from '@/i18n/metad
 import { localizePath } from '@/i18n/pathnames';
 import { getSiteUrl } from '@/lib/siteUrl';
 import {
+  PROPERTY_COUNTRY_CODE,
   PROPERTY_LATITUDE,
+  PROPERTY_LOCALITY,
   PROPERTY_LONGITUDE,
+  PROPERTY_POSTAL_CODE,
   PROPERTY_STREET,
 } from '@/modules/property/property-details.config';
 import { SITE_NAME, buildAvailabilityHref, DEPOSIT_PERCENT } from '@/modules/booking/booking.config';
@@ -23,6 +26,12 @@ import ImageGallery from '@/components/hotel/ImageGallery';
 import { Link } from '@/i18n/navigation';
 import { InternalLinks } from '@/components/seo/InternalLinks';
 import type { RoomLocale } from '@/modules/rooms/room.types';
+import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
+import {
+  getJsonLdOfferPrice,
+  getRoomPriceDisplay,
+} from '@/modules/booking/room-display-price';
+import { getListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -70,6 +79,23 @@ export default async function RoomDetailPage({ params }: Props) {
 
   if (!room) notFound();
 
+  const myRentPricingEnabled = isMyRentPricingEnabled();
+  const tPricing = await getTranslations('pricingDisplay');
+  const listingFromBySlug = myRentPricingEnabled
+    ? await getListingFromPriceMap()
+    : {};
+  const listingEntry = listingFromBySlug[room.slug] ?? null;
+  const priceDisplay = getRoomPriceDisplay(
+    room,
+    myRentPricingEnabled,
+    listingEntry,
+  );
+  const jsonLdOfferPrice = getJsonLdOfferPrice(
+    room,
+    myRentPricingEnabled,
+    listingEntry,
+  );
+
   // Soba prvo, zatim zajednički prostori (bez dupliciranja datoteka)
   const galleryImages = appendSharedPropertyImages(room.images);
 
@@ -108,7 +134,7 @@ export default async function RoomDetailPage({ params }: Props) {
     offers: {
       '@type': 'Offer',
       priceCurrency: 'EUR',
-      price: room.price,
+      ...(jsonLdOfferPrice != null ? { price: jsonLdOfferPrice } : {}),
       availability: room.fullyBooked
         ? 'https://schema.org/OutOfStock'
         : 'https://schema.org/InStock',
@@ -120,9 +146,9 @@ export default async function RoomDetailPage({ params }: Props) {
       address: {
         '@type': 'PostalAddress',
         streetAddress: PROPERTY_STREET,
-        addressLocality: 'Daruvar',
-        postalCode: '43500',
-        addressCountry: 'HR',
+        addressLocality: PROPERTY_LOCALITY,
+        postalCode: PROPERTY_POSTAL_CODE,
+        addressCountry: PROPERTY_COUNTRY_CODE,
       },
       geo: {
         '@type': 'GeoCoordinates',
@@ -270,9 +296,31 @@ export default async function RoomDetailPage({ params }: Props) {
                   <p className="text-xs text-muted uppercase tracking-widest font-medium mb-4">
                     {t('price.title')}
                   </p>
-                  <div className="flex justify-between items-center mb-6">
-                    <span className="text-sm text-muted">{t('price.perNight')}</span>
-                    <span className="text-2xl text-primary font-bold">{room.price}€</span>
+                  <div className="mb-6">
+                    {priceDisplay.mode === 'select_dates' ? (
+                      <p className="text-sm text-muted leading-snug">
+                        {tPricing('selectDatesHint')}
+                      </p>
+                    ) : priceDisplay.mode === 'from' ? (
+                      <div className="space-y-2">
+                        <p className="text-2xl text-primary font-bold">
+                          {tPricing('fromPerNight').replace(
+                            '{amount}',
+                            String(priceDisplay.perNight),
+                          )}
+                        </p>
+                        <p className="text-xs text-muted leading-snug">
+                          {tPricing('fromPriceNote')}
+                        </p>
+                      </div>
+                    ) : (
+                      <div className="flex justify-between items-center">
+                        <span className="text-sm text-muted">{t('price.perNight')}</span>
+                        <span className="text-2xl text-primary font-bold">
+                          {priceDisplay.perNight}€
+                        </span>
+                      </div>
+                    )}
                   </div>
                   <Link
                     href={buildAvailabilityHref({ room: room.slug })}

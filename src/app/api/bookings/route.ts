@@ -21,7 +21,10 @@ import { resolveBookingPrice } from '@/modules/booking/resolve-booking-price';
 import { evaluateQuotedPrice } from '@/modules/booking/quoted-price';
 import { MyRentPricingUnavailableError } from '@/modules/myrent/myrent.pricing-service';
 import { SpaWellnessSurchargeNotConfiguredError } from '@/modules/myrent/myrent.spa-pricing';
-import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
+import {
+  isMyRentPricingEnabled,
+  usesMyRentStayPricing,
+} from '@/modules/myrent/myrent.pricing-config';
 import { MIN_NIGHTS } from '@/modules/booking/booking.config';
 import { guestApiError } from '@/lib/guest-api-error';
 import {
@@ -198,7 +201,7 @@ export async function POST(request: NextRequest) {
 
       // MyRent pricing: quote mora točno odgovarati serveru (nema klijentskog bypassa).
       // UI nakon 409 prikaže novi iznos; gost potvrdi; pošalje novi quoted_*.
-      if (isMyRentPricingEnabled()) {
+      if (usesMyRentStayPricing(room_slug, isMyRentPricingEnabled())) {
         const verdict = evaluateQuotedPrice({
           quoted: {
             totalPrice:

@@ -28,6 +28,16 @@ export type {
 export { evaluateQuotedPrice, pricesMatch } from './quoted-price';
 export type { QuotedPriceInput } from './quoted-price';
 export { fetchStayQuote, StayQuoteError } from './fetch-stay-quote';
+export {
+  getRoomPriceDisplay,
+  getJsonLdOfferPrice,
+} from './room-display-price';
+export type { RoomPriceDisplay } from './room-display-price';
+export { getListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
+export type {
+  ListingFromPriceEntry,
+  ListingFromPriceMap,
+} from '@/modules/myrent/myrent.listing-from-price';
 export type {
   StayPriceQuoteResponse,
   StayPriceQuoteRequest,

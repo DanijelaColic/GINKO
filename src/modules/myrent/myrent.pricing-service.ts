@@ -2,8 +2,8 @@
  * Async MyRent pricing za guest quote / POST bookings.
  *
  * SoT: POST /user/price_period_details → b2b_object_price_period (Website A)
- * + SPA wellness nadoplata iz Ginko configa (samo spa-2; nije channel markup)
  * + Ginko dodaci (doručak, krevetić) bez Ginko EXTRA_BED.
+ * Wellness apartman (spa-2): cijena isključivo iz MyRent 7460 (bez Ginko surcharge).
  *
  * Fail-closed: API greška → MyRentPricingUnavailableError (osim mock moda).
  */
@@ -19,7 +19,6 @@ import {
 } from './myrent.pricing-config';
 import { buildMockMyRentPricePeriod } from './myrent.pricing-mock';
 import {
-  applySpaWellnessSurchargeToQuote,
   buildPriceBreakdownFromMyRentNights,
   ginkoAddonsForMyRentPricing,
   MyRentPricingError,
@@ -28,10 +27,6 @@ import {
   type MyRentAccommodationQuote,
 } from './myrent.pricing';
 import { fetchMyRentPricePeriodDetails } from './myrent.price-period';
-import {
-  SpaWellnessSurchargeNotConfiguredError,
-  spaWellnessSurchargePerNightForSlug,
-} from './myrent.spa-pricing';
 
 export class MyRentPricingUnavailableError extends Error {
   constructor(message = 'MyRent cijene trenutno nisu dostupne.') {
@@ -127,10 +122,7 @@ async function loadPeriodQuote(params: {
   }
 }
 
-/**
- * Svježi MyRent stay price za slug + datume + goste.
- * SPA-2: MyRent baza + (spa-2.price − spa-1.price) po noći, ubačeno u smještaj.
- */
+/** Svježi MyRent stay price za slug + datume + goste. */
 export async function fetchMyRentStayPrice(params: {
   roomSlug: string;
   checkIn: string;
@@ -155,16 +147,10 @@ export async function fetchMyRentStayPrice(params: {
   });
 
   try {
-    let quote = quoteFromPeriodNights({
+    const quote = quoteFromPeriodNights({
       nights: loaded.nights,
       accommodationTotal: loaded.accommodationTotal,
     });
-
-    // SPA-2: admin nadoplata × noći; ako nije unesena → SpaWellnessSurchargeNotConfiguredError
-    const spaPerNight = await spaWellnessSurchargePerNightForSlug(
-      params.roomSlug,
-    );
-    quote = applySpaWellnessSurchargeToQuote(quote, spaPerNight);
 
     const breakdown = buildPriceBreakdownFromMyRentNights(
       quote,
@@ -178,7 +164,6 @@ export async function fetchMyRentStayPrice(params: {
       breakdown,
     };
   } catch (err) {
-    if (err instanceof SpaWellnessSurchargeNotConfiguredError) throw err;
     if (err instanceof MyRentPricingError) {
       throw new MyRentPricingUnavailableError(err.message);
     }

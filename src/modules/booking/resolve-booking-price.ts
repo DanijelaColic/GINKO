@@ -2,14 +2,18 @@
  * Server-side izbor izvora cijene za quote API i POST /api/bookings.
  *
  * - MYRENT_PRICING_ENABLED off (default) → legacy calculatePrice(room.price)
- * - on → MyRent b2b_object_price_period / Website A (+ SPA wellness) + Ginko dodaci
+ * - on → MyRent b2b_object_price_period / Website A + Ginko dodaci
+ * - iznimka: ginko-spa-1 uvijek legacy 90 €/noć (hybrid model)
  */
 
 import type { Room } from '@/modules/rooms/room.types';
 import type { NightlyRate, PriceBreakdown } from './booking.types';
 import { calculatePrice, type PriceExtras } from './dates';
 import { formatDate } from './dates';
-import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
+import {
+  isMyRentPricingEnabled,
+  usesMyRentStayPricing,
+} from '@/modules/myrent/myrent.pricing-config';
 import { fetchMyRentStayPrice } from '@/modules/myrent/myrent.pricing-service';
 
 export type BookingPriceSource =
@@ -50,7 +54,7 @@ export async function resolveBookingPrice(params: {
   children?: number;
   extras?: PriceExtras;
 }): Promise<ResolvedBookingPrice> {
-  if (!isMyRentPricingEnabled()) {
+  if (!usesMyRentStayPricing(params.room.slug, isMyRentPricingEnabled())) {
     const breakdown = calculatePrice(
       params.checkIn,
       params.checkOut,

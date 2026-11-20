@@ -48,6 +48,9 @@ import {
 } from '@/modules/booking/guest-occupancy';
 import type { PriceBreakdown } from '@/modules/booking/booking.types';
 import { useStayPriceQuote } from '@/components/hotel/useStayPriceQuote';
+import { usesMyRentStayPricing } from '@/modules/myrent/myrent.pricing-config';
+import { getRoomPriceDisplay } from '@/modules/booking/room-display-price';
+import type { ListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
 const DEPOSIT_PCT_DISPLAY = Math.round(DEPOSIT_PERCENT * 100);
 const BALANCE_PCT_DISPLAY = 100 - DEPOSIT_PCT_DISPLAY;
@@ -78,6 +81,7 @@ type Props = {
    * bez quote API poziva (postojeće ponašanje).
    */
   myRentPricingEnabled?: boolean;
+  listingFromBySlug?: ListingFromPriceMap;
 };
 
 export default function BookingWidget({
@@ -95,11 +99,13 @@ export default function BookingWidget({
   rulesText,
   reviewSummary,
   myRentPricingEnabled = false,
+  listingFromBySlug,
 }: Props) {
   const locale = useLocale();
   const router = useRouter();
   const t = useTranslations('bookingWidget');
   const tPage = useTranslations('bookingPage');
+  const tPricing = useTranslations('pricingDisplay');
 
   const getNightsLabel = useCallback(
     (n: number) => {
@@ -215,8 +221,12 @@ export default function BookingWidget({
     [autoExtraBed, form.needsCrib, breakfastPerNight],
   );
 
+  const myRentQuoteActive = Boolean(
+    selectedSlug && usesMyRentStayPricing(selectedSlug, myRentPricingEnabled),
+  );
+
   const quoteState = useStayPriceQuote({
-    enabled: myRentPricingEnabled,
+    enabled: myRentQuoteActive,
     roomSlug: selectedSlug || null,
     checkIn,
     checkOut,
@@ -233,18 +243,18 @@ export default function BookingWidget({
   }, [selectedSlug, checkIn, checkOut, adultsCount, childrenCount, priceExtras]);
 
   const legacyPriceData =
-    !myRentPricingEnabled && checkIn && checkOut && selectedRoom
+    !myRentQuoteActive && checkIn && checkOut && selectedRoom
       ? calculatePrice(checkIn, checkOut, selectedRoom, priceExtras)
       : null;
 
-  const priceData: PriceBreakdown | null = myRentPricingEnabled
+  const priceData: PriceBreakdown | null = myRentQuoteActive
     ? pendingPriceUpdate ??
       (quoteState.status === 'ready' ? quoteState.breakdown : null)
     : legacyPriceData;
 
-  const pricingLoading = myRentPricingEnabled && quoteState.status === 'loading';
+  const pricingLoading = myRentQuoteActive && quoteState.status === 'loading';
   const pricingError =
-    myRentPricingEnabled && quoteState.status === 'error'
+    myRentQuoteActive && quoteState.status === 'error'
       ? quoteState.code
       : null;
   const canProceedWithPrice =
@@ -343,7 +353,7 @@ export default function BookingWidget({
         notes: buildNotes() || null,
         // quoted_* mora odgovarati serveru — nakon priceChanged UI ažurira
         // priceData na novi breakdown pa gost potvrdi checkboxom prije retryja.
-        ...(myRentPricingEnabled
+        ...(myRentQuoteActive
           ? {
               quoted_total_price: priceData.totalPrice,
               quoted_deposit: priceData.deposit,
@@ -424,7 +434,7 @@ export default function BookingWidget({
     childrenCount,
     form,
     locale,
-    myRentPricingEnabled,
+    myRentQuoteActive,
     priceData,
     selectedRoom,
     selectedSlug,
@@ -696,11 +706,27 @@ export default function BookingWidget({
             onChange={(e) => handleRoomChange(e.target.value)}
             className="w-full border border-stone rounded-xl px-4 py-3 text-sm focus:outline-none focus:border-primary transition-colors bg-white"
           >
-            {availableRooms.map((r) => (
-              <option key={r.slug} value={r.slug}>
-                {r.name} — {r.capacityNote} · {r.price}€/{t('form.perNight')}
-              </option>
-            ))}
+            {availableRooms.map((r) => {
+              const display = getRoomPriceDisplay(
+                r,
+                myRentPricingEnabled,
+                listingFromBySlug?.[r.slug],
+              );
+              const pricePart =
+                display.mode === 'fixed'
+                  ? `${display.perNight}€/${t('form.perNight')}`
+                  : display.mode === 'from'
+                    ? tPricing('fromPerNight').replace(
+                        '{amount}',
+                        String(display.perNight),
+                      )
+                    : tPricing('selectDatesHint');
+              return (
+                <option key={r.slug} value={r.slug}>
+                  {r.name} — {r.capacityNote} · {pricePart}
+                </option>
+              );
+            })}
           </select>
         </section>
       )}
@@ -1204,7 +1230,7 @@ export default function BookingWidget({
                 }
                 className="flex-1 bg-primary hover:bg-primary-dark disabled:opacity-50 disabled:cursor-not-allowed text-white font-medium py-3.5 rounded-full transition-colors text-sm flex items-center justify-center gap-2"
               >
-                {t('form.submit', { totalPrice: priceData.totalPrice })} →
+                {t('form.submit', { deposit: priceData.deposit })} →
               </button>
             </div>
           </form>

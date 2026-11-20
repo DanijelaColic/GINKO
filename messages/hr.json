@@ -4,21 +4,26 @@
     "description": "Ugodan smještaj u srcu Daruvara. Rezervirajte svoju sobu na ginko-sobe.com.",
     "openGraphAlt": "Ginko Boutique Rooms & Wellness – pogled na smještaj"
   },
+  "pricingDisplay": {
+    "selectDatesHint": "Cijena ovisi o terminu – odaberite datume.",
+    "fromPerNight": "Od {amount} € / noć",
+    "fromPriceNote": "Za 2 odrasle osobe, referentni slobodni termin u idućih 90 dana. Konačna cijena ovisi o odabranim datumima."
+  },
   "metadata": {
     "layout": {
       "title": {
-        "default": "Ginko Boutique Rooms & Wellness Daruvar",
-        "template": "%s | Ginko Boutique Rooms & Wellness Daruvar"
+        "default": "Sobe i wellness u Daruvaru | Ginko Boutique Rooms",
+        "template": "%s | Ginko Boutique Rooms"
       },
-      "description": "Udobne boutique sobe u srcu Daruvara — WiFi, klima, sauna i besplatan parking. Rezervirajte direktno bez posrednika.",
+      "description": "Boutique sobe i wellness u srcu Daruvara — ~400 m od toplica, WiFi, klima, sauna i besplatan parking. Rezervirajte direktno bez posrednika.",
       "openGraph": {
-        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
-        "description": "Udobne boutique sobe u srcu Daruvara. Sauna, terasa, besplatan parking. Rezervirajte direktno.",
-        "imageAlt": "Ginko Boutique Rooms & Wellness – Daruvar"
+        "title": "Sobe i wellness u Daruvaru | Ginko Boutique Rooms",
+        "description": "Boutique sobe u srcu Daruvara, ~400 m od Daruvarskih toplica. Sauna, terasa, besplatan parking. Rezervirajte direktno.",
+        "imageAlt": "Ginko Boutique Rooms & Wellness – Ulica Tomaša Garika Masaryka 1, Daruvar"
       },
       "twitter": {
-        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
-        "description": "Udobne boutique sobe u srcu Daruvara. Rezervirajte direktno."
+        "title": "Sobe i wellness u Daruvaru | Ginko Boutique Rooms",
+        "description": "Boutique sobe i wellness u srcu Daruvara. Rezervirajte direktno."
       }
     },
     "structuredData": {
@@ -101,7 +106,7 @@
   },
   "homePage": {
     "heroTitle": "Ginko Boutique Rooms & Wellness",
-    "heroSubtitle": "Elegantan smještaj, wellness i potpuni odmor u srcu grada",
+    "heroSubtitle": "Boutique sobe i wellness u srcu Daruvara — toplice na ~400 m",
     "heroCta": "Pogledajte sobe",
     "bookCta": "Rezervirajte sada",
     "heroCheckIn": "Dolazak",
@@ -135,8 +140,8 @@
     "feature2Desc": "Brza internet veza u svim sobama.",
     "feature3Title": "Klimatizacija",
     "feature3Desc": "Ugodna temperatura u svakom godišnjem dobu.",
-    "feature4Title": "Mirna lokacija",
-    "feature4Desc": "Okruženi prirodom, daleko od buke.",
+    "feature4Title": "Miran centar",
+    "feature4Desc": "U srcu grada, s tišinom uvečer nakon 23:00.",
     "feature5Title": "Domaća atmosfera",
     "feature5Desc": "Topli doček i savjeti domaćih domaćina.",
     "feature6Title": "Fleksibilan check-in",
@@ -173,9 +178,10 @@
       "01-living": "Ginko Boutique Rooms & Wellness — apartman, dnevni boravak",
       "01-cover": "Ginko Boutique Rooms & Wellness — soba"
     },
-    "aboutP1": "Smješten u samom srcu Daruvara, u ulici T. G. Masaryka 1, GINKO Boutique Rooms & Wellness nudi jedinstven spoj elegancije, udobnosti i opuštanja. Inspiraciju za naziv pronašli smo u najstarijem i najpoznatijem stablu Ginkgo biloba u Europi koje od 18. stoljeća krasi perivoj dvorca Janković.",
-    "aboutP2": "Naše moderno uređene sobe i wellness apartmani nalaze se unutar zaštićene povijesne jezgre grada, na svega nekoliko minuta hoda od Daruvarskih toplica i aqua parka Aquae Balissae. Zahvaljujući izvrsnoj lokaciji, GINKO je idealan izbor za wellness odmor, obiteljski vikend, poslovna putovanja ili oporavak nakon medicinskih i estetskih zahvata.",
-    "aboutP3": "Bilo da želite uživati u privatnom wellnessu, istražiti ljepote Daruvara ili pronaći mirno mjesto za odmor, GINKO Boutique Rooms & Wellness pružit će vam vrhunsku uslugu i osjećaj doma u gradu zelenila i piva.",
+    "aboutHeading": "Boutique smještaj u centru Daruvara",
+    "aboutP1": "Smješten u samom srcu Daruvara, na Ulici Tomaša Garika Masaryka 1, GINKO Boutique Rooms & Wellness nudi jedinstven spoj elegancije, udobnosti i opuštanja. Inspiraciju za naziv pronašli smo u najstarijem i najpoznatijem stablu Ginkgo biloba u Europi koje od 18. stoljeća krasi perivoj dvorca Janković.",
+    "aboutP2": "Naš smještaj u Daruvaru — moderno uređene [sobe u Daruvaru](/sobe-daruvar) i wellness apartmani — nalazi se unutar zaštićene povijesne jezgre, na svega nekoliko minuta hoda od Daruvarskih toplica i aqua parka Aquae Ballisae. Za fokus na blizinu bazena vidi [smještaj uz Daruvarske toplice](/smjestaj-uz-daruvarske-toplice). GINKO je idealan izbor za wellness odmor, obiteljski vikend, poslovna putovanja ili oporavak nakon medicinskih i estetskih zahvata.",
+    "aboutP3": "Bilo da želite uživati u [privatnom wellnessu](/wellness-daruvar), istražiti ljepote Daruvara ili pronaći mirno mjesto za odmor, GINKO Boutique Rooms & Wellness pružit će vam vrhunsku uslugu i osjećaj doma u gradu zelenila i piva.",
     "ctaTitle": "Spremi se za odmor?",
     "ctaSubtitle": "Rezerviraj svoju sobu danas i osiguraj mjesto u našem mirnom kutku Slavonije.",
     "ctaButton": "Rezerviraj sada",
@@ -309,8 +315,10 @@
   },
   "roomsPage": {
     "eyebrow": "Smještaj",
-    "title": "Naše sobe",
-    "description": "Sobe pažljivo uređene s prirodnim materijalima i ugodnom atmosferom.",
+    "title": "Sobe i apartmani u Daruvaru",
+    "description": "Boutique sobe i apartmani u centru Daruvara — Daruvarske toplice i aqua park na oko 400 m hoda. Usporedite tipove i rezervirajte direktno.",
+    "wellnessLink": "Privatni wellness (sauna i jacuzzi)",
+    "wellnessBadge": "Privatni wellness",
     "openGraph": {
       "title": "Sobe – Ginko Boutique Rooms & Wellness Daruvar",
       "description": "Udobne boutique sobe u Daruvaru s direktnom rezervacijom bez provizija.",
@@ -595,7 +603,7 @@
       "submitting": "Priprema plaćanja…",
       "continueToPayment": "Nastavi na plaćanje",
       "step3Redirecting": "Kreiranje rezervacije i preusmjeravanje na plaćanje…",
-      "submit": "Nastavi na plaćanje · {totalPrice} €"
+      "submit": "Nastavi na plaćanje depozita – {deposit} €"
     },
     "success": {
       "title": "Upit za rezervaciju zaprimljen!",

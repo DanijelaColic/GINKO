@@ -195,6 +195,23 @@ describe('buildMyRentRentAddPayload', () => {
     expect(wellness.spa_offer).toBe('wellness');
     expect(standard.spa_offer).toBe('standard');
     expect(wellness.rent_source_id).toBe(MYRENT_RENT_SOURCE_WEB_PAGE);
+    expect(standard.price).toBe(sampleBooking().total_price);
+  });
+
+  it('SPA apartman (ginko-spa-1) šalje Ginko legacy ukupnu cijenu u rent_add', () => {
+    const standard = buildMyRentRentAddPayload(
+      sampleBooking({
+        room_slug: 'ginko-spa-1',
+        include_wellness: false,
+        total_price: 180,
+        deposit: 90,
+      }),
+      { myRentUserId: '1' },
+    );
+    expect(standard.object_id).toBe(7460);
+    expect(standard.price).toBe(180);
+    expect(standard.in_advance).toBe(90);
+    expect(standard.spa_offer).toBe('standard');
   });
 });
 

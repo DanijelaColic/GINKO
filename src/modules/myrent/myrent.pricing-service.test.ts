@@ -40,10 +40,7 @@ import {
   fetchMyRentStayPrice,
   MyRentPricingUnavailableError,
 } from './myrent.pricing-service';
-import {
-  setSpaWellnessSurchargeForTests,
-  SpaWellnessSurchargeNotConfiguredError,
-} from './myrent.spa-pricing';
+import { setSpaWellnessSurchargeForTests } from './myrent.spa-pricing';
 
 const fetchPeriodMock = vi.mocked(fetchMyRentPricePeriodDetails);
 const mockFlag = vi.mocked(isMyRentPricingMock);
@@ -157,8 +154,8 @@ describe('fetchMyRentStayPrice (period)', () => {
       checkOut: '2026-11-26',
       adults: 2,
     });
-    expect(spa.breakdown.totalPrice).toBe(234 + 40);
-    expect(spa.breakdown.deposit).toBe(137);
+    expect(spa.breakdown.totalPrice).toBe(234);
+    expect(spa.breakdown.deposit).toBe(117);
   });
 
   it('ne zbraja Ginko EXTRA_BED uz MyRent goste (nema dvostruke naplate)', async () => {
@@ -186,65 +183,52 @@ describe('fetchMyRentStayPrice (period)', () => {
     ).toBe(false);
   });
 
-  it('SPA-2 = MyRent baza + admin wellness nadoplata (bez zasebnog linea)', async () => {
+  it('SPA-2 = samo MyRent Website (A) total — bez Ginko wellness surcharge', async () => {
     setSpaWellnessSurchargeForTests(100);
 
-    fetchPeriodMock.mockResolvedValue({
-      ...periodResult(390, [
-        { day: '2027-03-15', price: 195 },
-        { day: '2027-03-16', price: 195 },
-      ]),
-      objectId: 7460,
-    });
+    for (const nights of [
+      {
+        until: '2027-03-16',
+        total: 195,
+        nights: [{ day: '2027-03-15', price: 195 }],
+        deposit: 97.5,
+      },
+      {
+        until: '2027-03-17',
+        total: 390,
+        nights: [
+          { day: '2027-03-15', price: 195 },
+          { day: '2027-03-16', price: 195 },
+        ],
+        deposit: 195,
+      },
+      {
+        until: '2027-03-18',
+        total: 585,
+        nights: [
+          { day: '2027-03-15', price: 195 },
+          { day: '2027-03-16', price: 195 },
+          { day: '2027-03-17', price: 195 },
+        ],
+        deposit: 292.5,
+      },
+    ]) {
+      fetchPeriodMock.mockResolvedValue({
+        ...periodResult(nights.total, nights.nights),
+        objectId: 7460,
+      });
 
-    const wellness = await fetchMyRentStayPrice({
-      roomSlug: 'ginko-spa-2',
-      checkIn: '2027-03-15',
-      checkOut: '2027-03-17',
-      adults: 2,
-    });
-
-    fetchPeriodMock.mockResolvedValue({
-      ...periodResult(390, [
-        { day: '2027-03-15', price: 195 },
-        { day: '2027-03-16', price: 195 },
-      ]),
-      objectId: 7460,
-    });
-
-    const standard = await fetchMyRentStayPrice({
-      roomSlug: 'ginko-spa-1',
-      checkIn: '2027-03-15',
-      checkOut: '2027-03-17',
-      adults: 2,
-    });
-
-    expect(standard.breakdown.totalPrice).toBe(390);
-    expect(wellness.breakdown.totalPrice).toBe(390 + 100 * 2);
-    expect(wellness.breakdown.deposit).toBe(
-      Math.round(wellness.breakdown.totalPrice * 100 * 0.5) / 100,
-    );
-    expect(wellness.breakdown.lines).toHaveLength(1); // samo Smještaj
-  });
-
-  it('SPA-2 bez unesene nadoplate → SpaWellnessSurchargeNotConfiguredError', async () => {
-    setSpaWellnessSurchargeForTests(null);
-    fetchPeriodMock.mockResolvedValue({
-      ...periodResult(390, [
-        { day: '2027-03-15', price: 195 },
-        { day: '2027-03-16', price: 195 },
-      ]),
-      objectId: 7460,
-    });
-
-    await expect(
-      fetchMyRentStayPrice({
+      const wellness = await fetchMyRentStayPrice({
         roomSlug: 'ginko-spa-2',
         checkIn: '2027-03-15',
-        checkOut: '2027-03-17',
+        checkOut: nights.until,
         adults: 2,
-      }),
-    ).rejects.toBeInstanceOf(SpaWellnessSurchargeNotConfiguredError);
+      });
+
+      expect(wellness.breakdown.totalPrice).toBe(nights.total);
+      expect(wellness.breakdown.deposit).toBe(nights.deposit);
+      expect(wellness.breakdown.lines).toHaveLength(1);
+    }
   });
 
   it('quote i create koriste isti Website total (evaluateQuotedPrice ok)', async () => {

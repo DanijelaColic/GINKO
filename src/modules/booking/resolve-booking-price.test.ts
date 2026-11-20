@@ -2,9 +2,14 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { Room } from '@/modules/rooms/room.types';
 import { parseLocalDate } from './dates';
 
-vi.mock('@/modules/myrent/myrent.pricing-config', () => ({
-  isMyRentPricingEnabled: vi.fn(() => false),
-}));
+vi.mock('@/modules/myrent/myrent.pricing-config', async (importOriginal) => {
+  const actual =
+    await importOriginal<typeof import('@/modules/myrent/myrent.pricing-config')>();
+  return {
+    ...actual,
+    isMyRentPricingEnabled: vi.fn(() => false),
+  };
+});
 
 vi.mock('@/modules/myrent/myrent.pricing-service', () => ({
   fetchMyRentStayPrice: vi.fn(),
@@ -101,5 +106,41 @@ describe('resolveBookingPrice', () => {
         children: 0,
       }),
     );
+  });
+
+  it('flag uključen + ginko-spa-1 → legacy 90 €/noć (ne MyRent)', async () => {
+    isEnabled.mockReturnValue(true);
+    const spaRoom = {
+      slug: 'ginko-spa-1',
+      price: 90,
+      name: 'Apartman',
+      capacity: 4,
+    } as Room;
+
+    const one = await resolveBookingPrice({
+      room: spaRoom,
+      checkIn: parseLocalDate('2027-09-01'),
+      checkOut: parseLocalDate('2027-09-02'),
+    });
+    expect(one.source).toBe('legacy_room_price');
+    expect(one.breakdown.totalPrice).toBe(90);
+    expect(one.breakdown.deposit).toBe(45);
+
+    const two = await resolveBookingPrice({
+      room: spaRoom,
+      checkIn: parseLocalDate('2027-09-01'),
+      checkOut: parseLocalDate('2027-09-03'),
+    });
+    expect(two.breakdown.totalPrice).toBe(180);
+    expect(two.breakdown.deposit).toBe(90);
+
+    const three = await resolveBookingPrice({
+      room: spaRoom,
+      checkIn: parseLocalDate('2027-09-01'),
+      checkOut: parseLocalDate('2027-09-04'),
+    });
+    expect(three.breakdown.totalPrice).toBe(270);
+    expect(three.breakdown.deposit).toBe(135);
+    expect(fetchStay).not.toHaveBeenCalled();
   });
 });

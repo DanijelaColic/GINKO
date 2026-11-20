@@ -4,21 +4,26 @@
     "description": "Comfortable accommodation in the heart of Daruvar. Book your room at ginko-sobe.com.",
     "openGraphAlt": "Ginko Boutique Rooms & Wellness – accommodation view"
   },
+  "pricingDisplay": {
+    "selectDatesHint": "Price depends on dates – select your stay.",
+    "fromPerNight": "From {amount} € / night",
+    "fromPriceNote": "For 2 adults, first available reference date in the next 90 days. Final price depends on your selected dates."
+  },
   "metadata": {
     "layout": {
       "title": {
-        "default": "Ginko Boutique Rooms & Wellness Daruvar",
-        "template": "%s | Ginko Boutique Rooms & Wellness Daruvar"
+        "default": "Rooms & wellness in Daruvar | Ginko Boutique Rooms",
+        "template": "%s | Ginko Boutique Rooms"
       },
-      "description": "Boutique rooms in the heart of Daruvar, Croatia — WiFi, AC, sauna and free parking. Book directly, no middleman.",
+      "description": "Boutique rooms and wellness in the heart of Daruvar, Croatia — ~400 m from the spa, WiFi, AC, sauna and free parking. Book directly, no middleman.",
       "openGraph": {
-        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
-        "description": "Boutique rooms in the heart of Daruvar. Sauna, terrace, free parking. Book directly.",
-        "imageAlt": "Ginko Boutique Rooms & Wellness – Daruvar, Croatia"
+        "title": "Rooms & wellness in Daruvar | Ginko Boutique Rooms",
+        "description": "Boutique rooms in central Daruvar, ~400 m from Daruvar Spa. Sauna, terrace, free parking. Book directly.",
+        "imageAlt": "Ginko Boutique Rooms & Wellness – Ulica Tomaša Garika Masaryka 1, Daruvar"
       },
       "twitter": {
-        "title": "Ginko Boutique Rooms & Wellness – Daruvar",
-        "description": "Boutique rooms in the heart of Daruvar, Croatia. Book directly."
+        "title": "Rooms & wellness in Daruvar | Ginko Boutique Rooms",
+        "description": "Boutique rooms and wellness in Daruvar, Croatia. Book directly."
       }
     },
     "structuredData": {
@@ -101,7 +106,7 @@
   },
   "homePage": {
     "heroTitle": "Ginko Boutique Rooms & Wellness",
-    "heroSubtitle": "Elegant accommodation, wellness and complete relaxation in the heart of the city",
+    "heroSubtitle": "Boutique rooms and wellness in the heart of Daruvar — spa ~400 m away",
     "heroCta": "View Rooms",
     "bookCta": "Book Now",
     "heroCheckIn": "Check-in",
@@ -135,8 +140,8 @@
     "feature2Desc": "Fast internet connection in all rooms.",
     "feature3Title": "Air conditioning",
     "feature3Desc": "Comfortable temperature in every season.",
-    "feature4Title": "Peaceful location",
-    "feature4Desc": "Surrounded by nature, away from the noise.",
+    "feature4Title": "Quiet town centre",
+    "feature4Desc": "In the heart of town, with quiet evenings after 23:00.",
     "feature5Title": "Home atmosphere",
     "feature5Desc": "Warm welcome and local host tips.",
     "feature6Title": "Flexible check-in",
@@ -173,9 +178,10 @@
       "01-living": "Ginko Boutique Rooms & Wellness — apartment living room",
       "01-cover": "Ginko Boutique Rooms & Wellness — room"
     },
-    "aboutP1": "Located in the very heart of Daruvar, at T. G. Masaryk Street 1, GINKO Boutique Rooms & Wellness offers a unique blend of elegance, comfort and relaxation. The name was inspired by the oldest and most famous Ginkgo biloba tree in Europe, which has adorned the grounds of Janković Castle since the 18th century.",
-    "aboutP2": "Our modern rooms and wellness apartments sit within the town’s protected historic centre, just a few minutes’ walk from Daruvar Spa and the Aquae Balissae aqua park. Thanks to this excellent location, GINKO is an ideal choice for a wellness stay, a family weekend, business travel or recovery after medical and aesthetic treatments.",
-    "aboutP3": "Whether you want to enjoy a private wellness area, explore the beauty of Daruvar or find a quiet place to rest, GINKO Boutique Rooms & Wellness will give you outstanding service and a feeling of home in the town of greenery and beer.",
+    "aboutHeading": "Boutique accommodation in central Daruvar",
+    "aboutP1": "Located in the very heart of Daruvar, at Ulica Tomaša Garika Masaryka 1, GINKO Boutique Rooms & Wellness offers a unique blend of elegance, comfort and relaxation. The name was inspired by the oldest and most famous Ginkgo biloba tree in Europe, which has adorned the grounds of Janković Castle since the 18th century.",
+    "aboutP2": "Our accommodation in Daruvar — modern [rooms in Daruvar](/sobe-daruvar) and wellness apartments — sits within the town’s protected historic centre, just a few minutes’ walk from Daruvar Spa and the Aquae Ballisae aqua park. For a spa-distance focus see [accommodation near Daruvar Spa](/smjestaj-uz-daruvarske-toplice). GINKO is an ideal choice for a wellness stay, a family weekend, business travel or recovery after medical and aesthetic treatments.",
+    "aboutP3": "Whether you want [private wellness](/wellness-daruvar), to explore Daruvar or find a quiet place to rest, GINKO Boutique Rooms & Wellness will give you outstanding service and a feeling of home in the town of greenery and beer.",
     "ctaTitle": "Ready for your getaway?",
     "ctaSubtitle": "Book your room today and secure your spot in our peaceful corner of Slavonia.",
     "ctaButton": "Book Now",
@@ -309,8 +315,10 @@
   },
   "roomsPage": {
     "eyebrow": "Accommodation",
-    "title": "Our Rooms",
-    "description": "Rooms carefully designed with natural materials and a welcoming atmosphere.",
+    "title": "Rooms and apartments in Daruvar",
+    "description": "Boutique rooms and apartments in central Daruvar — Daruvar Spa and the aqua park about 400 m on foot. Compare types and book direct.",
+    "wellnessLink": "Private wellness (sauna and jacuzzi)",
+    "wellnessBadge": "Private wellness",
     "openGraph": {
       "title": "Rooms – Ginko Boutique Rooms & Wellness Daruvar",
       "description": "Comfortable boutique rooms in Daruvar with direct booking and no commission.",
@@ -595,7 +603,7 @@
       "submitting": "Preparing payment…",
       "continueToPayment": "Continue to payment",
       "step3Redirecting": "Creating your booking and redirecting to payment…",
-      "submit": "Continue to payment · {totalPrice} €"
+      "submit": "Continue to deposit payment – {deposit} €"
     },
     "success": {
       "title": "Booking inquiry received!",

@@ -1,4 +1,3 @@
-import type { Metadata } from 'next';
 import { Suspense } from 'react';
 import Image from 'next/image';
 import { getTranslations, getLocale } from 'next-intl/server';
@@ -7,7 +6,6 @@ import { Car, Wifi, Wind, TreePine, Star, ChevronRight, Waves, Phone, Mail } fro
 import ShareButton from '@/components/hotel/ShareButton';
 import { PropertyHeaderLocation } from '@/components/hotel/PropertyLocationMap';
 import { getValidLocale } from '@/i18n/messages';
-import { getRootMetadata } from '@/i18n/metadata';
 import { getRooms } from '@/modules/rooms/room.repository';
 import type { RoomLocale } from '@/modules/rooms/room.types';
 import HeroSearchBar from '@/components/hotel/HeroSearchBar';
@@ -19,14 +17,15 @@ import PropertyReviewsSection from '@/components/hotel/PropertyReviewsSection';
 import TravelerQuestionsSection from '@/components/hotel/TravelerQuestionsSection';
 import PropertySurroundingsSection from '@/components/hotel/PropertySurroundingsSection';
 import PropertyFacilitiesSection from '@/components/hotel/PropertyFacilitiesSection';
+import { InternalLinks } from '@/components/seo/InternalLinks';
 import { getGoogleReviews } from '@/modules/reviews/google-reviews.service';
+import { RichParagraph } from '@/modules/seo/rich-paragraph';
 import { CONTACT_EMAIL, AVAILABILITY_SECTION_HREF, OVERVIEW_SECTION_ID, CONTACT_PHONE_TEL, CONTACT_PHONE_DISPLAY } from '@/modules/booking/booking.config';
 import { isMyRentPricingEnabled } from '@/modules/myrent/myrent.pricing-config';
+import { getListingFromPriceMap } from '@/modules/myrent/myrent.listing-from-price';
 
-export async function generateMetadata(): Promise<Metadata> {
-  const locale = getValidLocale(await getLocale());
-  return getRootMetadata(locale);
-}
+// Title/description/robots dolaze iz root layout getRootMetadata — ne ponavljati ovdje
+// (inače Next template napravi „Brand | Brand“).
 
 const PROPERTY_IMAGE_SRCS = [
   // Cover (large left): building + two palms on terrace
@@ -68,6 +67,12 @@ export default async function HomePage() {
     Icon: FEATURE_ICONS[n - 1],
   }));
 
+  const tPricing = await getTranslations('pricingDisplay');
+  const myRentPricingEnabled = isMyRentPricingEnabled();
+  const listingFromBySlug = myRentPricingEnabled
+    ? await getListingFromPriceMap()
+    : {};
+
   const availabilityLabels = {
     selectDates: t('availabilitySelectDates'),
     selectGuests: t('availabilitySelectGuests'),
@@ -90,6 +95,9 @@ export default async function HomePage() {
     contactUs: t('availabilityContactUs'),
     reserve: t('availabilityReserve'),
     perNight: t('availabilityPerNight'),
+    selectDatesPriceHint: tPricing('selectDatesHint'),
+    fromPerNightLabel: tPricing('fromPerNight'),
+    fromPriceNote: tPricing('fromPriceNote'),
     pricingUnavailable: t('availabilityPricingUnavailable'),
     depositLabel: t('availabilityDepositLabel'),
     nightOne: t('availabilityNightOne'),
@@ -211,11 +219,23 @@ export default async function HomePage() {
       {/* ------------------------------------------------------------------ */}
       <section className="py-14 px-4 bg-white">
         <div className="max-w-6xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
-          {/* Lijevo: opis objekta */}
+          {/* Lijevo: opis objekta — H2 lokalni intent + contextual linkovi u copyju */}
           <div className="space-y-4">
-            <p className="text-text text-base leading-relaxed">{t('aboutP1')}</p>
-            <p className="text-text text-base leading-relaxed">{t('aboutP2')}</p>
-            <p className="text-text text-base leading-relaxed">{t('aboutP3')}</p>
+            <h2 className="font-serif text-2xl sm:text-3xl font-semibold text-text leading-tight">
+              {t('aboutHeading')}
+            </h2>
+            <RichParagraph
+              className="text-text text-base leading-relaxed"
+              text={t('aboutP1')}
+            />
+            <RichParagraph
+              className="text-text text-base leading-relaxed"
+              text={t('aboutP2')}
+            />
+            <RichParagraph
+              className="text-text text-base leading-relaxed"
+              text={t('aboutP3')}
+            />
           </div>
 
           {/* Desno: 6 ključnih sadržaja */}
@@ -243,7 +263,8 @@ export default async function HomePage() {
         <AvailabilitySection
           rooms={rooms}
           labels={availabilityLabels}
-          myRentPricingEnabled={isMyRentPricingEnabled()}
+          myRentPricingEnabled={myRentPricingEnabled}
+          listingFromBySlug={listingFromBySlug}
           reviewSummary={googleReviews
             ? { rating: googleReviews.rating, reviewCount: googleReviews.reviewCount }
             : null}
@@ -296,6 +317,11 @@ export default async function HomePage() {
           </Link>
         </div>
       </section>
+
+      {/* SEO: landings + core interne poveznice */}
+      <div className="mx-auto max-w-6xl px-4 pb-14">
+        <InternalLinks currentPath="/" />
+      </div>
     </div>
   );
 }
