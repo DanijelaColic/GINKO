@@ -401,6 +401,18 @@ describe('SQL zaključavanje', () => {
     expect(isTransactionAlreadyCaptured(declined)).toBe(false);
   });
 
+  it('payment_admin_alerts je samo za service_role', () => {
+    expect(sql).toMatch(
+      /create policy "Service role full access payment_admin_alerts"\s+on payment_admin_alerts\s+to service_role/i,
+    );
+    expect(sql).toContain(
+      'revoke all on table public.payment_admin_alerts from public, anon, authenticated',
+    );
+    expect(sql).toContain(
+      'grant all on table public.payment_admin_alerts to service_role',
+    );
+  });
+
   it('release traži pending, neplaćeno i istekao hold', () => {
     expect(sql).toMatch(/deposit_paid = false/);
     expect(sql).toMatch(/status = 'pending'/);

@@ -44,10 +44,16 @@ create table if not exists payment_admin_alerts (
 
 alter table payment_admin_alerts enable row level security;
 
+-- USING (true) bez TO vrijedi za svaku rolu koja ima GRANT, uključujući anon.
+-- service_role ionako zaobilazi RLS; prava na tablici su zato eksplicitno skinuta
+-- s public/anon/authenticated na dnu ove migracije.
 drop policy if exists "Service role full access payment_admin_alerts"
   on payment_admin_alerts;
 create policy "Service role full access payment_admin_alerts"
-  on payment_admin_alerts using (true) with check (true);
+  on payment_admin_alerts
+  to service_role
+  using (true)
+  with check (true);
 
 -- ── claim: jedna sesija, FOR UPDATE ──────────────────────────────
 
@@ -409,6 +415,9 @@ begin
   return updated = 1;
 end;
 $$;
+
+revoke all on table public.payment_admin_alerts from public, anon, authenticated;
+grant all on table public.payment_admin_alerts to service_role;
 
 revoke all on function public.claim_booking_payment_session(uuid, integer, text) from public, anon, authenticated;
 revoke all on function public.supersede_booking_payment_session(uuid, uuid, integer, text) from public, anon, authenticated;
