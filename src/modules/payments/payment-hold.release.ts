@@ -44,11 +44,13 @@ export async function releaseOneHold(input: {
       classes[intent.id] = 'uncertain';
       continue;
     }
+    // Isti razmak kao za nejasni ishod: napušteni wrong-state se ne poll-a.
+    const previous = intent.lastAssertClass;
     if (
-      intent.lastAssertClass === 'uncertain' &&
+      (previous === 'uncertain' || previous === 'abandoned_unconfirmed') &&
       recentUncertain(intent, input.nowMs)
     ) {
-      classes[intent.id] = 'uncertain';
+      classes[intent.id] = previous;
       continue;
     }
 

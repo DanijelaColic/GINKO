@@ -42,6 +42,8 @@ export function snapshotFromSaferpayError(err: unknown): AssertSnapshot {
       httpStatus: err.status,
       errorName: err.body?.ErrorName ?? null,
       transactionId: err.body?.TransactionId ?? null,
+      behavior: err.body?.Behavior ?? null,
+      errorDetail: err.body?.ErrorDetail ?? null,
     };
   }
   return { kind: 'unreachable' };

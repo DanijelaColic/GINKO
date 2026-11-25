@@ -11,6 +11,10 @@
  * - Init stariji od jednog sata smije se zatvoriti tek NAKON Asserta
  * - TRANSACTION_NOT_STARTED = „try again later”, nije konačan neuspjeh
  * - COMMUNICATION_TIMEOUT = autorizacija je možda nastala, a Saferpay to ne zna
+ * - TRANSACTION_IN_WRONG_STATE sam po sebi nije neuspjeh. Dokumentirani
+ *   napušteni ishod (DO_NOT_RETRY i „abandoned by the payer”) smije otkazati
+ *   tek ponovljeni Assert, nakon 60 min od Initializea i isteka RedirectUrl-a,
+ *   i samo ako nema autorizacije ni naplate
  * - ako je narudžba već plaćena, drugu autorizaciju treba Cancel, ne Capture
  *
  * Gostu obećavamo najmanje 30 minuta. Ako Saferpay vrati kasniji Expiration,
@@ -71,10 +75,17 @@ export type AssertSnapshot =
       httpStatus: number | null;
       errorName: string | null;
       transactionId: string | null;
+      behavior?: string | null;
+      errorDetail?: string[] | null;
     }
   | { kind: 'unreachable' };
 
-export type AssertClass = 'paid' | 'terminal_unpaid' | 'still_open' | 'uncertain';
+export type AssertClass =
+  | 'paid'
+  | 'terminal_unpaid'
+  | 'still_open'
+  | 'uncertain'
+  | 'abandoned_unconfirmed';
 
 export type IntentView = {
   id: string;
@@ -97,7 +108,15 @@ export type BookingHoldView = {
 
 export type ReleaseDecision =
   | { action: 'skip'; reason: 'not_pending' | 'deposit_paid' | 'no_deadline' }
-  | { action: 'keep'; reason: 'hold_open' | 'finalizing' | 'still_payable' | 'uncertain' }
+  | {
+      action: 'keep';
+      reason:
+        | 'hold_open'
+        | 'finalizing'
+        | 'still_payable'
+        | 'uncertain'
+        | 'abandoned_unconfirmed';
+    }
   | { action: 'release' }
   | { action: 'settle_paid'; intentId: string };
 
@@ -199,7 +218,44 @@ export function classifyAssert(
     return 'terminal_unpaid';
   }
 
+  // Nije na listi konačnih neuspjeha. Otkaz je moguć samo za dokumentirani
+  // napušteni Payment Page ishod, i to uz ponovljeni Assert i oba roka.
+  if (name === 'TRANSACTION_IN_WRONG_STATE' && snapshot.kind === 'error') {
+    return classifyAbandonedWrongState(snapshot, intent, nowMs);
+  }
+
   return 'uncertain';
+}
+
+/** Službeni primjer iz Payment Page vodiča, nije bilo koji wrong-state. */
+const DOCUMENTED_ABANDONED_DETAIL =
+  'transaction still in progress or abandoned by the payer';
+
+function isDocumentedAbandonedWrongState(
+  snapshot: Extract<AssertSnapshot, { kind: 'error' }>,
+): boolean {
+  const behavior = (snapshot.behavior ?? '').toUpperCase();
+  if (behavior !== 'DO_NOT_RETRY') return false;
+  const detail = (snapshot.errorDetail ?? []).join(' ').toLowerCase();
+  return detail.includes(DOCUMENTED_ABANDONED_DETAIL);
+}
+
+function classifyAbandonedWrongState(
+  snapshot: Extract<AssertSnapshot, { kind: 'error' }>,
+  intent: IntentView,
+  nowMs: number,
+): AssertClass {
+  if (!isDocumentedAbandonedWrongState(snapshot)) return 'uncertain';
+
+  const created = parseTime(intent.createdAt);
+  const redirectUntil = parseTime(intent.redirectExpiresAt);
+  const hourPassed =
+    created != null && nowMs - created >= SAFERPAY_ABANDON_AFTER_MS;
+  const redirectExpired = redirectUntil != null && nowMs >= redirectUntil;
+  const repeated = intent.lastAssertClass === 'abandoned_unconfirmed';
+
+  if (repeated && hourPassed && redirectExpired) return 'terminal_unpaid';
+  return 'abandoned_unconfirmed';
 }
 
 export function recentUncertain(intent: IntentView, nowMs: number): boolean {
@@ -236,6 +292,7 @@ export function decideHoldRelease(input: {
   }
 
   let uncertain = false;
+  let abandonedUnconfirmed = false;
   let stillPayable = false;
   let paidId: string | null = null;
 
@@ -243,6 +300,7 @@ export function decideHoldRelease(input: {
     if (intent.status === 'cancelled' || intent.status === 'succeeded') continue;
     const klass = input.classes[intent.id];
     if (klass === 'paid') paidId = intent.id;
+    else if (klass === 'abandoned_unconfirmed') abandonedUnconfirmed = true;
     else if (klass === 'uncertain' || klass == null) uncertain = true;
     else if (klass === 'still_open' || sessionCanStillBePaid(intent, input.nowMs)) {
       stillPayable = true;
@@ -251,6 +309,7 @@ export function decideHoldRelease(input: {
 
   if (paidId) return { action: 'settle_paid', intentId: paidId };
   if (uncertain) return { action: 'keep', reason: 'uncertain' };
+  if (abandonedUnconfirmed) return { action: 'keep', reason: 'abandoned_unconfirmed' };
   if (stillPayable) return { action: 'keep', reason: 'still_payable' };
   return { action: 'release' };
 }

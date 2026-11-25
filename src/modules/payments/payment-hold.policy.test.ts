@@ -16,6 +16,17 @@ import {
 
 const T0 = Date.parse('2027-01-15T10:00:00.000Z');
 
+function abandonedWrongState(): AssertSnapshot {
+  return {
+    kind: 'error',
+    httpStatus: 402,
+    errorName: 'TRANSACTION_IN_WRONG_STATE',
+    transactionId: null,
+    behavior: 'DO_NOT_RETRY',
+    errorDetail: ['Transaction still in progress or abandoned by the payer.'],
+  };
+}
+
 function intent(partial: Partial<IntentView> = {}): IntentView {
   return {
     id: 'intent-1',
@@ -128,6 +139,106 @@ describe('Assert klasifikacija', () => {
     ).toBe('uncertain');
   });
 
+  it('TRANSACTION_IN_WRONG_STATE bez dokumentiranog napuštanja nije konačan neuspjeh', () => {
+    const afterHour = T0 + SAFERPAY_ABANDON_AFTER_MS + 1000;
+    const row = intent({
+      redirectExpiresAt: new Date(T0 + 20 * 60 * 1000).toISOString(),
+      lastAssertClass: 'abandoned_unconfirmed',
+    });
+    expect(
+      classifyAssert(
+        {
+          kind: 'error',
+          httpStatus: 402,
+          errorName: 'TRANSACTION_IN_WRONG_STATE',
+          transactionId: null,
+          behavior: 'RETRY',
+          errorDetail: ['Transaction still in progress or abandoned by the payer.'],
+        },
+        row,
+        afterHour,
+      ),
+    ).toBe('uncertain');
+    expect(
+      classifyAssert(
+        {
+          kind: 'error',
+          httpStatus: 402,
+          errorName: 'TRANSACTION_IN_WRONG_STATE',
+          transactionId: null,
+          behavior: 'DO_NOT_RETRY',
+          errorDetail: ['Capture is not allowed in this state.'],
+        },
+        row,
+        afterHour,
+      ),
+    ).toBe('uncertain');
+  });
+
+  it('prvi dokumentirani napušteni Assert ne otkazuje ni nakon oba roka', () => {
+    const row = intent({
+      redirectExpiresAt: new Date(T0 + 20 * 60 * 1000).toISOString(),
+      lastAssertClass: null,
+    });
+    expect(
+      classifyAssert(abandonedWrongState(), row, T0 + SAFERPAY_ABANDON_AFTER_MS + 1000),
+    ).toBe('abandoned_unconfirmed');
+  });
+
+  it('ponovljeni napušteni Assert prije 60 minuta ili prije isteka RedirectUrl-a ne otkazuje', () => {
+    const repeated = intent({
+      redirectExpiresAt: new Date(T0 + 20 * 60 * 1000).toISOString(),
+      lastAssertClass: 'abandoned_unconfirmed',
+    });
+    expect(
+      classifyAssert(abandonedWrongState(), repeated, T0 + SAFERPAY_ABANDON_AFTER_MS - 1),
+    ).toBe('abandoned_unconfirmed');
+
+    const redirectOpen = intent({
+      redirectExpiresAt: new Date(T0 + 70 * 60 * 1000).toISOString(),
+      lastAssertClass: 'abandoned_unconfirmed',
+    });
+    expect(
+      classifyAssert(
+        abandonedWrongState(),
+        redirectOpen,
+        T0 + SAFERPAY_ABANDON_AFTER_MS + 1000,
+      ),
+    ).toBe('abandoned_unconfirmed');
+
+    const noRedirect = intent({
+      redirectExpiresAt: null,
+      lastAssertClass: 'abandoned_unconfirmed',
+    });
+    expect(
+      classifyAssert(abandonedWrongState(), noRedirect, T0 + SAFERPAY_ABANDON_AFTER_MS + 1000),
+    ).toBe('abandoned_unconfirmed');
+  });
+
+  it('ponovljeni napušteni Assert nakon 60 minuta i isteka RedirectUrl-a je neuspjeh', () => {
+    const row = intent({
+      redirectExpiresAt: new Date(T0 + 20 * 60 * 1000).toISOString(),
+      lastAssertClass: 'abandoned_unconfirmed',
+    });
+    expect(
+      classifyAssert(abandonedWrongState(), row, T0 + SAFERPAY_ABANDON_AFTER_MS + 1000),
+    ).toBe('terminal_unpaid');
+  });
+
+  it('autorizacija i dalje ima prednost nad prethodnim napuštenim Assertom', () => {
+    const row = intent({ lastAssertClass: 'abandoned_unconfirmed' });
+    expect(
+      classifyAssert({ kind: 'authorized', transactionId: 'tx' }, row, T0),
+    ).toBe('paid');
+    expect(
+      classifyAssert(
+        { kind: 'captured', transactionId: 'tx', captureId: 'cap' },
+        row,
+        T0,
+      ),
+    ).toBe('paid');
+  });
+
   it('AUTHORIZED i CAPTURED su plaćeno', () => {
     expect(
       classifyAssert(
@@ -173,6 +284,18 @@ describe('oslobađanje termina', () => {
         nowMs: after,
       }),
     ).toEqual({ action: 'release' });
+  });
+
+  it('nepotvrđeni napušteni Assert ne oslobađa', () => {
+    const row = intent();
+    expect(
+      decideHoldRelease({
+        booking: booking(),
+        intents: [row],
+        classes: { [row.id]: 'abandoned_unconfirmed' },
+        nowMs: after,
+      }),
+    ).toEqual({ action: 'keep', reason: 'abandoned_unconfirmed' });
   });
 
   it('nejasan Assert ne oslobađa', () => {

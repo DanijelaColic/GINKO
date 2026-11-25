@@ -5,11 +5,13 @@ import {
   PAYMENT_FINALIZING_GUARD_MS,
   PAYMENT_HOLD_MS,
   SAFERPAY_ABANDON_AFTER_MS,
+  UNCERTAIN_ASSERT_COOLDOWN_MS,
 } from './payment-hold.policy';
 import { SaferpayApiError } from './saferpay.client';
 import {
   captureOutcomeUnknown,
   isTransactionAlreadyCaptured,
+  snapshotFromSaferpayError,
 } from './payment-hold.saferpay';
 import {
   createInMemoryPaymentLock,
@@ -349,6 +351,160 @@ describe('release nakon Asserta', () => {
       },
     });
     expect(outcome).toEqual({ action: 'settled' });
+    expect(settled).toBe(true);
+    expect(released).toBe(false);
+  });
+});
+
+describe('TRANSACTION_IN_WRONG_STATE napušteno plaćanje', () => {
+  const documented = () =>
+    new SaferpayApiError(
+      402,
+      {
+        ErrorName: 'TRANSACTION_IN_WRONG_STATE',
+        Behavior: 'DO_NOT_RETRY',
+        ErrorMessage: 'Invalid action',
+        ErrorDetail: ['Transaction still in progress or abandoned by the payer.'],
+      },
+      'fallback',
+    );
+
+  function holdBooking() {
+    return {
+      status: 'pending' as const,
+      depositPaid: false,
+      paymentHoldUntil: new Date(T0 + PAYMENT_HOLD_MS).toISOString(),
+      paymentFinalizingAt: null,
+      paymentFinalizingIntentId: null,
+    };
+  }
+
+  it('prenosi Behavior i ErrorDetail u Assert snimku', () => {
+    expect(snapshotFromSaferpayError(documented())).toMatchObject({
+      kind: 'error',
+      httpStatus: 402,
+      errorName: 'TRANSACTION_IN_WRONG_STATE',
+      behavior: 'DO_NOT_RETRY',
+      errorDetail: ['Transaction still in progress or abandoned by the payer.'],
+    });
+  });
+
+  it('prvi Assert samo pamti ishod i ne otkazuje rezervaciju', async () => {
+    const seen: string[] = [];
+    let released = false;
+    const outcome = await releaseOneHold({
+      booking: holdBooking(),
+      intents: [
+        {
+          id: 'i1',
+          status: 'requires_payment_method',
+          createdAt: new Date(T0).toISOString(),
+          redirectExpiresAt: new Date(T0 + 20 * 60 * 1000).toISOString(),
+          hasToken: true,
+          orderId: 'o1',
+          lastAssertAt: null,
+          lastAssertClass: null,
+        },
+      ],
+      nowMs: T0 + SAFERPAY_ABANDON_AFTER_MS + 1000,
+      assertIntent: async () => snapshotFromSaferpayError(documented()),
+      settlePaid: async () => undefined,
+      markIntentUnpaid: async () => undefined,
+      rememberAssert: async (_intent, klass) => {
+        seen.push(klass);
+      },
+      releaseIfUnpaid: async () => {
+        released = true;
+        return true;
+      },
+    });
+    expect(outcome).toEqual({ action: 'kept', reason: 'abandoned_unconfirmed' });
+    expect(seen).toEqual(['abandoned_unconfirmed']);
+    expect(released).toBe(false);
+  });
+
+  it('drugi Assert unutar 15 minuta ne zove Saferpay ponovno', async () => {
+    let asserts = 0;
+    const now = T0 + SAFERPAY_ABANDON_AFTER_MS + 1000;
+    const outcome = await releaseOneHold({
+      booking: holdBooking(),
+      intents: [
+        {
+          id: 'i1',
+          status: 'requires_payment_method',
+          createdAt: new Date(T0).toISOString(),
+          redirectExpiresAt: new Date(T0 + 20 * 60 * 1000).toISOString(),
+          hasToken: true,
+          orderId: 'o1',
+          lastAssertAt: new Date(now - UNCERTAIN_ASSERT_COOLDOWN_MS + 1000).toISOString(),
+          lastAssertClass: 'abandoned_unconfirmed',
+        },
+      ],
+      nowMs: now,
+      assertIntent: async () => {
+        asserts += 1;
+        return snapshotFromSaferpayError(documented());
+      },
+      settlePaid: async () => undefined,
+      markIntentUnpaid: async () => undefined,
+      rememberAssert: async () => undefined,
+      releaseIfUnpaid: async () => true,
+    });
+    expect(outcome).toEqual({ action: 'kept', reason: 'abandoned_unconfirmed' });
+    expect(asserts).toBe(0);
+  });
+
+  it('ponovljeni Assert nakon oba roka otkazuje, a autorizacija i dalje ide u settle', async () => {
+    let marked = 0;
+    let released = false;
+    const ready = T0 + SAFERPAY_ABANDON_AFTER_MS + UNCERTAIN_ASSERT_COOLDOWN_MS;
+    const intent = {
+      id: 'i1',
+      status: 'requires_payment_method',
+      createdAt: new Date(T0).toISOString(),
+      redirectExpiresAt: new Date(T0 + 20 * 60 * 1000).toISOString(),
+      hasToken: true,
+      orderId: 'o1',
+      lastAssertAt: new Date(ready - UNCERTAIN_ASSERT_COOLDOWN_MS).toISOString(),
+      lastAssertClass: 'abandoned_unconfirmed',
+    };
+    const cancelled = await releaseOneHold({
+      booking: holdBooking(),
+      intents: [intent],
+      nowMs: ready,
+      assertIntent: async () => snapshotFromSaferpayError(documented()),
+      settlePaid: async () => undefined,
+      markIntentUnpaid: async () => {
+        marked += 1;
+      },
+      rememberAssert: async () => undefined,
+      releaseIfUnpaid: async () => {
+        released = true;
+        return true;
+      },
+    });
+    expect(cancelled).toEqual({ action: 'released' });
+    expect(marked).toBe(1);
+    expect(released).toBe(true);
+
+    let settled = false;
+    released = false;
+    const paid = await releaseOneHold({
+      booking: holdBooking(),
+      intents: [intent],
+      nowMs: ready,
+      assertIntent: async () => ({ kind: 'authorized', transactionId: 'tx' }),
+      settlePaid: async () => {
+        settled = true;
+      },
+      markIntentUnpaid: async () => undefined,
+      rememberAssert: async () => undefined,
+      releaseIfUnpaid: async () => {
+        released = true;
+        return true;
+      },
+    });
+    expect(paid).toEqual({ action: 'settled' });
     expect(settled).toBe(true);
     expect(released).toBe(false);
   });
