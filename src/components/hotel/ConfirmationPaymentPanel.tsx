@@ -10,6 +10,16 @@ import {
   PROPERTY_MAP_URL,
 } from '@/modules/property/property-details.config';
 
+function formatHoldUntil(iso: string, locale: string): string {
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return iso;
+  return new Intl.DateTimeFormat(locale, {
+    dateStyle: 'medium',
+    timeStyle: 'short',
+    timeZone: 'Europe/Zagreb',
+  }).format(date);
+}
+
 type Props = {
   bookingId: string;
   token: string;
@@ -17,6 +27,8 @@ type Props = {
   depositEur: number;
   remainingEur: number;
   guestFirstName?: string;
+  paymentHoldUntil?: string | null;
+  locale?: string;
   paymentBanner?: {
     kind: 'success' | 'cancelled';
     bg: string;
@@ -34,6 +46,8 @@ export default function ConfirmationPaymentPanel({
   depositEur,
   remainingEur,
   guestFirstName,
+  paymentHoldUntil,
+  locale = 'hr',
   paymentBanner,
 }: Props) {
   const t = useTranslations('bookingConfirmation');
@@ -82,6 +96,14 @@ export default function ConfirmationPaymentPanel({
               {t('cardPayNote', { amount: depositEur })}
             </p>
           </div>
+          {paymentHoldUntil && (
+            <div className="mx-6 mb-4 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-950">
+              <p className="font-medium">{t('holdTitle')}</p>
+              <p className="mt-1 text-amber-950/80">
+                {t('holdBody', { until: formatHoldUntil(paymentHoldUntil, locale) })}
+              </p>
+            </div>
+          )}
           <div className="px-6 pb-6">
             <PayDepositButton
               bookingId={bookingId}

@@ -11,7 +11,7 @@
 //
 import { NextRequest, NextResponse } from 'next/server';
 import { insertWebhookEvent, markWebhookEventProcessed } from '@/modules/payments/payment.repository';
-import { handleSaferpayNotify } from '@/modules/payments/payment.service';
+import { handleSaferpayNotify, PaymentSettlementInProgressError } from '@/modules/payments/payment.service';
 import { formatSafeErrorMessage } from '@/modules/payments/safe-error';
 
 // Assert/Capture + await MyRent sync može trajati dulje od default serverless limita.
@@ -42,6 +42,9 @@ async function processNotify(orderId: string, result: string | null) {
     await markWebhookEventProcessed(webhookRow.id);
     return NextResponse.json({ received: true });
   } catch (err) {
+    if (err instanceof PaymentSettlementInProgressError) {
+      return NextResponse.json({ error: 'settlement_in_progress' }, { status: 500 });
+    }
     const msg = formatSafeErrorMessage(err);
     console.error('[webhook/saferpay] Handler error:', msg);
     await markWebhookEventProcessed(webhookRow.id, msg);

@@ -44,6 +44,7 @@ import { DEPOSIT_PERCENT, bookingReference } from '@/modules/booking/booking.con
 import type { Booking } from '@/modules/booking/booking.types';
 import BookingTimeline from './BookingTimeline';
 import MyRentSyncIssuesBanner from './MyRentSyncIssuesBanner';
+import PaymentHoldAlertsBanner from './PaymentHoldAlertsBanner';
 import { ToastContainer, type ToastItem } from './Toast';
 import {
   bookingPaymentAdminLabel,
@@ -567,6 +568,8 @@ export default function AdminBookings() {
             </div>
           </div>
         )}
+
+        <PaymentHoldAlertsBanner />
 
         {/* MyRent: rezervacije koje nisu live-sinkronizirane (mock ≠ uspjeh) */}
         <MyRentSyncIssuesBanner />

@@ -101,6 +101,7 @@ async function fetchLocalBookedRanges(
     .from('bookings')
     .select('id, check_in, check_out')
     .in('room_slug', slugsToCheck)
+    // pending drži termin dok hold cron sigurno ne postavi cancelled
     .neq('status', 'cancelled');
 
   if (excludeId) {
@@ -257,7 +258,7 @@ export type ConfirmAvailabilityResult =
   | { ok: true }
   | {
       ok: false;
-      reason: 'unavailable' | 'myrent_down' | 'missing_booking' | 'error';
+      reason: 'unavailable' | 'myrent_down' | 'missing_booking' | 'booking_cancelled' | 'error';
       message: string;
     };
 
@@ -300,7 +301,7 @@ export async function recheckAvailabilityBeforeBookingConfirm(
     if (data.status === 'cancelled') {
       return {
         ok: false,
-        reason: 'unavailable',
+        reason: 'booking_cancelled',
         message: 'Rezervacija je otkazana.',
       };
     }

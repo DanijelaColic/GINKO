@@ -184,6 +184,8 @@ export default async function BookingConfirmationPage({ params, searchParams }: 
               remainingEur={remainingEur}
               guestFirstName={guestFirstName}
               paymentBanner={paymentBanner}
+              paymentHoldUntil={data.paymentHoldUntil ?? null}
+              locale={locale}
             />
 
             {/* Back link */}

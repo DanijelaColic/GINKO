@@ -3,15 +3,12 @@
 import {
   getSaferpayConfig,
   saferpayRequest,
-  SaferpayApiError,
   type PaymentPageAssertResponse,
   type PaymentPageInitializeResponse,
-  type SaferpayTransaction,
   type TransactionCaptureResponse,
   type TransactionRefundResponse,
 } from './saferpay.client';
 import {
-  createPaymentIntentRecord,
   getPaymentIntentByBookingId,
   getPaymentIntentByProviderId,
   getPaymentIntentByOrderId,
@@ -36,6 +33,15 @@ import { notifyGuestBookingConfirmed } from '@/lib/email';
 import { recheckAvailabilityBeforeBookingConfirm } from '@/modules/booking/availability.service';
 import { queueMyRentSyncAfterPayment } from '@/modules/myrent/myrent.booking-sync-hook';
 import { formatSafeErrorMessage } from './safe-error';
+import { createSupabasePaymentLock } from './payment-hold.supabase-lock';
+import { startLockedCheckout } from './payment-hold.checkout';
+import { classifyAssert, decideMoneyMovement, type AssertSnapshot, type CaptureGate } from './payment-hold.policy';
+import {
+  captureOutcomeUnknown,
+  isTransactionAlreadyCaptured,
+  snapshotFromAssertBody,
+  snapshotFromSaferpayError,
+} from './payment-hold.saferpay';
 
 // ── Status mapping ────────────────────────────────────────────────
 
@@ -55,10 +61,6 @@ function mapSaferpayTransactionStatus(
     default:
       return 'requires_payment_method';
   }
-}
-
-function isPaymentSuccessful(status: PaymentIntentStatus): boolean {
-  return status === 'succeeded';
 }
 
 /**
@@ -95,10 +97,17 @@ async function markBookingConfirmBlocked(
   }
 }
 
-async function confirmBookingAfterPayment(bookingId: string): Promise<void> {
+async function confirmBookingAfterPayment(
+  bookingId: string,
+): Promise<'confirmed' | 'blocked' | 'cancelled'> {
   const availability = await recheckAvailabilityBeforeBookingConfirm(bookingId);
 
   if (!availability.ok) {
+    // Otkazana (hold release) rezervacija ne smije dobiti deposit_paid.
+    // Zakašnjeli novac ide u Cancel/Refund prije ovog poziva.
+    if (availability.reason === 'booking_cancelled') {
+      return 'cancelled';
+    }
     // Plaćeno, ali nije potvrđeno — jasan admin signal (pending + deposit_paid)
     await updateBookingPaymentState(bookingId, { depositPaid: true });
     await markBookingConfirmBlocked(
@@ -112,7 +121,7 @@ async function confirmBookingAfterPayment(bookingId: string): Promise<void> {
       availability.reason,
       availability.message,
     );
-    return;
+    return 'blocked';
   }
 
   const { confirmed } = await updateBookingPaymentState(bookingId, {
@@ -149,6 +158,7 @@ async function confirmBookingAfterPayment(bookingId: string): Promise<void> {
   // Await — Vercel inače može zamrznuti funkciju prije MyRent POST/reconcile.
   // Greške se gutaju: naplata / confirmed status već su zapisani.
   await ensureMyRentSyncAfterSuccessfulPayment(bookingId);
+  return 'confirmed';
 }
 
 /**
@@ -176,90 +186,138 @@ function centsToSaferpayValue(cents: number): string {
 
 // ── Create Payment Page session ───────────────────────────────────
 
+export class PaymentCheckoutRejectedError extends Error {
+  readonly code: 'session_active' | 'already_paid' | 'cancelled' | 'not_found' | 'unclear';
+
+  constructor(
+    code: 'session_active' | 'already_paid' | 'cancelled' | 'not_found' | 'unclear',
+  ) {
+    super(code);
+    this.name = 'PaymentCheckoutRejectedError';
+    this.code = code;
+  }
+}
+
+export class PaymentSettlementInProgressError extends Error {
+  constructor() {
+    super('payment_settlement_in_progress');
+    this.name = 'PaymentSettlementInProgressError';
+  }
+}
+
 /**
  * Create a Saferpay Payment Page session for a booking deposit.
- * Returns redirect URL for the guest.
+ * Jedna živa sesija po rezervaciji (Postgres claim). Returns redirect URL.
  */
 export async function createCheckoutSession(
   input: CreatePaymentIntentInput & { returnBasePath: string },
 ): Promise<{ url: string } & PaymentIntentResult> {
   const { customerId, terminalId } = getSaferpayConfig();
   const siteUrl = getSiteUrl();
-  const orderId = crypto.randomUUID().replace(/-/g, '').slice(0, 32);
-
-  // Saferpay returns NO payment data on redirect — we identify via our oid.
-  const returnUrl = `${siteUrl}${input.returnBasePath}&payment=return&oid=${orderId}`;
-  const notifyBase = `${siteUrl}/api/webhooks/saferpay?oid=${orderId}`;
-
   const languageCode = toSaferpayLanguageCode(input.languageCode);
+  const lock = createSupabasePaymentLock();
 
-  const init = await saferpayRequest<PaymentPageInitializeResponse>(
-    '/Payment/v1/PaymentPage/Initialize',
-    {
-      TerminalId: terminalId,
-      Payment: {
-        Amount: {
-          Value: centsToSaferpayValue(input.amount_cents),
-          CurrencyCode: (input.currency ?? 'eur').toUpperCase(),
-        },
-        OrderId: orderId,
-        Description: `Depozit rezervacije ${input.booking_id}`,
-      },
-      Payer: {
-        LanguageCode: languageCode,
-      },
-      ReturnUrl: {
-        Url: returnUrl,
-      },
-      Notification: {
-        SuccessNotifyUrl: `${notifyBase}&result=success`,
-        FailNotifyUrl: `${notifyBase}&result=fail`,
-      },
-      PaymentMethods: ['VISA', 'MASTERCARD', 'MAESTRO'],
-    },
-  );
-
-  if (!init.Token || !init.RedirectUrl) {
-    throw new Error('Saferpay nije vratio Token ili RedirectUrl');
-  }
-
-  const record = await createPaymentIntentRecord({
-    booking_id: input.booking_id,
-    provider_payment_id: init.Token,
-    amount: input.amount_cents,
+  const started = await startLockedCheckout({
+    bookingId: input.booking_id,
+    amountCents: input.amount_cents,
     currency: (input.currency ?? 'eur').toLowerCase(),
-    status: 'requires_payment_method',
-    client_secret: null,
-    metadata: {
-      order_id: orderId,
-      saferpay_token: init.Token,
-      saferpay_customer_id: customerId,
-      payment_type: input.metadata?.payment_type ?? 'deposit',
-      provider: 'saferpay',
-      ...(input.metadata ?? {}),
+    nowMs: Date.now(),
+    lock,
+    initialize: async () => {
+      const orderId = crypto.randomUUID().replace(/-/g, '').slice(0, 32);
+      const returnUrl = `${siteUrl}${input.returnBasePath}&payment=return&oid=${orderId}`;
+      const notifyBase = `${siteUrl}/api/webhooks/saferpay?oid=${orderId}`;
+      const init = await saferpayRequest<PaymentPageInitializeResponse>(
+        '/Payment/v1/PaymentPage/Initialize',
+        {
+          TerminalId: terminalId,
+          Payment: {
+            Amount: {
+              Value: centsToSaferpayValue(input.amount_cents),
+              CurrencyCode: (input.currency ?? 'eur').toUpperCase(),
+            },
+            OrderId: orderId,
+            Description: `Depozit rezervacije ${input.booking_id}`,
+          },
+          Payer: { LanguageCode: languageCode },
+          ReturnUrl: { Url: returnUrl },
+          Notification: {
+            SuccessNotifyUrl: `${notifyBase}&result=success`,
+            FailNotifyUrl: `${notifyBase}&result=fail`,
+          },
+          PaymentMethods: ['VISA', 'MASTERCARD', 'MAESTRO'],
+        },
+      );
+      if (!init.Token || !init.RedirectUrl) {
+        throw new Error('Saferpay nije vratio Token ili RedirectUrl');
+      }
+      return {
+        token: init.Token,
+        redirectUrl: init.RedirectUrl,
+        expiration: init.Expiration ?? null,
+        orderId,
+      };
+    },
+    assertIntent: async (_intentId, orderId) => {
+      if (!orderId) return { kind: 'unreachable' };
+      const existing = await getPaymentIntentByOrderId(orderId);
+      const token =
+        (existing?.metadata?.saferpay_token as string | undefined) ??
+        existing?.provider_payment_id;
+      if (!token || token.startsWith('creating:')) return { kind: 'unreachable' };
+      try {
+        const body = await saferpayRequest<PaymentPageAssertResponse>(
+          '/Payment/v1/PaymentPage/Assert',
+          { Token: token },
+        );
+        return snapshotFromAssertBody(body);
+      } catch (err) {
+        return snapshotFromSaferpayError(err);
+      }
+    },
+    settlePaid: async (orderId) => {
+      await syncSaferpayPayment(orderId);
     },
   });
 
+  if (!started.ok) {
+    throw new PaymentCheckoutRejectedError(started.reason);
+  }
+
+  try {
+    await updatePaymentIntentStatus(started.token, 'requires_payment_method', {
+      saferpay_customer_id: customerId,
+      payment_type: input.metadata?.payment_type ?? 'deposit',
+      ...(input.metadata ?? {}),
+    });
+  } catch (err) {
+    console.error(
+      '[payments] checkout metadata:',
+      formatSafeErrorMessage(err),
+    );
+  }
+
   return {
-    url: init.RedirectUrl,
-    id: record.id,
-    provider_payment_id: init.Token,
+    url: started.url,
+    id: started.intentId,
+    provider_payment_id: started.token,
     client_secret: '',
-    amount: record.amount,
-    currency: record.currency,
-    status: record.status,
+    amount: input.amount_cents,
+    currency: (input.currency ?? 'eur').toLowerCase(),
+    status: 'requires_payment_method',
   };
 }
 
 // ── Assert + Capture (return URL + notify + reconcile) ────────────
 
 /**
- * Finalize a Saferpay Payment Page session (Assert → Capture if needed).
- * Safe to call from ReturnUrl and NotifyUrl (idempotent).
+ * Finalize a Saferpay Payment Page session (Assert → Capture ili Cancel/Refund).
+ * Fail notify NIJE dokaz neuspjeha: uvijek ide Assert.
+ * Capture ide tek nakon compare-and-set zaključavanja rezervacije.
  */
 export async function syncSaferpayPayment(
   orderId: string,
-  opts: { failedNotify?: boolean } = {},
+  _opts: { failedNotify?: boolean } = {},
 ): Promise<PaymentIntentStatus | null> {
   const record = await getPaymentIntentByOrderId(orderId);
   if (!record) {
@@ -268,98 +326,249 @@ export async function syncSaferpayPayment(
   }
 
   if (record.status === 'succeeded') {
-    // Oporavak: prethodni poziv možda pao nakon succeeded, a prije MyRent claima.
-    // Idempotentno — ne radi drugi POST ako je live_ok / uncertain / claim.
     if (record.booking_id) {
-      await ensureMyRentSyncAfterSuccessfulPayment(record.booking_id);
+      const outcome = await confirmBookingAfterPayment(record.booking_id);
+      if (outcome === 'cancelled') {
+        const transactionId = record.metadata?.saferpay_transaction_id;
+        const captureId = record.metadata?.saferpay_capture_id;
+        if (typeof transactionId === 'string') {
+          await settleLateMoney({
+            bookingId: record.booking_id,
+            intent: record,
+            transactionId,
+            captureId: typeof captureId === 'string' ? captureId : transactionId,
+            action: 'refund_capture',
+            reason: 'booking_released',
+          });
+        }
+        return 'cancelled';
+      }
     }
     return 'succeeded';
   }
 
-  if (opts.failedNotify) {
-    await updatePaymentIntentStatus(record.provider_payment_id, 'cancelled');
-    return 'cancelled';
+  if (!record.booking_id) {
+    console.error('[payments] sync without booking_id', record.id);
+    return record.status;
   }
 
   const token =
     (record.metadata?.saferpay_token as string | undefined) ??
     record.provider_payment_id;
+  if (!token || token.startsWith('creating:')) return record.status;
 
-  let assertBody: PaymentPageAssertResponse;
+  let snapshot: AssertSnapshot;
   try {
-    assertBody = await saferpayRequest<PaymentPageAssertResponse>(
+    const body = await saferpayRequest<PaymentPageAssertResponse>(
       '/Payment/v1/PaymentPage/Assert',
       { Token: token },
     );
+    snapshot = snapshotFromAssertBody(body);
   } catch (err) {
-    if (err instanceof SaferpayApiError && err.status >= 400) {
-      console.warn(
-        '[saferpay] Assert failed:',
-        err.message,
-        err.body?.ErrorName,
-      );
+    snapshot = snapshotFromSaferpayError(err);
+    if (snapshot.kind !== 'error' && snapshot.kind !== 'unreachable') throw err;
+  }
+
+  const intentView = {
+    id: record.id,
+    status: record.status,
+    createdAt: record.created_at,
+    redirectExpiresAt:
+      typeof record.metadata?.saferpay_redirect_expires_at === 'string'
+        ? record.metadata.saferpay_redirect_expires_at
+        : null,
+    hasToken: true,
+    orderId,
+    lastAssertAt: null,
+  };
+  const klass = classifyAssert(snapshot, intentView, Date.now());
+
+  if (klass !== 'paid') {
+    if (klass === 'terminal_unpaid') {
       await updatePaymentIntentStatus(record.provider_payment_id, 'cancelled', {
-        saferpay_assert_error: err.body?.ErrorName ?? err.message,
+        saferpay_assert_error:
+          snapshot.kind === 'error' ? snapshot.errorName : klass,
       });
       return 'cancelled';
     }
-    throw err;
-  }
-
-  const tx = assertBody.Transaction;
-  const transactionId = tx.Id;
-  if (!transactionId) {
-    console.warn('[saferpay] Assert without Transaction.Id');
+    await updatePaymentIntentStatus(record.provider_payment_id, record.status, {
+      saferpay_last_assert_at: new Date().toISOString(),
+      saferpay_last_assert_class: klass,
+      saferpay_assert_error: snapshot.kind === 'error' ? snapshot.errorName : null,
+    });
     return record.status;
   }
 
-  let captureId =
-    (record.metadata?.saferpay_capture_id as string | undefined) ??
-    tx.CaptureId ??
-    null;
-  let finalStatus = (tx.Status ?? '').toUpperCase();
+  const lock = createSupabasePaymentLock();
+  const gate: CaptureGate = await lock.beginCapture(
+    record.booking_id,
+    record.id,
+    Date.now(),
+  );
+  const action = decideMoneyMovement({ gate, snapshot });
 
-  // Card payments typically return AUTHORIZED — Capture to settle funds.
-  if (finalStatus === 'AUTHORIZED') {
-    try {
-      const capture = await saferpayRequest<TransactionCaptureResponse>(
-        '/Payment/v1/Transaction/Capture',
-        {
-          TransactionReference: { TransactionId: transactionId },
-        },
-      );
-      captureId = capture.CaptureId ?? transactionId;
-      finalStatus = (capture.Status ?? 'CAPTURED').toUpperCase();
-    } catch (err) {
-      // Already captured (retry / notify race) — treat as success.
-      const msg = formatSafeErrorMessage(err);
-      if (/already|captured|TRANSACTION_ALREADY/i.test(msg)) {
-        captureId = captureId ?? transactionId;
-        finalStatus = 'CAPTURED';
-      } else {
-        throw err;
-      }
-    }
+  if (action.action === 'in_progress') {
+    throw new PaymentSettlementInProgressError();
+  }
+  if (action.action === 'already_done') {
+    await confirmBookingAfterPayment(record.booking_id);
+    return 'succeeded';
   }
 
-  const newStatus = mapSaferpayTransactionStatus(finalStatus);
+  const transactionId =
+    snapshot.kind === 'authorized' || snapshot.kind === 'captured'
+      ? snapshot.transactionId
+      : null;
+  if (!transactionId) return record.status;
 
-  await updatePaymentIntentStatus(record.provider_payment_id, newStatus, {
-    saferpay_transaction_id: transactionId,
-    saferpay_capture_id: captureId,
-    saferpay_status: finalStatus,
-    six_transaction_reference: tx.SixTransactionReference ?? null,
-    payment_means: assertBody.PaymentMeans?.DisplayText ?? null,
-  });
+  if (action.action === 'void_authorization' || action.action === 'refund_capture') {
+    await settleLateMoney({
+      bookingId: record.booking_id,
+      intent: record,
+      transactionId,
+      captureId: snapshot.kind === 'captured' ? snapshot.captureId : null,
+      action: action.action,
+      reason: action.reason,
+    });
+    return 'cancelled';
+  }
 
-  await applyPaymentOutcome(record, tx, newStatus, {
-    source: 'saferpay_assert',
-    order_id: orderId,
-    transaction_id: transactionId,
-    capture_id: captureId,
-  });
+  let captureId = snapshot.kind === 'captured' ? snapshot.captureId : null;
+  let finalStatus = snapshot.kind === 'captured' ? 'CAPTURED' : 'AUTHORIZED';
+  // Prekid veze nakon Capturea ostavlja zaključavanje. Paralelni poziv
+  // dobije in_progress umjesto drugog Capturea.
+  let releaseFinalizing = true;
 
-  return newStatus;
+  try {
+    if (action.action === 'capture_and_confirm') {
+      try {
+        const capture = await saferpayRequest<TransactionCaptureResponse>(
+          '/Payment/v1/Transaction/Capture',
+          { TransactionReference: { TransactionId: transactionId } },
+        );
+        captureId = capture.CaptureId ?? transactionId;
+        finalStatus = (capture.Status ?? 'CAPTURED').toUpperCase();
+      } catch (err) {
+        if (isTransactionAlreadyCaptured(err)) {
+          captureId = captureId ?? transactionId;
+          finalStatus = 'CAPTURED';
+        } else if (captureOutcomeUnknown(err)) {
+          releaseFinalizing = false;
+          throw err;
+        } else {
+          throw err;
+        }
+      }
+    }
+
+    const newStatus = mapSaferpayTransactionStatus(finalStatus);
+    await updatePaymentIntentStatus(record.provider_payment_id, newStatus, {
+      saferpay_transaction_id: transactionId,
+      saferpay_capture_id: captureId,
+      saferpay_status: finalStatus,
+    });
+
+    if (newStatus === 'succeeded') {
+      await createTransactionRecord({
+        payment_intent_id: record.id,
+        provider_transaction_id: transactionId,
+        type: 'charge',
+        amount: record.amount,
+        currency: record.currency,
+        status: 'succeeded',
+        metadata: { source: 'saferpay_assert', order_id: orderId, capture_id: captureId },
+      }).catch((err: unknown) => {
+        const msg = formatSafeErrorMessage(err);
+        if (!/unique|duplicate|23505/i.test(msg)) throw err;
+      });
+      const outcome = await confirmBookingAfterPayment(record.booking_id);
+      if (outcome === 'cancelled') {
+        await settleLateMoney({
+          bookingId: record.booking_id,
+          intent: record,
+          transactionId,
+          captureId: captureId ?? transactionId,
+          action: 'refund_capture',
+          reason: 'booking_released',
+        });
+        return 'cancelled';
+      }
+    }
+    return newStatus;
+  } finally {
+    if (releaseFinalizing) {
+      await lock.clearFinalizing(record.booking_id, record.id);
+    }
+  }
+}
+
+async function settleLateMoney(input: {
+  bookingId: string;
+  intent: PaymentIntent;
+  transactionId: string;
+  captureId: string | null;
+  action: 'void_authorization' | 'refund_capture';
+  reason: 'booking_released' | 'already_paid_other';
+}): Promise<void> {
+  const supabase = createServerSupabaseClient();
+  const released = input.reason === 'booking_released';
+  try {
+    if (input.action === 'void_authorization') {
+      await saferpayRequest('/Payment/v1/Transaction/Cancel', {
+        TransactionReference: { TransactionId: input.transactionId },
+      });
+    } else {
+      await saferpayRequest<TransactionRefundResponse>(
+        '/Payment/v1/Transaction/Refund',
+        {
+          Refund: {
+            Amount: {
+              Value: centsToSaferpayValue(input.intent.amount),
+              CurrencyCode: input.intent.currency.toUpperCase(),
+            },
+          },
+          CaptureReference: {
+            CaptureId: input.captureId ?? input.transactionId,
+          },
+        },
+      );
+    }
+
+    await updatePaymentIntentStatus(input.intent.provider_payment_id, 'cancelled', {
+      late_payment_action: input.action,
+      late_payment_reason: input.reason,
+    });
+
+    const message =
+      input.action === 'void_authorization'
+        ? released
+          ? 'Zakašnjela autorizacija stigla je nakon oslobođenog termina. Autorizacija je poništena (Transaction Cancel). Novac nije zadržan. Provjerite Saferpay.'
+          : 'Druga sesija je autorizirana nakon što je depozit već plaćen. Autorizacija je poništena da ne bi bilo dvostruke naplate. Provjerite Saferpay.'
+        : released
+          ? 'Zakašnjela naplata stigla je nakon oslobođenog termina. Iznos je vraćen (Refund). Rezervacija nije ponovno potvrđena. Provjerite Saferpay.'
+          : 'Druga naplata je vraćena jer je depozit već bio plaćen. Provjerite Saferpay.';
+
+    await supabase.from('payment_admin_alerts').insert({
+      booking_id: input.bookingId,
+      payment_intent_id: input.intent.id,
+      kind:
+        input.action === 'void_authorization'
+          ? 'late_authorization_voided'
+          : 'late_capture_refunded',
+      message,
+    });
+  } catch (err) {
+    const detail = formatSafeErrorMessage(err);
+    await supabase.from('payment_admin_alerts').insert({
+      booking_id: input.bookingId,
+      payment_intent_id: input.intent.id,
+      kind: 'late_payment_needs_review',
+      message:
+        `Zakašnjela uplata nije automatski poništena (${detail}). ` +
+        'Ručna provjera u Saferpayu. Rezervacija se ne potvrđuje iz ovog koraka.',
+    });
+    throw err;
+  }
 }
 
 /** @deprecated Use syncSaferpayPayment — kept for transitional imports */
@@ -377,45 +586,6 @@ export async function syncHostedCheckoutStatus(
     return syncSaferpayPayment(byToken.metadata.order_id as string);
   }
   return null;
-}
-
-async function applyPaymentOutcome(
-  record: PaymentIntent,
-  tx: SaferpayTransaction,
-  status: PaymentIntentStatus,
-  metadata: Record<string, unknown>,
-): Promise<void> {
-  if (!isPaymentSuccessful(status)) return;
-
-  const chargeId = tx.Id ?? `saferpay_success_${record.id}`;
-  const amount = tx.Amount?.Value
-    ? Number.parseInt(tx.Amount.Value, 10)
-    : record.amount;
-  const currency = (tx.Amount?.CurrencyCode ?? record.currency).toLowerCase();
-
-  await createTransactionRecord({
-    payment_intent_id: record.id,
-    provider_transaction_id: chargeId,
-    type: 'charge',
-    amount,
-    currency,
-    status: 'succeeded',
-    metadata,
-  }).catch((err: unknown) => {
-    const msg = formatSafeErrorMessage(err);
-    if (!/unique|duplicate|23505/i.test(msg)) throw err;
-  });
-
-  if (record.booking_id) {
-    await confirmBookingAfterPayment(record.booking_id);
-  } else {
-    // Booking obrisan (CASCADE) ili nikad povezan — naplata postoji u Saferpayu,
-    // lokalni intent može nestati s bookingom. Webhook i dalje ima orderId.
-    console.error(
-      '[payments] applyPaymentOutcome: succeeded payment without booking_id — ručni pregled potreban',
-      record.id,
-    );
-  }
 }
 
 // ── Get Payment Status ────────────────────────────────────────────

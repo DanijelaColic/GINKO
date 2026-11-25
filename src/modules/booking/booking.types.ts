@@ -97,6 +97,8 @@ export type BookingConfirmationData = {
   depositPaid?: boolean;
   priceBreakdown: PriceBreakdown;
   createdAt: string;
+  /** ISO rok privremene blokade. NULL = stari red bez automatskog oslobađanja. */
+  paymentHoldUntil?: string | null;
   payment: {
     recipient: string;
     iban: string;

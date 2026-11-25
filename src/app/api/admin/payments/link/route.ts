@@ -7,7 +7,7 @@ import {
   createBookingViewToken,
   getBookingConfirmationPath,
 } from '@/lib/bookingConfirmation';
-import { createCheckoutSession } from '@/modules/payments/payment.service';
+import { createCheckoutSession, PaymentCheckoutRejectedError } from '@/modules/payments/payment.service';
 import { eurToCents } from '@/modules/payments/payment.types';
 import { getValidLocale } from '@/i18n/messages';
 
@@ -75,6 +75,19 @@ export async function POST(request: NextRequest) {
       amount_cents: result.amount,
     });
   } catch (err) {
+    if (err instanceof PaymentCheckoutRejectedError) {
+      const message =
+        err.code === 'session_active'
+          ? 'Već postoji otvorena Saferpay sesija za ovu rezervaciju.'
+          : err.code === 'already_paid'
+            ? 'Depozit je već plaćen.'
+            : err.code === 'cancelled'
+              ? 'Rezervacija je otkazana — link nije moguće kreirati'
+              : err.code === 'unclear'
+                ? 'Status plaćanja još nije jasan. Nova sesija nije otvorena.'
+                : 'Rezervacija nije pronađena';
+      return NextResponse.json({ error: message }, { status: err.code === 'unclear' ? 503 : 409 });
+    }
     const message = err instanceof Error ? err.message : String(err);
     console.error('[admin/payments/link]', message);
 

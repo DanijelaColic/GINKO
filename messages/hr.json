@@ -850,6 +850,8 @@
     "bookingCancelledHint": "Za novo rezerviranje posjetite stranicu dostupnosti.",
     "cardPayTitle": "Plaćanje depozita karticom",
     "cardPayNote": "Plaća se samo depozit od {amount} € — ostatak se plaća pri dolasku",
+    "holdTitle": "Termin je privremeno rezerviran",
+    "holdBody": "Soba je držana do {until}. Ako depozit do tada ne bude plaćen, termin se automatski oslobađa samo kad je sigurno da uplate nema i da se više ne može izvršiti. Dok je status nepoznat, soba ostaje rezervirana.",
     "paidPendingConfirmTitle": "Plaćanje zaprimljeno",
     "paidPendingConfirmBody": "Plaćanje je zaprimljeno, ali rezervacija još nije potvrđena. Kontaktirat ćemo vas radi rješenja.",
     "confirmedTitle": "Depozit je plaćen",
@@ -870,6 +872,8 @@
       "alreadyPaid": "Depozit je već plaćen. Ova rezervacija je potvrđena.",
       "invalidDeposit": "Iznos depozita nije važeći. Kontaktirajte nas.",
       "paymentUnavailable": "Plaćanje trenutno nije dostupno. Pokušajte ponovo ili nas kontaktirajte.",
+      "paymentSessionActive": "Plaćanje je već otvoreno. Dovršite ga na Saferpay stranici. Nova sesija se ne otvara dok prethodna ne istekne ili ne uspije.",
+      "paymentStatusUnclear": "Status plaćanja još nije potvrđen. Termin ostaje rezerviran. Pokušajte ponovo za nekoliko minuta.",
       "createFailed": "Greška pri kreiranju plaćanja. Pokušajte ponovo."
     }
   },

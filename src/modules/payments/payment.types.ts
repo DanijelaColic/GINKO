@@ -3,6 +3,7 @@
 // ── Database row types ────────────────────────────────────────────
 
 export type PaymentIntentStatus =
+  | 'creating'
   | 'requires_payment_method'
   | 'requires_confirmation'
   | 'requires_action'

@@ -38,6 +38,7 @@ import {
   getBookingConfirmationUrlFromRequest,
 } from '@/lib/bookingConfirmation';
 import { sendOwnerNewBookingNotification } from '@/lib/email';
+import { holdUntilFrom } from '@/modules/payments/payment-hold.policy';
 import { getValidLocale } from '@/i18n/messages';
 
 // GET /api/bookings?room=slug
@@ -262,6 +263,7 @@ export async function POST(request: NextRequest) {
         total_price: totalPrice,
         deposit,
         status: 'pending',
+        payment_hold_until: holdUntilFrom(Date.now()),
         locale,
         notes: notes || null,
       })

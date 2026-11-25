@@ -850,6 +850,8 @@
     "bookingCancelledHint": "Pro novou rezervaci navštivte stránku dostupnosti.",
     "cardPayTitle": "Platba zálohy kartou",
     "cardPayNote": "Platí se pouze záloha {amount} € — zbytek se platí při příjezdu",
+    "holdTitle": "Termín je dočasně rezervován",
+    "holdBody": "Pokoj je držen do {until}. Pokud záloha do té doby není zaplacena, termín se uvolní jen když je jisté, že platba neproběhla a už ji nelze dokončit. Dokud stav platby není jasný, pokoj zůstává rezervovaný.",
     "paidPendingConfirmTitle": "Platba přijata",
     "paidPendingConfirmBody": "Platba byla přijata, ale rezervace ještě není potvrzena. Budeme vás kontaktovat ohledně řešení.",
     "confirmedTitle": "Záloha je zaplacena",
@@ -870,6 +872,8 @@
       "alreadyPaid": "Záloha už byla zaplacena. Tato rezervace je potvrzena.",
       "invalidDeposit": "Částka zálohy není platná. Kontaktujte nás.",
       "paymentUnavailable": "Platba je dočasně nedostupná. Zkuste to znovu nebo nás kontaktujte.",
+      "paymentSessionActive": "Platba už je otevřená. Dokončete ji na stránce Saferpay. Nová relace se nespustí, dokud předchozí neskončí.",
+      "paymentStatusUnclear": "Stav platby ještě není potvrzen. Termín zůstává rezervovaný. Zkuste to znovu za několik minut.",
       "createFailed": "Platbu se nepodařilo vytvořit. Zkuste to znovu."
     }
   },

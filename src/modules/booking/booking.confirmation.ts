@@ -28,7 +28,7 @@ export async function getBookingConfirmationData(
     const { data: booking, error } = await supabase
       .from('bookings')
       .select(
-        'id, room_slug, check_in, check_out, nights, guest_name, guest_first_name, guest_email, total_price, deposit, deposit_paid, status, created_at, adults, children, locale',
+        'id, room_slug, check_in, check_out, nights, guest_name, guest_first_name, guest_email, total_price, deposit, deposit_paid, status, created_at, adults, children, locale, payment_hold_until',
       )
       .eq('id', bookingId)
       .single();
@@ -80,6 +80,8 @@ export async function getBookingConfirmationData(
       depositPaid: booking.deposit_paid === true,
       priceBreakdown,
       createdAt: booking.created_at,
+      paymentHoldUntil:
+        typeof booking.payment_hold_until === 'string' ? booking.payment_hold_until : null,
       payment: {
         recipient: RECIPIENT_NAME,
         iban: RECIPIENT_IBAN,

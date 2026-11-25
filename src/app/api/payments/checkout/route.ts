@@ -11,7 +11,7 @@ import {
   verifyBookingViewToken,
 } from '@/lib/bookingConfirmation';
 import { guestApiError } from '@/lib/guest-api-error';
-import { createCheckoutSession } from '@/modules/payments/payment.service';
+import { createCheckoutSession, PaymentCheckoutRejectedError } from '@/modules/payments/payment.service';
 import { eurToCents } from '@/modules/payments/payment.types';
 import { getSiteUrl } from '@/lib/siteUrl';
 import { getValidLocale } from '@/i18n/messages';
@@ -80,6 +80,13 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ url: result.url });
   } catch (err) {
+    if (err instanceof PaymentCheckoutRejectedError) {
+      if (err.code === 'session_active') return guestApiError('paymentSessionActive', 409);
+      if (err.code === 'already_paid') return guestApiError('alreadyPaid', 409);
+      if (err.code === 'cancelled') return guestApiError('bookingCancelled', 409);
+      if (err.code === 'unclear') return guestApiError('paymentStatusUnclear', 503);
+      return guestApiError('bookingNotFound', 404);
+    }
     const message = err instanceof Error ? err.message : String(err);
     console.error('[POST /api/payments/checkout]', message);
 
