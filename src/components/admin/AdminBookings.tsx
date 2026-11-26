@@ -215,7 +215,9 @@ export default function AdminBookings() {
       else if ('deposit_paid' in updates)
         showToast(updates.deposit_paid ? 'Depozit označen kao plaćen' : 'Depozit označen kao neplaćen');
     } else {
-      showToast('Greška pri ažuriranju', 'error');
+      // API vraća tekst preklapanja; generički toast bi sakrio razlog odbijanja.
+      const data = (await res.json().catch(() => null)) as { error?: string } | null;
+      showToast(data?.error ?? 'Greška pri ažuriranju', 'error');
     }
     await fetchBookings();
     setActionLoading(null);

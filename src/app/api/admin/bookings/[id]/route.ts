@@ -8,6 +8,10 @@ import { parseLocalDate, diffDays, calculatePrice } from '@/modules/booking/date
 import { sendConfirmationEmail, notifyGuestBookingConfirmed, bookingRowToEmailData } from '@/lib/email';
 import { createBookingViewToken, getBookingConfirmationUrlFromRequest } from '@/lib/bookingConfirmation';
 import { checkBookingHardDeleteAllowed } from '@/modules/booking/booking-delete-policy';
+import {
+  bookingOverlapConflictResponse,
+  isBookingOverlapConflict,
+} from '@/modules/booking/booking-overlap';
 import type { Booking } from '@/modules/booking/booking.types';
 
 type Params = { params: Promise<{ id: string }> };
@@ -88,7 +92,11 @@ export async function PATCH(request: NextRequest, { params }: Params) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    // Promjena datuma ili statusa u pending/confirmed može sudariti tuđu aktivnu rezervaciju.
+    if (isBookingOverlapConflict(error)) return bookingOverlapConflictResponse();
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 
   // Bankovna uplata: gost prima potvrdu kad admin označi depozit kao plaćen
   if (

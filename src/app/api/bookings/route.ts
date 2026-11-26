@@ -40,6 +40,7 @@ import {
 import { sendOwnerNewBookingNotification } from '@/lib/email';
 import { holdUntilFrom } from '@/modules/payments/payment-hold.policy';
 import { getValidLocale } from '@/i18n/messages';
+import { isBookingOverlapConflict } from '@/modules/booking/booking-overlap';
 
 // GET /api/bookings?room=slug
 // Returns booked date ranges for the calendar component (MyRent + local).
@@ -270,7 +271,14 @@ export async function POST(request: NextRequest) {
       .select()
       .single();
 
-    if (insertError) throw insertError;
+    if (insertError) {
+      // Drugi paralelni insert: baza odbija prije Initializea.
+      // Gost dobije isti datesUnavailable kao kod već zauzetog termina.
+      if (isBookingOverlapConflict(insertError)) {
+        return guestApiError('datesUnavailable', 409);
+      }
+      throw insertError;
+    }
 
     const confirmationToken = createBookingViewToken(booking.id, guest_email);
     const origin = request.headers.get('origin') ?? request.headers.get('referer');

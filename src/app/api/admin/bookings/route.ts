@@ -7,6 +7,7 @@ import { isAdminAuthenticatedFromRequest } from '@/lib/admin-auth';
 import { checkBookingHardDeleteAllowed } from '@/modules/booking/booking-delete-policy';
 import { getRoomBySlug } from '@/modules/rooms/room.repository';
 import { parseLocalDate, diffDays, calculatePrice } from '@/modules/booking/dates';
+import { bookingOverlapConflictResponse, isBookingOverlapConflict } from '@/modules/booking/booking-overlap';
 
 // GET /api/admin/bookings — sve rezervacije
 export async function GET(request: NextRequest) {
@@ -83,7 +84,11 @@ export async function POST(request: NextRequest) {
     .select()
     .single();
 
-  if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+  if (error) {
+    // Isti exclusion constraint kao gostujući POST. Cijena i status se ne mijenjaju.
+    if (isBookingOverlapConflict(error)) return bookingOverlapConflictResponse();
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
   return NextResponse.json(data, { status: 201 });
 }
 
